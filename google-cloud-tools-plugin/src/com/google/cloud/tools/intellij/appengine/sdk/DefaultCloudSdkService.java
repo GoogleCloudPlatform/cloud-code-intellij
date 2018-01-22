@@ -41,7 +41,7 @@ public class DefaultCloudSdkService implements CloudSdkService {
     if (propertiesComponent.getValue(CLOUD_SDK_PROPERTY_KEY) != null) {
       // To let Windows users that persisted the old malformed path save a new one.
       // TODO(joaomartins): Delete this after a while so gets are faster.
-      if (isMalformedCloudSdkPath(propertiesComponent.getValue(CLOUD_SDK_PROPERTY_KEY))) {
+      if (CloudSdkValidator.isMalformedCloudSdkPath(propertiesComponent.getValue(CLOUD_SDK_PROPERTY_KEY))) {
         UsageTrackerProvider.getInstance().trackEvent(GctTracking.CLOUD_SDK_MALFORMED_PATH).ping();
         return null;
       }

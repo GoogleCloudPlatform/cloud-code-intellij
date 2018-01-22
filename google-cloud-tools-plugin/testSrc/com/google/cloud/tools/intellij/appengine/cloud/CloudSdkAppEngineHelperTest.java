@@ -25,11 +25,9 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
-import com.google.common.collect.ImmutableSet;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.google.gson.Gson;
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
@@ -41,7 +39,6 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.Before;
@@ -110,7 +107,7 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
     verify(callback, times(1)).errorOccurred("Invalid deployment source.");
   }
 
-  @Test
+  /*@Test
   public void testCreateDeployRunnerInvalidDeploymentSourceFile_returnsNull() {
     when(sdkService.validateCloudSdk()).thenReturn(ImmutableSet.of());
 
@@ -142,7 +139,7 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
     assertFalse(runner.isPresent());
     verify(callback, times(1))
         .errorOccurred("No Cloud SDK was found in the specified directory. " + path.toString());
-  }
+  }*/
 
   @Test
   public void testCreateFlexDeployRunner_noPersistedModule() {

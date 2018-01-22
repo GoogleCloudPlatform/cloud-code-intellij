@@ -22,6 +22,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.intellij.icons.AllIcons.RunConfigurations;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
@@ -104,9 +105,10 @@ public class CloudSdkPanel {
     }
 
     CloudSdkService sdkService = CloudSdkService.getInstance();
+    CloudSdkValidator sdkValidator = ServiceManager.getService(CloudSdkValidator.class);
     // Use a sorted set to guarantee consistent ordering of CloudSdkValidationResults.
     Set<CloudSdkValidationResult> validationResults =
-        new TreeSet<>(sdkService.validateCloudSdk(path));
+        new TreeSet<>(sdkValidator.validateCloudSdk(path));
 
     if (!validationResults.isEmpty()) {
       // Display all validation results as a list.
@@ -193,16 +195,13 @@ public class CloudSdkPanel {
   }
 
   public void apply() throws ConfigurationException {
-    CloudSdkService sdkService = CloudSdkService.getInstance();
-
-    if (sdkService
-        .validateCloudSdk(getCloudSdkDirectoryText())
-        .contains(CloudSdkValidationResult.MALFORMED_PATH)) {
+    Set<CloudSdkValidationResult> validationResults = validateCloudSdk();
+    if (validationResults.contains(CloudSdkValidationResult.MALFORMED_PATH)) {
       throw new ConfigurationException(
           GctBundle.message("appengine.cloudsdk.location.badchars.message"));
     }
 
-    sdkService.setSdkHomePath(getCloudSdkDirectoryText());
+    CloudSdkService.getInstance().setSdkHomePath(getCloudSdkDirectoryText());
   }
 
   public void reset() {
@@ -231,6 +230,13 @@ public class CloudSdkPanel {
   @NotNull
   public JPanel getComponent() {
     return cloudSdkPanel;
+  }
+
+  @VisibleForTesting
+  public Set<CloudSdkValidationResult> validateCloudSdk() {
+    CloudSdkService sdkService = CloudSdkService.getInstance();
+    CloudSdkValidator sdkValidator = ServiceManager.getService(CloudSdkValidator.class);
+    return sdkValidator.validateCloudSdk(getCloudSdkDirectoryText());
   }
 
   private String getCloudSdkDownloadMessage() {

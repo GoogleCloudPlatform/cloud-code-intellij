@@ -21,6 +21,7 @@ import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibl
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.annotations.VisibleForTesting;
@@ -38,6 +39,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.application.WriteAction;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
@@ -74,8 +76,6 @@ public class AppEngineStandardSupportProvider extends FrameworkSupportInModulePr
 
   private static final Logger LOG =
       Logger.getInstance("#com.intellij.appengine.facet.AppEngineStandardSupportProvider");
-
-  private static final CloudSdkService sdkService = CloudSdkService.getInstance();
 
   @NotNull
   @Override
@@ -286,7 +286,9 @@ public class AppEngineStandardSupportProvider extends FrameworkSupportInModulePr
         @NotNull Module module,
         @NotNull ModifiableRootModel rootModel,
         @NotNull ModifiableModelsProvider modifiableModelsProvider) {
-      if (!sdkService
+      CloudSdkService sdkService = CloudSdkService.getInstance();
+      CloudSdkValidator sdkValidator = ServiceManager.getService(CloudSdkValidator.class);
+      if (!sdkValidator
           .validateCloudSdk(cloudSdkPanel.getCloudSdkDirectoryText())
           .contains(CloudSdkValidationResult.MALFORMED_PATH)) {
         sdkService.setSdkHomePath(cloudSdkPanel.getCloudSdkDirectoryText());

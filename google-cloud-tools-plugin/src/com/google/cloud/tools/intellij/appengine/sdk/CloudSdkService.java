@@ -31,7 +31,7 @@ public interface CloudSdkService {
   Path getSdkHomePath();
 
   void setSdkHomePath(String path);
-  
+
     /*enum SdkStatus {
     READY, INSTALLING, INVALID, NOT_AVAILABLE
   }

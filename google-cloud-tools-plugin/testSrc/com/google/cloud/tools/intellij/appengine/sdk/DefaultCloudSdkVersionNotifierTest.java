@@ -37,6 +37,8 @@ public class DefaultCloudSdkVersionNotifierTest extends BasePluginTestCase {
 
   @Mock private CloudSdkService cloudSdkServiceMock;
 
+  @Mock private CloudSdkValidator cloudSdkValidator;
+
   @Before
   public void setUp() throws ProcessRunnerException {
     registerService(CloudSdkService.class, cloudSdkServiceMock);
@@ -44,8 +46,8 @@ public class DefaultCloudSdkVersionNotifierTest extends BasePluginTestCase {
 
   @Test
   public void testNotifyIfCloudSdkNotSupported_isSupported() {
-    when(cloudSdkServiceMock.validateCloudSdk())
-        .thenReturn(new HashSet<CloudSdkValidationResult>());
+    when(cloudSdkValidator.validateCloudSdk())
+        .thenReturn(new HashSet<>());
     checker.notifyIfUnsupportedVersion();
 
     verify(checker, times(0)).showNotification();
@@ -53,7 +55,7 @@ public class DefaultCloudSdkVersionNotifierTest extends BasePluginTestCase {
 
   @Test
   public void testNotifyIfCloudSdkNotSupported_notSupported() {
-    when(cloudSdkServiceMock.validateCloudSdk())
+    when(cloudSdkValidator.validateCloudSdk())
         .thenReturn(Sets.newHashSet(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED));
 
     checker.notifyIfUnsupportedVersion();
@@ -62,7 +64,7 @@ public class DefaultCloudSdkVersionNotifierTest extends BasePluginTestCase {
 
   @Test
   public void testNotifyIfCloudSdkNotSupported_sdkNotFound() {
-    when(cloudSdkServiceMock.validateCloudSdk())
+    when(cloudSdkValidator.validateCloudSdk())
         .thenReturn(Sets.newHashSet(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND));
 
     checker.notifyIfUnsupportedVersion();

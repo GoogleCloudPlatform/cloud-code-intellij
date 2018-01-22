@@ -21,13 +21,15 @@ import com.google.common.annotations.VisibleForTesting;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.components.ServiceManager;
 
 /** Service implementation of {@link CloudSdkVersionNotifier} */
 public class DefaultCloudSdkVersionNotifier extends CloudSdkVersionNotifier {
 
   @Override
   public void notifyIfUnsupportedVersion() {
-    if (CloudSdkService.getInstance()
+    CloudSdkValidator sdkValidator = ServiceManager.getService(CloudSdkValidator.class);
+    if (sdkValidator
         .validateCloudSdk()
         .contains(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED)) {
       showNotification();

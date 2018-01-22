@@ -51,12 +51,7 @@ public class CloudSdkDevelopmentDetails {
 
   private final CloudSdkService cloudSdkService;
 
-  public static CloudSdkDevelopmentDetails createFor(CloudSdkService cloudSdkService) {
-    return new CloudSdkDevelopmentDetails(cloudSdkService);
-  }
-
-  CloudSdkDevelopmentDetails(
-      CloudSdkService cloudSdkService) {
+  public CloudSdkDevelopmentDetails(CloudSdkService cloudSdkService) {
     this.cloudSdkService = cloudSdkService;
   }
 
@@ -86,7 +81,7 @@ public class CloudSdkDevelopmentDetails {
   public File[] getJspLibraries() {
     return getJavaToolsBasePath() != null
         ? getJarsFromDirectory(
-        getJavaToolsBasePath().resolve(Paths.get("lib", "shared", "jsp")).toFile())
+            getJavaToolsBasePath().resolve(Paths.get("lib", "shared", "jsp")).toFile())
         : new File[0];
   }
 

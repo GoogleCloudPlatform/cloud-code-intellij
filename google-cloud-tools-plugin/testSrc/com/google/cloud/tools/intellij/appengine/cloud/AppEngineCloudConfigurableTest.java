@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 
 import static com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND;
 import static com.google.common.truth.Truth.assertThat;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -79,7 +78,7 @@ public final class AppEngineCloudConfigurableTest {
   public void apply_withInvalidSdkPath_doesSetSdkPath() throws ConfigurationException {
     String sdkPath = "/some/sdk/path";
     appEngineCloudConfigurable.getCloudSdkPanel().setCloudSdkDirectoryText(sdkPath);
-    when(mockCloudSdkService.validateCloudSdk(anyString()))
+    when(appEngineCloudConfigurable.getCloudSdkPanel().validateCloudSdk())
         .thenReturn(ImmutableSet.of(CLOUD_SDK_NOT_FOUND));
 
     appEngineCloudConfigurable.apply();

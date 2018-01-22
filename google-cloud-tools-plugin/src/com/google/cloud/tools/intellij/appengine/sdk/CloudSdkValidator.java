@@ -33,16 +33,7 @@ import org.jetbrains.annotations.Nullable;
 /** Helper class to check validity of {@link CloudSdkService}. */
 public class CloudSdkValidator {
 
-  private final CloudSdkService cloudSdkService;
-
-  public static CloudSdkValidator createFor(CloudSdkService cloudSdkService) {
-    return new CloudSdkValidator(cloudSdkService);
-  }
-
-  @VisibleForTesting
-  CloudSdkValidator(CloudSdkService cloudSdkService) {
-    this.cloudSdkService = cloudSdkService;
-  }
+  private final CloudSdkService cloudSdkService = CloudSdkService.getInstance();
 
   protected Set<com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult>
       validateCloudSdk(Path path) {
@@ -121,7 +112,7 @@ public class CloudSdkValidator {
   }
 
   /** Checks for invalid characters that trigger an {@link InvalidPathException} on Windows. */
-  public boolean isMalformedCloudSdkPath(@Nullable String sdkPath) {
+  static boolean isMalformedCloudSdkPath(@Nullable String sdkPath) {
     if (sdkPath != null) {
       try {
         Paths.get(sdkPath);

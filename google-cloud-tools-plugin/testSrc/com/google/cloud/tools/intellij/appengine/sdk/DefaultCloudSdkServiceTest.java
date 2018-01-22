@@ -19,7 +19,9 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
@@ -27,73 +29,74 @@ import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkOutOfDateException;
 import com.google.cloud.tools.appengine.cloudsdk.serialization.CloudSdkVersion;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
-import java.io.IOException;
+import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.TestService;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
-import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.Spy;
 
 /** Unit tests for {@link DefaultCloudSdkService} */
-@RunWith(MockitoJUnitRunner.class)
 public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
+  @Rule public CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
 
   private static final CloudSdkVersion unsupportedVersion = new CloudSdkVersion("1.0.0");
   // arbitrarily high version number
   private static final CloudSdkVersion supportedVersion =
       new CloudSdkVersion(Integer.toString(Integer.MAX_VALUE) + ".0.0");
 
-  private DefaultCloudSdkService service;
+  @Mock @TestService private DefaultCloudSdkService service;
+
+  @Spy @TestService private CloudSdkValidator sdkValidator;
 
   @Mock private CloudSdk mockSdk;
 
-  @Mock private Path mockPath;
-
   @Before
   public void setUp() throws Exception {
-    service = new DefaultCloudSdkServiceForTesting();
+    when(service.getSdkHomePath()).thenReturn(Paths.get("/home/path"));
+    when(sdkValidator.buildCloudSdkWithPath(any())).thenReturn(mockSdk);
   }
 
   @Test
-  public void testValidateCloudSdk_cloudSdkNotFound() throws IOException {
+  public void testValidateCloudSdk_cloudSdkNotFound() {
     doThrow(CloudSdkNotFoundException.class).when(mockSdk).validateCloudSdk();
-    Set<CloudSdkValidationResult> results = service.validateCloudSdk();
+    Set<CloudSdkValidationResult> results = sdkValidator.validateCloudSdk();
     assertEquals(1, results.size());
     assertEquals(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND, results.iterator().next());
-    assertFalse(service.isValidCloudSdk());
+    assertFalse(sdkValidator.isValidCloudSdk());
   }
 
   @Test
-  public void testValidateCloudSdk_versionUnsupported() throws IOException {
+  public void testValidateCloudSdk_versionUnsupported() {
     doThrow(CloudSdkOutOfDateException.class).when(mockSdk).validateCloudSdk();
-    Set<CloudSdkValidationResult> results = service.validateCloudSdk();
+    Set<CloudSdkValidationResult> results = sdkValidator.validateCloudSdk();
     assertEquals(1, results.size());
     assertEquals(
         CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED, results.iterator().next());
-    assertFalse(service.isValidCloudSdk());
+    assertFalse(sdkValidator.isValidCloudSdk());
   }
 
   @Test
-  public void testValidateCloudSdk_valid() throws IOException {
-    Set<CloudSdkValidationResult> results = service.validateCloudSdk();
+  public void testValidateCloudSdk_valid() {
+    Set<CloudSdkValidationResult> results = sdkValidator.validateCloudSdk();
     assertEquals(0, results.size());
-    assertTrue(service.isValidCloudSdk());
+    assertTrue(sdkValidator.isValidCloudSdk());
   }
 
   @Test
   public void testValidateCloudSdk_nullPath() {
-    Set<CloudSdkValidationResult> results = service.validateCloudSdk((Path) null);
+    Set<CloudSdkValidationResult> results = sdkValidator.validateCloudSdk((Path) null);
     assertEquals(1, results.size());
     assertEquals(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND, results.iterator().next());
   }
 
   @Test
   public void testValidateCloudSdk_nullString() {
-    Set<CloudSdkValidationResult> results = service.validateCloudSdk((String) null);
+    Set<CloudSdkValidationResult> results = sdkValidator.validateCloudSdk((String) null);
     assertEquals(1, results.size());
     assertEquals(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND, results.iterator().next());
   }
@@ -101,62 +104,48 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
   @Test
   public void testValidateCloudSdk_specialChars() {
     if (System.getProperty("os.name").contains("Windows")) {
-      Set<CloudSdkValidationResult> results = service.validateCloudSdk(" /path");
+      Set<CloudSdkValidationResult> results = sdkValidator.validateCloudSdk(" /path");
       assertEquals(1, results.size());
       assertEquals(CloudSdkValidationResult.MALFORMED_PATH, results.iterator().next());
-      assertFalse(service.isValidCloudSdk(" /path"));
-      results = service.validateCloudSdk("/path ");
+      assertFalse(sdkValidator.isValidCloudSdk(" /path"));
+      results = sdkValidator.validateCloudSdk("/path ");
       assertEquals(1, results.size());
       assertEquals(CloudSdkValidationResult.MALFORMED_PATH, results.iterator().next());
-      assertFalse(service.isValidCloudSdk("/path "));
-      results = service.validateCloudSdk("/path/with/<special");
+      assertFalse(sdkValidator.isValidCloudSdk("/path "));
+      results = sdkValidator.validateCloudSdk("/path/with/<special");
       assertEquals(1, results.size());
       assertEquals(CloudSdkValidationResult.MALFORMED_PATH, results.iterator().next());
-      assertFalse(service.isValidCloudSdk("/path/with/<special"));
+      assertFalse(sdkValidator.isValidCloudSdk("/path/with/<special"));
     }
   }
 
   @Test
-  public void testValidateCloudSdk_goodString() throws IOException {
-    Set<CloudSdkValidationResult> results = service.validateCloudSdk("/good/path");
+  public void testValidateCloudSdk_goodString() {
+    Set<CloudSdkValidationResult> results = sdkValidator.validateCloudSdk("/good/path");
     assertEquals(0, results.size());
-    assertTrue(service.isValidCloudSdk("/good/path"));
+    assertTrue(sdkValidator.isValidCloudSdk("/good/path"));
   }
 
   @Test
-  public void testValidateJavaComponents() throws IOException {
+  public void testValidateJavaComponents() {
     doThrow(AppEngineJavaComponentsNotInstalledException.class)
         .when(mockSdk)
         .validateAppEngineJavaComponents();
-    Set<CloudSdkValidationResult> results = service.validateCloudSdk("/good/path");
+    Set<CloudSdkValidationResult> results = sdkValidator.validateCloudSdk("/good/path");
     assertEquals(1, results.size());
     assertEquals(CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT, results.iterator().next());
   }
 
   @Test
-  public void testValidateCloudSdk_multipleResults() throws IOException {
+  public void testValidateCloudSdk_multipleResults() {
     doThrow(AppEngineJavaComponentsNotInstalledException.class)
         .when(mockSdk)
         .validateAppEngineJavaComponents();
     doThrow(CloudSdkOutOfDateException.class).when(mockSdk).validateCloudSdk();
 
-    Set<CloudSdkValidationResult> results = service.validateCloudSdk("/good/path");
+    Set<CloudSdkValidationResult> results = sdkValidator.validateCloudSdk("/good/path");
     assertEquals(2, results.size());
     assertTrue(results.contains(CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT));
     assertTrue(results.contains(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED));
-  }
-
-  // Create a special subclass of DefaultCloudSdkService so we can control some of its methods
-  class DefaultCloudSdkServiceForTesting extends DefaultCloudSdkService {
-    @Override
-    CloudSdk buildCloudSdkWithPath(Path path) {
-      return mockSdk;
-    }
-
-    @Nullable
-    @Override
-    public Path getSdkHomePath() {
-      return Paths.get("/home/path");
-    }
   }
 }

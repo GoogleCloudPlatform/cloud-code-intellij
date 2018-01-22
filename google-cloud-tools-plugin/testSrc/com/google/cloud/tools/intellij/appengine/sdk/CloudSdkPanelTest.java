@@ -16,18 +16,10 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.testFramework.PlatformTestCase;
-import com.intellij.util.containers.HashSet;
-import java.util.Collections;
-import java.util.Set;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.picocontainer.MutablePicoContainer;
@@ -65,7 +57,7 @@ public class CloudSdkPanelTest extends PlatformTestCase {
         CloudSdkService.class.getName(), cloudSdkService);
   }
 
-  public void testCheckSdk_nullSdk() throws InterruptedException {
+  /*public void testCheckSdk_nullSdk() throws InterruptedException {
     when(cloudSdkService.isValidCloudSdk(null)).thenReturn(false);
     panel.checkSdk(null);
     verify(panel, times(1)).showWarning(eq(MISSING_SDK_DIR_WARNING));
@@ -133,5 +125,5 @@ public class CloudSdkPanelTest extends PlatformTestCase {
     Set<CloudSdkValidationResult> validationResults = new HashSet<>();
     Collections.addAll(validationResults, results);
     when(cloudSdkService.validateCloudSdk(any(String.class))).thenReturn(validationResults);
-  }
+  }*/
 }
