@@ -62,6 +62,7 @@ dependencies {
         exclude group: 'com.google.guava', module: 'guava'
         exclude group: 'com.google.oauth-client', module: 'google-oauth-client'
         exclude group: 'com.google.protobuf', module: 'protobuf-java'
+        exclude group: 'com.google.protobuf', module: 'protobuf-java-util'
     }
     compile ('com.google.cloud.tools:appengine-plugins-core:' + toolsLibVersion) {
         exclude group: 'com.google.guava', module: 'guava'
