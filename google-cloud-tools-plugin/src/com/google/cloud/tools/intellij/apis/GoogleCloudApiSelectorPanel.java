@@ -97,6 +97,8 @@ final class GoogleCloudApiSelectorPanel {
                     lib -> new CloudApiManagementSpec(SHOULD_ENABLE_API_DEFAULT)));
 
     panel.setPreferredSize(new Dimension(800, 600));
+
+    projectSelector.loadActiveCloudProject();
   }
 
   /** Returns the {@link JPanel} that holds the UI elements in this panel. */
@@ -107,6 +109,11 @@ final class GoogleCloudApiSelectorPanel {
   /** Adds the given {@link ActionListener} to the {@link ModulesComboBox}. */
   void addModuleSelectionListener(ActionListener listener) {
     modulesComboBox.addActionListener(listener);
+  }
+
+  /** Adds the given {@link TableModelListener} to the {@link TableModel}. */
+  void addTableModelListener(TableModelListener listener) {
+    cloudLibrariesTable.getModel().addTableModelListener(listener);
   }
 
   /** Returns the selected {@link Module}. */
@@ -202,9 +209,9 @@ final class GoogleCloudApiSelectorPanel {
                 updateManagementUI();
               }
             });
-    cloudLibrariesTable.getModel().addTableModelListener(e -> updateManagementUI());
+    addTableModelListener(e -> updateManagementUI());
 
-    projectSelector = new ProjectSelector();
+    projectSelector = new ProjectSelector(project);
     projectSelector.addProjectSelectionListener(cloudProject -> updateManagementUI());
   }
 

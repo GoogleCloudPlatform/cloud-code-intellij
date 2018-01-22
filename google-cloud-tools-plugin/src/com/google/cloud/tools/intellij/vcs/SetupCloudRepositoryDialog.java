@@ -50,14 +50,16 @@ public class SetupCloudRepositoryDialog extends DialogWrapper {
   private String repositoryId;
   private String remoteName;
   private CredentialedUser credentialedUser;
+  @NotNull private final Project ideProject;
   private GitRepository gitRepository;
 
   public SetupCloudRepositoryDialog(
-      @NotNull Project project,
+      @NotNull Project ideProject,
       @Nullable GitRepository gitRepository,
       @NotNull String title,
       @NotNull String okText) {
-    super(project, true);
+    super(ideProject, true);
+    this.ideProject = ideProject;
 
     this.gitRepository = gitRepository;
 
@@ -65,6 +67,8 @@ public class SetupCloudRepositoryDialog extends DialogWrapper {
     setTitle(title);
     setOKButtonText(okText);
     setOKActionEnabled(false);
+
+    projectSelector.loadActiveCloudProject();
   }
 
   /** Return the project ID selected by the user. */
@@ -95,7 +99,7 @@ public class SetupCloudRepositoryDialog extends DialogWrapper {
   }
 
   private void createUIComponents() {
-    projectSelector = new ProjectSelector();
+    projectSelector = new ProjectSelector(ideProject);
     projectSelector.setMinimumSize(new Dimension(400, 0));
 
     repositorySelector =

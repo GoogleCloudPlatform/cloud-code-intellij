@@ -22,6 +22,7 @@ import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.common.base.Strings;
 import com.intellij.openapi.options.SettingsEditor;
+import com.intellij.openapi.project.Project;
 import java.util.Optional;
 import javax.swing.JComponent;
 import org.jetbrains.annotations.NotNull;
@@ -34,8 +35,8 @@ public class CloudDebugSettingsEditor extends SettingsEditor<CloudDebugRunConfig
 
   private final CloudDebugRunConfigurationPanel settingsPanel;
 
-  CloudDebugSettingsEditor() {
-    settingsPanel = new CloudDebugRunConfigurationPanel();
+  CloudDebugSettingsEditor(Project project) {
+    settingsPanel = new CloudDebugRunConfigurationPanel(project);
   }
 
   @Override
@@ -57,9 +58,7 @@ public class CloudDebugSettingsEditor extends SettingsEditor<CloudDebugRunConfig
   protected void resetEditorFrom(@NotNull CloudDebugRunConfiguration runConfiguration) {
     // TODO(ivanporty) CloudDebugRunConfiguration uses `cloudProjectName` for project ID.
     String projectId = runConfiguration.getCloudProjectName();
-    if (Strings.isNullOrEmpty(projectId)) {
-      settingsPanel.setSelectedCloudProject(null);
-    } else {
+    if (!Strings.isNullOrEmpty(projectId)) {
       settingsPanel.setSelectedCloudProject(
           CloudProject.create(
               // TODO(ivanporty) no project name in CloudDebugRunConfiguration.
@@ -70,6 +69,8 @@ public class CloudDebugSettingsEditor extends SettingsEditor<CloudDebugRunConfig
               Optional.ofNullable(Services.getLoginService().getActiveUser())
                   .map(CredentialedUser::getEmail)
                   .orElse("")));
+    } else {
+      settingsPanel.loadActiveCloudProject();
     }
   }
 }

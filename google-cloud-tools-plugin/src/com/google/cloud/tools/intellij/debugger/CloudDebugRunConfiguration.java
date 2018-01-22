@@ -105,7 +105,7 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
   @NotNull
   @Override
   public SettingsEditor<? extends RunConfiguration> getConfigurationEditor() {
-    return new CloudDebugSettingsEditor();
+    return new CloudDebugSettingsEditor(getProject());
   }
 
   @NotNull

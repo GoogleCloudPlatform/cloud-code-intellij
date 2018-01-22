@@ -73,6 +73,7 @@ class ProjectDebuggeeBinding {
     this.okAction = okAction;
 
     this.projectSelector.addProjectSelectionListener(this::refreshDebugTargetList);
+    this.projectSelector.loadActiveCloudProject();
   }
 
   @NotNull
