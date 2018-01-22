@@ -248,6 +248,7 @@ public class ProjectSelector extends JPanel {
       super.setIcon(icon);
     }
 
+    @Override
     public String getText() {
       return text;
     }
