@@ -31,7 +31,6 @@ import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.server.run.AppEngineServerConfigurationType;
 import com.google.cloud.tools.intellij.compiler.artifacts.ArtifactsTestUtil;
 import com.google.cloud.tools.intellij.javaee.supportProvider.JavaeeFrameworkSupportProviderTestCase;
-
 import com.intellij.appengine.AppEngineCodeInsightTestCase;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.configurations.RunConfiguration;
@@ -49,16 +48,12 @@ import com.intellij.openapi.roots.impl.libraries.ProjectLibraryTable;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packaging.artifacts.Artifact;
-
+import java.io.File;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.picocontainer.MutablePicoContainer;
 
-import java.io.File;
-import java.util.List;
-
-/**
- * @author nik
- */
+/** @author nik */
 public class AppEngineStandardSupportProviderTest extends JavaeeFrameworkSupportProviderTestCase {
   public void testAppEngine_noManagedLibrariesSelected() {
     setupAppEngine(new AppEngineStandardLibraryPanel(false /*enabled*/), null /*library*/);
@@ -66,16 +61,17 @@ public class AppEngineStandardSupportProviderTest extends JavaeeFrameworkSupport
 
     assertNull(FacetManager.getInstance(myModule).getFacetByType(WebFacet.ID));
     final String moduleName = myModule.getName();
-    ArtifactsTestUtil.assertLayout(myProject, moduleName, "<root>\n" +
-                                                          " WEB-INF/\n" +
-                                                          "  classes/\n" +
-                                                          "   module:" + moduleName + "\n");
+    ArtifactsTestUtil.assertLayout(
+        myProject,
+        moduleName,
+        "<root>\n" + " WEB-INF/\n" + "  classes/\n" + "   module:" + moduleName + "\n");
   }
 
   public void testAppEngineWithWeb_noManagedLibrariesSelected() {
     setupAppEngine(new AppEngineStandardLibraryPanel(false /*enabled*/), null /*library*/);
     selectFramework(WebFacet.ID);
-    selectVersion(WebFrameworkType.getInstance(), new WebFrameworkVersion(WebAppVersion.WebAppVersion_2_5));
+    selectVersion(
+        WebFrameworkType.getInstance(), new WebFrameworkVersion(WebAppVersion.WebAppVersion_2_5));
     addSupport();
 
     getFacet(AppEngineStandardFacetType.ID);
@@ -84,16 +80,23 @@ public class AppEngineStandardSupportProviderTest extends JavaeeFrameworkSupport
 
     final String moduleName = myModule.getName();
     Artifact artifact = ArtifactsTestUtil.findArtifact(myProject, moduleName + ":war exploded");
-    ArtifactsTestUtil.assertLayout(artifact.getRootElement(), "<root>\n" +
-                                                              " javaee-resources:Web(" + moduleName + ")\n" +
-                                                              " WEB-INF/\n" +
-                                                              "  classes/\n" +
-                                                              "   module:" + moduleName + "\n");
+    ArtifactsTestUtil.assertLayout(
+        artifact.getRootElement(),
+        "<root>\n"
+            + " javaee-resources:Web("
+            + moduleName
+            + ")\n"
+            + " WEB-INF/\n"
+            + "  classes/\n"
+            + "   module:"
+            + moduleName
+            + "\n");
     assertRunConfigurationCreated(artifact);
   }
 
   public void testAppEngine_defaultManagedLibrariesSelected() {
-    AppEngineStandardLibraryPanel libraryPanel = new AppEngineStandardLibraryPanel(true /*enabled*/);
+    AppEngineStandardLibraryPanel libraryPanel =
+        new AppEngineStandardLibraryPanel(true /*enabled*/);
 
     LibraryEx library = mock(LibraryEx.class);
     when(library.getTable()).thenReturn(ProjectLibraryTable.getInstance(myModule.getProject()));
@@ -105,37 +108,44 @@ public class AppEngineStandardSupportProviderTest extends JavaeeFrameworkSupport
 
     assertNull(FacetManager.getInstance(myModule).getFacetByType(WebFacet.ID));
     final String moduleName = myModule.getName();
-    ArtifactsTestUtil.assertLayout(myProject, moduleName, "<root>\n" +
-                                                          " WEB-INF/\n" +
-                                                          "  classes/\n" +
-                                                          "   module:" + moduleName + "\n" +
-                                                          "  lib/\n" +
-                                                          "   lib:javax.servlet:servlet-api:2.5(project)\n");
+    ArtifactsTestUtil.assertLayout(
+        myProject,
+        moduleName,
+        "<root>\n"
+            + " WEB-INF/\n"
+            + "  classes/\n"
+            + "   module:"
+            + moduleName
+            + "\n"
+            + "  lib/\n"
+            + "   lib:javax.servlet:servlet-api:2.5(project)\n");
   }
 
   private void setupAppEngine(AppEngineStandardLibraryPanel libraryPanel, Library library) {
     CloudSdkService sdkService = mock(CloudSdkService.class);
-    when(sdkService.getLibraries()).thenReturn(new File[]{});
+    when(sdkService.getLibraries()).thenReturn(new File[] {});
 
-    MavenRepositoryLibraryDownloader libraryDownloader = mock(MavenRepositoryLibraryDownloader.class);
-    when(libraryDownloader.downloadLibrary(any(Module.class),
-        any(AppEngineStandardMavenLibrary.class))).thenReturn(library);
+    MavenRepositoryLibraryDownloader libraryDownloader =
+        mock(MavenRepositoryLibraryDownloader.class);
+    when(libraryDownloader.downloadLibrary(
+            any(Module.class), any(AppEngineStandardMavenLibrary.class)))
+        .thenReturn(library);
 
-    MutablePicoContainer applicationContainer = (MutablePicoContainer)
-        ApplicationManager.getApplication().getPicoContainer();
+    MutablePicoContainer applicationContainer =
+        (MutablePicoContainer) ApplicationManager.getApplication().getPicoContainer();
     applicationContainer.unregisterComponent(CloudSdkService.class.getName());
-    applicationContainer.registerComponentInstance(
-        CloudSdkService.class.getName(), sdkService);
+    applicationContainer.registerComponentInstance(CloudSdkService.class.getName(), sdkService);
     applicationContainer.unregisterComponent(MavenRepositoryLibraryDownloader.class.getName());
     applicationContainer.registerComponentInstance(
         MavenRepositoryLibraryDownloader.class.getName(), libraryDownloader);
 
-    FrameworkSupportInModuleConfigurable configurable = selectFramework(
-        AppEngineStandardFrameworkType.ID);
+    FrameworkSupportInModuleConfigurable configurable =
+        selectFramework(AppEngineStandardFrameworkType.ID);
     if (libraryPanel != null && configurable instanceof AppEngineSupportConfigurable) {
       ((AppEngineSupportConfigurable) configurable).setAppEngineStandardLibraryPanel(libraryPanel);
     }
-    AppEngineStandardSupportProvider.setSdkPath(configurable, AppEngineCodeInsightTestCase.getSdkPath());
+    AppEngineStandardSupportProvider.setSdkPath(
+        configurable, AppEngineCodeInsightTestCase.getSdkPath());
   }
 
   @NotNull
@@ -146,7 +156,9 @@ public class AppEngineStandardSupportProviderTest extends JavaeeFrameworkSupport
   }
 
   private void assertRunConfigurationCreated(Artifact artifactToDeploy) {
-    List<RunConfiguration> list = RunManager.getInstance(myProject).getConfigurationsList(AppEngineServerConfigurationType.getInstance());
+    List<RunConfiguration> list =
+        RunManager.getInstance(myProject)
+            .getConfigurationsList(AppEngineServerConfigurationType.getInstance());
     CommonModel configuration = assertInstanceOf(assertOneElement(list), CommonModel.class);
     assertSameElements(configuration.getDeployedArtifacts(), artifactToDeploy);
   }

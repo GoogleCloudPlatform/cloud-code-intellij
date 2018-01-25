@@ -31,12 +31,11 @@ import com.intellij.openapi.ui.MessageDialogBuilder;
 
 /**
  * Google Login used to be implemented as its own plugin that was distributed separately, but
- * depended on by the Cloud Tools plugin.  We have now incorporated login directly into the
- * Cloud Tools plugin and this class checks whether the legacy Google Account plugin is still
- * installed and removes it, prompting the user to restart.
+ * depended on by the Cloud Tools plugin. We have now incorporated login directly into the Cloud
+ * Tools plugin and this class checks whether the legacy Google Account plugin is still installed
+ * and removes it, prompting the user to restart.
  *
- * <p/>
- * Keeping the old Google Account plugin installed causes problems such as duplicating the login
+ * <p>Keeping the old Google Account plugin installed causes problems such as duplicating the login
  * widget in the toolbar.
  */
 public class GoogleAccountPluginUninstaller {
@@ -47,22 +46,18 @@ public class GoogleAccountPluginUninstaller {
     IdeaPluginDescriptor accountPlugin =
         PluginManager.getPlugin(PluginId.findId("com.google.gct.login"));
     if (accountPlugin != null) {
-      UsageTrackerProvider.getInstance()
-          .trackEvent(GctTracking.ACCOUNT_PLUGIN_DETECTED)
-          .ping();
+      UsageTrackerProvider.getInstance().trackEvent(GctTracking.ACCOUNT_PLUGIN_DETECTED).ping();
       LOGGER.info("legacy google account plugin found.");
       accountPlugin.setEnabled(false);
       PluginManagerConfigurable managerConfigurable =
           new PluginManagerConfigurable(PluginManagerUISettings.getInstance());
       UninstallPluginAction.uninstall(managerConfigurable.getOrCreatePanel(), true, accountPlugin);
-      UsageTrackerProvider.getInstance()
-          .trackEvent(GctTracking.ACCOUNT_PLUGIN_UNINSTALLED)
-          .ping();
+      UsageTrackerProvider.getInstance().trackEvent(GctTracking.ACCOUNT_PLUGIN_UNINSTALLED).ping();
       LOGGER.info(
           "legacy google account plugin has been disabled and uninstalled. This will take effect on"
               + " the next IDE restart.");
-      if (MessageDialogBuilder
-          .yesNo(GctBundle.message("account.plugin.removal.requires.restart.title"),
+      if (MessageDialogBuilder.yesNo(
+              GctBundle.message("account.plugin.removal.requires.restart.title"),
               GctBundle.message("account.plugin.removal.requires.restart.text"))
           .yesText(GctBundle.message("OK"))
           .noText(GctBundle.message("Cancel"))

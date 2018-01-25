@@ -18,8 +18,5 @@ package com.google.cloud.tools.intellij.login;
 
 import java.io.IOException;
 
-/**
- * An exception that indicates that the login request was cancelled by the user.
- */
-class RequestCancelledException extends IOException {
-}
+/** An exception that indicates that the login request was cancelled by the user. */
+class RequestCancelledException extends IOException {}

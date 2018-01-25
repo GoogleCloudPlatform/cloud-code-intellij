@@ -18,6 +18,8 @@ package com.google.cloud.tools.intellij.apis;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import com.google.cloud.tools.intellij.project.CloudProject;
+import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.google.cloud.tools.intellij.testing.TestModule;
@@ -31,9 +33,14 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
@@ -73,6 +80,7 @@ public final class GoogleCloudApiSelectorPanelTest {
       TestCloudLibrary.create(
           "Library 1",
           "ID 1",
+          "service_1",
           "Docs Link 1",
           "Description 1",
           "Icon Link 1",
@@ -81,6 +89,7 @@ public final class GoogleCloudApiSelectorPanelTest {
       TestCloudLibrary.create(
           "Library 2",
           "ID 2",
+          "service_2",
           "Docs Link 2",
           "Description 2",
           "Icon Link 2",
@@ -118,7 +127,7 @@ public final class GoogleCloudApiSelectorPanelTest {
     GoogleCloudApiSelectorPanel panel =
         new GoogleCloudApiSelectorPanel(ImmutableList.of(library), testFixture.getProject());
     JTable table = panel.getCloudLibrariesTable();
-    checkCheckbox(table, 0);
+    checkAddLibraryCheckbox(table, 0);
 
     assertThat(table.getSelectionModel().isSelectedIndex(0)).isTrue();
 
@@ -184,7 +193,7 @@ public final class GoogleCloudApiSelectorPanelTest {
     JTable table = panel.getCloudLibrariesTable();
 
     // Checks the second row's checkbox, which should be library2.
-    checkCheckbox(table, 1);
+    checkAddLibraryCheckbox(table, 1);
 
     assertThat(table.getSelectionModel().isSelectedIndex(0)).isFalse();
     assertThat(table.getSelectionModel().isSelectedIndex(1)).isTrue();
@@ -210,8 +219,8 @@ public final class GoogleCloudApiSelectorPanelTest {
             ImmutableList.of(library2, library1), testFixture.getProject());
     JTable table = panel.getCloudLibrariesTable();
 
-    checkCheckbox(table, 1);
-    checkCheckbox(table, 0);
+    checkAddLibraryCheckbox(table, 1);
+    checkAddLibraryCheckbox(table, 0);
 
     assertThat(table.getSelectionModel().isSelectedIndex(0)).isTrue();
     assertThat(table.getSelectionModel().isSelectedIndex(1)).isFalse();
@@ -301,7 +310,7 @@ public final class GoogleCloudApiSelectorPanelTest {
             ImmutableList.of(library1, library2), testFixture.getProject());
     JTable table = panel.getCloudLibrariesTable();
 
-    checkCheckbox(table, 0);
+    checkAddLibraryCheckbox(table, 0);
 
     assertThat(panel.getSelectedLibraries()).containsExactly(library1);
   }
@@ -316,10 +325,143 @@ public final class GoogleCloudApiSelectorPanelTest {
             ImmutableList.of(library1, library2), testFixture.getProject());
     JTable table = panel.getCloudLibrariesTable();
 
-    checkCheckbox(table, 0);
-    checkCheckbox(table, 1);
+    checkAddLibraryCheckbox(table, 0);
+    checkAddLibraryCheckbox(table, 1);
 
     assertThat(panel.getSelectedLibraries()).containsExactly(library1, library2);
+  }
+
+  @Test
+  public void getApisToEnable_shouldEnableSelectedLibraryByDefault() {
+    CloudLibrary library = LIBRARY_1.toCloudLibrary();
+
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(library), testFixture.getProject());
+    JTable table = panel.getCloudLibrariesTable();
+    checkAddLibraryCheckbox(table, 0);
+
+    Set<CloudLibrary> apisToEnable = panel.getApisToEnable();
+    assertThat(apisToEnable).containsExactly(library);
+  }
+
+  @Test
+  // todo broken
+  public void
+      getApisToEnable_withAllLibrariesChecked_AndNoShouldEnableChecked_returnsNoneEnabled() {
+    CloudLibrary library1 = LIBRARY_1.toCloudLibrary();
+    CloudLibrary library2 = LIBRARY_2.toCloudLibrary();
+
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(
+            ImmutableList.of(library1, library2), testFixture.getProject());
+    JTable table = panel.getCloudLibrariesTable();
+
+    checkAddLibraryCheckbox(table, 0);
+    checkAddLibraryCheckbox(table, 1);
+
+    Map<CloudLibrary, CloudApiManagementSpec> apiManagementMap = panel.getApiManagementMap();
+
+    panel.getDetailsPanel().setCloudLibrary(library1, apiManagementMap.get(library1));
+    checkEnableCheckbox(panel.getDetailsPanel().getEnableApiCheckbox(), false);
+
+    panel.getDetailsPanel().setCloudLibrary(library2, apiManagementMap.get(library2));
+    checkEnableCheckbox(panel.getDetailsPanel().getEnableApiCheckbox(), false);
+
+    assertThat(panel.getApisToEnable()).isEmpty();
+  }
+
+  @Test
+  public void
+      getApisToEnable_withAllLibrariesChecked_AndSomeShouldEnableChecked_returnsSomeEnabled() {
+    CloudLibrary library1 = LIBRARY_1.toCloudLibrary();
+    CloudLibrary library2 = LIBRARY_2.toCloudLibrary();
+
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(
+            ImmutableList.of(library1, library2), testFixture.getProject());
+    JTable table = panel.getCloudLibrariesTable();
+
+    checkAddLibraryCheckbox(table, 0);
+    checkAddLibraryCheckbox(table, 1);
+
+    Map<CloudLibrary, CloudApiManagementSpec> apiManagementMap = panel.getApiManagementMap();
+
+    panel.getDetailsPanel().setCloudLibrary(library1, apiManagementMap.get(library1));
+    checkEnableCheckbox(panel.getDetailsPanel().getEnableApiCheckbox(), false);
+
+    panel.getDetailsPanel().setCloudLibrary(library2, apiManagementMap.get(library2));
+    checkEnableCheckbox(panel.getDetailsPanel().getEnableApiCheckbox(), true);
+
+    assertThat(panel.getApisToEnable()).containsExactly(library2);
+  }
+
+  @Test
+  public void
+      getApisToEnable_withNoLibrariesChecked_AndAllShouldEnableChecked_returnsNoneEnabled() {
+    CloudLibrary library1 = LIBRARY_1.toCloudLibrary();
+    CloudLibrary library2 = LIBRARY_2.toCloudLibrary();
+
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(
+            ImmutableList.of(library1, library2), testFixture.getProject());
+
+    Map<CloudLibrary, CloudApiManagementSpec> apiManagementMap = panel.getApiManagementMap();
+
+    panel.getDetailsPanel().setCloudLibrary(library1, apiManagementMap.get(library1));
+    checkEnableCheckbox(panel.getDetailsPanel().getEnableApiCheckbox(), true);
+
+    panel.getDetailsPanel().setCloudLibrary(library2, apiManagementMap.get(library2));
+    checkEnableCheckbox(panel.getDetailsPanel().getEnableApiCheckbox(), true);
+
+    assertThat(panel.getApisToEnable()).isEmpty();
+  }
+
+  @Test
+  public void getManagementUI_withLibraryAndProjectUnselected_isDisabled() {
+    CloudLibrary library = LIBRARY_1.toCloudLibrary();
+
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(library), testFixture.getProject());
+
+    panel.getDetailsPanel().setCloudLibrary(library, panel.getApiManagementMap().get(library));
+
+    assertThat(panel.getDetailsPanel().getEnableApiCheckbox().isEnabled()).isFalse();
+    assertThat(panel.getDetailsPanel().getManagementInfoPanel().isVisible()).isTrue();
+  }
+
+  @Test
+  public void getManagementUI_withLibraryAndProjectSelected_isEnabled() {
+    CloudLibrary library = LIBRARY_1.toCloudLibrary();
+
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(library), testFixture.getProject());
+    JTable table = panel.getCloudLibrariesTable();
+
+    checkAddLibraryCheckbox(table, 0);
+    panel.getDetailsPanel().setCloudLibrary(library, panel.getApiManagementMap().get(library));
+
+    CloudProject cloudProject = CloudProject.create("name", "id", "user");
+    ProjectSelector projectSelector = panel.getProjectSelector();
+    projectSelector.setSelectedProject(cloudProject);
+    projectSelector
+        .getProjectSelectionListeners()
+        .forEach(listener -> listener.projectSelected(cloudProject));
+
+    assertThat(panel.getDetailsPanel().getEnableApiCheckbox().isEnabled()).isTrue();
+    assertThat(panel.getDetailsPanel().getManagementInfoPanel().isVisible()).isFalse();
+  }
+
+  @Test
+  public void getEnableCheckbox_withNoLibrarySelected_isNotSelected() {
+    CloudLibrary library = LIBRARY_1.toCloudLibrary();
+
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(library), testFixture.getProject());
+
+    Map<CloudLibrary, CloudApiManagementSpec> apiManagementMap = panel.getApiManagementMap();
+    panel.getDetailsPanel().setCloudLibrary(library, apiManagementMap.get(library));
+
+    assertThat(panel.getDetailsPanel().getEnableApiCheckbox().isSelected()).isFalse();
   }
 
   /**
@@ -328,9 +470,23 @@ public final class GoogleCloudApiSelectorPanelTest {
    * @param table the {@link JTable} to check the checkbox in
    * @param row the index of the row to check the checkbox in
    */
-  private static void checkCheckbox(JTable table, int row) {
+  private static void checkAddLibraryCheckbox(JTable table, int row) {
     table.setRowSelectionInterval(row, row);
     table.setValueAt(true, row, 1);
+  }
+
+  /**
+   * Checks or unchecks the given checkbox. {@link ActionListener} does not respond to {@link
+   * JCheckBox#setSelected(boolean)} so the attached listeners are manually invoked.
+   *
+   * @param checkbox the checkbox to check or uncheck
+   * @param select whether to check or uncheck it
+   */
+  private static void checkEnableCheckbox(JCheckBox checkbox, boolean select) {
+    checkbox.setSelected(select);
+    ActionEvent e = new ActionEvent(checkbox, 1, "");
+    Arrays.stream(checkbox.getListeners(ActionListener.class))
+        .forEach(listener -> listener.actionPerformed(e));
   }
 
   /**

@@ -19,18 +19,14 @@ package com.google.cloud.tools.intellij.appengine.cloud.flexible;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeployable;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.icons.AllIcons.FileTypes;
 import com.intellij.openapi.module.ModulePointer;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
 import com.intellij.remoteServer.impl.configuration.deployment.ModuleDeploymentSourceImpl;
-
+import java.io.File;
+import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.io.File;
-
-import javax.swing.Icon;
 
 /**
  * A deployment source used as a placeholder to allow user selection of a jar or war file from the
@@ -98,8 +94,7 @@ public class UserSpecifiedPathDeploymentSource extends ModuleDeploymentSourceImp
   @NotNull
   @Override
   public DeploymentSourceType<?> getType() {
-    return DeploymentSourceType.EP_NAME.findExtension(
-        UserSpecifiedPathDeploymentSourceType.class);
+    return DeploymentSourceType.EP_NAME.findExtension(UserSpecifiedPathDeploymentSourceType.class);
   }
 
   @Override

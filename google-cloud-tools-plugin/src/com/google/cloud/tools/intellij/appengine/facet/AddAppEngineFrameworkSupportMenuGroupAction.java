@@ -27,5 +27,4 @@ public class AddAppEngineFrameworkSupportMenuGroupAction extends DefaultActionGr
     getTemplatePresentation().setText(GctBundle.message("appengine.add.facet.group.menu.text"));
     getTemplatePresentation().setIcon(GoogleCloudToolsIcons.APP_ENGINE);
   }
-
 }

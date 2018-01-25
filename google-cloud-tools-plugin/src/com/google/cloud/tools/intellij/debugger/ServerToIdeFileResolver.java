@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.debugger;
 
 import com.google.common.annotations.VisibleForTesting;
-
+import com.google.common.base.Splitter;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.StandardFileSystems;
@@ -31,25 +31,24 @@ import com.intellij.psi.PsiPackage;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
-
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Collection;
+import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Provides a translation between file names sent from the CDB API and IntelliJ project files in the
  * local file system.
- * <p/>
- * This is necessary mostly because StackFrames locations in CDB only contain the package and file
- * name. The Cloud Debugger API returns StackFrame.SourceLocation.path in the form of
- * <p/>
- * com/my/package/Class.java
- * <p/>
- * while IntelliJ offers VirtualFiles whose path is the absolute path from root. e.g.,
- * <p/>
- * /home/user/workspace/repo/path/com/my/package/Class.java
- * <p/>
- * These are methods which are Java specific for the cloud debugger. When we add other languages,
+ *
+ * <p>This is necessary mostly because StackFrames locations in CDB only contain the package and
+ * file name. The Cloud Debugger API returns StackFrame.SourceLocation.path in the form of
+ *
+ * <p>com/my/package/Class.java
+ *
+ * <p>while IntelliJ offers VirtualFiles whose path is the absolute path from root. e.g.,
+ *
+ * <p>/home/user/workspace/repo/path/com/my/package/Class.java
+ *
+ * <p>These are methods which are Java specific for the cloud debugger. When we add other languages,
  * some of this may need to be extracted to an extensionpoint.
  */
 public class ServerToIdeFileResolver {
@@ -57,18 +56,16 @@ public class ServerToIdeFileResolver {
   private VirtualFileSystem fileSystem =
       VirtualFileManager.getInstance().getFileSystem(StandardFileSystems.FILE_PROTOCOL);
 
-  /**
-   * Utility method that returns the full class name for a file.
-   */
+  /** Utility method that returns the full class name for a file. */
   public static String getCloudPathFromJavaFile(PsiJavaFile javaFile) {
     return javaFile.getPackageName().replace('.', '/') + "/" + javaFile.getName();
   }
 
   /**
    * Given a possible file path, returns a VirtualFile instance that the IDE can work with.
-   * <p/>
-   * This method tries to fetch a file in three ways. First, it uses its full path in the local file
-   * system. Then, it tries the full class name form (com/google/gct/idea/debugger/
+   *
+   * <p>This method tries to fetch a file in three ways. First, it uses its full path in the local
+   * file system. Then, it tries the full class name form (com/google/gct/idea/debugger/
    * CloudDebugProcess.java). Finally, it searches for possible file matches within the project.
    */
   public VirtualFile getFileFromPath(@NotNull Project project, @NotNull String path) {
@@ -76,12 +73,13 @@ public class ServerToIdeFileResolver {
     VirtualFile file = fileSystem.findFileByPath(project.getBasePath() + "/" + path);
     // Try class name with package and class file name.
     if (file == null) {
-      PsiPackage psiPackage = JavaPsiFacade.getInstance(project)
-          .findPackage(getPackageFromPath(path));
+      PsiPackage psiPackage =
+          JavaPsiFacade.getInstance(project).findPackage(getPackageFromPath(path));
       // If a class isn't in a project's classpath, psiPackage will be null.
       if (psiPackage != null) {
-        PsiClass[] matchingClasses = psiPackage.findClassByShortName(
-            getClassNameFromPath(path), GlobalSearchScope.allScope(project));
+        PsiClass[] matchingClasses =
+            psiPackage.findClassByShortName(
+                getClassNameFromPath(path), GlobalSearchScope.allScope(project));
         if (matchingClasses.length > 0) {
           file = matchingClasses[0].getContainingFile().getVirtualFile();
         }
@@ -91,8 +89,12 @@ public class ServerToIdeFileResolver {
     // first.
     // We might want to improve string matching and return more than one possible match.
     if (file == null) {
-      Collection<VirtualFile> projectJavaFiles = FileBasedIndex.getInstance().getContainingFiles(
-          FileTypeIndex.NAME, JavaFileType.INSTANCE, GlobalSearchScope.projectScope(project));
+      Collection<VirtualFile> projectJavaFiles =
+          FileBasedIndex.getInstance()
+              .getContainingFiles(
+                  FileTypeIndex.NAME,
+                  JavaFileType.INSTANCE,
+                  GlobalSearchScope.projectScope(project));
       for (VirtualFile projectFile : projectJavaFiles) {
         if (projectFile.getName().equals(path)) {
           file = projectFile;
@@ -105,22 +107,22 @@ public class ServerToIdeFileResolver {
 
   /**
    * Produces a Java package name from a file path.
-   * <p/>
-   * Example: returns "com.java.package" from "com/java/package/Class.java".
+   *
+   * <p>Example: returns "com.java.package" from "com/java/package/Class.java".
    */
   @VisibleForTesting
   static String getPackageFromPath(String path) {
-    String[] tokens = path.split("/");
+    List<String> tokens = Splitter.on("/").splitToList(path);
     StringBuilder packageBuilder = new StringBuilder();
-    if (tokens.length > 1) {
-      if (tokens[0].length() > 0) {
-        packageBuilder.append(tokens[0]);
+    if (tokens.size() > 1) {
+      if (tokens.get(0).length() > 0) {
+        packageBuilder.append(tokens.get(0));
       }
-      for (int token = 1; token < tokens.length - 1; token++) {
-        if (tokens[token].length() > 0 && packageBuilder.length() > 0) {
+      for (int token = 1; token < tokens.size() - 1; token++) {
+        if (tokens.get(token).length() > 0 && packageBuilder.length() > 0) {
           packageBuilder.append(".");
         }
-        packageBuilder.append(tokens[token]);
+        packageBuilder.append(tokens.get(token));
       }
     }
 
@@ -129,8 +131,8 @@ public class ServerToIdeFileResolver {
 
   /**
    * Produces a class name from a file path.
-   * <p/>
-   * Example: returns "Class" from "com/java/package/Class.java".
+   *
+   * <p>Example: returns "Class" from "com/java/package/Class.java".
    */
   @VisibleForTesting
   static String getClassNameFromPath(String path) {

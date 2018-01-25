@@ -20,15 +20,11 @@ import com.google.api.services.source.model.Repo;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.vcs.CloudRepositoryService;
-
 import com.intellij.openapi.components.ServiceManager;
-
+import java.util.List;
+import javax.swing.tree.DefaultMutableTreeNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-
-import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
  * TreeNode representation of the set of available Cloud Source Repositories for a given GCP
@@ -44,40 +40,42 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
   }
 
   @SuppressWarnings("FutureReturnValueIgnored")
-  public void loadRepositories(@NotNull String cloudProject, @NotNull CredentialedUser user,
-      @Nullable Runnable onComplete) {
+  public void loadRepositories(
+      @NotNull String cloudProject, @NotNull CredentialedUser user, @Nullable Runnable onComplete) {
     setUserObject(cloudProject);
 
     cloudRepositoryService
         .listAsync(user, cloudProject)
-        .thenAccept(response -> {
-          removeAllChildren();
+        .thenAccept(
+            response -> {
+              removeAllChildren();
 
-          List<Repo> repositories = response.getRepos();
-          if (!response.isEmpty() && repositories != null) {
-            repositories.forEach(repo -> {
-              Object name = repo.get("name");
-              if (name != null) {
-                add(new RepositoryModelItem(name.toString()));
+              List<Repo> repositories = response.getRepos();
+              if (!response.isEmpty() && repositories != null) {
+                repositories.forEach(
+                    repo -> {
+                      Object name = repo.get("name");
+                      if (name != null) {
+                        add(new RepositoryModelItem(name.toString()));
+                      }
+                    });
+              } else {
+                add(new ResourceEmptyModelItem(GctBundle.message("cloud.repository.list.empty")));
               }
+
+              if (onComplete != null) {
+                onComplete.run();
+              }
+            })
+        .exceptionally(
+            response -> {
+              removeAllChildren();
+              add(new ResourceErrorModelItem(GctBundle.message("cloud.repository.list.error")));
+
+              if (onComplete != null) {
+                onComplete.run();
+              }
+              return null;
             });
-          } else {
-            add(new ResourceEmptyModelItem(GctBundle.message("cloud.repository.list.empty")));
-          }
-
-          if (onComplete != null) {
-            onComplete.run();
-          }
-        })
-        .exceptionally(response -> {
-          removeAllChildren();
-          add(new ResourceErrorModelItem(GctBundle.message("cloud.repository.list.error")));
-
-          if (onComplete != null) {
-            onComplete.run();
-          }
-          return null;
-        });
   }
-
 }

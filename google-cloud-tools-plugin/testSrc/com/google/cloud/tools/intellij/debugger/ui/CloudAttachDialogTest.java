@@ -27,7 +27,8 @@ import com.google.cloud.tools.intellij.debugger.SyncResult;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
 import com.google.cloud.tools.intellij.login.Services;
-import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.cloud.tools.intellij.project.CloudProject;
+import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.testing.TestUtils;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.intellij.openapi.project.Project;
@@ -41,7 +42,8 @@ import javax.swing.JLabel;
 public class CloudAttachDialogTest extends PlatformTestCase {
   private static final String NO_LOGIN_WARNING = "You must be logged in to perform this action.";
   private static final String NO_PROJECT_ID_WARNING = "Please enter a Project ID.";
-  private static final String NO_MODULES_FOUND_WARNING = "No debuggable modules found. Please ensure that your application has live instances.";
+  private static final String NO_MODULES_FOUND_WARNING =
+      "No debuggable modules found. Please ensure that your application has live instances.";
 
   private static final String USER = "test@user.com";
   private static final String PASSWORD = "123";
@@ -127,10 +129,9 @@ public class CloudAttachDialogTest extends PlatformTestCase {
   }
 
   /**
-   * If there is no module loaded (including no default module)
-   * then this indicates that the async module loading is still in progress. We do not
-   * want to display an error to the user until the thread completes to avoid
-   * flashing error messages
+   * If there is no module loaded (including no default module) then this indicates that the async
+   * module loading is still in progress. We do not want to display an error to the user until the
+   * thread completes to avoid flashing error messages
    */
   public void testUnknownProjectSelected() {
     CloudAttachDialog dialog = initDialog();
@@ -149,10 +150,9 @@ public class CloudAttachDialogTest extends PlatformTestCase {
   }
 
   /**
-   * After selecting a module that requires sync/stash, any subsequent module that is
-   * selected that has no remote repository is shown the sync/stash checkbox regardless of its state.
-   * The visibility of this option needs to be properly reset.
-   *
+   * After selecting a module that requires sync/stash, any subsequent module that is selected that
+   * has no remote repository is shown the sync/stash checkbox regardless of its state. The
+   * visibility of this option needs to be properly reset.
    */
   public void testSyncStashReset() {
     mockLoggedInUser();
@@ -191,7 +191,7 @@ public class CloudAttachDialogTest extends PlatformTestCase {
 
   private CloudAttachDialog initDialog() {
     CloudAttachDialog dialog = new CloudAttachDialog(this.getProject(), binding);
-    projectSelector = dialog.getElysiumProjectSelector();
+    projectSelector = dialog.getProjectSelector();
     targetSelector = dialog.getTargetSelector();
     warningHeader = dialog.getWarningHeader();
     warningMessage = dialog.getWarningMessage();
@@ -202,7 +202,10 @@ public class CloudAttachDialogTest extends PlatformTestCase {
 
   @SuppressWarnings("unchecked")
   private void selectEmptyProject() {
-    projectSelector.setText("emptyProject");
+    String projectName = "emptyProject";
+    projectSelector.setSelectedProject(
+        CloudProject.create(projectName, projectName, null, "some-user-id"));
+
     targetSelector.removeAllItems();
     targetSelector.setEnabled(false);
     targetSelector.addItem(NO_MODULES_FOUND_WARNING);
@@ -211,7 +214,8 @@ public class CloudAttachDialogTest extends PlatformTestCase {
   @SuppressWarnings("unchecked")
   private void selectProjectWithDebuggableModules() {
     String projectName = "projectWithDebuggableModules";
-    projectSelector.setText(projectName);
+    projectSelector.setSelectedProject(
+        CloudProject.create(projectName, projectName, null, "some-user-id"));
     targetSelector.removeAllItems();
     targetSelector.setEnabled(true);
 
@@ -221,17 +225,19 @@ public class CloudAttachDialogTest extends PlatformTestCase {
 
   private void selectInProgressProject() {
     String projectName = "unknownProject";
-    projectSelector.setText(projectName);
+    projectSelector.setSelectedProject(
+        CloudProject.create(projectName, projectName, null, "some-user-id"));
   }
 
   private void mockCredentials() throws Exception {
-    IntegratedGoogleLoginService mockLoginService = TestUtils
-        .installMockService(IntegratedGoogleLoginService.class);
+    IntegratedGoogleLoginService mockLoginService =
+        TestUtils.installMockService(IntegratedGoogleLoginService.class);
 
     GoogleLoginState googleLoginState = mock(GoogleLoginState.class);
     Credential credential = mock(Credential.class);
     this.user = mock(CredentialedUser.class);
-    LinkedHashMap<String, CredentialedUser> allusers = new LinkedHashMap<String, CredentialedUser>();
+    LinkedHashMap<String, CredentialedUser> allusers =
+        new LinkedHashMap<String, CredentialedUser>();
 
     when(this.user.getCredential()).thenReturn(credential);
     when(this.user.getEmail()).thenReturn(USER);
@@ -250,8 +256,8 @@ public class CloudAttachDialogTest extends PlatformTestCase {
   }
 
   /**
-   * Creates a mock sync result representing a debuggable module selection
-   * that doesn't need stash or sync
+   * Creates a mock sync result representing a debuggable module selection that doesn't need stash
+   * or sync
    */
   private SyncResult mockSyncResult(boolean needsStash, boolean hasRemoteRepository) {
     SyncResult syncResult = mock(SyncResult.class);

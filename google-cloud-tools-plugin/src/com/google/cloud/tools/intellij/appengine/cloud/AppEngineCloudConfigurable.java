@@ -29,9 +29,7 @@ import javax.swing.JTextPane;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * GCP App Engine Cloud configuration UI.
- */
+/** GCP App Engine Cloud configuration UI. */
 public class AppEngineCloudConfigurable extends RemoteServerConfigurable implements Configurable {
 
   private static final String MORE_INFO_URI_OPEN_TAG =
@@ -43,15 +41,10 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
   private JTextPane appEngineMoreInfoLabel;
   private CloudSdkPanel cloudSdkPanel;
 
-  /**
-   * Initialize the UI.
-   */
+  /** Initialize the UI. */
   public AppEngineCloudConfigurable() {
     appEngineMoreInfoLabel.setText(
-        GctBundle.message(
-            "appengine.more.info",
-            MORE_INFO_URI_OPEN_TAG,
-            MORE_INFO_URI_CLOSE_TAG));
+        GctBundle.message("appengine.more.info", MORE_INFO_URI_OPEN_TAG, MORE_INFO_URI_CLOSE_TAG));
     appEngineMoreInfoLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
     appEngineMoreInfoLabel.setBackground(mainPanel.getBackground());
   }

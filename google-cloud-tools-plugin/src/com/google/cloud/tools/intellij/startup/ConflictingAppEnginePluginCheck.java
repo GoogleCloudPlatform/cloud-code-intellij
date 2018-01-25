@@ -34,9 +34,7 @@ import com.intellij.openapi.ui.popup.util.PopupUtil;
 import javax.swing.event.HyperlinkEvent;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * Checks if conflicting any conflicting plugins are installed.
- */
+/** Checks if conflicting any conflicting plugins are installed. */
 public class ConflictingAppEnginePluginCheck {
 
   private static final String DEACTIVATE_LINK_HREF = "#deactivate";
@@ -47,8 +45,8 @@ public class ConflictingAppEnginePluginCheck {
    * notified to disable it.
    */
   public void notifyIfConflicting() {
-    ApplicationPluginInfoService applicationInfoService = ServiceManager
-        .getService(ApplicationPluginInfoService.class);
+    ApplicationPluginInfoService applicationInfoService =
+        ServiceManager.getService(ApplicationPluginInfoService.class);
 
     if (applicationInfoService.isPluginActive(BUNDLED_PLUGIN_ID)) {
       Optional<IdeaPluginDescriptor> plugin = applicationInfoService.findPlugin(BUNDLED_PLUGIN_ID);
@@ -116,8 +114,8 @@ public class ConflictingAppEnginePluginCheck {
     }
 
     private void showDisablePluginDialog() {
-      DisablePluginWarningDialog dialog = new DisablePluginWarningDialog(plugin.getPluginId(),
-          PopupUtil.getActiveComponent());
+      DisablePluginWarningDialog dialog =
+          new DisablePluginWarningDialog(plugin.getPluginId(), PopupUtil.getActiveComponent());
       dialog.showAndDisablePlugin();
     }
   }

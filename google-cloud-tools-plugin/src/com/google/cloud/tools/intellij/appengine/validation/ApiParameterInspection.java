@@ -19,7 +19,6 @@ package com.google.cloud.tools.intellij.appengine.validation;
 import com.google.cloud.tools.intellij.appengine.GctConstants;
 import com.google.cloud.tools.intellij.appengine.util.EndpointBundle;
 import com.google.cloud.tools.intellij.appengine.util.EndpointUtilities;
-
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -35,7 +34,6 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiType;
-
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -109,9 +107,11 @@ public class ApiParameterInspection extends EndpointInspectionBase {
 
         // Check that API parameter has Named Resource (@Named)
         if (!hasParameterName(psiParameter)) {
-          holder.registerProblem(psiParameter, "Missing parameter name. Parameter type ("
-              + psiType.getPresentableText()
-              + ") is not an entity type and thus should be annotated with @Named.",
+          holder.registerProblem(
+              psiParameter,
+              "Missing parameter name. Parameter type ("
+                  + psiType.getPresentableText()
+                  + ") is not an entity type and thus should be annotated with @Named.",
               new MyQuickFix());
         }
       }
@@ -137,14 +137,10 @@ public class ApiParameterInspection extends EndpointInspectionBase {
     return false;
   }
 
-  /**
-   * Quick fix for {@link ApiParameterInspection} problems to add @Named to method parameters.
-   */
+  /** Quick fix for {@link ApiParameterInspection} problems to add @Named to method parameters. */
   public class MyQuickFix implements LocalQuickFix {
 
-    public MyQuickFix() {
-
-    }
+    public MyQuickFix() {}
 
     @NotNull
     @Override
@@ -193,8 +189,9 @@ public class ApiParameterInspection extends EndpointInspectionBase {
       }
 
       String annotationString = "@Named(\"" + parameter.getName() + "\")";
-      PsiAnnotation annotation = JavaPsiFacade.getElementFactory(project)
-          .createAnnotationFromText(annotationString, element);
+      PsiAnnotation annotation =
+          JavaPsiFacade.getElementFactory(project)
+              .createAnnotationFromText(annotationString, element);
       modifierList.add(annotation);
 
       PsiFile file = parameter.getContainingFile();

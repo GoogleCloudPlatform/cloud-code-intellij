@@ -16,11 +16,6 @@
 
 package com.google.cloud.tools.intellij;
 
-/**
- * The default configuration service implementation for Google Cloud plugins in IntelliJ.
- */
-public class DefaultCloudToolsPluginConfigurationService extends
-    DefaultPluginConfigurationService implements
-    CloudToolsPluginConfigurationService {
-
-}
+/** The default configuration service implementation for Google Cloud plugins in IntelliJ. */
+public class DefaultCloudToolsPluginConfigurationService extends DefaultPluginConfigurationService
+    implements CloudToolsPluginConfigurationService {}

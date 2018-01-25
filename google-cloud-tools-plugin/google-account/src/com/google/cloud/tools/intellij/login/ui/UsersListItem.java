@@ -19,9 +19,7 @@ package com.google.cloud.tools.intellij.login.ui;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import java.awt.Image;
 
-/**
- * A single user item in the Google Login panel.
- */
+/** A single user item in the Google Login panel. */
 public class UsersListItem {
   private final CredentialedUser user;
 

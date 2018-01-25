@@ -61,9 +61,7 @@ import javax.swing.JPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Adds Flexible support to new or existing IJ modules.
- */
+/** Adds Flexible support to new or existing IJ modules. */
 public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModuleProvider {
   @NotNull
   @Override
@@ -84,16 +82,18 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
   }
 
   @Override
-  public boolean isSupportAlreadyAdded(@NotNull Module module,
-      @NotNull FacetsProvider facetsProvider) {
+  public boolean isSupportAlreadyAdded(
+      @NotNull Module module, @NotNull FacetsProvider facetsProvider) {
     return !facetsProvider.getFacetsByType(module, AppEngineFlexibleFacetType.ID).isEmpty()
         || !facetsProvider.getFacetsByType(module, AppEngineStandardFacetType.ID).isEmpty();
   }
 
-  /** Initializes the Flexible facet by settings the default paths for app.yaml and Dockerfile
-   * and generating the necessary run configurations.
+  /**
+   * Initializes the Flexible facet by settings the default paths for app.yaml and Dockerfile and
+   * generating the necessary run configurations.
    */
-  public static void addSupport(@NotNull AppEngineFlexibleFacet facet,
+  public static void addSupport(
+      @NotNull AppEngineFlexibleFacet facet,
       @NotNull ModifiableRootModel rootModel,
       boolean generateConfigFiles) {
     UsageTrackerProvider.getInstance()
@@ -103,10 +103,10 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
     VirtualFile[] contentRoots = rootModel.getContentRoots();
     AppEngineProjectService appEngineProjectService = AppEngineProjectService.getInstance();
     if (contentRoots.length > 0) {
-      Path appYamlPath = Paths.get(
-          appEngineProjectService.getDefaultAppYamlPath(contentRoots[0].getPath()));
-      Path dockerDirectory = Paths.get(
-          appEngineProjectService.getDefaultDockerDirectory(contentRoots[0].getPath()));
+      Path appYamlPath =
+          Paths.get(appEngineProjectService.getDefaultAppYamlPath(contentRoots[0].getPath()));
+      Path dockerDirectory =
+          Paths.get(appEngineProjectService.getDefaultDockerDirectory(contentRoots[0].getPath()));
 
       facet.getConfiguration().setAppYamlPath(appYamlPath.toString());
       facet.getConfiguration().setDockerDirectory(dockerDirectory.toString());
@@ -131,13 +131,13 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
     RunManager runManager = RunManager.getInstance(module.getProject());
 
     if (!hasFlexibleDeploymentConfiguration(runManager.getAllConfigurationsList())) {
-      AppEngineCloudType serverType =
-          ServerType.EP_NAME.findExtension(AppEngineCloudType.class);
-      DeployToServerConfigurationType configurationType
-          = DeployToServerConfigurationTypesRegistrar.getDeployConfigurationType(serverType);
+      AppEngineCloudType serverType = ServerType.EP_NAME.findExtension(AppEngineCloudType.class);
+      DeployToServerConfigurationType configurationType =
+          DeployToServerConfigurationTypesRegistrar.getDeployConfigurationType(serverType);
 
-      RunnerAndConfigurationSettings settings = runManager.createRunConfiguration(
-          configurationType.getDisplayName(), configurationType.getFactory());
+      RunnerAndConfigurationSettings settings =
+          runManager.createRunConfiguration(
+              configurationType.getDisplayName(), configurationType.getFactory());
 
       // Sets the GAE Flex server, if any exists, in the run config.
       DeployToServerRunConfiguration<?, AppEngineDeploymentConfiguration> runConfiguration =
@@ -177,12 +177,15 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
     }
 
     @Override
-    public void addSupport(@NotNull Module module, @NotNull ModifiableRootModel rootModel,
+    public void addSupport(
+        @NotNull Module module,
+        @NotNull ModifiableRootModel rootModel,
         @NotNull ModifiableModelsProvider modifiableModelsProvider) {
       FacetType<AppEngineFlexibleFacet, AppEngineFlexibleFacetConfiguration> facetType =
           AppEngineFlexibleFacet.getFacetType();
-      AppEngineFlexibleFacet facet = FacetManager.getInstance(module).addFacet(
-          facetType, facetType.getPresentableName(), null /* underlyingFacet */);
+      AppEngineFlexibleFacet facet =
+          FacetManager.getInstance(module)
+              .addFacet(facetType, facetType.getPresentableName(), null /* underlyingFacet */);
 
       StartupManagerEx startupManger = StartupManagerEx.getInstanceEx(module.getProject());
       if (!startupManger.postStartupActivityPassed()) {
@@ -193,15 +196,16 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       }
 
       CloudSdkService sdkService = CloudSdkService.getInstance();
-      if (!sdkService.validateCloudSdk(cloudSdkPanel.getCloudSdkDirectoryText())
+      if (!sdkService
+          .validateCloudSdk(cloudSdkPanel.getCloudSdkDirectoryText())
           .contains(CloudSdkValidationResult.MALFORMED_PATH)) {
         sdkService.setSdkHomePath(cloudSdkPanel.getCloudSdkDirectoryText());
       }
     }
 
     @VisibleForTesting
-    void addAppEngineFlexibleSupport(@NotNull ModifiableRootModel rootModel,
-        AppEngineFlexibleFacet facet) {
+    void addAppEngineFlexibleSupport(
+        @NotNull ModifiableRootModel rootModel, AppEngineFlexibleFacet facet) {
       AppEngineFlexibleSupportProvider.addSupport(
           facet, rootModel, generateConfigurationFilesCheckBox.isSelected());
     }

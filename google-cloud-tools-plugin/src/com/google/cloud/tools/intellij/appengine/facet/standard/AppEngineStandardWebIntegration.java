@@ -20,7 +20,6 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineServerConfiguration;
 import com.google.cloud.tools.intellij.debugger.CloudDebugConfigType;
 import com.google.cloud.tools.intellij.debugger.CloudDebugRunConfiguration;
-
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configuration.ConfigurationFactoryEx;
@@ -44,15 +43,11 @@ import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerCon
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerConfigurationTypesRegistrar;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerRunConfiguration;
 import com.intellij.util.containers.ContainerUtil;
-
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
-/**
- * @author nik
- */
+/** @author nik */
 public abstract class AppEngineStandardWebIntegration {
 
   public static AppEngineStandardWebIntegration getInstance() {
@@ -60,14 +55,8 @@ public abstract class AppEngineStandardWebIntegration {
   }
 
   @Nullable
-  public abstract VirtualFile suggestParentDirectoryForAppEngineWebXml(@NotNull Module module,
-      @NotNull ModifiableRootModel rootModel);
-
-  @NotNull
-  public List<ArtifactType> getAppEngineTargetArtifactTypes() {
-    return ContainerUtil
-        .packNullables(getAppEngineWebArtifactType());
-  }
+  public abstract VirtualFile suggestParentDirectoryForAppEngineWebXml(
+      @NotNull Module module, @NotNull ModifiableRootModel rootModel);
 
   @NotNull
   public abstract ArtifactType getAppEngineWebArtifactType();
@@ -85,7 +74,9 @@ public abstract class AppEngineStandardWebIntegration {
   // TODO(joaomartins): Delete unused code.
   public abstract void setupJpaSupport(@NotNull Module module, @NotNull VirtualFile persistenceXml);
 
-  public void setupRunConfigurations(@Nullable Artifact artifact, @Nullable Module module,
+  public void setupRunConfigurations(
+      @Nullable Artifact artifact,
+      @Nullable Module module,
       @Nullable ModuleRunConfiguration existingConfiguration) {
     setupDebugRunConfiguration(module.getProject());
     setupDeployRunConfiguration(module);
@@ -96,40 +87,39 @@ public abstract class AppEngineStandardWebIntegration {
   // TODO(joaomartins): Delete unused code.
   public abstract void addDevServerToModuleDependencies(@NotNull ModifiableRootModel rootModel);
 
-  public abstract void addLibraryToArtifact(@NotNull Library library, @NotNull Artifact artifact,
-      @NotNull Project project);
+  public abstract void addLibraryToArtifact(
+      @NotNull Library library, @NotNull Artifact artifact, @NotNull Project project);
 
-  public void addDescriptor(@NotNull Artifact artifact, @NotNull Project project,
-      @NotNull VirtualFile descriptor) {
-  }
+  public void addDescriptor(
+      @NotNull Artifact artifact, @NotNull Project project, @NotNull VirtualFile descriptor) {}
 
-  public void registerFrameworkInModel(FrameworkSupportModel model,
-      AppEngineStandardFacet appEngineStandardFacet) {
-  }
+  public void registerFrameworkInModel(
+      FrameworkSupportModel model, AppEngineStandardFacet appEngineStandardFacet) {}
 
   private void setupDeployRunConfiguration(@NotNull Module module) {
     RunManager runManager = RunManager.getInstance(module.getProject());
 
-    boolean hasExistingDeployConfiguration = runManager.getAllConfigurationsList()
-        .stream()
-        .filter(config -> config instanceof DeployToServerRunConfiguration)
-        .map(config -> ((DeployToServerRunConfiguration) config).getServerType())
-        .anyMatch(serverType -> serverType instanceof AppEngineCloudType);
+    boolean hasExistingDeployConfiguration =
+        runManager
+            .getAllConfigurationsList()
+            .stream()
+            .filter(config -> config instanceof DeployToServerRunConfiguration)
+            .map(config -> ((DeployToServerRunConfiguration) config).getServerType())
+            .anyMatch(serverType -> serverType instanceof AppEngineCloudType);
 
     if (!hasExistingDeployConfiguration) {
-      AppEngineCloudType serverType =
-          ServerType.EP_NAME.findExtension(AppEngineCloudType.class);
-      RemoteServer<AppEngineServerConfiguration> server
-          = ContainerUtil.getFirstItem(RemoteServersManager.getInstance().getServers(serverType));
+      AppEngineCloudType serverType = ServerType.EP_NAME.findExtension(AppEngineCloudType.class);
+      RemoteServer<AppEngineServerConfiguration> server =
+          ContainerUtil.getFirstItem(RemoteServersManager.getInstance().getServers(serverType));
 
-      DeployToServerConfigurationType configurationType
-          = DeployToServerConfigurationTypesRegistrar.getDeployConfigurationType(serverType);
+      DeployToServerConfigurationType configurationType =
+          DeployToServerConfigurationTypesRegistrar.getDeployConfigurationType(serverType);
 
       ConfigurationFactoryEx factory = configurationType.getFactory();
-      RunnerAndConfigurationSettings settings = runManager.createRunConfiguration(
-          configurationType.getDisplayName(), factory);
-      DeployToServerRunConfiguration<?, ?> runConfiguration
-          = (DeployToServerRunConfiguration<?, ?>) settings.getConfiguration();
+      RunnerAndConfigurationSettings settings =
+          runManager.createRunConfiguration(configurationType.getDisplayName(), factory);
+      DeployToServerRunConfiguration<?, ?> runConfiguration =
+          (DeployToServerRunConfiguration<?, ?>) settings.getConfiguration();
 
       if (server != null) {
         runConfiguration.setServerName(server.getName());
@@ -142,15 +132,18 @@ public abstract class AppEngineStandardWebIntegration {
   private void setupDebugRunConfiguration(@NotNull Project project) {
     RunManager runManager = RunManager.getInstance(project);
 
-    boolean hasExistingDebugConfiguration = runManager.getAllConfigurationsList()
-        .stream()
-        .anyMatch(config -> config instanceof CloudDebugRunConfiguration);
+    boolean hasExistingDebugConfiguration =
+        runManager
+            .getAllConfigurationsList()
+            .stream()
+            .anyMatch(config -> config instanceof CloudDebugRunConfiguration);
 
     if (!hasExistingDebugConfiguration) {
       CloudDebugConfigType debugConfigType = CloudDebugConfigType.getInstance();
       ConfigurationFactory factory = debugConfigType.getConfigurationFactories()[0];
-      RunnerAndConfigurationSettings settings = runManager.createConfiguration(
-          new CloudDebugRunConfiguration(project, factory).clone(), factory);
+      RunnerAndConfigurationSettings settings =
+          runManager.createConfiguration(
+              new CloudDebugRunConfiguration(project, factory).clone(), factory);
 
       runManager.addConfiguration(settings, false /*isShared*/);
     }

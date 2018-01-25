@@ -18,9 +18,5 @@ package com.google.cloud.tools.intellij.resources;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-/**
- * Represents an existing or non-existing GCP project
- */
-public class ProjectModelItem extends DefaultMutableTreeNode {
-
-}
+/** Represents an existing or non-existing GCP project */
+public class ProjectModelItem extends DefaultMutableTreeNode {}

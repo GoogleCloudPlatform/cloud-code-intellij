@@ -17,28 +17,21 @@
 package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
 import com.google.common.annotations.VisibleForTesting;
-
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-/**
- * UI panel containing App Engine flexible runtime information.
- */
+/** UI panel containing App Engine flexible runtime information. */
 public final class AppEngineFlexibleRuntimePanel {
 
   private JPanel runtimePanel;
   private JLabel runtimeLabel;
 
-  /**
-   * Sets the visibility of the entire panel.
-   */
+  /** Sets the visibility of the entire panel. */
   public void setVisible(boolean visibile) {
     runtimePanel.setVisible(visibile);
   }
 
-  /**
-   * Sets the text of the runtime label ('custom', 'java', etc.).
-   */
+  /** Sets the text of the runtime label ('custom', 'java', etc.). */
   public void setLabelText(String text) {
     runtimeLabel.setText(text);
   }

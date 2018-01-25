@@ -19,7 +19,6 @@ package com.google.cloud.tools.intellij.appengine.facet.standard;
 import static java.util.stream.Collectors.toSet;
 
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetConfiguration.AppEngineStandardFacetProperties;
-
 import com.intellij.facet.FacetConfiguration;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
@@ -29,41 +28,32 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
-
-import org.jdom.Element;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
+import org.jdom.Element;
+import org.jetbrains.annotations.NotNull;
 
-/**
- * @author nik
- */
-public class AppEngineStandardFacetConfiguration implements FacetConfiguration,
-    PersistentStateComponent<AppEngineStandardFacetProperties> {
+/** @author nik */
+public class AppEngineStandardFacetConfiguration
+    implements FacetConfiguration, PersistentStateComponent<AppEngineStandardFacetProperties> {
 
-  private AppEngineStandardFacetProperties properties
-      = new AppEngineStandardFacetProperties();
+  private AppEngineStandardFacetProperties properties = new AppEngineStandardFacetProperties();
 
   @Override
-  public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext,
-      FacetValidatorsManager validatorsManager) {
-    return new FacetEditorTab[]{
-        new AppEngineStandardFacetEditor(this, editorContext)
-    };
+  public FacetEditorTab[] createEditorTabs(
+      FacetEditorContext editorContext, FacetValidatorsManager validatorsManager) {
+    return new FacetEditorTab[] {new AppEngineStandardFacetEditor(this, editorContext)};
   }
 
-  public void readExternal(Element element) throws InvalidDataException {
-  }
+  public void readExternal(Element element) throws InvalidDataException {}
 
-  public void writeExternal(Element element) throws WriteExternalException {
-  }
+  public void writeExternal(Element element) throws WriteExternalException {}
 
   /**
-   * Looks up the user's configured libraries for the project and returns a set of
-   * {@link AppEngineStandardMavenLibrary} for each configured library matching one of the AE
-   * standard managed libraries.
+   * Looks up the user's configured libraries for the project and returns a set of {@link
+   * AppEngineStandardMavenLibrary} for each configured library matching one of the AE standard
+   * managed libraries.
    *
    * <p>The lookup is performed based on the maven display id consisting of groupId, artifactName,
    * and version. If the configured lib doesn't entirely match this strategy, then it will not be
@@ -71,9 +61,10 @@ public class AppEngineStandardFacetConfiguration implements FacetConfiguration,
    */
   public Set<AppEngineStandardMavenLibrary> getLibraries(@NotNull Project project) {
     return Arrays.stream(
-        LibraryTablesRegistrar.getInstance().getLibraryTable(project).getLibraries())
-        .map(library ->
-            AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(library.getName()))
+            LibraryTablesRegistrar.getInstance().getLibraryTable(project).getLibraries())
+        .map(
+            library ->
+                AppEngineStandardMavenLibrary.getLibraryByMavenDisplayName(library.getName()))
         .filter(Optional::isPresent)
         .map(Optional::get)
         .collect(toSet());
@@ -89,7 +80,5 @@ public class AppEngineStandardFacetConfiguration implements FacetConfiguration,
     properties = state;
   }
 
-  public static class AppEngineStandardFacetProperties {
-
-  }
+  public static class AppEngineStandardFacetProperties {}
 }

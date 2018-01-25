@@ -19,13 +19,10 @@ package com.google.cloud.tools.intellij.debugger;
 import com.google.cloud.tools.intellij.debugger.ui.LogoutDebugProcessDetacher;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
-
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.openapi.diagnostic.Logger;
-
-import org.jetbrains.annotations.NotNull;
-
 import java.io.OutputStream;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * The CloudDebugProcessHandler handles attach and detach actions. It also acts as the container of
@@ -37,9 +34,7 @@ public class CloudDebugProcessHandler extends ProcessHandler {
 
   private final CloudDebugProcess process;
 
-  /**
-   * Initialize the cloud debug process handler.
-   */
+  /** Initialize the cloud debug process handler. */
   public CloudDebugProcessHandler(@NotNull CloudDebugProcess process) {
     this.process = process;
     if (process.getProcessState() != null) {

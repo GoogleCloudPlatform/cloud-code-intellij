@@ -19,15 +19,14 @@ package com.google.cloud.tools.intellij.resources;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.services.appengine.v1.Appengine;
 import com.google.api.services.cloudresourcemanager.CloudResourceManager;
+import com.google.api.services.servicemanagement.ServiceManagement;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.intellij.openapi.components.ServiceManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Factory class for creating instances of Google API clients.
- */
+/** Factory class for creating instances of Google API clients. */
 public abstract class GoogleApiClientFactory {
 
   public static GoogleApiClientFactory getInstance() {
@@ -35,18 +34,28 @@ public abstract class GoogleApiClientFactory {
   }
 
   /**
-   * Creates a new instance of a {@link CloudResourceManager} client
+   * Creates a new instance of a {@link CloudResourceManager} client.
+   *
    * @param httpRequestInitializer optional HttpRequestInitializer
    */
-  public abstract CloudResourceManager getCloudResourceManagerClient(@Nullable HttpRequestInitializer
-      httpRequestInitializer);
+  public abstract CloudResourceManager getCloudResourceManagerClient(
+      @Nullable HttpRequestInitializer httpRequestInitializer);
 
   /**
-   * Creates a new instance of a {@link Appengine} client
+   * Creates a new instance of a {@link ServiceManagement} client.
+   *
    * @param httpRequestInitializer optional HttpRequestInitializer
    */
-  public abstract Appengine getAppEngineApiClient(@Nullable HttpRequestInitializer
-      httpRequestInitializer);
+  public abstract ServiceManagement getServiceManagementClient(
+      @Nullable HttpRequestInitializer httpRequestInitializer);
+
+  /**
+   * Creates a new instance of a {@link Appengine} client.
+   *
+   * @param httpRequestInitializer optional HttpRequestInitializer
+   */
+  public abstract Appengine getAppEngineApiClient(
+      @Nullable HttpRequestInitializer httpRequestInitializer);
 
   /**
    * Creates a new instance of {@link Storage} client.

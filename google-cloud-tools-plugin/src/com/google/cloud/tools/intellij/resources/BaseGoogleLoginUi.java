@@ -17,26 +17,20 @@
 package com.google.cloud.tools.intellij.resources;
 
 import com.google.cloud.tools.intellij.login.ui.GoogleLoginIcons;
-
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.UIUtil;
-
-import org.jetbrains.annotations.NotNull;
-
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
+import org.jetbrains.annotations.NotNull;
 
-/**
- * UI for the node that prompts for Google Login.
- */
-class BaseGoogleLoginUi extends JPanel {
+/** UI for the node that prompts for Google Login. */
+public class BaseGoogleLoginUi extends JPanel {
 
   public static final int PREFERRED_HEIGHT = 150;
   public static final int MIN_WIDTH = 450;

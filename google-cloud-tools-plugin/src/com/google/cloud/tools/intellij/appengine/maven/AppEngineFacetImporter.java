@@ -16,16 +16,16 @@
 
 package com.google.cloud.tools.intellij.appengine.maven;
 
-import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetConfiguration;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetConfiguration;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardWebIntegration;
-
 import com.intellij.facet.FacetType;
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider;
 import com.intellij.openapi.module.Module;
 import com.intellij.packaging.artifacts.Artifact;
-
+import java.util.List;
+import java.util.Map;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.importing.FacetImporter;
 import org.jetbrains.idea.maven.importing.MavenRootModelAdapter;
@@ -36,25 +36,23 @@ import org.jetbrains.idea.maven.project.MavenProjectChanges;
 import org.jetbrains.idea.maven.project.MavenProjectsProcessorTask;
 import org.jetbrains.idea.maven.project.MavenProjectsTree;
 
-import java.util.List;
-import java.util.Map;
-
-/**
- * @author nik
- */
+/** @author nik */
 // TODO update this to use the new maven plugin and sdk
-public class AppEngineFacetImporter extends
-    FacetImporter<AppEngineStandardFacet, AppEngineStandardFacetConfiguration, AppEngineStandardFacetType> {
+public class AppEngineFacetImporter
+    extends FacetImporter<
+        AppEngineStandardFacet, AppEngineStandardFacetConfiguration, AppEngineStandardFacetType> {
 
   public AppEngineFacetImporter() {
-    super("com.google.appengine", "appengine-maven-plugin",
+    super(
+        "com.google.appengine",
+        "appengine-maven-plugin",
         FacetType.findInstance(AppEngineStandardFacetType.class));
   }
 
   @Nullable
   private String getVersion(MavenProject project) {
-    for (MavenArtifact artifact : project
-        .findDependencies("com.google.appengine", "appengine-api-1.0-sdk")) {
+    for (MavenArtifact artifact :
+        project.findDependencies("com.google.appengine", "appengine-api-1.0-sdk")) {
       String artifactVersion = artifact.getVersion();
       if (artifactVersion != null) {
         return artifactVersion;
@@ -65,12 +63,11 @@ public class AppEngineFacetImporter extends
   }
 
   @Override
-  protected void setupFacet(AppEngineStandardFacet facet, MavenProject mavenProject) {
-
-  }
+  protected void setupFacet(AppEngineStandardFacet facet, MavenProject mavenProject) {}
 
   @Override
-  protected void reimportFacet(IdeModifiableModelsProvider modelsProvider,
+  protected void reimportFacet(
+      IdeModifiableModelsProvider modelsProvider,
       Module module,
       MavenRootModelAdapter rootModel,
       AppEngineStandardFacet facet,
@@ -83,12 +80,10 @@ public class AppEngineFacetImporter extends
     if (version != null) {
       AppEngineStandardWebIntegration.getInstance().setupDevServer();
       final String artifactName = module.getName() + ":war exploded";
-      final Artifact webArtifact = modelsProvider.getModifiableArtifactModel()
-          .findArtifact(artifactName);
-      AppEngineStandardWebIntegration.getInstance().setupRunConfigurations(
-          webArtifact,
-          module,
-          null /* existingConfiguration */);
+      final Artifact webArtifact =
+          modelsProvider.getModifiableArtifactModel().findArtifact(artifactName);
+      AppEngineStandardWebIntegration.getInstance()
+          .setupRunConfigurations(webArtifact, module, null /* existingConfiguration */);
     }
   }
 }
