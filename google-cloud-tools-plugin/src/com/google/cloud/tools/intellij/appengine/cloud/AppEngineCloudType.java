@@ -24,7 +24,6 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.RemoteServerConfigurable;
 import com.intellij.remoteServer.ServerType;
@@ -98,7 +97,7 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
         return;
       }
 
-      CloudSdkValidator sdkValidator = ServiceManager.getService(CloudSdkValidator.class);
+      CloudSdkValidator sdkValidator = CloudSdkValidator.getSdkValidator();
       if (!sdkValidator.isValidCloudSdk()) {
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.invalid.cloudsdk"));
         Notification invalidSdkWarning =

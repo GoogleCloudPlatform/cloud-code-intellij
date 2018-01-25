@@ -39,7 +39,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.application.WriteAction;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
@@ -287,7 +286,7 @@ public class AppEngineStandardSupportProvider extends FrameworkSupportInModulePr
         @NotNull ModifiableRootModel rootModel,
         @NotNull ModifiableModelsProvider modifiableModelsProvider) {
       CloudSdkService sdkService = CloudSdkService.getInstance();
-      CloudSdkValidator sdkValidator = ServiceManager.getService(CloudSdkValidator.class);
+      CloudSdkValidator sdkValidator = CloudSdkValidator.getSdkValidator();
       if (!sdkValidator
           .validateCloudSdk(cloudSdkPanel.getCloudSdkDirectoryText())
           .contains(CloudSdkValidationResult.MALFORMED_PATH)) {

@@ -22,7 +22,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.intellij.icons.AllIcons.RunConfigurations;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
@@ -104,8 +103,7 @@ public class CloudSdkPanel {
       return htmlEnabled ? missingMessage + " " + getCloudSdkDownloadMessage() : missingMessage;
     }
 
-    CloudSdkService sdkService = CloudSdkService.getInstance();
-    CloudSdkValidator sdkValidator = ServiceManager.getService(CloudSdkValidator.class);
+    CloudSdkValidator sdkValidator = CloudSdkValidator.getSdkValidator();
     // Use a sorted set to guarantee consistent ordering of CloudSdkValidationResults.
     Set<CloudSdkValidationResult> validationResults =
         new TreeSet<>(sdkValidator.validateCloudSdk(path));
