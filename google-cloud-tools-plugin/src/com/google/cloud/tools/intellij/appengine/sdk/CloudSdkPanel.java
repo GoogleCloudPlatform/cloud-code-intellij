@@ -195,7 +195,8 @@ public class CloudSdkPanel {
   }
 
   public void apply() throws ConfigurationException {
-    Set<CloudSdkValidationResult> validationResults = validateCloudSdk();
+    Set<CloudSdkValidationResult> validationResults =
+        CloudSdkValidator.getSdkValidator().validateCloudSdk(getCloudSdkDirectoryText());
     if (validationResults.contains(CloudSdkValidationResult.MALFORMED_PATH)) {
       throw new ConfigurationException(
           GctBundle.message("appengine.cloudsdk.location.badchars.message"));
@@ -230,13 +231,6 @@ public class CloudSdkPanel {
   @NotNull
   public JPanel getComponent() {
     return cloudSdkPanel;
-  }
-
-  @VisibleForTesting
-  public Set<CloudSdkValidationResult> validateCloudSdk() {
-    CloudSdkService sdkService = CloudSdkService.getInstance();
-    CloudSdkValidator sdkValidator = ServiceManager.getService(CloudSdkValidator.class);
-    return sdkValidator.validateCloudSdk(getCloudSdkDirectoryText());
   }
 
   private String getCloudSdkDownloadMessage() {

@@ -30,7 +30,6 @@ import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibl
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestDirectory;
@@ -66,7 +65,7 @@ public final class AppEngineDeploymentConfigurationTest {
   @Mock private AppEngineDeployable mockAppEngineDeployable;
   @Mock private UserSpecifiedPathDeploymentSource mockUserSpecifiedPathDeploymentSource;
   @Mock private DeploymentSource mockOtherDeploymentSource;
-  @Mock @TestService private CloudSdkService mockCloudSdkService;
+
   @Mock @TestService private CloudSdkValidator mockSdkValidator;
   @Mock @TestService private AppEngineProjectService mockAppEngineProjectService;
 
@@ -203,8 +202,7 @@ public final class AppEngineDeploymentConfigurationTest {
   @Test
   public void checkConfiguration_withNoAppEngineComponent_throwsException() {
     setUpValidFlexConfiguration();
-    when(mockSdkValidator.validateCloudSdk())
-        .thenReturn(ImmutableSet.of(NO_APP_ENGINE_COMPONENT));
+    when(mockSdkValidator.validateCloudSdk()).thenReturn(ImmutableSet.of(NO_APP_ENGINE_COMPONENT));
 
     RuntimeConfigurationError error =
         expectThrows(

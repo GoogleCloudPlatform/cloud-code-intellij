@@ -22,6 +22,7 @@ import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkOutOfDateException;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
+import com.intellij.openapi.components.ServiceManager;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,10 +31,12 @@ import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/** Helper class to check validity of {@link CloudSdkService}. */
+/** Helper service to check validity of {@link CloudSdkService}. */
 public class CloudSdkValidator {
 
-  private final CloudSdkService cloudSdkService = CloudSdkService.getInstance();
+  public static CloudSdkValidator getSdkValidator() {
+    return ServiceManager.getService(CloudSdkValidator.class);
+  }
 
   protected Set<com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult>
       validateCloudSdk(Path path) {
@@ -73,10 +76,10 @@ public class CloudSdkValidator {
 
     return validationResults;
   }
-  /** Checks if the stored path contains a valid Cloud SDK. */
+  /** Checks if the default SDK stored path contains a valid Cloud SDK. */
   public Set<com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult>
       validateCloudSdk() {
-    return validateCloudSdk(cloudSdkService.getSdkHomePath());
+    return validateCloudSdk(CloudSdkService.getInstance().getSdkHomePath());
   }
 
   /**
@@ -106,9 +109,9 @@ public class CloudSdkValidator {
     return validateCloudSdk(path).isEmpty();
   }
 
-  /** Checks if the saved path contains a valid Cloud SDK installation. */
+  /** Checks if the default SDK saved path contains a valid Cloud SDK installation. */
   public boolean isValidCloudSdk() {
-    return validateCloudSdk(cloudSdkService.getSdkHomePath()).isEmpty();
+    return validateCloudSdk(CloudSdkService.getInstance().getSdkHomePath()).isEmpty();
   }
 
   /** Checks for invalid characters that trigger an {@link InvalidPathException} on Windows. */

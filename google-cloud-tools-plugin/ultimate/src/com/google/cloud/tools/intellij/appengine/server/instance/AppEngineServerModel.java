@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.server.instance;
 
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -126,7 +126,7 @@ public class AppEngineServerModel
           GctBundle.message("appengine.run.server.artifact.missing"));
     }
 
-    if (!CloudSdkService.getInstance().isValidCloudSdk()) {
+    if (!CloudSdkValidator.getSdkValidator().isValidCloudSdk()) {
       throw new RuntimeConfigurationError(
           GctBundle.message("appengine.run.server.sdk.misconfigured.panel.message"));
     }

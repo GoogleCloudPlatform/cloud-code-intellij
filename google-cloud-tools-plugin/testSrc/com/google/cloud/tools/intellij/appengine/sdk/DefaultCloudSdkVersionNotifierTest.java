@@ -20,34 +20,30 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.cloud.tools.appengine.cloudsdk.internal.process.ProcessRunnerException;
-import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
+import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.common.collect.Sets;
 import com.intellij.util.containers.HashSet;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Spy;
 
 /** Unit tests for {@link DefaultCloudSdkVersionNotifier} */
-public class DefaultCloudSdkVersionNotifierTest extends BasePluginTestCase {
+public class DefaultCloudSdkVersionNotifierTest {
+
+  @Rule public CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
 
   // Wrap the class under test in a spy so we can perform verifications on it
   @Spy private DefaultCloudSdkVersionNotifier checker;
 
-  @Mock private CloudSdkService cloudSdkServiceMock;
+  @Mock @TestService private CloudSdkService cloudSdkServiceMock;
 
-  @Mock private CloudSdkValidator cloudSdkValidator;
-
-  @Before
-  public void setUp() throws ProcessRunnerException {
-    registerService(CloudSdkService.class, cloudSdkServiceMock);
-  }
+  @Mock @TestService private CloudSdkValidator cloudSdkValidator;
 
   @Test
   public void testNotifyIfCloudSdkNotSupported_isSupported() {
-    when(cloudSdkValidator.validateCloudSdk())
-        .thenReturn(new HashSet<>());
+    when(cloudSdkValidator.validateCloudSdk()).thenReturn(new HashSet<>());
     checker.notifyIfUnsupportedVersion();
 
     verify(checker, times(0)).showNotification();

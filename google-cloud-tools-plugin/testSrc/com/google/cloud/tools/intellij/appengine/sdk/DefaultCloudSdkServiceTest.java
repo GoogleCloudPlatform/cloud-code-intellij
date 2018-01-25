@@ -20,6 +20,7 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
@@ -27,8 +28,6 @@ import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInsta
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkOutOfDateException;
-import com.google.cloud.tools.appengine.cloudsdk.serialization.CloudSdkVersion;
-import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
 import java.nio.file.Path;
@@ -41,15 +40,10 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 
 /** Unit tests for {@link DefaultCloudSdkService} */
-public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
+public class DefaultCloudSdkServiceTest {
   @Rule public CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
 
-  private static final CloudSdkVersion unsupportedVersion = new CloudSdkVersion("1.0.0");
-  // arbitrarily high version number
-  private static final CloudSdkVersion supportedVersion =
-      new CloudSdkVersion(Integer.toString(Integer.MAX_VALUE) + ".0.0");
-
-  @Mock @TestService private DefaultCloudSdkService service;
+  @Mock @TestService private CloudSdkService service;
 
   @Spy @TestService private CloudSdkValidator sdkValidator;
 
@@ -58,7 +52,7 @@ public class DefaultCloudSdkServiceTest extends BasePluginTestCase {
   @Before
   public void setUp() throws Exception {
     when(service.getSdkHomePath()).thenReturn(Paths.get("/home/path"));
-    when(sdkValidator.buildCloudSdkWithPath(any())).thenReturn(mockSdk);
+    doReturn(mockSdk).when(sdkValidator).buildCloudSdkWithPath(any(Path.class));
   }
 
   @Test

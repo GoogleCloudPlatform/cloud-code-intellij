@@ -18,7 +18,7 @@ package com.google.cloud.tools.intellij.appengine.server.run;
 
 import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineExecutor;
 import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineStandardRunTask;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator;
 import com.google.cloud.tools.intellij.appengine.server.instance.AppEngineServerModel;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.collect.Maps;
@@ -63,7 +63,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
               String workingDirectory, Map<String, String> configuredEnvironment)
               throws ExecutionException {
 
-            if (!CloudSdkService.getInstance().isValidCloudSdk()) {
+            if (!CloudSdkValidator.getSdkValidator().isValidCloudSdk()) {
               throw new ExecutionException(
                   GctBundle.message("appengine.run.server.sdk.misconfigured.message"));
             }
