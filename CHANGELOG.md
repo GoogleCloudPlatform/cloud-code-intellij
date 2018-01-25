@@ -1,6 +1,11 @@
 # Release notes
 This page documents production updates to Cloud Tools for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## 18.1.1
+
+### Fixed
+  - Fixed broken error reporting mechanism. [1842](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1842)
+
 ## 17.12.2
 
 ### Fixed
