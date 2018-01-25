@@ -30,21 +30,24 @@ public interface CloudSdkService {
   @Nullable
   Path getSdkHomePath();
 
+  /* TODO(ivanporty) to be removed from common interface, only applies for custom sdk service.*/
+  @Deprecated
   void setSdkHomePath(String path);
 
-  /*enum SdkStatus {
-    READY, INSTALLING, INVALID, NOT_AVAILABLE
+  SdkStatus getStatus();
+
+  boolean installAutomatically();
+
+  void addStatusUpdateListener(SdkStatusUpdateListener listener);
+
+  enum SdkStatus {
+    READY,
+    INSTALLING,
+    INVALID,
+    NOT_AVAILABLE
   }
 
-  static interface SdkStatusUpdateListener {
+  interface SdkStatusUpdateListener {
     void onSdkStatusChange(CloudSdkService sdkService, SdkStatus status);
   }
-
-  abstract SdkStatus getStatus();
-
-  abstract boolean installAutomatically();
-
-  void addStatusUpdateListener(SdkStatusUpdateListener listener) {
-
-  }*/
 }

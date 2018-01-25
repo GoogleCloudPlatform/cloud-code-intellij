@@ -20,6 +20,7 @@ import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctTracking;
+import com.google.common.base.Strings;
 import com.intellij.ide.util.PropertiesComponent;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,7 +30,6 @@ import org.jetbrains.annotations.Nullable;
  * Default implementation of {@link CloudSdkService} backed by {@link PropertiesComponent} for
  * serialization.
  */
-// TODO (eshaul) Offload path logic for retrieving AE libs to the common library once implemented
 public class DefaultCloudSdkService implements CloudSdkService {
 
   private PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
@@ -38,15 +38,15 @@ public class DefaultCloudSdkService implements CloudSdkService {
   @Nullable
   @Override
   public Path getSdkHomePath() {
-    if (propertiesComponent.getValue(CLOUD_SDK_PROPERTY_KEY) != null) {
+    String sdkPath = propertiesComponent.getValue(CLOUD_SDK_PROPERTY_KEY);
+    if (sdkPath != null) {
       // To let Windows users that persisted the old malformed path save a new one.
       // TODO(joaomartins): Delete this after a while so gets are faster.
-      if (CloudSdkValidator.isMalformedCloudSdkPath(
-          propertiesComponent.getValue(CLOUD_SDK_PROPERTY_KEY))) {
+      if (CloudSdkValidator.isMalformedCloudSdkPath(sdkPath)) {
         UsageTrackerProvider.getInstance().trackEvent(GctTracking.CLOUD_SDK_MALFORMED_PATH).ping();
         return null;
       }
-      return Paths.get(propertiesComponent.getValue(CLOUD_SDK_PROPERTY_KEY));
+      return Paths.get(sdkPath);
     }
 
     // Let common library auto-discover Cloud SDK's location.
@@ -60,5 +60,26 @@ public class DefaultCloudSdkService implements CloudSdkService {
   @Override
   public void setSdkHomePath(String cloudSdkHomePath) {
     propertiesComponent.setValue(CLOUD_SDK_PROPERTY_KEY, cloudSdkHomePath);
+  }
+
+  @Override
+  public SdkStatus getStatus() {
+    String sdkPath = propertiesComponent.getValue(CLOUD_SDK_PROPERTY_KEY);
+    if (Strings.isNullOrEmpty(sdkPath)) {
+      return SdkStatus.NOT_AVAILABLE;
+    }
+
+    boolean malformedSdkPath = CloudSdkValidator.isMalformedCloudSdkPath(sdkPath);
+    return malformedSdkPath ? SdkStatus.INVALID : SdkStatus.READY;
+  }
+
+  @Override
+  public boolean installAutomatically() {
+    return false; /* not supported. */
+  }
+
+  @Override
+  public void addStatusUpdateListener(SdkStatusUpdateListener listener) {
+    /* not supported. */
   }
 }
