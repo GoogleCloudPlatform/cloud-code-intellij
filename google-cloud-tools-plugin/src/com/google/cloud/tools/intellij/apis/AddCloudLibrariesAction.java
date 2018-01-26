@@ -20,11 +20,11 @@ import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.project.Project;
 import git4idea.DialogManager;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * The action in the Google Cloud Tools menu group that opens the wizard to add client libraries to
@@ -41,19 +41,16 @@ public final class AddCloudLibrariesAction extends DumbAwareAction {
 
   @Override
   public void update(AnActionEvent e) {
-    boolean enableAddLibraries = false;
-    Project project = e.getProject();
-    if (project != null) {
-      // check if this project has any 'maven-style' modules.
-      for (Module module : ModuleManager.getInstance(project).getModules()) {
-        if (AppEngineProjectService.getInstance().isMavenModule(module)) {
-          enableAddLibraries = true;
-          break;
-        }
-      }
-    }
-
-    e.getPresentation().setVisible(enableAddLibraries);
+    e.getPresentation()
+        .setVisible(
+            Optional.ofNullable(e.getProject())
+                .map(
+                    project ->
+                        Stream.of(ModuleManager.getInstance(project).getModules())
+                            .anyMatch(
+                                module ->
+                                    AppEngineProjectService.getInstance().isMavenModule(module)))
+                .orElse(false));
   }
 
   @Override
