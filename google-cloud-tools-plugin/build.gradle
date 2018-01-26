@@ -60,6 +60,8 @@ dependencies {
         exclude group: 'com.google.code.findbugs', module: 'jsr305'
         exclude group: 'com.google.guava', module: 'guava'
         exclude group: 'com.google.oauth-client', module: 'google-oauth-client'
+        exclude group: 'com.google.protobuf', module: 'protobuf-java'
+        exclude group: 'com.google.protobuf', module: 'protobuf-java-util'
     }
     compile 'com.google.apis:google-api-services-servicemanagement:v1-rev374-1.22.0'
     compile ('com.google.cloud.tools:appengine-plugins-core:' + toolsLibVersion) {
