@@ -19,8 +19,12 @@ package com.google.cloud.tools.intellij.apis;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import git4idea.DialogManager;
+import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
 /**
  * The action in the Google Cloud Tools menu group that opens the wizard to add client libraries to
@@ -33,6 +37,23 @@ public final class AddCloudLibrariesAction extends DumbAwareAction {
         GctBundle.message("cloud.libraries.menu.action.text"),
         GctBundle.message("cloud.libraries.menu.action.description"),
         GoogleCloudToolsIcons.CLOUD);
+  }
+
+  @Override
+  public void update(AnActionEvent e) {
+    boolean enableAddLibraries = false;
+    Project project = e.getProject();
+    if (project != null) {
+      // check if this project has any 'maven-style' modules.
+      for (Module module: ModuleManager.getInstance(project).getModules()) {
+        if (MavenProjectsManager.getInstance(project).isMavenizedModule(module)) {
+          enableAddLibraries = true;
+          break;
+        }
+      }
+    }
+
+    e.getPresentation().setVisible(enableAddLibraries);
   }
 
   @Override
