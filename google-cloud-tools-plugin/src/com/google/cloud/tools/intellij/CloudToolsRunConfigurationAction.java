@@ -27,11 +27,9 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-
+import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import javax.swing.Icon;
 
 /**
  * Creates or executes a run configuration of a given type. If the run configuration already exists,
@@ -59,25 +57,27 @@ public class CloudToolsRunConfigurationAction extends AnAction {
       return;
     }
 
-    final RunnerAndConfigurationSettings settings = RunManagerImpl.getInstanceImpl(project)
-        .findConfigurationByName(configType.getDisplayName());
+    final RunnerAndConfigurationSettings settings =
+        RunManagerImpl.getInstanceImpl(project)
+            .findConfigurationByName(configType.getDisplayName());
 
-    ApplicationManager.getApplication().invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        if (settings == null) {
-          createNewConfiguration(project);
-        } else {
-          runExistingConfiguration(project, settings);
-        }
-      }
-    });
-
+    ApplicationManager.getApplication()
+        .invokeLater(
+            new Runnable() {
+              @Override
+              public void run() {
+                if (settings == null) {
+                  createNewConfiguration(project);
+                } else {
+                  runExistingConfiguration(project, settings);
+                }
+              }
+            });
   }
 
   private void runExistingConfiguration(Project project, RunnerAndConfigurationSettings settings) {
-    ProgramRunnerUtil
-        .executeConfiguration(project, settings, DefaultDebugExecutor.getDebugExecutorInstance());
+    ProgramRunnerUtil.executeConfiguration(
+        project, settings, DefaultDebugExecutor.getDebugExecutorInstance());
   }
 
   private void createNewConfiguration(Project project) {
@@ -96,5 +96,4 @@ public class CloudToolsRunConfigurationAction extends AnAction {
       }
     }
   }
-
 }

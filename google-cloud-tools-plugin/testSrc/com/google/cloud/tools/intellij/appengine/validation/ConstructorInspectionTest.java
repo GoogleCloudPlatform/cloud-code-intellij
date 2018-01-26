@@ -16,8 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.validation;
 
-import com.google.cloud.tools.intellij.appengine.util.EndpointUtilities;
+import static org.mockito.Mockito.mock;
 
+import com.google.cloud.tools.intellij.appengine.util.EndpointUtilities;
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
 import com.intellij.codeInspection.ex.ProblemDescriptorImpl;
@@ -25,37 +26,31 @@ import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElementFactory;
 import com.intellij.psi.PsiMethod;
-
 import junit.framework.Assert;
-
 import org.mockito.MockitoAnnotations;
 
-import static org.mockito.Mockito.mock;
-
-/**
- * Tests for {@link ConstructorInspection}
- */
+/** Tests for {@link ConstructorInspection} */
 public class ConstructorInspectionTest extends EndpointTestBase {
 
   /**
-   * Tests that a ConstructorInspection error is generated for a class with only a constructor
-   * with arguments.
+   * Tests that a ConstructorInspection error is generated for a class with only a constructor with
+   * arguments.
    */
   public void testClassWithConstructorWithArgument() {
     doTest();
   }
 
   /**
-   * Tests that a ConstructorInspection error is not generated for a class with
-   * with no user provided constructor.
+   * Tests that a ConstructorInspection error is not generated for a class with with no user
+   * provided constructor.
    */
   public void testClassWithNoConstructor() {
     doTest();
   }
 
   /**
-   * Tests that a ConstructorInspection error is generated for a class with only a
-   * private constructor.
+   * Tests that a ConstructorInspection error is generated for a class with only a private
+   * constructor.
    */
   public void testClassWithPrivateConstructor() {
     doTest();
@@ -70,16 +65,16 @@ public class ConstructorInspectionTest extends EndpointTestBase {
   }
 
   /**
-   *  Tests that a ConstructorInspection error is not generated for a class with multiple
-   *  constructors including a public nullary constructor.
+   * Tests that a ConstructorInspection error is not generated for a class with multiple
+   * constructors including a public nullary constructor.
    */
   public void testMultipleConstructorsIncludingPublicNullary() {
     doTest();
   }
 
   /**
-   *  Tests that a ConstructorInspection error is generated for a class with multiple
-   *  constructors that does not include a public nullary constructor.
+   * Tests that a ConstructorInspection error is generated for a class with multiple constructors
+   * that does not include a public nullary constructor.
    */
   public void testMultipleConstructorsWithoutPublicNullary() {
     doTest();
@@ -89,7 +84,10 @@ public class ConstructorInspectionTest extends EndpointTestBase {
     ProblemDescriptorImpl problemDescriptorMock = mock(ProblemDescriptorImpl.class);
     MockitoAnnotations.initMocks(this);
 
-    PsiClass psiClass = JavaPsiFacade.getInstance(myFixture.getProject()).getElementFactory().createClass(getName());
+    PsiClass psiClass =
+        JavaPsiFacade.getInstance(myFixture.getProject())
+            .getElementFactory()
+            .createClass(getName());
     ConstructorInspection constructorInspection = new ConstructorInspection();
     ConstructorInspection.MyQuickFix myQuickFix = constructorInspection.new MyQuickFix(psiClass);
     myQuickFix.applyFix(myFixture.getProject(), problemDescriptorMock);
@@ -101,9 +99,11 @@ public class ConstructorInspectionTest extends EndpointTestBase {
     ProblemDescriptorImpl problemDescriptorMock = mock(ProblemDescriptorImpl.class);
     MockitoAnnotations.initMocks(this);
 
-    PsiElementFactory factory = JavaPsiFacade.getInstance(myFixture.getProject()).getElementFactory();
+    PsiElementFactory factory =
+        JavaPsiFacade.getInstance(myFixture.getProject()).getElementFactory();
     PsiClass psiClass = factory.createClass(getName());
-    PsiMethod nullaryConstructor = factory.createMethodFromText("public " + psiClass.getName() + "() { }", psiClass);
+    PsiMethod nullaryConstructor =
+        factory.createMethodFromText("public " + psiClass.getName() + "() { }", psiClass);
     psiClass.addAfter(nullaryConstructor, null);
 
     ConstructorInspection constructorInspection = new ConstructorInspection();
@@ -117,9 +117,12 @@ public class ConstructorInspectionTest extends EndpointTestBase {
     ProblemDescriptorImpl problemDescriptorMock = mock(ProblemDescriptorImpl.class);
     MockitoAnnotations.initMocks(this);
 
-    PsiElementFactory factory = JavaPsiFacade.getInstance(myFixture.getProject()).getElementFactory();
+    PsiElementFactory factory =
+        JavaPsiFacade.getInstance(myFixture.getProject()).getElementFactory();
     PsiClass psiClass = factory.createClass(getName());
-    PsiMethod nullaryConstructor = factory.createMethodFromText("public " + psiClass.getName() + "(String param) { }", psiClass);
+    PsiMethod nullaryConstructor =
+        factory.createMethodFromText(
+            "public " + psiClass.getName() + "(String param) { }", psiClass);
     psiClass.addAfter(nullaryConstructor, null);
 
     ConstructorInspection constructorInspection = new ConstructorInspection();
@@ -134,6 +137,8 @@ public class ConstructorInspectionTest extends EndpointTestBase {
     String testName = getTestName(true);
     final String testDataPath = getTestDataPath();
     myFixture.setTestDataPath(testDataPath);
-    myFixture.testInspection("inspections/constructorInspection/" + testName, new LocalInspectionToolWrapper(localInspectionTool));
+    myFixture.testInspection(
+        "inspections/constructorInspection/" + testName,
+        new LocalInspectionToolWrapper(localInspectionTool));
   }
 }

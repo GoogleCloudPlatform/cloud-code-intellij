@@ -22,35 +22,33 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.AbstractVcs;
 import com.intellij.openapi.vcs.actions.VcsQuickListContentProvider;
-
+import java.util.Collections;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.List;
-
-/**
- * Adds Google Cloud Platform checkout to VCS quicklist.
- */
+/** Adds Google Cloud Platform checkout to VCS quicklist. */
 public class GcpQuickListContentProvider implements VcsQuickListContentProvider {
 
   @Override
-  public List<AnAction> getVcsActions(@Nullable Project project, @Nullable AbstractVcs activeVcs,
+  public List<AnAction> getVcsActions(
+      @Nullable Project project,
+      @Nullable AbstractVcs activeVcs,
       @Nullable DataContext dataContext) {
     return null;
   }
 
   @Override
-  public List<AnAction> getNotInVcsActions(@Nullable Project project,
-      @Nullable DataContext dataContext) {
-    final AnAction action = ActionManager.getInstance()
-        .getAction("GoogleCloudTools.UploadSourceToGCP");
+  public List<AnAction> getNotInVcsActions(
+      @Nullable Project project, @Nullable DataContext dataContext) {
+    final AnAction action =
+        ActionManager.getInstance().getAction("GoogleCloudTools.UploadSourceToGCP");
     return Collections.singletonList(action);
   }
 
   @Override
-  public boolean replaceVcsActionsFor(@NotNull AbstractVcs activeVcs,
-      @Nullable DataContext dataContext) {
+  public boolean replaceVcsActionsFor(
+      @NotNull AbstractVcs activeVcs, @Nullable DataContext dataContext) {
     return false;
   }
 }

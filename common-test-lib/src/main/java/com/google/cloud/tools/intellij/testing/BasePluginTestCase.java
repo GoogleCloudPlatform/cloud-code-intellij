@@ -28,9 +28,7 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.picocontainer.MutablePicoContainer;
 
-/**
- * Test base class that provides a mock Intellij application and project.
- */
+/** Test base class that provides a mock Intellij application and project. */
 @RunWith(MockitoJUnitRunner.class)
 public class BasePluginTestCase {
 
@@ -39,25 +37,21 @@ public class BasePluginTestCase {
 
   private ExtensionsAreaImpl extensionsArea;
 
-  /**
-   * Sets up the container.
-   */
+  /** Sets up the container. */
   @Before
   public final void setup() {
     // prevent memory leak error
     TestRunnerUtil.replaceIdeEventQueueSafely();
 
     Disposable disposableParent = TestUtils.createMockApplication();
-    applicationContainer = (MutablePicoContainer)
-        ApplicationManager.getApplication().getPicoContainer();
+    applicationContainer =
+        (MutablePicoContainer) ApplicationManager.getApplication().getPicoContainer();
     project = TestUtils.mockProject(applicationContainer);
     Extensions.cleanRootArea(disposableParent);
     extensionsArea = (ExtensionsAreaImpl) Extensions.getRootArea();
   }
 
-  /**
-   * Register your mock implementations here before executing your test cases.
-   */
+  /** Register your mock implementations here before executing your test cases. */
   protected <T> void registerService(Class<T> clazz, T instance) {
     applicationContainer.registerComponentInstance(clazz.getName(), instance);
   }

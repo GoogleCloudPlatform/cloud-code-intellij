@@ -23,6 +23,7 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson.JacksonFactory;
 import com.google.api.services.appengine.v1.Appengine;
 import com.google.api.services.cloudresourcemanager.CloudResourceManager;
+import com.google.api.services.servicemanagement.ServiceManagement;
 import com.google.auth.oauth2.UserCredentials;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
@@ -39,19 +40,24 @@ public class DefaultGoogleApiClientFactory extends GoogleApiClientFactory {
   private static final JsonFactory jsonFactory = new JacksonFactory();
 
   @Override
-  public CloudResourceManager getCloudResourceManagerClient(@Nullable HttpRequestInitializer
-      httpRequestInitializer) {
-    return new CloudResourceManager.Builder(
-        httpTransport, jsonFactory, httpRequestInitializer)
+  public CloudResourceManager getCloudResourceManagerClient(
+      @Nullable HttpRequestInitializer httpRequestInitializer) {
+    return new CloudResourceManager.Builder(httpTransport, jsonFactory, httpRequestInitializer)
         .setApplicationName(getApplicationName())
         .build();
   }
 
   @Override
-  public Appengine getAppEngineApiClient(@Nullable HttpRequestInitializer
-      httpRequestInitializer) {
-    return new Appengine.Builder(
-        httpTransport, jsonFactory, httpRequestInitializer)
+  public ServiceManagement getServiceManagementClient(
+      @Nullable HttpRequestInitializer httpRequestInitializer) {
+    return new ServiceManagement.Builder(httpTransport, jsonFactory, httpRequestInitializer)
+        .setApplicationName(getApplicationName())
+        .build();
+  }
+
+  @Override
+  public Appengine getAppEngineApiClient(@Nullable HttpRequestInitializer httpRequestInitializer) {
+    return new Appengine.Builder(httpTransport, jsonFactory, httpRequestInitializer)
         .setApplicationName(getApplicationName())
         .build();
   }

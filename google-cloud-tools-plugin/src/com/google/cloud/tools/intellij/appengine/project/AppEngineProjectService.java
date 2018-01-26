@@ -19,28 +19,23 @@ package com.google.cloud.tools.intellij.appengine.project;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.AppEngineFlexibleDeploymentArtifactType;
 import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandardRuntime;
-
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
-
+import java.nio.file.Path;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.nio.file.Path;
-import java.util.Optional;
-
-/**
- * A set of helper methods for inspecting an App Engine project's structure and configuration.
- */
+/** A set of helper methods for inspecting an App Engine project's structure and configuration. */
 public abstract class AppEngineProjectService {
 
   /**
-   * Represents the target App Engine runtime as defined in the app.yaml configuration file via
-   * the 'runtime: [custom|java]' field.
+   * Represents the target App Engine runtime as defined in the app.yaml configuration file via the
+   * 'runtime: [custom|java]' field.
    */
   public enum FlexibleRuntime {
     CUSTOM,
@@ -51,9 +46,7 @@ public abstract class AppEngineProjectService {
       return name().toLowerCase();
     }
 
-    /**
-     * Tests if the runtime is {@link FlexibleRuntime#CUSTOM}.
-     */
+    /** Tests if the runtime is {@link FlexibleRuntime#CUSTOM}. */
     public boolean isCustom() {
       return this == FlexibleRuntime.CUSTOM;
     }
@@ -68,11 +61,8 @@ public abstract class AppEngineProjectService {
    * configured in 'compatibility' mode. This indicates that the deployable runs in the flexible
    * environment.
    *
-   * <p>A flex compat deployment source has an appengine-web.xml with either:
-   * {@code
-   * <vm>true</vm>
-   * <env>flex</env>
-   * }
+   * <p>A flex compat deployment source has an appengine-web.xml with either: {@code <vm>true</vm>
+   * <env>flex</env> }
    */
   public abstract boolean isFlexCompat(@Nullable XmlFile appEngineWebXml);
 
@@ -81,10 +71,9 @@ public abstract class AppEngineProjectService {
   /**
    * Determines the {@link AppEngineEnvironment} type of the module. If {@code module} contains an
    * {@link com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacet}, it is
-   * considered Flexible. If it contains an
-   * {@link com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet}, it is
+   * considered Flexible. If it contains an {@link
+   * com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet}, it is
    * considered Standard if its appengine-web.xml doesn't contain <vm>true</vm> or <env>flex</env>.
-   *
    */
   public abstract Optional<AppEngineEnvironment> getModuleAppEngineEnvironment(Module module);
 
@@ -96,34 +85,23 @@ public abstract class AppEngineProjectService {
   public abstract AppEngineStandardRuntime getAppEngineStandardDeclaredRuntime(
       @Nullable XmlFile appengineWebXml);
 
-  /**
-   * {@code true} if the artifact type is an exploded-war.
-   */
+  /** {@code true} if the artifact type is an exploded-war. */
   public abstract boolean isAppEngineStandardArtifactType(@NotNull Artifact artifact);
 
-
-  /**
-   * {@code true} if the artifact type is a jar or war.
-   */
+  /** {@code true} if the artifact type is a jar or war. */
   public abstract boolean isAppEngineFlexArtifactType(@NotNull Artifact artifact);
 
   public abstract boolean hasAppEngineStandardFacet(@NotNull Module module);
 
   public abstract boolean hasAppEngineFlexFacet(@NotNull Module module);
 
-  /**
-   * Determines if the module is backed by maven.
-   */
+  /** Determines if the module is backed by maven. */
   public abstract boolean isMavenModule(@NotNull Module module);
 
-  /**
-   * Determines if the module is backed by gradle.
-   */
+  /** Determines if the module is backed by gradle. */
   public abstract boolean isGradleModule(@NotNull Module module);
 
-  /**
-   * Determines if the module has jar or war packaging and is buildable by Maven.
-   */
+  /** Determines if the module has jar or war packaging and is buildable by Maven. */
   public abstract boolean isJarOrWarMavenBuild(@NotNull Module module);
 
   public abstract Optional<String> getServiceNameFromAppYaml(@NotNull String appYamlPath)
@@ -138,26 +116,24 @@ public abstract class AppEngineProjectService {
    * module.
    *
    * @return the value of the first found service tag, or else the value of the first found module
-   * tag, or else "default"
+   *     tag, or else "default"
    */
   public abstract String getServiceNameFromAppEngineWebXml(
       Project project, DeploymentSource deploymentSource);
-
 
   /**
    * Generates an app.yaml configuration file in the <@code>outputFolderPath</@code>. If an app.yaml
    * already exists it will not overwrite the file.
    */
-  public abstract void generateAppYaml(FlexibleRuntime runtime, Module module,
-      Path outputFolderPath);
-
+  public abstract void generateAppYaml(
+      FlexibleRuntime runtime, Module module, Path outputFolderPath);
 
   /**
    * Generates a Dockerfile in the <@code>outputFolderPath</@code>. If a Dockerfile already exists
    * it will not overwrite the file.
    */
-  public abstract void generateDockerfile(AppEngineFlexibleDeploymentArtifactType type,
-      Module module, Path outputFolderPath);
+  public abstract void generateDockerfile(
+      AppEngineFlexibleDeploymentArtifactType type, Module module, Path outputFolderPath);
 
   /**
    * Returns the default location of the app.yaml configuration file, relative to a module content

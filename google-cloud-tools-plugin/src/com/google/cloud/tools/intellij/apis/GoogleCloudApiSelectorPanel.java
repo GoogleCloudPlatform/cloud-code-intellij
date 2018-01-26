@@ -16,8 +16,11 @@
 
 package com.google.cloud.tools.intellij.apis;
 
+import com.google.cloud.tools.intellij.project.CloudProject;
+import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.intellij.application.options.ModulesComboBox;
@@ -39,10 +42,14 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -66,14 +73,32 @@ final class GoogleCloudApiSelectorPanel {
   private JTable cloudLibrariesTable;
   private JLabel modulesLabel;
   private ModulesComboBox modulesComboBox;
+  private ProjectSelector projectSelector;
 
+  private final Map<CloudLibrary, CloudApiManagementSpec> apiManagementMap;
   private final List<CloudLibrary> libraries;
+
   private final Project project;
+
+  private static final boolean SHOULD_ENABLE_API_DEFAULT = true;
+  private static int CLOUD_LIBRARY_COL = 0;
+  private static int CLOUD_LIBRARY_SELECT_COL = 1;
 
   GoogleCloudApiSelectorPanel(List<CloudLibrary> libraries, Project project) {
     this.libraries = libraries;
     this.project = project;
+
+    apiManagementMap =
+        libraries
+            .stream()
+            .collect(
+                ImmutableMap.toImmutableMap(
+                    Function.identity(),
+                    lib -> new CloudApiManagementSpec(SHOULD_ENABLE_API_DEFAULT)));
+
     panel.setPreferredSize(new Dimension(800, 600));
+
+    projectSelector.loadActiveCloudProject();
   }
 
   /** Returns the {@link JPanel} that holds the UI elements in this panel. */
@@ -86,6 +111,11 @@ final class GoogleCloudApiSelectorPanel {
     modulesComboBox.addActionListener(listener);
   }
 
+  /** Adds the given {@link TableModelListener} to the {@link TableModel}. */
+  void addTableModelListener(TableModelListener listener) {
+    cloudLibrariesTable.getModel().addTableModelListener(listener);
+  }
+
   /** Returns the selected {@link Module}. */
   Module getSelectedModule() {
     return modulesComboBox.getSelectedModule();
@@ -94,6 +124,18 @@ final class GoogleCloudApiSelectorPanel {
   /** Returns the set of selected {@link CloudLibrary CloudLibraries}. */
   Set<CloudLibrary> getSelectedLibraries() {
     return ((CloudLibraryTableModel) cloudLibrariesTable.getModel()).getSelectedLibraries();
+  }
+
+  CloudProject getCloudProject() {
+    return projectSelector.getSelectedProject();
+  }
+
+  Set<CloudLibrary> getApisToEnable() {
+    return getSelectedLibraries()
+        .stream()
+        .filter(library -> Objects.nonNull(library.getServiceName()))
+        .filter(library -> apiManagementMap.get(library).shouldEnable())
+        .collect(Collectors.toSet());
   }
 
   /** Returns the {@link ModulesComboBox} in this panel. */
@@ -115,6 +157,21 @@ final class GoogleCloudApiSelectorPanel {
   @VisibleForTesting
   GoogleCloudApiDetailsPanel getDetailsPanel() {
     return detailsPanel;
+  }
+
+  /**
+   * Returns the API management map holding the mapping from {@link CloudLibrary} to {@link
+   * CloudApiManagementSpec}.
+   */
+  @VisibleForTesting
+  Map<CloudLibrary, CloudApiManagementSpec> getApiManagementMap() {
+    return apiManagementMap;
+  }
+
+  /** Returns the {@link ProjectSelector} in this panel. */
+  @VisibleForTesting
+  ProjectSelector getProjectSelector() {
+    return projectSelector;
   }
 
   /**
@@ -146,10 +203,25 @@ final class GoogleCloudApiSelectorPanel {
               if (!model.isSelectionEmpty()) {
                 int selectedIndex = model.getMinSelectionIndex();
                 CloudLibrary library =
-                    (CloudLibrary) cloudLibrariesTable.getModel().getValueAt(selectedIndex, 0);
-                detailsPanel.setCloudLibrary(library);
+                    (CloudLibrary)
+                        cloudLibrariesTable.getModel().getValueAt(selectedIndex, CLOUD_LIBRARY_COL);
+                detailsPanel.setCloudLibrary(library, apiManagementMap.get(library));
+                updateManagementUI();
               }
             });
+    addTableModelListener(e -> updateManagementUI());
+
+    projectSelector = new ProjectSelector(project);
+    projectSelector.addProjectSelectionListener(cloudProject -> updateManagementUI());
+  }
+
+  private void updateManagementUI() {
+    TableModel model = cloudLibrariesTable.getModel();
+    boolean addLibrary =
+        cloudLibrariesTable.getSelectedRow() != -1
+            && (boolean)
+                model.getValueAt(cloudLibrariesTable.getSelectedRow(), CLOUD_LIBRARY_SELECT_COL);
+    detailsPanel.setManagementUIEnabled(addLibrary && projectSelector.getSelectedProject() != null);
   }
 
   /** The custom {@link JBTable} for the table of supported Cloud libraries. */
@@ -157,7 +229,6 @@ final class GoogleCloudApiSelectorPanel {
 
     CloudLibraryTable(List<CloudLibrary> libraries) {
       super(new CloudLibraryTableModel(libraries));
-
       setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
       setDefaultRenderer(CloudLibrary.class, new CloudLibraryRenderer());
       setDefaultRenderer(Boolean.class, new BooleanTableCellRenderer());
@@ -239,7 +310,7 @@ final class GoogleCloudApiSelectorPanel {
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-      if (columnIndex == 0) {
+      if (columnIndex == CLOUD_LIBRARY_COL) {
         return CloudLibrary.class;
       }
       return Boolean.class;
@@ -247,12 +318,12 @@ final class GoogleCloudApiSelectorPanel {
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-      return columnIndex == 1;
+      return columnIndex == CLOUD_LIBRARY_SELECT_COL;
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-      if (columnIndex == 0) {
+      if (columnIndex == CLOUD_LIBRARY_COL) {
         return librariesMap.keySet().toArray()[rowIndex];
       }
       return librariesMap.values().toArray()[rowIndex];
@@ -260,7 +331,7 @@ final class GoogleCloudApiSelectorPanel {
 
     @Override
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
-      if (columnIndex == 0) {
+      if (columnIndex == CLOUD_LIBRARY_COL) {
         throw new UnsupportedOperationException("The first column is immutable.");
       }
 

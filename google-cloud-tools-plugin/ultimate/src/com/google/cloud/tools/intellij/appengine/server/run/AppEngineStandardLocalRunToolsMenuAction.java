@@ -21,25 +21,21 @@ import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
-
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
-
+import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.stream.Stream;
-
-/**
- * Creates a shortcut to the App Engine standard local run configuration in the tools menu.
- */
+/** Creates a shortcut to the App Engine standard local run configuration in the tools menu. */
 public class AppEngineStandardLocalRunToolsMenuAction extends CloudToolsRunConfigurationAction {
 
   public AppEngineStandardLocalRunToolsMenuAction() {
-    super(AppEngineServerConfigurationType.getInstance(),
+    super(
+        AppEngineServerConfigurationType.getInstance(),
         GctBundle.message("appengine.tools.menu.run.server.text"),
         GctBundle.message("appengine.tools.menu.run.server.description"),
         GoogleCloudToolsIcons.APP_ENGINE);
@@ -57,14 +53,12 @@ public class AppEngineStandardLocalRunToolsMenuAction extends CloudToolsRunConfi
     }
   }
 
-  /**
-   * Determines if the project has at least one module with the App Engine standard facet.
-   */
+  /** Determines if the project has at least one module with the App Engine standard facet. */
   @VisibleForTesting
   boolean isAppEngineStandardProject(@NotNull Project project) {
     return Stream.of(ModuleManager.getInstance(project).getModules())
-        .anyMatch(module ->
-            AppEngineProjectService.getInstance().hasAppEngineStandardFacet(module));
+        .anyMatch(
+            module -> AppEngineProjectService.getInstance().hasAppEngineStandardFacet(module));
   }
 
   private void notifyNotAppEngineStandardProject(@NotNull Project project) {
@@ -82,5 +76,4 @@ public class AppEngineStandardLocalRunToolsMenuAction extends CloudToolsRunConfi
             null /*listener*/)
         .notify(project);
   }
-
 }

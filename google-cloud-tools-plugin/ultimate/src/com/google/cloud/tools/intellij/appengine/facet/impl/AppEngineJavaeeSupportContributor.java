@@ -31,15 +31,13 @@ import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlTag;
 import org.apache.commons.lang3.JavaVersion;
 
-/**
- * @author nik
- */
+/** @author nik */
 public class AppEngineJavaeeSupportContributor extends JavaeeFrameworkSupportContributor {
 
   private static final String SERVLET_VERSION = "2.5";
   private static final String SERVLET_NAMESPACE = "http://java.sun.com/xml/ns/javaee";
-  private static final String SERVLET_SCHEMA_URL
-      = "http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd";
+  private static final String SERVLET_SCHEMA_URL =
+      "http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd";
 
   @Override
   public void setupFrameworkSupport(JavaeeFrameworkSupportContributionModel model) {
@@ -57,8 +55,8 @@ public class AppEngineJavaeeSupportContributor extends JavaeeFrameworkSupportCon
       artifactToDeploy = model.getExplodedWarArtifact();
     }
     if (artifactToDeploy != null) {
-      AppEngineStandardWebIntegration.getInstance().setupRunConfigurations(
-          artifactToDeploy, model.getModule(), model.getRunConfiguration());
+      AppEngineStandardWebIntegration.getInstance()
+          .setupRunConfigurations(artifactToDeploy, model.getModule(), model.getRunConfiguration());
     }
   }
 
@@ -67,31 +65,33 @@ public class AppEngineJavaeeSupportContributor extends JavaeeFrameworkSupportCon
    * web.xml to the correct version.
    */
   private void setWebXmlServletVersion(Module module) {
-    StartupManager.getInstance(module.getProject()).runWhenProjectIsInitialized(() -> {
-      for (WebFacet webFacet : WebFacet.getInstances(module)) {
-        final WebApp webApp = webFacet.getRoot();
-        if (webApp == null) {
-          continue;
-        }
+    StartupManager.getInstance(module.getProject())
+        .runWhenProjectIsInitialized(
+            () -> {
+              for (WebFacet webFacet : WebFacet.getInstances(module)) {
+                final WebApp webApp = webFacet.getRoot();
+                if (webApp == null) {
+                  continue;
+                }
 
-        new WriteCommandAction.Simple(module.getProject()) {
-          @Override
-          protected void run() throws Throwable {
-            webApp.getVersion().setStringValue(SERVLET_VERSION);
+                new WriteCommandAction.Simple(module.getProject()) {
+                  @Override
+                  protected void run() throws Throwable {
+                    webApp.getVersion().setStringValue(SERVLET_VERSION);
 
-            XmlTag webAppTag = webApp.getXmlTag();
-            XmlAttribute xmlns = webAppTag.getAttribute("xmlns");
-            XmlAttribute schemaLocation = webAppTag.getAttribute("xsi:schemaLocation");
+                    XmlTag webAppTag = webApp.getXmlTag();
+                    XmlAttribute xmlns = webAppTag.getAttribute("xmlns");
+                    XmlAttribute schemaLocation = webAppTag.getAttribute("xsi:schemaLocation");
 
-            if (xmlns != null) {
-              xmlns.setValue(SERVLET_NAMESPACE);
-            }
-            if (schemaLocation != null) {
-              schemaLocation.setValue(SERVLET_SCHEMA_URL);
-            }
-          }
-        }.execute();
-      }
-    });
+                    if (xmlns != null) {
+                      xmlns.setValue(SERVLET_NAMESPACE);
+                    }
+                    if (schemaLocation != null) {
+                      schemaLocation.setValue(SERVLET_SCHEMA_URL);
+                    }
+                  }
+                }.execute();
+              }
+            });
   }
 }

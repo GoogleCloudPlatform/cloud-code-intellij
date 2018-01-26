@@ -17,17 +17,13 @@
 package com.google.cloud.tools.intellij.appengine.descriptor.dom;
 
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
-
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.util.xml.DomFileDescription;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * This is the file description for the App Engine xml config file
- */
+/** This is the file description for the App Engine xml config file */
 public class AppEngineStandardWebFileDescriptor
     extends DomFileDescription<AppEngineStandardWebApp> {
 

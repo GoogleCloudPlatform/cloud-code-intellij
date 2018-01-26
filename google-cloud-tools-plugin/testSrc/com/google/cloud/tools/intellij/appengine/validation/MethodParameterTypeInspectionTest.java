@@ -15,13 +15,10 @@
  */
 package com.google.cloud.tools.intellij.appengine.validation;
 
-
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ex.LocalInspectionToolWrapper;
 
-/**
- * Unit test for {@link MethodParameterTypeInspection}.
- */
+/** Unit test for {@link MethodParameterTypeInspection}. */
 public class MethodParameterTypeInspectionTest extends EndpointTestBase {
 
   @Override
@@ -57,6 +54,8 @@ public class MethodParameterTypeInspectionTest extends EndpointTestBase {
     LocalInspectionTool localInspectionTool = new MethodParameterTypeInspection();
     String testName = getTestName(true);
     myFixture.setTestDataPath(getTestDataPath());
-    myFixture.testInspection("inspections/methodParameterTypeInspection/" + testName, new LocalInspectionToolWrapper(localInspectionTool));
+    myFixture.testInspection(
+        "inspections/methodParameterTypeInspection/" + testName,
+        new LocalInspectionToolWrapper(localInspectionTool));
   }
 }

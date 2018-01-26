@@ -16,13 +16,10 @@
 
 package com.google.cloud.tools.intellij.analytics;
 
-/**
- * For usage tracker of the Google Login actions.
- */
+/** For usage tracker of the Google Login actions. */
 public class LoginTracking {
 
-  private LoginTracking() {
-  }
+  private LoginTracking() {}
 
   public static final String LOGIN_START = "user.login.start";
   public static final String LOGIN_CANCELLED = "user.login.cancelled";

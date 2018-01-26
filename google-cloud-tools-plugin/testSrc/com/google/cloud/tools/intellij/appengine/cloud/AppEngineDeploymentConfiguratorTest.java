@@ -28,7 +28,9 @@ import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.remoteServer.configuration.RemoteServer;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
+import com.intellij.testFramework.UsefulTestCase;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,6 +54,12 @@ public final class AppEngineDeploymentConfiguratorTest {
   @Before
   public void setUpConfigurator() {
     configurator = new AppEngineDeploymentConfigurator(testFixture.getProject());
+  }
+
+  @After
+  public void tearDown() throws IllegalAccessException {
+    // scratch project reference to avoid project leaks.
+    UsefulTestCase.clearDeclaredFields(configurator, configurator.getClass());
   }
 
   @Test

@@ -25,13 +25,10 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileFilter;
 import com.intellij.testFramework.PlatformTestCase;
 import com.intellij.testFramework.PlatformTestUtil;
-
 import java.io.File;
 import java.io.IOException;
 
-/**
- * Base class for integration tests for converters.
- */
+/** Base class for integration tests for converters. */
 public abstract class BaseConverterTest extends PlatformTestCase {
 
   protected static final String BEFORE_PATH = "before";
@@ -48,16 +45,15 @@ public abstract class BaseConverterTest extends PlatformTestCase {
     // run the conversion operation
     ProjectConversionTestUtil.convert(tempDir.getAbsolutePath());
 
-    PlatformTestUtil.assertDirectoriesEqual(LocalFileSystem.getInstance().refreshAndFindFileByIoFile(expectedDataDir),
+    PlatformTestUtil.assertDirectoriesEqual(
+        LocalFileSystem.getInstance().refreshAndFindFileByIoFile(expectedDataDir),
         LocalFileSystem.getInstance().refreshAndFindFileByIoFile(tempDir),
         new VirtualFileFilter() {
           @Override
           public boolean accept(VirtualFile file) {
             // ignore any generated backup files
-            return !file.getName().startsWith(
-                ProjectConversionUtil.PROJECT_FILES_BACKUP);
+            return !file.getName().startsWith(ProjectConversionUtil.PROJECT_FILES_BACKUP);
           }
         });
   }
-
 }

@@ -23,22 +23,16 @@ import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
-
 import com.intellij.icons.AllIcons.General;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime.UndeploymentTaskCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
-
+import java.util.Collections;
+import javax.swing.SwingUtilities;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
-
-import javax.swing.SwingUtilities;
-
-/**
- * Stops a module & version of an application running on App Engine.
- */
+/** Stops a module & version of an application running on App Engine. */
 public class AppEngineStop {
 
   private static final Logger logger = Logger.getInstance(AppEngineStop.class);
@@ -48,9 +42,7 @@ public class AppEngineStop {
   private AppEngineDeploymentConfiguration deploymentConfiguration;
   private UndeploymentTaskCallback callback;
 
-  /**
-   * Initialize the stop dependencies.
-   */
+  /** Initialize the stop dependencies. */
   public AppEngineStop(
       @NotNull AppEngineHelper helper,
       @NotNull LoggingHandler loggingHandler,
@@ -62,28 +54,24 @@ public class AppEngineStop {
     this.callback = callback;
   }
 
-  /**
-   * Stops the given module / version of an App Engine application.
-   */
+  /** Stops the given module / version of an App Engine application. */
   public void stop(
       @NotNull String module,
       @NotNull String version,
       @NotNull ProcessStartListener startListener) {
-    ProcessOutputLineListener outputListener = new ProcessOutputLineListener() {
-      @Override
-      public void onOutputLine(String line) {
-        loggingHandler.print(line + "\n");
-      }
-    };
+    ProcessOutputLineListener outputListener =
+        new ProcessOutputLineListener() {
+          @Override
+          public void onOutputLine(String line) {
+            loggingHandler.print(line + "\n");
+          }
+        };
 
     ProcessExitListener stopExitListener = new StopExitListener();
 
-    CloudSdk sdk = helper.createSdk(
-        loggingHandler,
-        startListener,
-        outputListener,
-        outputListener,
-        stopExitListener);
+    CloudSdk sdk =
+        helper.createSdk(
+            loggingHandler, startListener, outputListener, outputListener, stopExitListener);
 
     DefaultVersionsSelectionConfiguration configuration =
         new DefaultVersionsSelectionConfiguration();
@@ -115,21 +103,21 @@ public class AppEngineStop {
         if (exitCode == 0) {
           callback.succeeded();
 
-          SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-              Messages.showMessageDialog(
-                  GctBundle.message("appengine.stop.modules.version.success.dialog.message"),
-                  GctBundle.message("appengine.stop.modules.version.success.dialog.title"),
-                  General.Information);
-            }
-          });
+          SwingUtilities.invokeLater(
+              new Runnable() {
+                @Override
+                public void run() {
+                  Messages.showMessageDialog(
+                      GctBundle.message("appengine.stop.modules.version.success.dialog.message"),
+                      GctBundle.message("appengine.stop.modules.version.success.dialog.title"),
+                      General.Information);
+                }
+              });
         } else {
-          logger.warn(
-              "Application stop process exited with an error. Exit Code:" + exitCode);
+          logger.warn("Application stop process exited with an error. Exit Code:" + exitCode);
           callback.errorOccurred(
-              GctBundle.message("appengine.stop.modules.version.execution.error.with.code",
-                  exitCode));
+              GctBundle.message(
+                  "appengine.stop.modules.version.execution.error.with.code", exitCode));
         }
       } finally {
         helper.deleteCredentials();

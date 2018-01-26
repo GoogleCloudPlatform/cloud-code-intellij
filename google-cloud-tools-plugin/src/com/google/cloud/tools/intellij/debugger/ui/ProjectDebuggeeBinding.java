@@ -24,23 +24,22 @@ import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 import com.google.cloud.tools.intellij.debugger.CloudDebugProcessState;
 import com.google.cloud.tools.intellij.debugger.CloudDebuggerClient;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.cloud.tools.intellij.login.Services;
+import com.google.cloud.tools.intellij.project.CloudProject;
+import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.base.Strings;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.containers.HashMap;
-import com.intellij.util.ui.tree.TreeModelAdapter;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 import javax.swing.Action;
 import javax.swing.JComboBox;
 import javax.swing.SwingUtilities;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.TreeModelEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,54 +63,59 @@ class ProjectDebuggeeBinding {
   //   has projectSelector.getProjectNumber() set to null.
   private boolean isCdbQueried = false;
 
-  public ProjectDebuggeeBinding(@NotNull ProjectSelector projectSelector,
+  @SuppressWarnings("unchecked")
+  ProjectDebuggeeBinding(
+      @NotNull ProjectSelector projectSelector,
       @NotNull JComboBox targetSelector,
       @NotNull Action okAction) {
     this.projectSelector = projectSelector;
     this.targetSelector = targetSelector;
     this.okAction = okAction;
 
-    this.projectSelector.addTextChangedListener(new DocumentAdapter() {
-      @Override
-      protected void textChanged(DocumentEvent event) {
-        refreshDebugTargetList();
-      }
-    });
-
-    this.projectSelector.addModelListener(new TreeModelAdapter() {
-      @Override
-      public void treeStructureChanged(TreeModelEvent event) {
-        refreshDebugTargetList();
-      }
-    });
+    this.projectSelector.addProjectSelectionListener(this::refreshDebugTargetList);
+    this.projectSelector.loadActiveCloudProject();
   }
 
   @NotNull
   public CloudDebugProcessState buildResult(Project project) {
-    Long number = projectSelector.getProjectNumber();
-    String projectNumberString = number != null ? number.toString() : null;
+    CloudProject cloudProject = projectSelector.getSelectedProject();
+    String projectId = Optional.ofNullable(cloudProject).map(CloudProject::projectId).orElse("");
+    String projectNumberString =
+        Optional.ofNullable(cloudProject)
+            .map(CloudProject::projectNumber)
+            .map(Object::toString)
+            .orElse(null);
+
     DebugTarget selectedItem = (DebugTarget) targetSelector.getSelectedItem();
     String savedDebuggeeId = selectedItem != null ? selectedItem.getId() : null;
-    String savedProjectDescription = projectSelector.getText();
 
-    return new CloudDebugProcessState(credentialedUser != null ? credentialedUser.getEmail() : null,
+    return new CloudDebugProcessState(
+        credentialedUser != null ? credentialedUser.getEmail() : null,
         savedDebuggeeId,
-        savedProjectDescription,
+        projectId,
         projectNumberString,
         project);
   }
 
   @Nullable
-  public Debugger getCloudDebuggerClient() {
-    CredentialedUser credentialedUser = projectSelector.getSelectedUser();
+  private Debugger getCloudDebuggerClient() {
+    CloudProject cloudProject = projectSelector.getSelectedProject();
+    CredentialedUser credentialedUser =
+        cloudProject == null
+            ? null
+            : Services.getLoginService()
+                .getLoggedInUser(cloudProject.googleUsername())
+                .orElse(null);
+
     if (this.credentialedUser == credentialedUser) {
       return cloudDebuggerClient;
     }
 
     this.credentialedUser = credentialedUser;
     cloudDebuggerClient =
-        this.credentialedUser != null ? CloudDebuggerClient.getLongTimeoutClient(
-            this.credentialedUser.getEmail()) : null;
+        this.credentialedUser != null
+            ? CloudDebuggerClient.getLongTimeoutClient(this.credentialedUser.getEmail())
+            : null;
 
     return cloudDebuggerClient;
   }
@@ -123,28 +127,44 @@ class ProjectDebuggeeBinding {
 
   public void setInputState(@Nullable CloudDebugProcessState inputState) {
     this.inputState = inputState;
-    if (this.inputState != null) {
-      projectSelector.setText(this.inputState.getProjectName());
+    if (this.inputState != null
+        && !Strings.isNullOrEmpty(this.inputState.getProjectName())
+        && !Strings.isNullOrEmpty(this.inputState.getUserEmail())) {
+      Long projectNumber = null;
+      if (!Strings.isNullOrEmpty(this.inputState.getProjectNumber())) {
+        projectNumber = Long.parseLong(this.inputState.getProjectNumber());
+      }
+      projectSelector.setSelectedProject(
+          CloudProject.create(
+              this.inputState.getProjectName(), // TODO(ivanporty) add separate project name/ID
+              this.inputState.getProjectName(),
+              projectNumber,
+              this.inputState.getUserEmail()));
+
+      // update the state here as well
+      refreshDebugTargetList(projectSelector.getSelectedProject());
     }
   }
 
-  /**
-   * Refreshes the list of attachable debug targets based on the project selection.
-   */
+  /** Refreshes the list of attachable debug targets based on the project selection. */
   @SuppressWarnings("FutureReturnValueIgnored")
-  private void refreshDebugTargetList() {
+  private void refreshDebugTargetList(CloudProject cloudProject) {
     targetSelector.removeAllItems();
     ApplicationManager.getApplication()
         .executeOnPooledThread(
             () -> {
               try {
-                if (projectSelector.getProjectNumber() != null
-                    && getCloudDebuggerClient() != null) {
+                String projectNumber =
+                    Optional.ofNullable(cloudProject.projectNumber())
+                        .map(Object::toString)
+                        .orElse(null);
+
+                if (projectNumber != null && getCloudDebuggerClient() != null) {
                   final ListDebuggeesResponse debuggees =
                       getCloudDebuggerClient()
                           .debuggees()
                           .list()
-                          .setProject(projectSelector.getProjectNumber().toString())
+                          .setProject(projectNumber)
                           .setClientVersion(
                               ServiceManager.getService(CloudToolsPluginInfoService.class)
                                   .getClientVersionForCloudDebugger())
@@ -164,7 +184,7 @@ class ProjectDebuggeeBinding {
                           Map<String, DebugTarget> perModuleCache = new HashMap<>();
 
                           for (Debuggee debuggee : debuggees.getDebuggees()) {
-                            DebugTarget item = new DebugTarget(debuggee, projectSelector.getText());
+                            DebugTarget item = new DebugTarget(debuggee, cloudProject.projectId());
                             if (!Strings.isNullOrEmpty(item.getModule())
                                 && !Strings.isNullOrEmpty(item.getVersion())) {
                               // If we already have an existing item for that module+version,
@@ -234,8 +254,8 @@ class ProjectDebuggeeBinding {
       case 403:
         return GctBundle.message("clouddebug.debug.targets.accessdenied");
       default:
-        return GctBundle
-            .getString("clouddebug.debug.targets.error", reason.getDetails().getMessage());
+        return GctBundle.getString(
+            "clouddebug.debug.targets.error", reason.getDetails().getMessage());
     }
   }
 

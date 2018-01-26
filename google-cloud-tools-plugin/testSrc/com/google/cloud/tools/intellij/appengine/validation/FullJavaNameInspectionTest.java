@@ -23,9 +23,7 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiType;
 import com.intellij.testFramework.MockProblemDescriptor;
 
-/**
- * Tests for {@link FullJavaNameInspection}.
- */
+/** Tests for {@link FullJavaNameInspection}. */
 public class FullJavaNameInspectionTest extends EndpointTestBase {
 
   public void testClassWithUniqueMethodNames() {
@@ -38,8 +36,11 @@ public class FullJavaNameInspectionTest extends EndpointTestBase {
 
   public void testQuickFix() {
     PsiMethod someFunction =
-      JavaPsiFacade.getInstance(myFixture.getProject()).getElementFactory().createMethod("someFunction", PsiType.VOID);
-    MockProblemDescriptor problemDescriptor = new MockProblemDescriptor(someFunction, "", ProblemHighlightType.ERROR);
+        JavaPsiFacade.getInstance(myFixture.getProject())
+            .getElementFactory()
+            .createMethod("someFunction", PsiType.VOID);
+    MockProblemDescriptor problemDescriptor =
+        new MockProblemDescriptor(someFunction, "", ProblemHighlightType.ERROR);
 
     FullJavaNameInspection.MyQuickFix myQuickFix = new FullJavaNameInspection().new MyQuickFix();
     myQuickFix.applyFix(myFixture.getProject(), problemDescriptor);
@@ -53,6 +54,8 @@ public class FullJavaNameInspectionTest extends EndpointTestBase {
     LocalInspectionTool localInspectionTool = new FullJavaNameInspection();
     String testName = getTestName(true);
     myFixture.setTestDataPath(getTestDataPath());
-    myFixture.testInspection("inspections/fullJavaNameInspection/" + testName, new LocalInspectionToolWrapper(localInspectionTool));
+    myFixture.testInspection(
+        "inspections/fullJavaNameInspection/" + testName,
+        new LocalInspectionToolWrapper(localInspectionTool));
   }
 }

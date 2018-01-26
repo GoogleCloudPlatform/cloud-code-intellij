@@ -22,6 +22,7 @@ import com.google.cloud.tools.intellij.login.ui.GoogleLoginIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.FixedSizeButton;
 import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.components.JBLabel;
@@ -29,18 +30,25 @@ import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent.EventType;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * ProjectSelector allows the user to select a GCP project id. It shows selected project name and
  * user account information. To change selection it uses {@link ProjectSelectionDialog} to call into
  * {@link com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService} to get the set of
  * credentialed users and then into resource manager to get the set of projects.
+ *
+ * <p>Initial selection is empty. Project selector can be pre-populated with active cloud project
+ * ({@link #loadActiveCloudProject()})from current IDE project, set in {@link
+ * #ProjectSelector(Project)}. See also {@link ActiveCloudProjectManager}.
  */
 public class ProjectSelector extends JPanel {
+
   static final int ACCOUNT_ICON_SIZE = 16;
 
   private final List<ProjectSelectionListener> projectSelectionListeners = new ArrayList<>();
@@ -53,6 +61,13 @@ public class ProjectSelector extends JPanel {
   private JPanel rootPanel;
 
   private CloudProject cloudProject;
+  // null by default. set by caller to allow project selector to pre-select active project.
+  private Project ideProject;
+
+  /** @param ideProject IDE {@link Project} to be used to update active cloud project settings. */
+  public ProjectSelector(@Nullable Project ideProject) {
+    this.ideProject = ideProject;
+  }
 
   /** Returns project selection or null if no project is selected. */
   public CloudProject getSelectedProject() {
@@ -74,6 +89,22 @@ public class ProjectSelector extends JPanel {
   }
 
   /**
+   * Loads active {@link CloudProject}, if IDE {@link Project} has been specified. This should be
+   * called when project selector and the related UI are completely initialized. Calls listeners to
+   * notify on new project selection.
+   */
+  public void loadActiveCloudProject() {
+    Optional<CloudProject> projectOptional =
+        Optional.ofNullable(ideProject)
+            .map(p -> ActiveCloudProjectManager.getInstance().getActiveCloudProject(p));
+    projectOptional.ifPresent(
+        activeCloudProject -> {
+          setSelectedProject(activeCloudProject);
+          notifyProjectSelectionListeners();
+        });
+  }
+
+  /**
    * Adds a {@link ProjectSelectionListener} to this class's internal list of listeners. All
    * ProjectSelectionListeners are notified when the selection is changed to a valid project.
    *
@@ -92,9 +123,15 @@ public class ProjectSelector extends JPanel {
     projectSelectionListeners.remove(projectSelectionListener);
   }
 
+  /** Returns the list of registered {@link ProjectSelectionListener ProjectSelectionListeners}. */
+  public List<ProjectSelectionListener> getProjectSelectionListeners() {
+    return projectSelectionListeners;
+  }
+
   private void createUIComponents() {
     projectNameLabel = new HyperlinkLabelWithStateAccess();
-    projectNameLabel.setHyperlinkText(GctBundle.getString("project.selector.no.selected.project"));
+    projectNameLabel.setHyperlinkText(
+        GctBundle.getString("cloud.project.selector.no.selected.project"));
     projectNameLabel.addHyperlinkListener(
         (event) -> {
           if (event.getEventType() == EventType.ACTIVATED) {
@@ -115,8 +152,12 @@ public class ProjectSelector extends JPanel {
 
     hyperlinksPanel = new JPanel();
     hyperlinksPanel.setBorder(UIManager.getBorder("TextField.border"));
+    hyperlinksPanel.setLayout(new BoxLayout(hyperlinksPanel, BoxLayout.X_AXIS));
+
     browseButton = new FixedSizeButton(hyperlinksPanel);
     browseButton.addActionListener((actionEvent) -> handleOpenProjectSelectionDialog());
+    browseButton.setFocusable(true);
+    browseButton.setToolTipText(GctBundle.getString("cloud.project.selector.open.dialog.tooltip"));
   }
 
   @VisibleForTesting
@@ -128,11 +169,16 @@ public class ProjectSelector extends JPanel {
     if (newSelection != null) {
       setSelectedProject(newSelection);
       notifyProjectSelectionListeners();
+      // keep as last active project if IDE project has been specified.
+      if (ideProject != null) {
+        ActiveCloudProjectManager.getInstance().setActiveCloudProject(newSelection, ideProject);
+      }
     }
   }
 
   private void updateEmptySelection() {
-    projectNameLabel.setHyperlinkText(GctBundle.getString("project.selector.no.selected.project"));
+    projectNameLabel.setHyperlinkText(
+        GctBundle.getString("cloud.project.selector.no.selected.project"));
     accountInfoLabel.setHyperlinkText("");
     accountInfoLabel.setIcon(null);
     projectAccountSeparatorLabel.setVisible(false);
@@ -144,7 +190,7 @@ public class ProjectSelector extends JPanel {
     // first just show account email, then expand with name/picture if this account is signed in.
     accountInfoLabel.setHyperlinkText(selection.googleUsername());
     Optional<CredentialedUser> loggedInUser =
-        Services.getLoginService().getLoggedInUser(selection.projectName());
+        Services.getLoginService().getLoggedInUser(selection.googleUsername());
     if (loggedInUser.isPresent()) {
       accountInfoLabel.setHyperlinkText(
           String.format("%s (%s)", loggedInUser.get().getName(), loggedInUser.get().getEmail()));
@@ -155,6 +201,12 @@ public class ProjectSelector extends JPanel {
 
   private void notifyProjectSelectionListeners() {
     projectSelectionListeners.forEach(listener -> listener.projectSelected(cloudProject));
+  }
+
+  /** Sets IDE {@link Project} to be used to update active cloud project settings. */
+  @VisibleForTesting
+  void setIdeProject(Project ideProject) {
+    this.ideProject = ideProject;
   }
 
   @VisibleForTesting

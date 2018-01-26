@@ -16,9 +16,5 @@
 
 package com.google.cloud.tools.intellij;
 
-/**
- * Use this service to change the configuration of the Google Cloud Tools plugin.
- */
-public interface CloudToolsPluginConfigurationService extends PluginConfigurationService {
-
-}
+/** Use this service to change the configuration of the Google Cloud Tools plugin. */
+public interface CloudToolsPluginConfigurationService extends PluginConfigurationService {}

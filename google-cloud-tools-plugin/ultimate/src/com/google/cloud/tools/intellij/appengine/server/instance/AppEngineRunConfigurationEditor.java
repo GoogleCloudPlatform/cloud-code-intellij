@@ -16,9 +16,10 @@
 
 package com.google.cloud.tools.intellij.appengine.server.instance;
 
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.util.GctBundle;
-
+import com.google.common.collect.Lists;
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
@@ -26,31 +27,30 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Comparing;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.impl.run.BuildArtifactsBeforeRunTaskProvider;
+import com.intellij.remoteServer.impl.configuration.deployment.ArtifactDeploymentSourceImpl;
 import com.intellij.ui.IdeBorderFactory.PlainSmallWithoutIndent;
+import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.PanelWithAnchor;
 import com.intellij.ui.components.JBLabel;
-
-import org.jetbrains.annotations.NotNull;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import java.util.List;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import org.jetbrains.annotations.NotNull;
 
-/**
- * @author nik
- */
-public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel> implements
-    PanelWithAnchor {
+/** @author nik */
+public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
+    implements PanelWithAnchor {
 
   private final Project myProject;
   private JPanel myMainPanel;
   private JComponent anchor;
   private JBLabel myWebArtifactToDeployLabel;
-  private JComboBox myArtifactComboBox;
+  private JComboBox<Artifact> myArtifactComboBox;
   private JTextField host;
   private JBLabel myPortLabel;
   private JTextField port;
@@ -59,12 +59,13 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
 
   public AppEngineRunConfigurationEditor(Project project) {
     myProject = project;
-    myArtifactComboBox.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent event) {
-        onArtifactChanged();
-      }
-    });
+    myArtifactComboBox.addActionListener(
+        new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent event) {
+            onArtifactChanged();
+          }
+        });
 
     setAnchor(myWebArtifactToDeployLabel);
     appEngineSettingsPanel.setBorder(
@@ -81,12 +82,12 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     final Artifact selectedArtifact = getSelectedArtifact();
     if (!Comparing.equal(myLastSelectedArtifact, selectedArtifact)) {
       if (myLastSelectedArtifact != null) {
-        BuildArtifactsBeforeRunTaskProvider
-            .setBuildArtifactBeforeRunOption(myMainPanel, myProject, myLastSelectedArtifact, false);
+        BuildArtifactsBeforeRunTaskProvider.setBuildArtifactBeforeRunOption(
+            myMainPanel, myProject, myLastSelectedArtifact, false);
       }
       if (selectedArtifact != null) {
-        BuildArtifactsBeforeRunTaskProvider
-            .setBuildArtifactBeforeRunOption(myMainPanel, myProject, selectedArtifact, true);
+        BuildArtifactsBeforeRunTaskProvider.setBuildArtifactBeforeRunOption(
+            myMainPanel, myProject, selectedArtifact, true);
       }
       myLastSelectedArtifact = selectedArtifact;
     }
@@ -95,14 +96,13 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   /**
    * Resets the configuration editor form using the settings in the server model. The following
    * settings have been omitted from the form:
+   *
    * <ul>
-   * <li> maxModuleInstances - we set this on behalf of the user to prevent breaking the dev app
-   * server in debug mode. See
-   * <a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/928">#928</a>
-   * </li>
-   * <li> automaticRestart - it is set to false so that HotSwap doesn't break IJ's debug server.
-   * <a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/972">#927</a>.
-   * </li>
+   *   <li>maxModuleInstances - we set this on behalf of the user to prevent breaking the dev app
+   *       server in debug mode. See <a
+   *       href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/928">#928</a>
+   *   <li>automaticRestart - it is set to false so that HotSwap doesn't break IJ's debug server. <a
+   *       href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/972">#927</a>.
    * </ul>
    */
   @Override
@@ -139,11 +139,11 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
   private Artifact getSelectedArtifact() {
     return (Artifact) myArtifactComboBox.getSelectedItem();
   }
-  
+
   @NotNull
   @Override
   protected JComponent createEditor() {
-    AppEngineUtil.setupAppEngineStandardArtifactCombobox(myProject, myArtifactComboBox);
+    initDeploymentSources();
     return myMainPanel;
   }
 
@@ -157,5 +157,30 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     this.anchor = anchor;
     myWebArtifactToDeployLabel.setAnchor(anchor);
     myPortLabel.setAnchor(anchor);
+  }
+
+  /**
+   * Initializes the 'artifact to deploy' combobox with the eligible artifact deployment sources.
+   */
+  private void initDeploymentSources() {
+    myArtifactComboBox.setRenderer(
+        new ListCellRendererWrapper<Artifact>() {
+          @Override
+          public void customize(
+              JList list, Artifact value, int index, boolean selected, boolean hasFocus) {
+            if (value != null) {
+              setIcon(value.getArtifactType().getIcon());
+              setText(value.getName());
+            }
+          }
+        });
+
+    List<AppEngineArtifactDeploymentSource> deploymentSources = Lists.newArrayList();
+    deploymentSources.addAll(AppEngineUtil.createArtifactDeploymentSources(myProject));
+
+    deploymentSources
+        .stream()
+        .map(ArtifactDeploymentSourceImpl::getArtifact)
+        .forEach(myArtifactComboBox::addItem);
   }
 }

@@ -22,8 +22,9 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
+import com.google.cloud.tools.intellij.project.CloudProject;
+import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
-import com.google.cloud.tools.intellij.resources.ProjectSelector;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.google.cloud.tools.intellij.testing.TestService;
@@ -38,9 +39,7 @@ public class GcsBucketPanelTest {
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
   @TestFixture private IdeaProjectTestFixture testFixture;
 
-  @Mock
-  @TestService
-  private IntegratedGoogleLoginService loginService;
+  @Mock @TestService private IntegratedGoogleLoginService loginService;
   @Mock @TestService private GoogleApiClientFactory apiFactory;
   @Mock private ProjectSelector projectSelector;
 
@@ -65,7 +64,7 @@ public class GcsBucketPanelTest {
 
   @Test
   public void testNotificationLabel_emptyProjectSelection() {
-    when(projectSelector.getText()).thenReturn("");
+    when(projectSelector.getSelectedProject()).thenReturn(null);
 
     bucketPanel.refresh();
 
@@ -91,8 +90,9 @@ public class GcsBucketPanelTest {
 
   @Test
   public void testNotificationLabel_nonExistentProject() {
-    when(projectSelector.getText()).thenReturn("non-existent-project");
-    when(projectSelector.getSelectedUser()).thenReturn(null);
+    CloudProject nonExistingProject =
+        CloudProject.create("non-existent-project", "non-existent-project", "non-existing-user");
+    when(projectSelector.getSelectedProject()).thenReturn(nonExistingProject);
 
     bucketPanel.refresh();
 

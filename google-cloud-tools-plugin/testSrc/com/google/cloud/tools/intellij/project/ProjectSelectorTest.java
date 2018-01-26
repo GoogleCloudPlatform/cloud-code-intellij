@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.intellij.openapi.project.Project;
 import java.awt.Component;
 import org.junit.Before;
 import org.junit.Rule;
@@ -37,19 +38,24 @@ public class ProjectSelectorTest {
   private ProjectSelector projectSelector;
   @Mock private ProjectSelectionListener projectSelectionListener;
   @Mock private ProjectSelectionDialog projectSelectionDialog;
+  @Mock private Project mockIdeProject;
+  @Mock private ActiveCloudProjectManager mockActiveCloudProjectManager;
 
-  private static final CloudProject TEST_PROJECT = CloudProject.create("test-1", "test@google.com");
+  private static final CloudProject TEST_PROJECT =
+      CloudProject.create("test-1", "test-1-id", "test@google.com");
 
   @Before
   public void setUp() {
     projectSelector =
-        new ProjectSelector() {
+        new ProjectSelector(null /* no IDE project by default for tests. */) {
           @Override
           ProjectSelectionDialog createProjectSelectionDialog(Component parent) {
             return projectSelectionDialog;
           }
         };
     projectSelector.addProjectSelectionListener(projectSelectionListener);
+
+    ActiveCloudProjectManager.setInstance(mockActiveCloudProjectManager);
   }
 
   @Test
@@ -71,8 +77,7 @@ public class ProjectSelectorTest {
 
     projectSelector.handleOpenProjectSelectionDialog();
 
-    assertThat(projectSelector.getSelectedProject())
-        .isEqualTo(TEST_PROJECT);
+    assertThat(projectSelector.getSelectedProject()).isEqualTo(TEST_PROJECT);
   }
 
   @Test
@@ -128,22 +133,68 @@ public class ProjectSelectorTest {
 
   @Test
   public void setEmptyProject_acceptsAndUpdatesUi() {
-    projectSelector.setSelectedProject(CloudProject.create("", ""));
+    projectSelector.setSelectedProject(CloudProject.create("", "", ""));
 
     verifyUiStateForProject(null);
+  }
+
+  @Test
+  public void loadActiveProject_withoutIdeProject_doesNothing() {
+    projectSelector.loadActiveCloudProject();
+
+    assertThat(projectSelector.getSelectedProject()).isNull();
+    verifyUiStateForProject(null);
+  }
+
+  @Test
+  public void loadActiveProject_withoutIdeProject_doesNotChangeSelection() {
+    projectSelector.setSelectedProject(TEST_PROJECT);
+    projectSelector.loadActiveCloudProject();
+
+    assertThat(projectSelector.getSelectedProject()).isEqualTo(TEST_PROJECT);
+    verifyUiStateForProject(TEST_PROJECT);
+  }
+
+  @Test
+  public void lastSelectedProject_saved_withValidIdeProject() {
+    projectSelector.setIdeProject(mockIdeProject);
+    when(projectSelectionDialog.showDialog(any())).thenReturn(TEST_PROJECT);
+    projectSelector.handleOpenProjectSelectionDialog();
+
+    verify(mockActiveCloudProjectManager).setActiveCloudProject(TEST_PROJECT, mockIdeProject);
+  }
+
+  @Test
+  public void loadActiveProject_setsValidProject_withValidIdeProject() {
+    projectSelector.setIdeProject(mockIdeProject);
+    when(mockActiveCloudProjectManager.getActiveCloudProject(mockIdeProject))
+        .thenReturn(TEST_PROJECT);
+    projectSelector.loadActiveCloudProject();
+
+    assertThat(projectSelector.getSelectedProject()).isEqualTo(TEST_PROJECT);
+    verifyUiStateForProject(TEST_PROJECT);
+  }
+
+  @Test
+  public void loadActiveProject_validProject_triggerListeners() {
+    projectSelector.setIdeProject(mockIdeProject);
+    when(mockActiveCloudProjectManager.getActiveCloudProject(mockIdeProject))
+        .thenReturn(TEST_PROJECT);
+    projectSelector.loadActiveCloudProject();
+
+    verify(projectSelectionListener).projectSelected(TEST_PROJECT);
   }
 
   private void verifyUiStateForProject(CloudProject project) {
     if (project == null) {
       assertThat(projectSelector.getProjectNameLabel().getText())
-          .isEqualTo(GctBundle.getString("project.selector.no.selected.project"));
+          .isEqualTo(GctBundle.getString("cloud.project.selector.no.selected.project"));
       // no account information UI is visible/populated.
       assertThat(projectSelector.getProjectAccountSeparatorLabel().isVisible()).isFalse();
       assertThat(projectSelector.getAccountInfoLabel().getText()).isEmpty();
       assertThat(projectSelector.getAccountInfoLabel().getIcon()).isNull();
     } else {
-      assertThat(projectSelector.getProjectNameLabel().getText())
-          .isEqualTo(project.projectName());
+      assertThat(projectSelector.getProjectNameLabel().getText()).isEqualTo(project.projectName());
       assertThat(projectSelector.getProjectAccountSeparatorLabel().isVisible()).isTrue();
       assertThat(projectSelector.getAccountInfoLabel().getText())
           .isEqualTo(project.googleUsername());

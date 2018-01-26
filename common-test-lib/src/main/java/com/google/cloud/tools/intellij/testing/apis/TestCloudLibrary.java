@@ -40,7 +40,7 @@ public abstract class TestCloudLibrary extends TestJson {
    * built with empty strings too.
    */
   public static TestCloudLibrary createEmpty() {
-    return create("", "", "", "", "", ImmutableList.of(TestCloudLibraryClient.createEmpty()));
+    return create("", "", "", "", "", "", ImmutableList.of(TestCloudLibraryClient.createEmpty()));
   }
 
   /**
@@ -51,11 +51,13 @@ public abstract class TestCloudLibrary extends TestJson {
   public static TestCloudLibrary create(
       String name,
       String id,
+      String serviceName,
       String documentation,
       String description,
       String icon,
       List<TestCloudLibraryClient> clients) {
-    return new AutoValue_TestCloudLibrary(name, id, documentation, description, icon, clients);
+    return new AutoValue_TestCloudLibrary(
+        name, id, serviceName, documentation, description, icon, clients);
   }
 
   /** @see CloudLibrary#name */
@@ -63,6 +65,9 @@ public abstract class TestCloudLibrary extends TestJson {
 
   /** @see CloudLibrary#id */
   public abstract String id();
+
+  /** @see CloudLibrary#serviceName */
+  public abstract String serviceName();
 
   /** @see CloudLibrary#documentation */
   public abstract String documentation();

@@ -30,46 +30,46 @@ import org.junit.Test;
 
 public class CloudDebugProcessHandlerTest extends BasePluginTestCase {
 
-    private CloudDebugProcessHandler handler;
+  private CloudDebugProcessHandler handler;
   private IntegratedGoogleLoginService mockLoginService = mock(IntegratedGoogleLoginService.class);
 
-    @Before
-    public void setUp() throws Exception {
-      registerService(IntegratedGoogleLoginService.class, mockLoginService);
+  @Before
+  public void setUp() throws Exception {
+    registerService(IntegratedGoogleLoginService.class, mockLoginService);
 
-        setupMocks();
-    }
+    setupMocks();
+  }
 
-    @Test
-    public void testIsSilentlyDisposed() {
-        Assert.assertTrue(handler.isSilentlyDestroyOnClose());
-    }
+  @Test
+  public void testIsSilentlyDisposed() {
+    Assert.assertTrue(handler.isSilentlyDestroyOnClose());
+  }
 
-    @Test
-    public void testDetachIsDefault() {
-        Assert.assertTrue(handler.detachIsDefault());
-    }
+  @Test
+  public void testDetachIsDefault() {
+    Assert.assertTrue(handler.detachIsDefault());
+  }
 
-    @Test
-    public void testGetProcessInput() {
-        Assert.assertNull(handler.getProcessInput());
-    }
+  @Test
+  public void testGetProcessInput() {
+    Assert.assertNull(handler.getProcessInput());
+  }
 
-    private void setupMocks() {
-        GoogleLoginState googleLoginState = mock(GoogleLoginState.class);
-        CredentialedUser credentialedUser = mock(CredentialedUser.class);
-        when(credentialedUser.getGoogleLoginState()).thenReturn(googleLoginState);
+  private void setupMocks() {
+    GoogleLoginState googleLoginState = mock(GoogleLoginState.class);
+    CredentialedUser credentialedUser = mock(CredentialedUser.class);
+    when(credentialedUser.getGoogleLoginState()).thenReturn(googleLoginState);
 
-        LinkedHashMap<String, CredentialedUser> users = new LinkedHashMap<String, CredentialedUser>();
-        users.put("mockUser@foo.bar", credentialedUser);
-        when(mockLoginService.getAllUsers()).thenReturn(users);
+    LinkedHashMap<String, CredentialedUser> users = new LinkedHashMap<String, CredentialedUser>();
+    users.put("mockUser@foo.bar", credentialedUser);
+    when(mockLoginService.getAllUsers()).thenReturn(users);
 
-        CloudDebugProcessState cloudDebugProcessState = mock(CloudDebugProcessState.class);
-        when(cloudDebugProcessState.getUserEmail()).thenReturn("mockUser@foo.bar");
+    CloudDebugProcessState cloudDebugProcessState = mock(CloudDebugProcessState.class);
+    when(cloudDebugProcessState.getUserEmail()).thenReturn("mockUser@foo.bar");
 
-        CloudDebugProcess cloudDebugProcess = mock(CloudDebugProcess.class);
-        when(cloudDebugProcess.getProcessState()).thenReturn(cloudDebugProcessState);
+    CloudDebugProcess cloudDebugProcess = mock(CloudDebugProcess.class);
+    when(cloudDebugProcess.getProcessState()).thenReturn(cloudDebugProcessState);
 
-        handler = new CloudDebugProcessHandler(cloudDebugProcess);
-    }
+    handler = new CloudDebugProcessHandler(cloudDebugProcess);
+  }
 }

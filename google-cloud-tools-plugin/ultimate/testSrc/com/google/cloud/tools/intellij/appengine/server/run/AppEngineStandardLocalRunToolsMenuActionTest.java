@@ -18,14 +18,11 @@ package com.google.cloud.tools.intellij.appengine.server.run;
 
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacet;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
-
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.testFramework.PlatformTestCase;
 
-/**
- * Tests for {@link AppEngineStandardLocalRunToolsMenuAction}.
- */
+/** Tests for {@link AppEngineStandardLocalRunToolsMenuAction}. */
 public class AppEngineStandardLocalRunToolsMenuActionTest extends PlatformTestCase {
 
   private AppEngineStandardLocalRunToolsMenuAction action;
@@ -42,19 +39,29 @@ public class AppEngineStandardLocalRunToolsMenuActionTest extends PlatformTestCa
   }
 
   public void testIsAppEngineStandardProjectCheck_flexibleFacet() {
-    ApplicationManager.getApplication().runWriteAction(() -> {
-      FacetManager.getInstance(getModule()).addFacet(AppEngineFlexibleFacet.getFacetType(),
-          "flex facet", null /* underlyingFacet */);
-    });
+    ApplicationManager.getApplication()
+        .runWriteAction(
+            () -> {
+              FacetManager.getInstance(getModule())
+                  .addFacet(
+                      AppEngineFlexibleFacet.getFacetType(),
+                      "flex facet",
+                      null /* underlyingFacet */);
+            });
 
     assertFalse(action.isAppEngineStandardProject(getProject()));
   }
 
   public void testIsAppEngineStandardProjectCheck_standardFacet() {
-    ApplicationManager.getApplication().runWriteAction(() -> {
-      FacetManager.getInstance(getModule()).addFacet(AppEngineStandardFacet.getFacetType(),
-          "standard facet", null /* underlyingFacet */);
-    });
+    ApplicationManager.getApplication()
+        .runWriteAction(
+            () -> {
+              FacetManager.getInstance(getModule())
+                  .addFacet(
+                      AppEngineStandardFacet.getFacetType(),
+                      "standard facet",
+                      null /* underlyingFacet */);
+            });
 
     assertTrue(action.isAppEngineStandardProject(getProject()));
   }

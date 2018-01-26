@@ -16,25 +16,30 @@
 
 package com.google.cloud.tools.intellij.debugger.ui;
 
-import com.google.cloud.tools.intellij.resources.ProjectSelector;
+import com.google.cloud.tools.intellij.project.CloudProject;
+import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
-
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.HyperlinkLabel;
-
+import com.intellij.ui.components.JBCheckBox;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-/**
- * This is the config UI for cloud debug run configs.
- */
+/** This is the config UI for cloud debug run configs. */
 public class CloudDebugRunConfigurationPanel {
 
-  private ProjectSelector elysiumProjectId;
   private JPanel panel;
   private HyperlinkLabel docsLink;
   private JLabel description;
+  private ProjectSelector projectSelector;
+  private JCheckBox hiddenValidationTrigger;
 
-  public CloudDebugRunConfigurationPanel() {
+  private Project ideProject;
+
+  public CloudDebugRunConfigurationPanel(Project ideProject) {
+    this.ideProject = ideProject;
+
     docsLink.setHyperlinkText(
         GctBundle.message("clouddebug.runconfig.formoredetails"),
         GctBundle.message("clouddebug.runconfig.documentation.url.text"),
@@ -47,11 +52,31 @@ public class CloudDebugRunConfigurationPanel {
     return panel;
   }
 
-  public String getProjectName() {
-    return elysiumProjectId.getText();
+  public CloudProject getSelectedCloudProject() {
+    return projectSelector.getSelectedProject();
   }
 
-  public void setProjectName(String name) {
-    elysiumProjectId.setText(name);
+  public void setSelectedCloudProject(CloudProject cloudProject) {
+    projectSelector.setSelectedProject(cloudProject);
+  }
+
+  public void loadActiveCloudProject() {
+    projectSelector.loadActiveCloudProject();
+  }
+
+  private void triggerValidation() {
+    hiddenValidationTrigger.doClick();
+  }
+
+  private void createUIComponents() {
+    hiddenValidationTrigger = new JBCheckBox();
+    hiddenValidationTrigger.setVisible(false);
+
+    projectSelector = new ProjectSelector(ideProject);
+    projectSelector.addProjectSelectionListener(
+        (selectedProject) -> {
+          // settings editor does not see all the changes by default, use explicit notification.
+          triggerValidation();
+        });
   }
 }

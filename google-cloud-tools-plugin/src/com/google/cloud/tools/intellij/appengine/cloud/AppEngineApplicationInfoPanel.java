@@ -36,9 +36,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.event.HyperlinkListener;
 
-/**
- * A {@link JPanel} that displays contextual information about an App Engine Application.
- */
+/** A {@link JPanel} that displays contextual information about an App Engine Application. */
 public class AppEngineApplicationInfoPanel extends JPanel {
 
   private static final int COMPONENTS_HORIZONTAL_PADDING = 5;
@@ -60,53 +58,55 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   }
 
   /**
-   * Updates the panel as follows:
-   * if {@code projectId} is valid, it displays the given project's information,
-   * if {@code projectId} is invalid, it displays an error message,
-   * if {@code projectId} is empty, no message is displayed.
+   * Updates the panel as follows: if {@code projectId} is valid, it displays the given project's
+   * information, if {@code projectId} is invalid, it displays an error message, if {@code
+   * projectId} is empty, no message is displayed.
    *
    * @param projectId the ID of the project whose application info to display
    * @param credential the Credential to use to make any required API calls
    */
   @SuppressWarnings("FutureReturnValueIgnored")
   public void refresh(final String projectId, final Credential credential) {
-    ApplicationManager.getApplication().executeOnPooledThread(() -> {
-      if (projectId.isEmpty()) {
-        clearMessage();
-        return;
-      }
+    ApplicationManager.getApplication()
+        .invokeLater(
+            () -> {
+              if (projectId.isEmpty()) {
+                clearMessage();
+                return;
+              }
 
-      if (projectId == null || credential == null) {
-        setMessage(GctBundle.getString("appengine.infopanel.no.region"),
-            true /* isError*/);
-        return;
-      }
+              if (projectId == null || credential == null) {
+                setMessage(GctBundle.getString("appengine.infopanel.no.region"), true /* isError*/);
+                return;
+              }
 
-      try {
-        Application application =
-            AppEngineAdminService.getInstance().getApplicationForProjectId(projectId, credential);
+              try {
+                Application application =
+                    AppEngineAdminService.getInstance()
+                        .getApplicationForProjectId(projectId, credential);
 
-        if (application != null) {
-          setMessage(application.getLocationId(), false);
-        } else {
-          setCreateApplicationMessage(projectId, credential);
-        }
-      } catch (IOException | GoogleApiException e) {
-        setMessage(GctBundle.message("appengine.application.region.fetch.error"), true);
-      }
-    });
+                if (application != null) {
+                  setMessage(application.getLocationId(), false);
+                } else {
+                  setCreateApplicationMessage(projectId, credential);
+                }
+              } catch (IOException | GoogleApiException e) {
+                setMessage(GctBundle.message("appengine.application.region.fetch.error"), true);
+              }
+            });
   }
 
-  /**
-   * Prints a message that doesn't contain a hyperlink.
-   */
+  /** Prints a message that doesn't contain a hyperlink. */
   public void setMessage(String text, boolean isError) {
-    setMessage(() -> {
-      messageText.setText(text);
-      // HyperlinkLabels require that revalidate() be called after setText(), in order for text to
-      // actually show up. setHyperlinkText() calls revalidate() internally.
-      messageText.revalidate();
-    }, isError);
+    setMessage(
+        () -> {
+          messageText.setText(text);
+          // HyperlinkLabels require that revalidate() be called after setText(), in order for text
+          // to
+          // actually show up. setHyperlinkText() calls revalidate() internally.
+          messageText.revalidate();
+        },
+        isError);
   }
 
   void clearMessage() {
@@ -135,15 +135,18 @@ public class AppEngineApplicationInfoPanel extends JPanel {
     String beforeLinkText = GctBundle.getString("appengine.application.not.exist") + " ";
     String linkText = GctBundle.getString("appengine.application.create.linkText");
     String afterLinkText = " " + GctBundle.getString("appengine.application.create.afterLinkText");
-    setMessage(() -> {
-      messageText.addHyperlinkListener(new CreateApplicationLinkListener(projectId, credential));
-      messageText.setHyperlinkText(beforeLinkText, linkText, afterLinkText);
-    }, true);
+    setMessage(
+        () -> {
+          messageText.addHyperlinkListener(
+              new CreateApplicationLinkListener(projectId, credential));
+          messageText.setHyperlinkText(beforeLinkText, linkText, afterLinkText);
+        },
+        true);
   }
 
   /**
-   * Implementation of {@link HyperlinkListener} that opens a
-   * {@link AppEngineApplicationCreateDialog} when the link is clicked.
+   * Implementation of {@link HyperlinkListener} that opens a {@link
+   * AppEngineApplicationCreateDialog} when the link is clicked.
    */
   private class CreateApplicationLinkListener implements HyperlinkListener {
 
@@ -159,8 +162,9 @@ public class AppEngineApplicationInfoPanel extends JPanel {
     public void hyperlinkUpdate(HyperlinkEvent e) {
       if (e.getEventType() == EventType.ACTIVATED) {
         // construct and show the application creation dialog
-        AppEngineApplicationCreateDialog applicationDialog = new AppEngineApplicationCreateDialog(
-            AppEngineApplicationInfoPanel.this, projectId, credential);
+        AppEngineApplicationCreateDialog applicationDialog =
+            new AppEngineApplicationCreateDialog(
+                AppEngineApplicationInfoPanel.this, projectId, credential);
         DialogManager.show(applicationDialog);
         applicationDialog.getDisposable().dispose();
 

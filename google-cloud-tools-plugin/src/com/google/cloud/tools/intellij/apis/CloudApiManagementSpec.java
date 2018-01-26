@@ -14,12 +14,21 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.resources;
+package com.google.cloud.tools.intellij.apis;
 
-/**
- * A non-existing project specified in the Project field of the App Engine Deployment configuration
- * dialog.
- */
-final class InvalidResourceProjectModelItem extends ProjectModelItem {
+/** Defines the management specification of a single GCP API for actions such as API enablement. */
+class CloudApiManagementSpec {
+  private boolean shouldEnable;
 
+  CloudApiManagementSpec(boolean shouldEnable) {
+    this.shouldEnable = shouldEnable;
+  }
+
+  boolean shouldEnable() {
+    return shouldEnable;
+  }
+
+  void setShouldEnable(boolean shouldEnable) {
+    this.shouldEnable = shouldEnable;
+  }
 }
