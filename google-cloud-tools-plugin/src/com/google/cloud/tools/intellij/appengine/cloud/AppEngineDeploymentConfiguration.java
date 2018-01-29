@@ -27,7 +27,6 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.collect.Iterables;
 import com.intellij.execution.configurations.RuntimeConfigurationError;
 import com.intellij.execution.configurations.RuntimeConfigurationException;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.remoteServer.configuration.RemoteServer;
@@ -237,7 +236,7 @@ public class AppEngineDeploymentConfiguration
 
   private void checkCommonConfig(AppEngineDeployable deployable) throws RuntimeConfigurationError {
     Set<CloudSdkValidationResult> sdkValidationResult =
-        ServiceManager.getService(CloudSdkValidator.class).validateCloudSdk();
+        CloudSdkValidator.getSdkValidator().validateCloudSdk();
     if (!sdkValidationResult.isEmpty()) {
       CloudSdkValidationResult result = Iterables.getFirst(sdkValidationResult, null);
       throw new RuntimeConfigurationError(
