@@ -225,6 +225,6 @@ public class AppEngineForbiddenCodeInspection extends BaseJavaLocalInspectionToo
   @NotNull
   @Override
   public String getShortName() {
-    return "AppEngineForbiddenCode";
+    return "GoogleAppEngineForbiddenCode";
   }
 }
