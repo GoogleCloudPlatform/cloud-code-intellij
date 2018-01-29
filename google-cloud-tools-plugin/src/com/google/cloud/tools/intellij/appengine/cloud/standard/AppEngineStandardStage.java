@@ -22,6 +22,7 @@ import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineStandardStagin
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.cloud.CloudSdkAppEngineHelper;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 import java.nio.file.Path;
@@ -30,15 +31,18 @@ import org.jetbrains.annotations.NotNull;
 /** Stages an application in preparation for deployment to the App Engine flexible environment. */
 public class AppEngineStandardStage {
   private CloudSdkAppEngineHelper helper;
+  private AppEngineDeploymentConfiguration deploymentConfiguration;
   private LoggingHandler loggingHandler;
   private Path deploymentArtifactPath;
 
   /** Initialize the staging dependencies. */
   public AppEngineStandardStage(
       @NotNull CloudSdkAppEngineHelper helper,
+      AppEngineDeploymentConfiguration deploymentConfiguration,
       @NotNull LoggingHandler loggingHandler,
       @NotNull Path deploymentArtifactPath) {
     this.helper = helper;
+    this.deploymentConfiguration = deploymentConfiguration;
     this.loggingHandler = loggingHandler;
     this.deploymentArtifactPath = deploymentArtifactPath;
   }
@@ -72,6 +76,18 @@ public class AppEngineStandardStage {
     // TODO(joaomartins): Change File to Path on library configs.
     stageConfig.setStagingDirectory(stagingDirectory.toFile());
     stageConfig.setSourceDirectory(deploymentArtifactPath.toFile());
+
+    // Other option is to move the DefaultStageStandardConfiguration into
+    // AppEngineDeploymentConfiguration
+    // TODO: add studd here
+    stageConfig.setCompileEncoding(deploymentConfiguration.getCompileEncoding());
+    stageConfig.setDeleteJsps(deploymentConfiguration.getDeleteJsps());
+    stageConfig.setDisableJarJsps(deploymentConfiguration.getDisableJarJsps());
+    stageConfig.setDisableUpdateCheck(deploymentConfiguration.getDisableUpdateCheck());
+    stageConfig.setEnableJarClasses(deploymentConfiguration.getEnableJarClasses());
+    stageConfig.setEnableJarSplitting(deploymentConfiguration.getEnableJarSplitting());
+    stageConfig.setEnableQuickstart(deploymentConfiguration.getEnableQuickstart());
+    stageConfig.setJarSplittingExcludes(deploymentConfiguration.getJarSplittingExcludes());
 
     CloudSdkAppEngineStandardStaging staging = new CloudSdkAppEngineStandardStaging(sdk);
     staging.stageStandard(stageConfig);

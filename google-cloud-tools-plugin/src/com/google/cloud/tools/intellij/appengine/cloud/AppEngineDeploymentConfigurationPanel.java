@@ -30,10 +30,10 @@ import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBTextField;
 import java.util.Optional;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import org.jetbrains.annotations.NotNull;
 
@@ -54,13 +54,15 @@ public final class AppEngineDeploymentConfigurationPanel {
   private HyperlinkLabel appEngineCostWarningLabel;
   private JLabel serviceLabel;
   private JCheckBox hiddenValidationTrigger;
-  private JTextField textField1;
-  private JCheckBox delete_jspsCheckBox;
-  private JCheckBox enable_jar_classesCheckBox;
-  private JCheckBox disable_jar_jspsCheckBox;
-  private JCheckBox disable_update_checkCheckBox;
-  private JCheckBox enable_quickstartCheckBox;
-  private JTextField textField2;
+  private JTextField compileEncodingTextField;
+  private JCheckBox deleteJspsCheckBox;
+  private JCheckBox enableJarClassesCheckBox;
+  private JCheckBox disableJarJspsCheckBox;
+  private JCheckBox disableUpdateCheckCheckBox;
+  private JCheckBox enableQuickstartCheckBox;
+  private JTextField jarSplittingExcldesTextField;
+  private JCheckBox enableJarSplittingCheckBox;
+  private JTabbedPane parametersTabbedPane;
 
   private final Project ideProject;
 
@@ -137,6 +139,16 @@ public final class AppEngineDeploymentConfigurationPanel {
       projectSelector.loadActiveCloudProject();
     }
 
+    // TODO: only do for standard
+    compileEncodingTextField.setText(configuration.getCompileEncoding());
+    deleteJspsCheckBox.setSelected(configuration.getDeleteJsps());
+    disableJarJspsCheckBox.setSelected(configuration.getDisableJarJsps());
+    disableUpdateCheckCheckBox.setSelected(configuration.getDisableUpdateCheck());
+    enableJarClassesCheckBox.setSelected(configuration.getEnableJarClasses());
+    enableJarSplittingCheckBox.setSelected(configuration.getEnableJarSplitting());
+    enableQuickstartCheckBox.setSelected(configuration.getEnableQuickstart());
+    jarSplittingExcldesTextField.setText(configuration.getJarSplittingExcludes());
+
     refreshApplicationInfoPanel(projectSelector.getSelectedProject());
   }
 
@@ -156,6 +168,16 @@ public final class AppEngineDeploymentConfigurationPanel {
       configuration.setCloudProjectName(selectedProject.projectId());
       configuration.setGoogleUsername(selectedProject.googleUsername());
     }
+
+    // TODO: How do you handle Standard Specific configs?
+    configuration.setCompileEncoding(compileEncodingTextField.getText());
+    configuration.setDeleteJsps(deleteJspsCheckBox.isSelected());
+    configuration.setDisableJarJsps(disableJarJspsCheckBox.isSelected());
+    configuration.setDisableUpdateCheck(disableUpdateCheckCheckBox.isSelected());
+    configuration.setEnableJarClasses(enableJarClassesCheckBox.isSelected());
+    configuration.setEnableJarSplitting(enableJarSplittingCheckBox.isSelected());
+    configuration.setEnableQuickstart(enableQuickstartCheckBox.isSelected());
+    configuration.setJarSplittingExcludes(jarSplittingExcldesTextField.getText());
   }
 
   /**
