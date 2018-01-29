@@ -30,9 +30,11 @@ import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBTextField;
 import java.util.Optional;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import org.jetbrains.annotations.NotNull;
 
 /** Common App Engine deployment configuration UI shared by flexible and standard deployments. */
@@ -52,6 +54,13 @@ public final class AppEngineDeploymentConfigurationPanel {
   private HyperlinkLabel appEngineCostWarningLabel;
   private JLabel serviceLabel;
   private JCheckBox hiddenValidationTrigger;
+  private JTextField textField1;
+  private JCheckBox delete_jspsCheckBox;
+  private JCheckBox enable_jar_classesCheckBox;
+  private JCheckBox disable_jar_jspsCheckBox;
+  private JCheckBox disable_update_checkCheckBox;
+  private JCheckBox enable_quickstartCheckBox;
+  private JTextField textField2;
 
   private final Project ideProject;
 
