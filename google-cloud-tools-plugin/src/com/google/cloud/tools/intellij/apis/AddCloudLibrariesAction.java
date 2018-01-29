@@ -16,15 +16,20 @@
 
 package com.google.cloud.tools.intellij.apis;
 
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
+import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.intellij.facet.FacetManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import git4idea.DialogManager;
 import java.util.Optional;
 import java.util.stream.Stream;
+import org.apache.commons.lang3.JavaVersion;
 
 /**
  * The action in the Google Cloud Tools menu group that opens the wizard to add client libraries to
@@ -41,16 +46,23 @@ public final class AddCloudLibrariesAction extends DumbAwareAction {
 
   @Override
   public void update(AnActionEvent e) {
-    e.getPresentation()
-        .setVisible(
-            Optional.ofNullable(e.getProject())
-                .map(
-                    project ->
-                        Stream.of(ModuleManager.getInstance(project).getModules())
-                            .anyMatch(
-                                module ->
-                                    AppEngineProjectService.getInstance().isMavenModule(module)))
-                .orElse(false));
+    Boolean addLibrariesEnabled =
+        Optional.ofNullable(e.getProject())
+            .map(
+                project ->
+                    Stream.of(ModuleManager.getInstance(project).getModules())
+                        .anyMatch(this::isValidModuleForAddCloudLibraries))
+            .orElse(false);
+
+    e.getPresentation().setEnabled(addLibrariesEnabled);
+    if (!addLibrariesEnabled) {
+      // update message to hint Maven/Java 8 project is required.
+      e.getPresentation()
+          .setDescription(GctBundle.message("cloud.libraries.menu.action.disabled.description"));
+    } else {
+      e.getPresentation()
+          .setDescription(GctBundle.message("cloud.libraries.menu.action.description"));
+    }
   }
 
   @Override
@@ -64,5 +76,17 @@ public final class AddCloudLibrariesAction extends DumbAwareAction {
             librariesDialog.getSelectedLibraries(), librariesDialog.getSelectedModule());
       }
     }
+  }
+
+  private boolean isValidModuleForAddCloudLibraries(Module module) {
+    // AppEngine Standard + Java 7 are not supported for GCP Libraries
+    if (AppEngineProjectService.getInstance().hasAppEngineStandardFacet(module)) {
+      AppEngineStandardFacet appEngineStandardFacet =
+          FacetManager.getInstance(module).getFacetByType(AppEngineStandardFacetType.ID);
+      if (!appEngineStandardFacet.getRuntimeJavaVersion().atLeast(JavaVersion.JAVA_1_8))
+        return false;
+    }
+
+    return AppEngineProjectService.getInstance().isMavenModule(module);
   }
 }
