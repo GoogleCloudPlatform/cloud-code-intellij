@@ -44,6 +44,8 @@ import com.intellij.openapi.actionSystem.Anchor;
 import com.intellij.openapi.actionSystem.Constraints;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.IdeActions;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
@@ -306,28 +308,27 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
             new ResolveBreakpointHandler() {
               @Override
               public void onSuccess(@NotNull final Breakpoint result) {
-                SwingUtilities.invokeLater(
-                    new Runnable() {
-                      @Override
-                      public void run() {
-                        // We will only do the selection if the id for this async task matches the
-                        // latest
-                        // user clicked item.  This prevents multiple (and possibly out of order)
-                        // selections getting queued up.
-                        if (id.equals(navigatedSnapshotId)) {
-                          if (!Boolean.TRUE.equals(result.getIsFinalState())
-                              || result.getStackFrames() == null) {
-                            getBreakpointHandler().navigateTo(result);
-                            if (result.getStackFrames() == null) {
-                              navigateToBreakpoint(result);
+                ApplicationManager.getApplication()
+                    .invokeLater(
+                        () -> {
+                          // We will only do the selection if the id for this async task matches the
+                          // latest
+                          // user clicked item.  This prevents multiple (and possibly out of order)
+                          // selections getting queued up.
+                          if (id.equals(navigatedSnapshotId)) {
+                            if (!Boolean.TRUE.equals(result.getIsFinalState())
+                                || result.getStackFrames() == null) {
+                              getBreakpointHandler().navigateTo(result);
+                              if (result.getStackFrames() == null) {
+                                navigateToBreakpoint(result);
+                              }
+                              return;
                             }
-                            return;
-                          }
 
-                          navigateToBreakpoint(result);
-                        }
-                      }
-                    });
+                            navigateToBreakpoint(result);
+                          }
+                        },
+                        ModalityState.NON_MODAL);
               }
 
               @Override
