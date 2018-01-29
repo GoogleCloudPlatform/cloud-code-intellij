@@ -16,11 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
-import com.google.common.collect.Lists;
-import java.lang.ref.WeakReference;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Iterator;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -29,8 +25,6 @@ import org.jetbrains.annotations.Nullable;
  */
 // TODO(ivanporty) implementation coming in the next PR
 public class ManagedCloudSdkService implements CloudSdkService {
-  private final Collection<WeakReference<SdkStatusUpdateListener>> weakRefListeners =
-      Lists.newArrayList();
 
   @Nullable
   @Override
@@ -52,19 +46,5 @@ public class ManagedCloudSdkService implements CloudSdkService {
   }
 
   @Override
-  public void addStatusUpdateListener(SdkStatusUpdateListener listener) {
-    weakRefListeners.add(new WeakReference<>(listener));
-  }
-
-  private void notifyListeners(CloudSdkService sdkService, SdkStatus status) {
-    Iterator<WeakReference<SdkStatusUpdateListener>> refIterator = weakRefListeners.iterator();
-    while (refIterator.hasNext()) {
-      SdkStatusUpdateListener listener = refIterator.next().get();
-      if (listener == null /* GC-ed */) {
-        refIterator.remove();
-      } else {
-        listener.onSdkStatusChange(sdkService, status);
-      }
-    }
-  }
+  public void addStatusUpdateListener(SdkStatusUpdateListener listener) {}
 }
