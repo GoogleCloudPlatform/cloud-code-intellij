@@ -63,6 +63,7 @@ public final class AppEngineDeploymentConfigurationPanel {
   private JTextField jarSplittingExcldesTextField;
   private JCheckBox enableJarSplittingCheckBox;
   private JTabbedPane parametersTabbedPane;
+  private JPanel stagingPropertiesTab;
 
   private final Project ideProject;
 
@@ -109,6 +110,9 @@ public final class AppEngineDeploymentConfigurationPanel {
           // watcher.
           triggerSettingsEditorValidation();
         });
+
+    // TODO: hide/remove staging panel if flex
+    //parametersTabbedPane.remove(stagingPropertiesTab);
   }
 
   /**

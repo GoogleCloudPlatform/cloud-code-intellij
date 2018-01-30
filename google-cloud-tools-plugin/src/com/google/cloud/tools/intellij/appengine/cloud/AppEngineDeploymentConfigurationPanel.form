@@ -221,7 +221,7 @@
               </grid>
             </children>
           </grid>
-          <grid id="53897" layout-manager="GridLayoutManager" row-count="5" column-count="5" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+          <grid id="53897" binding="stagingPropertiesTab" layout-manager="GridLayoutManager" row-count="5" column-count="5" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="10" left="10" bottom="10" right="10"/>
             <constraints>
               <tabbedpane title-resource-bundle="messages/CloudToolsBundle" title-key="appengine.deployment.staging.properties.tab.title"/>
