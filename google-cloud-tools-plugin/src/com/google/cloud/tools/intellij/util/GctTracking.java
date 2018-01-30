@@ -83,4 +83,7 @@ public class GctTracking {
       "account.plugin.restart.dialog.yes.action";
   public static final String ACCOUNT_PLUGIN_RESTART_DIALOG_NO_ACTION =
       "account.plugin.restart.dialog.no.action";
+
+  public static final String CLIENT_LIBRARY_ADD_LIBRARY = "client.library.add.library";
+  public static final String CLIENT_LIBRARY_ENABLE_API = "client.library.enable.api";
 }
