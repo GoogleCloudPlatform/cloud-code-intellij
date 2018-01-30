@@ -27,7 +27,8 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import git4idea.DialogManager;
-import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.JavaVersion;
 
@@ -46,23 +47,39 @@ public final class AddCloudLibrariesAction extends DumbAwareAction {
 
   @Override
   public void update(AnActionEvent e) {
-    Boolean addLibrariesEnabled =
-        Optional.ofNullable(e.getProject())
-            .map(
-                project ->
-                    Stream.of(ModuleManager.getInstance(project).getModules())
-                        .anyMatch(this::isValidModuleForAddCloudLibraries))
-            .orElse(false);
+    boolean addLibrariesEnabled = false;
+    if (e.getProject() != null) {
+      Set<CloudLibrariesModuleSupportType> moduleSupportTypes =
+          Stream.of(ModuleManager.getInstance(e.getProject()).getModules())
+              .map(this::checkModuleForAddCloudLibraries)
+              .collect(Collectors.toSet());
+
+      addLibrariesEnabled = moduleSupportTypes.contains(CloudLibrariesModuleSupportType.SUPPORTED);
+      if (!addLibrariesEnabled) {
+        // update message to hint what is missing.
+        for (CloudLibrariesModuleSupportType supportType : moduleSupportTypes) {
+          switch (supportType) {
+            case MAVEN_REQUIRED:
+              e.getPresentation()
+                  .setDescription(
+                      GctBundle.message("cloud.libraries.menu.action.maven.required.description"));
+              break;
+            case APPENGINE_JAVA8_REQUIRED:
+              e.getPresentation()
+                  .setDescription(
+                      GctBundle.message(
+                          "cloud.libraries.menu.action.gae.java8.required.description"));
+              break;
+          }
+        }
+      } else {
+        // standard message for a supported module action.
+        e.getPresentation()
+            .setDescription(GctBundle.message("cloud.libraries.menu.action.description"));
+      }
+    }
 
     e.getPresentation().setEnabled(addLibrariesEnabled);
-    if (!addLibrariesEnabled) {
-      // update message to hint Maven/Java 8 project is required.
-      e.getPresentation()
-          .setDescription(GctBundle.message("cloud.libraries.menu.action.disabled.description"));
-    } else {
-      e.getPresentation()
-          .setDescription(GctBundle.message("cloud.libraries.menu.action.description"));
-    }
   }
 
   @Override
@@ -78,15 +95,23 @@ public final class AddCloudLibrariesAction extends DumbAwareAction {
     }
   }
 
-  private boolean isValidModuleForAddCloudLibraries(Module module) {
+  private enum CloudLibrariesModuleSupportType {
+    SUPPORTED,
+    MAVEN_REQUIRED,
+    APPENGINE_JAVA8_REQUIRED
+  }
+
+  private CloudLibrariesModuleSupportType checkModuleForAddCloudLibraries(Module module) {
     // AppEngine Standard + Java 7 are not supported for GCP Libraries
     if (AppEngineProjectService.getInstance().hasAppEngineStandardFacet(module)) {
       AppEngineStandardFacet appEngineStandardFacet =
           FacetManager.getInstance(module).getFacetByType(AppEngineStandardFacetType.ID);
       if (!appEngineStandardFacet.getRuntimeJavaVersion().atLeast(JavaVersion.JAVA_1_8))
-        return false;
+        return CloudLibrariesModuleSupportType.APPENGINE_JAVA8_REQUIRED;
     }
 
-    return AppEngineProjectService.getInstance().isMavenModule(module);
+    return AppEngineProjectService.getInstance().isMavenModule(module)
+        ? CloudLibrariesModuleSupportType.SUPPORTED
+        : CloudLibrariesModuleSupportType.MAVEN_REQUIRED;
   }
 }
