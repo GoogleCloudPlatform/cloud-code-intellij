@@ -211,6 +211,80 @@ public final class AppEngineStandardDeploymentEditorTest {
   }
 
   @Test
+  public void applyEditorTo_doesSetCompileEncoding() throws Exception {
+    String encoding = "UTF-8";
+    editor.getCommonConfig().getCompileEncodingTextField().setText(encoding);
+
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.getCompileEncoding()).isEqualTo(encoding);
+  }
+
+  @Test
+  public void applyEditorTo_doesSetDeleteJsps() throws Exception {
+    editor.getCommonConfig().getDeleteJspsCheckBox().setSelected(true);
+
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.getDeleteJsps()).isTrue();
+  }
+
+  @Test
+  public void applyEditorTo_doesSetDisableJarJsps() throws Exception {
+    editor.getCommonConfig().getDisableJarJspsCheckBox().setSelected(true);
+
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.getDisableJarJsps()).isTrue();
+  }
+
+  @Test
+  public void applyEditorTo_doesSetDisableUpdateCheck() throws Exception {
+    editor.getCommonConfig().getDisableUpdateCheckCheckBox().setSelected(true);
+
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.getDisableUpdateCheck()).isTrue();
+  }
+
+  @Test
+  public void applyEditorTo_doesSetEnableJarClasses() throws Exception {
+    editor.getCommonConfig().getEnableJarClassesCheckBox().setSelected(true);
+
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.getEnableJarClasses()).isTrue();
+  }
+
+  @Test
+  public void applyEditorTo_doesSetEnableJarSplitting() throws Exception {
+    editor.getCommonConfig().getEnableJarSplittingCheckBox().setSelected(true);
+
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.getEnableJarSplitting()).isTrue();
+  }
+
+  @Test
+  public void applyEditorTo_doesSetEnableQuickstart() throws Exception {
+    editor.getCommonConfig().getEnableQuickstartCheckBox().setSelected(true);
+
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.getEnableQuickstart()).isTrue();
+  }
+
+  @Test
+  public void applyEditorTo_doesSetJarSplittingExcludes() throws Exception {
+    String exclusions = "exclude.this";
+    editor.getCommonConfig().getJarSplittingExcludesTextField().setText(exclusions);
+
+    editor.applyEditorTo(configuration);
+
+    assertThat(configuration.getJarSplittingExcludes()).isEqualTo(exclusions);
+  }
+
+  @Test
   public void resetEditorFrom_withDefaultConfiguration_doesSetDefaults() {
     editor.resetEditorFrom(configuration);
 
@@ -280,5 +354,79 @@ public final class AppEngineStandardDeploymentEditorTest {
 
     CloudProject expectedProject = CloudProject.create(projectId, projectId, EMAIL);
     verify(projectSelector).setSelectedProject(expectedProject);
+  }
+
+  @Test
+  public void resetEditorFrom_doesSetCompileEncoding() {
+    String encoding = "UTF-8";
+    configuration.setCompileEncoding(encoding);
+
+    editor.resetEditorFrom(configuration);
+
+    assertThat(editor.getCommonConfig().getCompileEncodingTextField().getText()).isEqualTo(encoding);
+  }
+
+  @Test
+  public void resetEditorFrom_doesSetDeleteJsps() {
+    configuration.setDeleteJsps(true);
+
+    editor.resetEditorFrom(configuration);
+
+    assertThat(editor.getCommonConfig().getDeleteJspsCheckBox().isSelected()).isTrue();
+  }
+
+  @Test
+  public void resetEditorFrom_doesSetDisableJarJsps() {
+    configuration.setDisableJarJsps(true);
+
+    editor.resetEditorFrom(configuration);
+
+    assertThat(editor.getCommonConfig().getDisableJarJspsCheckBox().isSelected()).isTrue();
+  }
+
+  @Test
+  public void resetEditorFrom_doesSetDisableUpdateCheck() {
+    configuration.setDisableUpdateCheck(true);
+
+    editor.resetEditorFrom(configuration);
+
+    assertThat(editor.getCommonConfig().getDisableUpdateCheckCheckBox().isSelected()).isTrue();
+  }
+
+  @Test
+  public void resetEditorFrom_doesSetEnableJarClasses() {
+    configuration.setEnableJarClasses(true);
+
+    editor.resetEditorFrom(configuration);
+
+    assertThat(editor.getCommonConfig().getEnableJarClassesCheckBox().isSelected()).isTrue();
+  }
+
+  @Test
+  public void resetEditorFrom_doesSetEnableJarSplitting() {
+    configuration.setEnableJarSplitting(true);
+
+    editor.resetEditorFrom(configuration);
+
+    assertThat(editor.getCommonConfig().getEnableJarSplittingCheckBox().isSelected()).isTrue();
+  }
+
+  @Test
+  public void resetEditorFrom_doesSetEnableQuickstart() {
+    configuration.setEnableQuickstart(true);
+
+    editor.resetEditorFrom(configuration);
+
+    assertThat(editor.getCommonConfig().getEnableQuickstartCheckBox().isSelected()).isTrue();
+  }
+
+  @Test
+  public void resetEditorFrom_doesSetJarSplittingExcludes() {
+    String exclusions = "exclude.this";
+    configuration.setJarSplittingExcludes(exclusions);
+
+    editor.resetEditorFrom(configuration);
+
+    assertThat(editor.getCommonConfig().getJarSplittingExcludesTextField().getText()).isEqualTo(exclusions);
   }
 }

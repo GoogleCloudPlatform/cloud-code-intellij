@@ -62,7 +62,9 @@ public final class AppEngineDeploymentConfigurationPanel {
   private JCheckBox enableQuickstartCheckBox;
   private JTextField jarSplittingExcldesTextField;
   private JCheckBox enableJarSplittingCheckBox;
+
   private JTabbedPane parametersTabbedPane;
+
   private JPanel stagingPropertiesTab;
 
   private final Project ideProject;
@@ -268,7 +270,7 @@ public final class AppEngineDeploymentConfigurationPanel {
     return enableQuickstartCheckBox;
   }
 
-  public JTextField getJarSplittingExcldesTextField() {
+  public JTextField getJarSplittingExcludesTextField() {
     return jarSplittingExcldesTextField;
   }
 

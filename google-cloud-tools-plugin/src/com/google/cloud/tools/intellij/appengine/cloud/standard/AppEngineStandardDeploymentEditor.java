@@ -72,7 +72,7 @@ public final class AppEngineStandardDeploymentEditor
     commonConfig.getEnableJarClassesCheckBox().setSelected(configuration.getEnableJarClasses());
     commonConfig.getEnableJarSplittingCheckBox().setSelected(configuration.getEnableJarSplitting());
     commonConfig.getEnableQuickstartCheckBox().setSelected(configuration.getEnableQuickstart());
-    commonConfig.getJarSplittingExcldesTextField().setText(configuration.getJarSplittingExcludes());
+    commonConfig.getJarSplittingExcludesTextField().setText(configuration.getJarSplittingExcludes());
   }
 
   @Override
@@ -87,7 +87,7 @@ public final class AppEngineStandardDeploymentEditor
     configuration.setEnableJarClasses(commonConfig.getEnableJarClassesCheckBox().isSelected());
     configuration.setEnableJarSplitting(commonConfig.getEnableJarSplittingCheckBox().isSelected());
     configuration.setEnableQuickstart(commonConfig.getEnableQuickstartCheckBox().isSelected());
-    configuration.setJarSplittingExcludes(commonConfig.getJarSplittingExcldesTextField().getText());
+    configuration.setJarSplittingExcludes(commonConfig.getJarSplittingExcludesTextField().getText());
 
     boolean isFlexCompat =
         AppEngineProjectService.getInstance().isFlexCompat(project, deploymentSource);
