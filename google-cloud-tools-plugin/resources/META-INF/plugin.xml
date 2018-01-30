@@ -48,6 +48,8 @@
 
       <h2>[18.1.2]</h2>
 
+      <p>You can now add client libraries for accessing Google Cloud APIs to your project. Just select 'Tools > Google Cloud Tools > Add Cloud Libraries ...'.</p>
+
       <h3>Added</h3>
       <ul>
         <li>Added Google Cloud Java client library discovery and addition from the IDE. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1806">#1806</a>)</li>
