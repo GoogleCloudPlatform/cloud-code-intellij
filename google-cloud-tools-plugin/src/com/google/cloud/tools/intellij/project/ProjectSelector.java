@@ -30,7 +30,6 @@ import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
@@ -59,6 +58,7 @@ public class ProjectSelector extends JPanel {
   private FixedSizeButton browseButton;
   private JPanel hyperlinksPanel;
   private JPanel rootPanel;
+  private JPanel wrapperBorderPanel;
 
   private CloudProject cloudProject;
   // null by default. set by caller to allow project selector to pre-select active project.
@@ -151,10 +151,11 @@ public class ProjectSelector extends JPanel {
         });
 
     hyperlinksPanel = new JPanel();
-    hyperlinksPanel.setBorder(UIManager.getBorder("TextField.border"));
-    hyperlinksPanel.setLayout(new BoxLayout(hyperlinksPanel, BoxLayout.X_AXIS));
 
-    browseButton = new FixedSizeButton(hyperlinksPanel);
+    wrapperBorderPanel = new JPanel();
+    wrapperBorderPanel.setBorder(UIManager.getBorder("TextField.border"));
+
+    browseButton = new FixedSizeButton(wrapperBorderPanel);
     browseButton.addActionListener((actionEvent) -> handleOpenProjectSelectionDialog());
     browseButton.setFocusable(true);
     browseButton.setToolTipText(GctBundle.getString("cloud.project.selector.open.dialog.tooltip"));
@@ -248,7 +249,7 @@ public class ProjectSelector extends JPanel {
       super.setIcon(icon);
     }
 
-    public String getText() {
+    public String getHyperlinkText() {
       return text;
     }
 
