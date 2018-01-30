@@ -94,6 +94,7 @@ public final class AppEngineFlexibleDeploymentEditor
 
     commonConfig.getDeployAllConfigsCheckbox().setSelected(false);
     commonConfig.getDeployAllConfigsCheckbox().setVisible(false);
+    commonConfig.removeStagingPropertiesTab();
 
     addSettingsEditorListener(editor -> updateStagedArtifactNameEmptyText());
 
@@ -456,6 +457,5 @@ public final class AppEngineFlexibleDeploymentEditor
 
   private void createUIComponents() {
     commonConfig = new AppEngineDeploymentConfigurationPanel(project);
-    commonConfig.removeStagingPropertiesTab();
   }
 }

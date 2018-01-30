@@ -139,6 +139,7 @@ public class AppEngineDeploymentConfiguration
     return stagedArtifactNameLegacy;
   }
 
+  @Attribute("compileEncoding")
   public String getCompileEncoding() {
     return compileEncoding;
   }

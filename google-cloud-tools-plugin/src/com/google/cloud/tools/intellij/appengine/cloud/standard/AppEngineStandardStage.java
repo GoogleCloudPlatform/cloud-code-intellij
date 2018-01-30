@@ -72,14 +72,13 @@ public class AppEngineStandardStage {
 
     // TODO determine the default set of flags we want to set for AE standard staging
     DefaultStageStandardConfiguration stageConfig = new DefaultStageStandardConfiguration();
-    stageConfig.setEnableJarSplitting(true);
     // TODO(joaomartins): Change File to Path on library configs.
     stageConfig.setStagingDirectory(stagingDirectory.toFile());
     stageConfig.setSourceDirectory(deploymentArtifactPath.toFile());
 
     // Other option is to move the DefaultStageStandardConfiguration into
     // AppEngineDeploymentConfiguration
-    // TODO: add studd here
+    //TODO: do we want to set the default for enable_jar_splitting to true?
     stageConfig.setCompileEncoding(deploymentConfiguration.getCompileEncoding());
     stageConfig.setDeleteJsps(deploymentConfiguration.getDeleteJsps());
     stageConfig.setDisableJarJsps(deploymentConfiguration.getDisableJarJsps());
