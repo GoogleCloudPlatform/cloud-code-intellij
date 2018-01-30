@@ -14,10 +14,12 @@ into the IntelliJ IDEA UI. Currently this includes:
 * [Google Cloud Source Repositories](https://cloud.google.com/tools/cloud-repositories/) 
   Fully-featured private Git repositories hosted on Google Cloud Platform.
 * The [Google Cloud Debugger](https://cloud.google.com/tools/cloud-debugger/) 
-  The Cloud Debugger can inspect the state of a Java application running on 
+  The Cloud Debugger can inspect the state of a Java application running on. 
   [Google App Engine](https://cloud.google.com/appengine/)
   at any code location without stopping the application.
 * [Google App Engine](https://cloud.google.com/appengine/docs/) deployment via the Cloud SDK.
+* [Google Cloud Storage](https://cloud.google.com/storage/) 
+  Browse your Google Cloud Storage buckets.
 * [Google Cloud Java Client Libraries](https://github.com/GoogleCloudPlatform/google-cloud-java/) 
   Add Java client libraries to your project and enable Google Cloud APIs.
 
