@@ -140,16 +140,6 @@ public final class AppEngineDeploymentConfigurationPanel {
       projectSelector.loadActiveCloudProject();
     }
 
-    // TODO: only do for standard
-    compileEncodingTextField.setText(configuration.getCompileEncoding());
-    deleteJspsCheckBox.setSelected(configuration.getDeleteJsps());
-    disableJarJspsCheckBox.setSelected(configuration.getDisableJarJsps());
-    disableUpdateCheckCheckBox.setSelected(configuration.getDisableUpdateCheck());
-    enableJarClassesCheckBox.setSelected(configuration.getEnableJarClasses());
-    enableJarSplittingCheckBox.setSelected(configuration.getEnableJarSplitting());
-    enableQuickstartCheckBox.setSelected(configuration.getEnableQuickstart());
-    jarSplittingExcldesTextField.setText(configuration.getJarSplittingExcludes());
-
     refreshApplicationInfoPanel(projectSelector.getSelectedProject());
   }
 
@@ -169,16 +159,6 @@ public final class AppEngineDeploymentConfigurationPanel {
       configuration.setCloudProjectName(selectedProject.projectId());
       configuration.setGoogleUsername(selectedProject.googleUsername());
     }
-
-    // TODO: How do you handle Standard Specific configs?
-    configuration.setCompileEncoding(compileEncodingTextField.getText());
-    configuration.setDeleteJsps(deleteJspsCheckBox.isSelected());
-    configuration.setDisableJarJsps(disableJarJspsCheckBox.isSelected());
-    configuration.setDisableUpdateCheck(disableUpdateCheckCheckBox.isSelected());
-    configuration.setEnableJarClasses(enableJarClassesCheckBox.isSelected());
-    configuration.setEnableJarSplitting(enableJarSplittingCheckBox.isSelected());
-    configuration.setEnableQuickstart(enableQuickstartCheckBox.isSelected());
-    configuration.setJarSplittingExcludes(jarSplittingExcldesTextField.getText());
   }
 
   /**
@@ -207,7 +187,6 @@ public final class AppEngineDeploymentConfigurationPanel {
   public void removeStagingPropertiesTab() {
     parametersTabbedPane.remove(stagingPropertiesTab);
   }
-
 
   /**
    * Updates the text of the panel as follows: if no project is selected, no message is displayed,
@@ -263,6 +242,38 @@ public final class AppEngineDeploymentConfigurationPanel {
 
   public JCheckBox getPromoteCheckbox() {
     return promoteCheckbox;
+  }
+
+  public JTextField getCompileEncodingTextField() {
+    return compileEncodingTextField;
+  }
+
+  public JCheckBox getDeleteJspsCheckBox() {
+    return deleteJspsCheckBox;
+  }
+
+  public JCheckBox getEnableJarClassesCheckBox() {
+    return enableJarClassesCheckBox;
+  }
+
+  public JCheckBox getDisableJarJspsCheckBox() {
+    return disableJarJspsCheckBox;
+  }
+
+  public JCheckBox getDisableUpdateCheckCheckBox() {
+    return disableUpdateCheckCheckBox;
+  }
+
+  public JCheckBox getEnableQuickstartCheckBox() {
+    return enableQuickstartCheckBox;
+  }
+
+  public JTextField getJarSplittingExcldesTextField() {
+    return jarSplittingExcldesTextField;
+  }
+
+  public JCheckBox getEnableJarSplittingCheckBox() {
+    return enableJarSplittingCheckBox;
   }
 
   @VisibleForTesting

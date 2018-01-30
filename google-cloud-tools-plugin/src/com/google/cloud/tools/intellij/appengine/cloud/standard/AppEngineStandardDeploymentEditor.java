@@ -65,12 +65,29 @@ public final class AppEngineStandardDeploymentEditor
   @Override
   protected void resetEditorFrom(@NotNull AppEngineDeploymentConfiguration configuration) {
     commonConfig.resetEditorFrom(configuration);
+    commonConfig.getCompileEncodingTextField().setText(configuration.getCompileEncoding());
+    commonConfig.getDeleteJspsCheckBox().setSelected(configuration.getDeleteJsps());
+    commonConfig.getDisableJarJspsCheckBox().setSelected(configuration.getDisableJarJsps());
+    commonConfig.getDisableUpdateCheckCheckBox().setSelected(configuration.getDisableUpdateCheck());
+    commonConfig.getEnableJarClassesCheckBox().setSelected(configuration.getEnableJarClasses());
+    commonConfig.getEnableJarSplittingCheckBox().setSelected(configuration.getEnableJarSplitting());
+    commonConfig.getEnableQuickstartCheckBox().setSelected(configuration.getEnableQuickstart());
+    commonConfig.getJarSplittingExcldesTextField().setText(configuration.getJarSplittingExcludes());
   }
 
   @Override
   protected void applyEditorTo(@NotNull AppEngineDeploymentConfiguration configuration) {
     commonConfig.applyEditorTo(configuration);
     commonConfig.setDeploymentProjectAndVersion(deploymentSource);
+
+    configuration.setCompileEncoding(commonConfig.getCompileEncodingTextField().getText());
+    configuration.setDeleteJsps(commonConfig.getDeleteJspsCheckBox().isSelected());
+    configuration.setDisableJarJsps(commonConfig.getDisableJarJspsCheckBox().isSelected());
+    configuration.setDisableUpdateCheck(commonConfig.getDisableUpdateCheckCheckBox().isSelected());
+    configuration.setEnableJarClasses(commonConfig.getEnableJarClassesCheckBox().isSelected());
+    configuration.setEnableJarSplitting(commonConfig.getEnableJarSplittingCheckBox().isSelected());
+    configuration.setEnableQuickstart(commonConfig.getEnableQuickstartCheckBox().isSelected());
+    configuration.setJarSplittingExcludes(commonConfig.getJarSplittingExcldesTextField().getText());
 
     boolean isFlexCompat =
         AppEngineProjectService.getInstance().isFlexCompat(project, deploymentSource);
