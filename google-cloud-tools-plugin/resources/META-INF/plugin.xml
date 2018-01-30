@@ -48,7 +48,7 @@
 
       <h2>[18.1.2]</h2>
 
-      <p>You can now add client libraries for accessing Google Cloud APIs to your project. Just select 'Tools > Google Cloud Tools > Add Cloud Libraries ...'.</p>
+      <p>You can now add client libraries to your project for accessing Google Cloud APIs. Just select 'Tools > Google Cloud Tools > Add Cloud Libraries ...'.</p>
 
       <h3>Added</h3>
       <ul>
