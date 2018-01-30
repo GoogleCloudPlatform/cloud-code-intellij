@@ -360,13 +360,13 @@ public class ProjectSelectionDialog {
 
   private void validateProjectSelection() {
     int selectedRow = projectListTable.getSelectedRow();
-    // make explicit visible row check due to non-standard behaivor of IDEA's TableSpeedSearch
+    // make explicit visible row check due to non-standard behavior of IDEA's TableSpeedSearch
     int visibleRowCount = projectListTable.getRowSorter().getViewRowCount();
     if (selectedRow >= 0 && selectedRow < visibleRowCount) {
       dialogWrapper.setOKActionEnabled(true);
       selectedProjectsByAccount.put(
           (CredentialedUser) accountComboBox.getSelectedItem(), getSelectedProjectName());
-    } else if (selectedRow < 0 /* nothing selected. */) {
+    } else if (selectedRow < 0) { /* nothing selected. */
       dialogWrapper.setOKActionEnabled(false);
       selectedProjectsByAccount.remove((CredentialedUser) accountComboBox.getSelectedItem());
     }
