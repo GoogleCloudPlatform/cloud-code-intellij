@@ -268,7 +268,8 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
             event -> {
               try {
                 Desktop.getDesktop()
-                    .browse(URI.create(PANETHEON_CREATE_REPO_URL_PREFIX + cloudProject));
+                    .browse(
+                        URI.create(PANETHEON_CREATE_REPO_URL_PREFIX + cloudProject.projectId()));
               } catch (IOException e) {
                 logger.error(GctBundle.message("cloud.repository.selector.create.url.error"));
               }
