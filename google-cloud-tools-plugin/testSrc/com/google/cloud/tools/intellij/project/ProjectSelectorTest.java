@@ -187,16 +187,17 @@ public class ProjectSelectorTest {
 
   private void verifyUiStateForProject(CloudProject project) {
     if (project == null) {
-      assertThat(projectSelector.getProjectNameLabel().getText())
+      assertThat(projectSelector.getProjectNameLabel().getHyperlinkText())
           .isEqualTo(GctBundle.getString("cloud.project.selector.no.selected.project"));
       // no account information UI is visible/populated.
       assertThat(projectSelector.getProjectAccountSeparatorLabel().isVisible()).isFalse();
-      assertThat(projectSelector.getAccountInfoLabel().getText()).isEmpty();
+      assertThat(projectSelector.getAccountInfoLabel().getHyperlinkText()).isEmpty();
       assertThat(projectSelector.getAccountInfoLabel().getIcon()).isNull();
     } else {
-      assertThat(projectSelector.getProjectNameLabel().getText()).isEqualTo(project.projectName());
+      assertThat(projectSelector.getProjectNameLabel().getHyperlinkText())
+          .isEqualTo(project.projectName());
       assertThat(projectSelector.getProjectAccountSeparatorLabel().isVisible()).isTrue();
-      assertThat(projectSelector.getAccountInfoLabel().getText())
+      assertThat(projectSelector.getAccountInfoLabel().getHyperlinkText())
           .isEqualTo(project.googleUsername());
       assertThat(projectSelector.getAccountInfoLabel().getIcon()).isNotNull();
     }

@@ -26,13 +26,14 @@
         <li>Checking out or importing your projects from Cloud Source Repositories.</li>
         <li>Browsing your Google Cloud Storage buckets and copying bucket paths into your clipboard.</li>
         <li>Running and debugging App Engine standard applications on a local development server.</li>
+        <li>Adding Google Cloud Java client libraries to your project.</li>
       </ul>
     </html>]]>
   </description>
   <vendor>Google</vendor>
   <!-- "idea-version since-build" set to cover 2017.1 - 2017.3 -->
   <!-- Set manually because the gradle-intellij-plugin cannot span across major release versions -->
-  <idea-version since-build="171.3780" until-build="173.*"/>
+  <idea-version since-build="171.3780" until-build="181.*"/>
 
   <change-notes>
     <![CDATA[
@@ -44,6 +45,13 @@
       shell to ensure you have the latest Cloud SDK release.
       </p>
       <br/>
+
+      <h2>[18.1.1]</h2>
+
+      <h3>Fixed</h3>
+      <ul>
+        <li>Fixed broken error reporting mechanism. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1842">#1842</a>)</li>
+      </ul>
 
       <h2>[17.12.2]</h2>
 
@@ -405,7 +413,7 @@
 
     <fileTypeFactory implementation="com.google.cloud.tools.intellij.appengine.file.DockerFileTemplateTypeFactory"/>
 
-    <localInspection language="JAVA" shortName="AppEngineForbiddenCode" displayName="Forbidden code in App Engine applications"
+    <localInspection language="JAVA" shortName="GoogleAppEngineForbiddenCode" displayName="Forbidden code in App Engine applications"
                      groupName="Google App Engine" enabledByDefault="true" level="ERROR"
                      implementationClass="com.google.cloud.tools.intellij.appengine.inspections.AppEngineForbiddenCodeInspection"/>
 
