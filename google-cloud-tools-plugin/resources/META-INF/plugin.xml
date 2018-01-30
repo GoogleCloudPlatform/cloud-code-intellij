@@ -45,6 +45,25 @@
       </p>
       <br/>
 
+      <h2>[18.1.2]</h2>
+
+      <h3>Added</h3>
+      <ul>
+        <li>Added Google Cloud Java client library discovery and addition from the IDE. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1806">#1806</a>)</li>
+        <li>Added ability to enable Google Cloud APIs from the IDE. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1807">#1807</a>)</li>
+      </ul>
+
+      <h3>Changed</h3>
+      <ul>
+        <li>Updated the cloud project selector with a greatly improved user experience. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1719">#1719</a>)</li>
+        <li>Updated the cloud project selector so that the last selection is remembered and defaulted. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1812">#1812</a>)</li>
+      </ul>
+
+      <h3>Fixed</h3>
+      <ul>
+        <li>Fixed missing App Engine standard local run artifacts. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1625">#1625</a>)</li>
+      </ul>
+
       <h2>[18.1.1]</h2>
 
       <h3>Fixed</h3>
