@@ -110,9 +110,6 @@ public final class AppEngineDeploymentConfigurationPanel {
           // watcher.
           triggerSettingsEditorValidation();
         });
-
-    // TODO: hide/remove staging panel if flex
-    //parametersTabbedPane.remove(stagingPropertiesTab);
   }
 
   /**
@@ -206,6 +203,11 @@ public final class AppEngineDeploymentConfigurationPanel {
   public void triggerSettingsEditorValidation() {
     hiddenValidationTrigger.doClick();
   }
+
+  public void removeStagingPropertiesTab() {
+    parametersTabbedPane.remove(stagingPropertiesTab);
+  }
+
 
   /**
    * Updates the text of the panel as follows: if no project is selected, no message is displayed,

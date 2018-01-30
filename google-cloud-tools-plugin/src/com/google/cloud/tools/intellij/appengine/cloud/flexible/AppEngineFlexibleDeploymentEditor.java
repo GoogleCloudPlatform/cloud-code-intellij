@@ -456,5 +456,6 @@ public final class AppEngineFlexibleDeploymentEditor
 
   private void createUIComponents() {
     commonConfig = new AppEngineDeploymentConfigurationPanel(project);
+    commonConfig.removeStagingPropertiesTab();
   }
 }
