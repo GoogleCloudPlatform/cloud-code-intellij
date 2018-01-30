@@ -40,7 +40,7 @@ import org.jetbrains.annotations.Nullable;
 
 /** Internal details of GCP Cloud SDK implementation, including library and methods names. */
 public class CloudSdkInternals {
-  private static final Logger logger = Logger.getInstance(DefaultCloudSdkService.class);
+  private static final Logger logger = Logger.getInstance(CloudSdkInternals.class);
 
   private static CloudSdkInternals instance = new CloudSdkInternals();
 

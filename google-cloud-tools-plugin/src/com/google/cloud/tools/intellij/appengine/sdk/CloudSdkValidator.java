@@ -38,15 +38,11 @@ public class CloudSdkValidator {
     return ServiceManager.getService(CloudSdkValidator.class);
   }
 
-  protected Set<com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult>
-      validateCloudSdk(Path path) {
-    Set<com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult> validationResults =
-        new HashSet<>();
+  protected Set<CloudSdkValidationResult> validateCloudSdk(Path path) {
+    Set<CloudSdkValidationResult> validationResults = new HashSet<>();
 
     if (path == null) {
-      validationResults.add(
-          com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult
-              .CLOUD_SDK_NOT_FOUND);
+      validationResults.add(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
       // If the Cloud SDK is not found, don't bother checking anything else
       return validationResults;
     }
@@ -55,9 +51,7 @@ public class CloudSdkValidator {
     try {
       sdk.validateCloudSdk();
     } catch (CloudSdkNotFoundException exception) {
-      validationResults.add(
-          com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult
-              .CLOUD_SDK_NOT_FOUND);
+      validationResults.add(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
       // If the Cloud SDK is not found, don't bother checking anything else
       return validationResults;
     } catch (CloudSdkOutOfDateException exception) {
@@ -69,16 +63,13 @@ public class CloudSdkValidator {
     try {
       sdk.validateAppEngineJavaComponents();
     } catch (AppEngineJavaComponentsNotInstalledException ex) {
-      validationResults.add(
-          com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult
-              .NO_APP_ENGINE_COMPONENT);
+      validationResults.add(CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT);
     }
 
     return validationResults;
   }
   /** Checks if the default SDK stored path contains a valid Cloud SDK. */
-  public Set<com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult>
-      validateCloudSdk() {
+  public Set<CloudSdkValidationResult> validateCloudSdk() {
     return validateCloudSdk(CloudSdkService.getInstance().getSdkHomePath());
   }
 
@@ -88,17 +79,13 @@ public class CloudSdkValidator {
    * <p>Windows' implementation of Paths doesn't handle well converting strings with certain special
    * characters to paths. This method should be called before {@code Paths.get(path)}.
    */
-  public Set<com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult>
-      validateCloudSdk(String path) {
+  public Set<CloudSdkValidationResult> validateCloudSdk(String path) {
     if (path == null) {
-      return ImmutableSet.of(
-          com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult
-              .CLOUD_SDK_NOT_FOUND);
+      return ImmutableSet.of(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
     }
 
     if (isMalformedCloudSdkPath(path)) {
-      return ImmutableSet.of(
-          com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult.MALFORMED_PATH);
+      return ImmutableSet.of(CloudSdkValidationResult.MALFORMED_PATH);
     }
 
     return validateCloudSdk(Paths.get(path));
