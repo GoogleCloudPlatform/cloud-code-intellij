@@ -331,8 +331,8 @@ public class ProjectSelectionDialog {
       // reflect this text in the filter text field.
       @Override
       protected void selectElement(Object element, String selectedText) {
-        filterTextField.setText(selectedText);
         super.selectElement(element, selectedText);
+        filterTextField.setText(selectedText);
       }
     };
   }
@@ -359,11 +359,15 @@ public class ProjectSelectionDialog {
   }
 
   private void validateProjectSelection() {
-    if (projectListTable.getSelectedRow() >= 0) {
+    int selectedRow = projectListTable.getSelectedRow();
+    // make explicit visible row check due to non-standard behavior of IDEA's TableSpeedSearch
+    int visibleRowCount = projectListTable.getRowSorter().getViewRowCount();
+    if (selectedRow >= 0 && selectedRow < visibleRowCount) {
       dialogWrapper.setOKActionEnabled(true);
       selectedProjectsByAccount.put(
           (CredentialedUser) accountComboBox.getSelectedItem(), getSelectedProjectName());
-    } else {
+    } else if (selectedRow < 0) {
+      /* nothing selected. */
       dialogWrapper.setOKActionEnabled(false);
       selectedProjectsByAccount.remove((CredentialedUser) accountComboBox.getSelectedItem());
     }
