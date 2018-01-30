@@ -366,7 +366,8 @@ public class ProjectSelectionDialog {
       dialogWrapper.setOKActionEnabled(true);
       selectedProjectsByAccount.put(
           (CredentialedUser) accountComboBox.getSelectedItem(), getSelectedProjectName());
-    } else if (selectedRow < 0) { /* nothing selected. */
+    } else if (selectedRow < 0) {
+      /* nothing selected. */
       dialogWrapper.setOKActionEnabled(false);
       selectedProjectsByAccount.remove((CredentialedUser) accountComboBox.getSelectedItem());
     }
