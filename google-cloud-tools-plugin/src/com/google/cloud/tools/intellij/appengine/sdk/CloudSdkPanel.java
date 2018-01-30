@@ -103,10 +103,9 @@ public class CloudSdkPanel {
       return htmlEnabled ? missingMessage + " " + getCloudSdkDownloadMessage() : missingMessage;
     }
 
-    CloudSdkValidator sdkValidator = CloudSdkValidator.getSdkValidator();
     // Use a sorted set to guarantee consistent ordering of CloudSdkValidationResults.
     Set<CloudSdkValidationResult> validationResults =
-        new TreeSet<>(sdkValidator.validateCloudSdk(path));
+        new TreeSet<>(CloudSdkValidator.getInstance().validateCloudSdk(path));
 
     if (!validationResults.isEmpty()) {
       // Display all validation results as a list.
@@ -193,9 +192,9 @@ public class CloudSdkPanel {
   }
 
   public void apply() throws ConfigurationException {
-    Set<CloudSdkValidationResult> validationResults =
-        CloudSdkValidator.getSdkValidator().validateCloudSdk(getCloudSdkDirectoryText());
-    if (validationResults.contains(CloudSdkValidationResult.MALFORMED_PATH)) {
+    if (CloudSdkValidator.getInstance()
+        .validateCloudSdk(getCloudSdkDirectoryText())
+        .contains(CloudSdkValidationResult.MALFORMED_PATH)) {
       throw new ConfigurationException(
           GctBundle.message("appengine.cloudsdk.location.badchars.message"));
     }

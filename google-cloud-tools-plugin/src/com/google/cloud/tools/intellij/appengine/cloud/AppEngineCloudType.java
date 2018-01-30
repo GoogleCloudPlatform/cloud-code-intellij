@@ -97,8 +97,7 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
         return;
       }
 
-      CloudSdkValidator sdkValidator = CloudSdkValidator.getSdkValidator();
-      if (!sdkValidator.isValidCloudSdk()) {
+      if (!CloudSdkValidator.getInstance().isValidCloudSdk()) {
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.invalid.cloudsdk"));
         Notification invalidSdkWarning =
             new Notification(

@@ -27,6 +27,7 @@ import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandar
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardSupportProvider;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardSupportProvider.AppEngineSupportConfigurable;
 import com.google.cloud.tools.intellij.appengine.facet.standard.MavenRepositoryLibraryDownloader;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkInternals;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.server.run.AppEngineServerConfigurationType;
 import com.google.cloud.tools.intellij.compiler.artifacts.ArtifactsTestUtil;
@@ -123,7 +124,9 @@ public class AppEngineStandardSupportProviderTest extends JavaeeFrameworkSupport
 
   private void setupAppEngine(AppEngineStandardLibraryPanel libraryPanel, Library library) {
     CloudSdkService sdkService = mock(CloudSdkService.class);
-    when(sdkService.getLibraries()).thenReturn(new File[] {});
+    CloudSdkInternals mockSdkInternals = mock(CloudSdkInternals.class);
+    when(mockSdkInternals.getLibraries()).thenReturn(new File[] {});
+    CloudSdkInternals.setInstance(mockSdkInternals);
 
     MavenRepositoryLibraryDownloader libraryDownloader =
         mock(MavenRepositoryLibraryDownloader.class);

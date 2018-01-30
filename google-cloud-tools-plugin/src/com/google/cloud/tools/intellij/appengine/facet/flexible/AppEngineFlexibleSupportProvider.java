@@ -197,7 +197,7 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       }
 
       CloudSdkService sdkService = CloudSdkService.getInstance();
-      CloudSdkValidator sdkValidator = CloudSdkValidator.getSdkValidator();
+      CloudSdkValidator sdkValidator = CloudSdkValidator.getInstance();
       if (!sdkValidator
           .validateCloudSdk(cloudSdkPanel.getCloudSdkDirectoryText())
           .contains(CloudSdkValidationResult.MALFORMED_PATH)) {

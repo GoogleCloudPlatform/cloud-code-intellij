@@ -63,7 +63,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
               String workingDirectory, Map<String, String> configuredEnvironment)
               throws ExecutionException {
 
-            if (!CloudSdkValidator.getSdkValidator().isValidCloudSdk()) {
+            if (!CloudSdkValidator.getInstance().isValidCloudSdk()) {
               throw new ExecutionException(
                   GctBundle.message("appengine.run.server.sdk.misconfigured.message"));
             }

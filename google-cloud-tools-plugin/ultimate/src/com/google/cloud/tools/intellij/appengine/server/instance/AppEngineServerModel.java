@@ -126,7 +126,7 @@ public class AppEngineServerModel
           GctBundle.message("appengine.run.server.artifact.missing"));
     }
 
-    if (!CloudSdkValidator.getSdkValidator().isValidCloudSdk()) {
+    if (!CloudSdkValidator.getInstance().isValidCloudSdk()) {
       throw new RuntimeConfigurationError(
           GctBundle.message("appengine.run.server.sdk.misconfigured.panel.message"));
     }

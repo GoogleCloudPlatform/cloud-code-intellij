@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.cloud.tools.appengine.api.whitelist.AppEngineJreWhitelist;
+import com.google.common.annotations.VisibleForTesting;
 import com.intellij.execution.configurations.ParametersList;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
@@ -37,26 +38,33 @@ import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CloudSdkDevelopmentDetails {
+/** Internal details of GCP Cloud SDK implementation, including library and methods names. */
+public class CloudSdkInternals {
   private static final Logger logger = Logger.getInstance(DefaultCloudSdkService.class);
+
+  private static CloudSdkInternals instance = new CloudSdkInternals();
 
   private static final Path JAVA_TOOLS_RELATIVE_PATH =
       Paths.get("platform", "google_appengine", "google", "appengine", "tools", "java");
 
   // Kept around for AppEngineGwtServer
-  public static final Path LIB_APPENGINE_TOOLS_API_JAR =
+  private static final Path LIB_APPENGINE_TOOLS_API_JAR =
       Paths.get("lib", "appengine-tools-api.jar");
 
   private Map<String, Set<String>> myMethodsBlackList;
 
-  private final CloudSdkService cloudSdkService;
+  public static CloudSdkInternals getInstance() {
+    return instance;
+  }
 
-  public CloudSdkDevelopmentDetails(CloudSdkService cloudSdkService) {
-    this.cloudSdkService = cloudSdkService;
+  @VisibleForTesting
+  public static void setInstance(CloudSdkInternals instance) {
+    CloudSdkInternals.instance = instance;
   }
 
   @Nullable
   private Path getJavaToolsBasePath() {
+    CloudSdkService cloudSdkService = CloudSdkService.getInstance();
     return cloudSdkService.getSdkHomePath() != null
         ? cloudSdkService.getSdkHomePath().resolve(JAVA_TOOLS_RELATIVE_PATH.toString())
         : null;

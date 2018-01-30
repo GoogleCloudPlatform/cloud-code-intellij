@@ -286,7 +286,7 @@ public class AppEngineStandardSupportProvider extends FrameworkSupportInModulePr
         @NotNull ModifiableRootModel rootModel,
         @NotNull ModifiableModelsProvider modifiableModelsProvider) {
       CloudSdkService sdkService = CloudSdkService.getInstance();
-      CloudSdkValidator sdkValidator = CloudSdkValidator.getSdkValidator();
+      CloudSdkValidator sdkValidator = CloudSdkValidator.getInstance();
       if (!sdkValidator
           .validateCloudSdk(cloudSdkPanel.getCloudSdkDirectoryText())
           .contains(CloudSdkValidationResult.MALFORMED_PATH)) {

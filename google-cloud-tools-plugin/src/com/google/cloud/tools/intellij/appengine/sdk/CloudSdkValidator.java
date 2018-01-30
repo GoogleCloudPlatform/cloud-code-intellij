@@ -34,7 +34,7 @@ import org.jetbrains.annotations.Nullable;
 /** Helper service to check validity of {@link CloudSdkService}. */
 public class CloudSdkValidator {
 
-  public static CloudSdkValidator getSdkValidator() {
+  public static CloudSdkValidator getInstance() {
     return ServiceManager.getService(CloudSdkValidator.class);
   }
 

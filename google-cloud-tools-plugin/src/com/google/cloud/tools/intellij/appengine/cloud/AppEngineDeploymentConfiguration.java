@@ -236,7 +236,7 @@ public class AppEngineDeploymentConfiguration
 
   private void checkCommonConfig(AppEngineDeployable deployable) throws RuntimeConfigurationError {
     Set<CloudSdkValidationResult> sdkValidationResult =
-        CloudSdkValidator.getSdkValidator().validateCloudSdk();
+        CloudSdkValidator.getInstance().validateCloudSdk();
     if (!sdkValidationResult.isEmpty()) {
       CloudSdkValidationResult result = Iterables.getFirst(sdkValidationResult, null);
       throw new RuntimeConfigurationError(

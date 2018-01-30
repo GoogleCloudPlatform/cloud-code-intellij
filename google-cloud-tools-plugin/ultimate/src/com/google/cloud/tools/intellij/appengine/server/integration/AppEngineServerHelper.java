@@ -58,7 +58,7 @@ public class AppEngineServerHelper implements ApplicationServerHelper {
 
       @Override
       protected void applyEditorTo(ApplicationServerPersistentData data) {
-        if (CloudSdkValidator.getSdkValidator()
+        if (CloudSdkValidator.getInstance()
             .isValidCloudSdk(cloudSdkPanel.getCloudSdkDirectoryText())) {
           try {
             cloudSdkPanel.apply();
