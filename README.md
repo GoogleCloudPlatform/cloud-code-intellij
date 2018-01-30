@@ -18,6 +18,8 @@ into the IntelliJ IDEA UI. Currently this includes:
   [Google App Engine](https://cloud.google.com/appengine/)
   at any code location without stopping the application.
 * [Google App Engine](https://cloud.google.com/appengine/docs/) deployment via the Cloud SDK.
+* [Google Cloud Java Client Libraries](https://github.com/GoogleCloudPlatform/google-cloud-java/) 
+  Add Java client libraries to your project and enable Google Cloud APIs.
 
 For detailed user documentation go to our documentation
  [website](https://cloud.google.com/tools/intellij/docs/).
