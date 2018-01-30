@@ -197,7 +197,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       AppEngineDeploy deploy,
       boolean isFlexCompat) {
     AppEngineStandardStage standardStage =
-        new AppEngineStandardStage(this, deploy.getDeploymentConfiguration(), loggingHandler, artifactToDeploy);
+        new AppEngineStandardStage(
+            this, deploy.getDeploymentConfiguration(), loggingHandler, artifactToDeploy);
 
     return new AppEngineExecutor(
         new AppEngineStandardDeployTask(deploy, standardStage, isFlexCompat));

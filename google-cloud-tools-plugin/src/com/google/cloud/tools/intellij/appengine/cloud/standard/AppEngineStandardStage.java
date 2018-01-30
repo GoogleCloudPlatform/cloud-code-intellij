@@ -78,7 +78,7 @@ public class AppEngineStandardStage {
 
     // Other option is to move the DefaultStageStandardConfiguration into
     // AppEngineDeploymentConfiguration
-    //TODO: do we want to set the default for enable_jar_splitting to true?
+    // TODO: do we want to set the default for enable_jar_splitting to true?
     stageConfig.setCompileEncoding(deploymentConfiguration.getCompileEncoding());
     stageConfig.setDeleteJsps(deploymentConfiguration.getDeleteJsps());
     stageConfig.setDisableJarJsps(deploymentConfiguration.getDisableJarJsps());
