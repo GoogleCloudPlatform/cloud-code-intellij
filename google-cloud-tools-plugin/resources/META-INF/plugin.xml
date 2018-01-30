@@ -26,6 +26,7 @@
         <li>Checking out or importing your projects from Cloud Source Repositories.</li>
         <li>Browsing your Google Cloud Storage buckets and copying bucket paths into your clipboard.</li>
         <li>Running and debugging App Engine standard applications on a local development server.</li>
+        <li>Adding Google Cloud Java client libraries to your project.</li>
       </ul>
     </html>]]>
   </description>
