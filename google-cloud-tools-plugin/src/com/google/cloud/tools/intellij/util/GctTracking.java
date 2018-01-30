@@ -76,6 +76,8 @@ public class GctTracking {
 
   public static final String METADATA_LABEL_KEY = "label";
   public static final String METADATA_MESSAGE_KEY = "message";
+  public static final String METADATA_BUILD_SYSTEM_KEY = "build";
+  public static final String METADATA_BUILD_SYSTEM_MAVEN = "maven";
 
   public static final String ACCOUNT_PLUGIN_DETECTED = "account.plugin.detected";
   public static final String ACCOUNT_PLUGIN_UNINSTALLED = "account.plugin.uninstalled";

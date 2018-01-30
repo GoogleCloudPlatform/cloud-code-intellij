@@ -127,7 +127,8 @@ final class CloudLibraryDependencyWriter {
                 MavenDomUtil.createDomDependency(model, /* editor= */ null, mavenId);
                 UsageTrackerProvider.getInstance()
                     .trackEvent(GctTracking.CLIENT_LIBRARY_ADD_LIBRARY)
-                    .addMetadata("build", "maven")
+                    .addMetadata(GctTracking.METADATA_BUILD_SYSTEM_KEY,
+                        GctTracking.METADATA_BUILD_SYSTEM_MAVEN)
                     .addMetadata(GctTracking.METADATA_LABEL_KEY, mavenId.getDisplayString())
                     .ping();
               });
