@@ -17,12 +17,16 @@
 package com.google.cloud.tools.intellij.project;
 
 import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.login.GoogleLoginListener;
+import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.login.ui.GoogleLoginIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.FixedSizeButton;
 import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.components.JBLabel;
@@ -30,6 +34,7 @@ import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
@@ -64,9 +69,32 @@ public class ProjectSelector extends JPanel {
   // null by default. set by caller to allow project selector to pre-select active project.
   private Project ideProject;
 
+  @VisibleForTesting GoogleLoginListener googleLoginListener;
+
   /** @param ideProject IDE {@link Project} to be used to update active cloud project settings. */
   public ProjectSelector(@Nullable Project ideProject) {
     this.ideProject = ideProject;
+
+    // listen to login changes to show sign in prompt when no one is signed in.
+    googleLoginListener =
+        () -> {
+          if (cloudProject != null) {
+            ApplicationManager.getApplication()
+                .invokeLater(
+                    () -> {
+                      updateCloudProjectSelection(cloudProject);
+                      notifyProjectSelectionListeners();
+                    });
+          }
+        };
+    Stream.of(ProjectManager.getInstance().getOpenProjects())
+        .forEach(
+            project -> {
+              project
+                  .getMessageBus()
+                  .connect()
+                  .subscribe(GoogleLoginListener.GOOGLE_LOGIN_LISTENER_TOPIC, googleLoginListener);
+            });
   }
 
   /** Returns project selection or null if no project is selected. */
@@ -146,7 +174,11 @@ public class ProjectSelector extends JPanel {
     accountInfoLabel.addHyperlinkListener(
         (event) -> {
           if (event.getEventType() == EventType.ACTIVATED) {
-            handleOpenProjectSelectionDialog();
+            if (Services.getLoginService().isLoggedIn()) {
+              handleOpenProjectSelectionDialog();
+            } else {
+              Services.getLoginService().logIn();
+            }
           }
         });
 
@@ -189,15 +221,26 @@ public class ProjectSelector extends JPanel {
     projectNameLabel.setHyperlinkText(selection.projectName());
     projectAccountSeparatorLabel.setVisible(true);
     // first just show account email, then expand with name/picture if this account is signed in.
+    // if not signed in, hide icon and account name completely and prompt to sign in.
     accountInfoLabel.setHyperlinkText(selection.googleUsername());
+
+    IntegratedGoogleLoginService loginService = Services.getLoginService();
     Optional<CredentialedUser> loggedInUser =
-        Services.getLoginService().getLoggedInUser(selection.googleUsername());
-    if (loggedInUser.isPresent()) {
+        loginService.getLoggedInUser(selection.googleUsername());
+
+    if (!loginService.isLoggedIn()) {
+      accountInfoLabel.setHyperlinkText(GctBundle.message("cloud.project.selector.not.signed.in"));
+    } else if (loggedInUser.isPresent()) {
       accountInfoLabel.setHyperlinkText(
-          String.format("%s (%s)", loggedInUser.get().getName(), loggedInUser.get().getEmail()));
+          String.format(
+              "%s (%s)",
+              Strings.nullToEmpty(loggedInUser.get().getName()), loggedInUser.get().getEmail()));
     }
+
     accountInfoLabel.setIcon(
-        GoogleLoginIcons.getScaledUserIcon(ACCOUNT_ICON_SIZE, loggedInUser.orElse(null)));
+        loginService.isLoggedIn()
+            ? GoogleLoginIcons.getScaledUserIcon(ACCOUNT_ICON_SIZE, loggedInUser.orElse(null))
+            : null);
   }
 
   private void notifyProjectSelectionListeners() {
