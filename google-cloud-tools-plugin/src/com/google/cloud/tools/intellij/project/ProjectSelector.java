@@ -127,8 +127,12 @@ public class ProjectSelector extends JPanel {
             .map(p -> ActiveCloudProjectManager.getInstance().getActiveCloudProject(p));
     projectOptional.ifPresent(
         activeCloudProject -> {
-          setSelectedProject(activeCloudProject);
-          notifyProjectSelectionListeners();
+          // do not preset and notify on active project if not signed in to avoid misleading client
+          // code to assume project selection is made with an active account.
+          if (Services.getLoginService().isLoggedIn()) {
+            setSelectedProject(activeCloudProject);
+            notifyProjectSelectionListeners();
+          }
         });
   }
 
