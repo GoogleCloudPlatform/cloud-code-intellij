@@ -363,7 +363,8 @@ public final class AppEngineStandardDeploymentEditorTest {
 
     editor.resetEditorFrom(configuration);
 
-    assertThat(editor.getCommonConfig().getCompileEncodingTextField().getText()).isEqualTo(encoding);
+    assertThat(editor.getCommonConfig().getCompileEncodingTextField().getText())
+        .isEqualTo(encoding);
   }
 
   @Test
@@ -427,6 +428,7 @@ public final class AppEngineStandardDeploymentEditorTest {
 
     editor.resetEditorFrom(configuration);
 
-    assertThat(editor.getCommonConfig().getJarSplittingExcludesTextField().getText()).isEqualTo(exclusions);
+    assertThat(editor.getCommonConfig().getJarSplittingExcludesTextField().getText())
+        .isEqualTo(exclusions);
   }
 }
