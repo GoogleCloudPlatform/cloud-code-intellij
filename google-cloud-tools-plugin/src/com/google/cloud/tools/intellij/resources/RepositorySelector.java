@@ -66,7 +66,7 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
   private static final Logger logger = Logger.getInstance(RepositorySelector.class);
   private static final int SELECTOR_HEIGHT = 140;
   private static final int SELECTOR_WIDTH = 400;
-  private static final String PANETHEON_CREATE_REPO_URL_PATTERN =
+  private static final String PANTHEON_CREATE_REPO_URL_PATTERN =
       "https://console.cloud.google.com/code/develop/repo?project=%s&authuser=%s";
   private JBPopup popup;
   private JPanel panel;
@@ -271,7 +271,7 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
                     .browse(
                         URI.create(
                             String.format(
-                                PANETHEON_CREATE_REPO_URL_PATTERN,
+                                PANTHEON_CREATE_REPO_URL_PATTERN,
                                 cloudProject.projectId(),
                                 cloudProject.googleUsername())));
               } catch (IOException e) {
