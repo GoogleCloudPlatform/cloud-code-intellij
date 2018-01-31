@@ -76,6 +76,8 @@ public class GctTracking {
 
   public static final String METADATA_LABEL_KEY = "label";
   public static final String METADATA_MESSAGE_KEY = "message";
+  public static final String METADATA_BUILD_SYSTEM_KEY = "build";
+  public static final String METADATA_BUILD_SYSTEM_MAVEN = "maven";
 
   public static final String ACCOUNT_PLUGIN_DETECTED = "account.plugin.detected";
   public static final String ACCOUNT_PLUGIN_UNINSTALLED = "account.plugin.uninstalled";
@@ -83,4 +85,7 @@ public class GctTracking {
       "account.plugin.restart.dialog.yes.action";
   public static final String ACCOUNT_PLUGIN_RESTART_DIALOG_NO_ACTION =
       "account.plugin.restart.dialog.no.action";
+
+  public static final String CLIENT_LIBRARY_ADD_LIBRARY = "client.library.add.library";
+  public static final String CLIENT_LIBRARY_ENABLE_API = "client.library.enable.api";
 }
