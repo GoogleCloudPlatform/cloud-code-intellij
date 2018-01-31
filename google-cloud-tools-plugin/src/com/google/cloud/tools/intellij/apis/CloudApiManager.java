@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.apis;
 
 import com.google.api.services.servicemanagement.ServiceManagement;
 import com.google.api.services.servicemanagement.model.EnableServiceRequest;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
@@ -25,6 +26,7 @@ import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.collect.Sets;
 import com.intellij.notification.Notification;
@@ -116,6 +118,12 @@ class CloudApiManager {
 
   private static void enableApi(
       CloudLibrary library, CloudProject cloudProject, CredentialedUser user) throws IOException {
+
+    UsageTrackerProvider.getInstance()
+        .trackEvent(GctTracking.CLIENT_LIBRARY_ENABLE_API)
+        .addMetadata(GctTracking.METADATA_LABEL_KEY, library.getName())
+        .ping();
+
     ServiceManagement serviceManagement =
         GoogleApiClientFactory.getInstance().getServiceManagementClient(user.getCredential());
 

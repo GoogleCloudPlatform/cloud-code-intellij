@@ -16,9 +16,11 @@
 
 package com.google.cloud.tools.intellij.apis;
 
+import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.cloud.tools.libraries.json.CloudLibraryClientMavenCoordinates;
 import com.intellij.notification.Notification;
@@ -121,7 +123,16 @@ final class CloudLibraryDependencyWriter {
         List<MavenId> newMavenIds = mavenIdsMap.get(false);
         if (!newMavenIds.isEmpty()) {
           newMavenIds.forEach(
-              mavenId -> MavenDomUtil.createDomDependency(model, /* editor= */ null, mavenId));
+              mavenId -> {
+                MavenDomUtil.createDomDependency(model, /* editor= */ null, mavenId);
+                UsageTrackerProvider.getInstance()
+                    .trackEvent(GctTracking.CLIENT_LIBRARY_ADD_LIBRARY)
+                    .addMetadata(
+                        GctTracking.METADATA_BUILD_SYSTEM_KEY,
+                        GctTracking.METADATA_BUILD_SYSTEM_MAVEN)
+                    .addMetadata(GctTracking.METADATA_LABEL_KEY, mavenId.getDisplayString())
+                    .ping();
+              });
           notifyAddedDependencies(newMavenIds, project);
         }
       }
