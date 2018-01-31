@@ -3,8 +3,6 @@ This page documents production updates to Cloud Tools for IntelliJ. You can chec
 
 ## 18.1.2
 
-You can now add client libraries to your project for accessing Google Cloud APIs. Just select 'Tools > Google Cloud Tools > Add Cloud Libraries ...'.
-
 ### Added
   - Added Google Cloud Java client library discovery and addition from the IDE. [1806](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1806)
   - Added ability to enable Google Cloud APIs from the IDE. [1807](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1807)
