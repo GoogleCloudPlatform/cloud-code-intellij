@@ -278,6 +278,10 @@ public final class AppEngineDeploymentConfigurationPanel {
     return enableJarSplittingCheckBox;
   }
 
+  public JTabbedPane getParametersTabbedPane() {
+    return parametersTabbedPane;
+  }
+
   @VisibleForTesting
   public void setProjectSelector(ProjectSelector projectSelector) {
     this.projectSelector = projectSelector;
