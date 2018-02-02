@@ -34,7 +34,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
 import org.jetbrains.annotations.NotNull;
 
 /** Common App Engine deployment configuration UI shared by flexible and standard deployments. */
@@ -54,18 +53,7 @@ public final class AppEngineDeploymentConfigurationPanel {
   private HyperlinkLabel appEngineCostWarningLabel;
   private JLabel serviceLabel;
   private JCheckBox hiddenValidationTrigger;
-  private JTextField compileEncodingTextField;
-  private JCheckBox deleteJspsCheckBox;
-  private JCheckBox enableJarClassesCheckBox;
-  private JCheckBox disableJarJspsCheckBox;
-  private JCheckBox disableUpdateCheckCheckBox;
-  private JCheckBox enableQuickstartCheckBox;
-  private JTextField jarSplittingExcldesTextField;
-  private JCheckBox enableJarSplittingCheckBox;
-
   private JTabbedPane parametersTabbedPane;
-
-  private JPanel stagingPropertiesTab;
 
   private final Project ideProject;
 
@@ -184,10 +172,6 @@ public final class AppEngineDeploymentConfigurationPanel {
   // TODO(ivanporty) explore UserActivityProviderComponent usage.
   public void triggerSettingsEditorValidation() {
     hiddenValidationTrigger.doClick();
-  }
-
-  public void removeStagingPropertiesTab() {
-    parametersTabbedPane.remove(stagingPropertiesTab);
   }
 
   /**
