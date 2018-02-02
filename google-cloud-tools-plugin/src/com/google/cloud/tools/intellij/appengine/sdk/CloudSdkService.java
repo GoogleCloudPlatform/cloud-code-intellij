@@ -16,92 +16,38 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
-import com.google.common.collect.ImmutableSet;
-import com.intellij.execution.configurations.ParametersList;
 import com.intellij.openapi.components.ServiceManager;
-import java.io.File;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Set;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** IntelliJ configured service for providing the path to the Cloud SDK. */
-public abstract class CloudSdkService {
+public interface CloudSdkService {
 
-  public static CloudSdkService getInstance() {
+  static CloudSdkService getInstance() {
     return ServiceManager.getService(CloudSdkService.class);
   }
 
   @Nullable
-  public abstract Path getSdkHomePath();
+  Path getSdkHomePath();
 
-  public abstract void setSdkHomePath(String path);
+  /* TODO(ivanporty) to be removed from common interface, only applies for custom sdk service.*/
+  @Deprecated
+  void setSdkHomePath(String path);
 
-  protected abstract Set<CloudSdkValidationResult> validateCloudSdk(Path path);
+  SdkStatus getStatus();
 
-  /** Checks if the stored path contains a valid Cloud SDK. */
-  public Set<CloudSdkValidationResult> validateCloudSdk() {
-    return validateCloudSdk(getSdkHomePath());
+  boolean installAutomatically();
+
+  void addStatusUpdateListener(SdkStatusUpdateListener listener);
+
+  enum SdkStatus {
+    READY,
+    INSTALLING,
+    INVALID,
+    NOT_AVAILABLE
   }
 
-  /**
-   * Checks if a given path is malformed or if it contains a valid Cloud SDK.
-   *
-   * <p>Windows' implementation of Paths doesn't handle well converting strings with certain special
-   * characters to paths. This method should be called before {@code Paths.get(path)}.
-   */
-  public Set<CloudSdkValidationResult> validateCloudSdk(String path) {
-    if (path == null) {
-      return ImmutableSet.of(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
-    }
-
-    if (isMalformedCloudSdkPath(path)) {
-      return ImmutableSet.of(CloudSdkValidationResult.MALFORMED_PATH);
-    }
-
-    return validateCloudSdk(Paths.get(path));
+  interface SdkStatusUpdateListener {
+    void onSdkStatusChange(CloudSdkService sdkService, SdkStatus status);
   }
-
-  /** Checks if the provided path contains a valid Cloud SDK installation. */
-  public boolean isValidCloudSdk(String path) {
-    return validateCloudSdk(path).isEmpty();
-  }
-
-  /** Checks if the saved path contains a valid Cloud SDK installation. */
-  public boolean isValidCloudSdk() {
-    return validateCloudSdk(getSdkHomePath()).isEmpty();
-  }
-
-  /** Checks for invalid characters that trigger an {@link InvalidPathException} on Windows. */
-  public boolean isMalformedCloudSdkPath(@Nullable String sdkPath) {
-    if (sdkPath != null) {
-      try {
-        Paths.get(sdkPath);
-      } catch (InvalidPathException ipe) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  @Nullable
-  public abstract File getToolsApiJarFile();
-
-  @NotNull
-  public abstract File[] getLibraries();
-
-  @NotNull
-  public abstract File[] getJspLibraries();
-
-  public abstract boolean isMethodInBlacklist(
-      @NotNull String className, @NotNull String methodName);
-
-  public abstract boolean isClassInWhiteList(@NotNull String className);
-
-  @Nullable
-  public abstract File getWebSchemeFile();
-
-  public abstract void patchJavaParametersForDevServer(@NotNull ParametersList vmParameters);
 }

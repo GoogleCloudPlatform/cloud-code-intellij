@@ -26,9 +26,12 @@ import static org.mockito.Mockito.withSettings;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
-import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
+import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.TestFixture;
+import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.common.collect.ImmutableSet;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.google.gson.Gson;
@@ -36,6 +39,7 @@ import com.intellij.openapi.vcs.impl.CancellableRunnable;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
+import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import java.io.File;
 import java.io.Reader;
 import java.nio.charset.Charset;
@@ -45,28 +49,30 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 
 /** Unit tests for {@link CloudSdkAppEngineHelper} */
-public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
+public class CloudSdkAppEngineHelperTest {
+  @Rule public CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
 
-  CloudSdkAppEngineHelper helper;
+  @TestFixture private IdeaProjectTestFixture testFixture;
+
+  private CloudSdkAppEngineHelper helper;
   @Mock private AppEngineDeploymentConfiguration deploymentConfiguration;
-  @Mock private IntegratedGoogleLoginService googleLoginService;
+  @TestService @Mock private IntegratedGoogleLoginService googleLoginService;
   @Mock private CredentialedUser credentialedUser;
   @Mock private GoogleLoginState loginState;
   @Mock private LoggingHandler loggingHandler;
   @Mock private DeploymentOperationCallback callback;
-  @Mock private CloudSdkService sdkService;
+  @TestService @Mock private CloudSdkService sdkService;
+  @TestService @Mock private CloudSdkValidator cloudSdkValidator;
   @Mock private DeploymentSource undeployableDeploymentSource;
 
   @Before
   public void initialize() {
-    helper = new CloudSdkAppEngineHelper(getProject());
-
-    registerService(IntegratedGoogleLoginService.class, googleLoginService);
-    registerService(CloudSdkService.class, sdkService);
+    helper = new CloudSdkAppEngineHelper(testFixture.getProject());
   }
 
   @Test
@@ -112,7 +118,7 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
 
   @Test
   public void testCreateDeployRunnerInvalidDeploymentSourceFile_returnsNull() {
-    when(sdkService.validateCloudSdk()).thenReturn(ImmutableSet.of());
+    when(cloudSdkValidator.validateCloudSdk()).thenReturn(ImmutableSet.of());
 
     Optional<CancellableRunnable> runner =
         helper.createDeployRunner(
@@ -127,7 +133,7 @@ public class CloudSdkAppEngineHelperTest extends BasePluginTestCase {
 
   @Test
   public void testCreateDeployRunnerInvalidSdk() {
-    when(sdkService.validateCloudSdk())
+    when(cloudSdkValidator.validateCloudSdk())
         .thenReturn(ImmutableSet.of(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND));
     Path path = Paths.get(("/this/path"));
     when(sdkService.getSdkHomePath()).thenReturn(path);

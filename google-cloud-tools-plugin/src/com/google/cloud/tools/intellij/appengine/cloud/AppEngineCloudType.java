@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
@@ -97,7 +97,7 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
         return;
       }
 
-      if (!CloudSdkService.getInstance().isValidCloudSdk()) {
+      if (!CloudSdkValidator.getInstance().isValidCloudSdk()) {
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.invalid.cloudsdk"));
         Notification invalidSdkWarning =
             new Notification(

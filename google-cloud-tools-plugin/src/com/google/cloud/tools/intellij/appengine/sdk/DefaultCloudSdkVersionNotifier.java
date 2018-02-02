@@ -27,7 +27,8 @@ public class DefaultCloudSdkVersionNotifier extends CloudSdkVersionNotifier {
 
   @Override
   public void notifyIfUnsupportedVersion() {
-    if (CloudSdkService.getInstance()
+    CloudSdkValidator sdkValidator = CloudSdkValidator.getInstance();
+    if (sdkValidator
         .validateCloudSdk()
         .contains(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED)) {
       showNotification();

@@ -30,7 +30,7 @@ import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibl
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestDirectory;
 import com.google.cloud.tools.intellij.testing.TestFile;
@@ -65,7 +65,8 @@ public final class AppEngineDeploymentConfigurationTest {
   @Mock private AppEngineDeployable mockAppEngineDeployable;
   @Mock private UserSpecifiedPathDeploymentSource mockUserSpecifiedPathDeploymentSource;
   @Mock private DeploymentSource mockOtherDeploymentSource;
-  @Mock @TestService private CloudSdkService mockCloudSdkService;
+
+  @Mock @TestService private CloudSdkValidator mockSdkValidator;
   @Mock @TestService private AppEngineProjectService mockAppEngineProjectService;
 
   @TestFixture private IdeaProjectTestFixture testFixture;
@@ -170,7 +171,7 @@ public final class AppEngineDeploymentConfigurationTest {
   @Test
   public void checkConfiguration_withCloudSdkNotFound_throwsException() {
     setUpValidFlexConfiguration();
-    when(mockCloudSdkService.validateCloudSdk()).thenReturn(ImmutableSet.of(CLOUD_SDK_NOT_FOUND));
+    when(mockSdkValidator.validateCloudSdk()).thenReturn(ImmutableSet.of(CLOUD_SDK_NOT_FOUND));
 
     RuntimeConfigurationError error =
         expectThrows(
@@ -185,7 +186,7 @@ public final class AppEngineDeploymentConfigurationTest {
   @Test
   public void checkConfiguration_withOutdatedCloudSdkVersion_throwsException() {
     setUpValidFlexConfiguration();
-    when(mockCloudSdkService.validateCloudSdk())
+    when(mockSdkValidator.validateCloudSdk())
         .thenReturn(ImmutableSet.of(CLOUD_SDK_VERSION_NOT_SUPPORTED));
 
     RuntimeConfigurationError error =
@@ -201,8 +202,7 @@ public final class AppEngineDeploymentConfigurationTest {
   @Test
   public void checkConfiguration_withNoAppEngineComponent_throwsException() {
     setUpValidFlexConfiguration();
-    when(mockCloudSdkService.validateCloudSdk())
-        .thenReturn(ImmutableSet.of(NO_APP_ENGINE_COMPONENT));
+    when(mockSdkValidator.validateCloudSdk()).thenReturn(ImmutableSet.of(NO_APP_ENGINE_COMPONENT));
 
     RuntimeConfigurationError error =
         expectThrows(
@@ -482,7 +482,7 @@ public final class AppEngineDeploymentConfigurationTest {
 
   /** Sets up the {@code configuration} to be valid for a deployment to a flex environment. */
   private void setUpValidFlexConfiguration() {
-    when(mockCloudSdkService.validateCloudSdk()).thenReturn(ImmutableSet.of());
+    when(mockSdkValidator.validateCloudSdk()).thenReturn(ImmutableSet.of());
     when(mockAppEngineDeployable.isValid()).thenReturn(true);
     when(mockAppEngineDeployable.getEnvironment()).thenReturn(AppEngineEnvironment.APP_ENGINE_FLEX);
 
@@ -502,7 +502,7 @@ public final class AppEngineDeploymentConfigurationTest {
    * {@link UserSpecifiedPathDeploymentSource}.
    */
   private void setUpValidFlexConfigurationWithUserSpecifiedSource() {
-    when(mockCloudSdkService.validateCloudSdk()).thenReturn(ImmutableSet.of());
+    when(mockSdkValidator.validateCloudSdk()).thenReturn(ImmutableSet.of());
     when(mockUserSpecifiedPathDeploymentSource.isValid()).thenReturn(true);
     when(mockUserSpecifiedPathDeploymentSource.getEnvironment())
         .thenReturn(AppEngineEnvironment.APP_ENGINE_FLEX);
@@ -521,7 +521,7 @@ public final class AppEngineDeploymentConfigurationTest {
 
   /** Sets up the {@code configuration} to be a valid custom deployment to a flex environment. */
   private void setUpValidCustomFlexConfiguration() {
-    when(mockCloudSdkService.validateCloudSdk()).thenReturn(ImmutableSet.of());
+    when(mockSdkValidator.validateCloudSdk()).thenReturn(ImmutableSet.of());
     when(mockAppEngineDeployable.isValid()).thenReturn(true);
     when(mockAppEngineDeployable.getEnvironment()).thenReturn(AppEngineEnvironment.APP_ENGINE_FLEX);
 
@@ -546,7 +546,7 @@ public final class AppEngineDeploymentConfigurationTest {
 
   /** Sets up the {@code configuration} to be valid for a deployment to a standard environment. */
   private void setUpValidStandardConfiguration() {
-    when(mockCloudSdkService.validateCloudSdk()).thenReturn(ImmutableSet.of());
+    when(mockSdkValidator.validateCloudSdk()).thenReturn(ImmutableSet.of());
     when(mockAppEngineDeployable.isValid()).thenReturn(true);
     when(mockAppEngineDeployable.getEnvironment())
         .thenReturn(AppEngineEnvironment.APP_ENGINE_STANDARD);

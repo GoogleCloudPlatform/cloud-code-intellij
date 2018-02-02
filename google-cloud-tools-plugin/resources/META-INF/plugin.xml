@@ -390,6 +390,7 @@
 
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService"
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.DefaultCloudSdkService"/>
+    <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator"/>
 
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardWebIntegration"
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.facet.standard.impl.AppEngineStandardCommunityWebIntegration"/>
