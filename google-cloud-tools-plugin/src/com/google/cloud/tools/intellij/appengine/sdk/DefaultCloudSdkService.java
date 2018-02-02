@@ -74,7 +74,7 @@ public class DefaultCloudSdkService implements CloudSdkService {
   }
 
   @Override
-  public boolean installAutomatically() {
+  public boolean install() {
     return false; /* not supported. */
   }
 
