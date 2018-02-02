@@ -46,6 +46,7 @@ public final class AddCloudLibrariesAction extends DumbAwareAction {
   }
 
   @Override
+  @SuppressWarnings("MissingCasesInEnumSwitch")
   public void update(AnActionEvent e) {
     boolean addLibrariesEnabled = false;
     if (e.getProject() != null) {
