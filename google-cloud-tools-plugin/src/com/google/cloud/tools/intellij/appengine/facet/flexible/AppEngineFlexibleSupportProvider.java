@@ -26,6 +26,7 @@ import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator;
 import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.execution.RunManager;
@@ -196,7 +197,8 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       }
 
       CloudSdkService sdkService = CloudSdkService.getInstance();
-      if (!sdkService
+      CloudSdkValidator sdkValidator = CloudSdkValidator.getInstance();
+      if (!sdkValidator
           .validateCloudSdk(cloudSdkPanel.getCloudSdkDirectoryText())
           .contains(CloudSdkValidationResult.MALFORMED_PATH)) {
         sdkService.setSdkHomePath(cloudSdkPanel.getCloudSdkDirectoryText());

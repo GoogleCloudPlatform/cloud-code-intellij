@@ -18,11 +18,12 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 
 import static com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND;
 import static com.google.common.truth.Truth.assertThat;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.common.collect.ImmutableSet;
@@ -43,6 +44,8 @@ public final class AppEngineCloudConfigurableTest {
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
 
   @Mock @TestService private CloudSdkService mockCloudSdkService;
+
+  @Mock @TestService private CloudSdkValidator mockCloudSdkValidator;
 
   private AppEngineCloudConfigurable appEngineCloudConfigurable;
 
@@ -79,7 +82,7 @@ public final class AppEngineCloudConfigurableTest {
   public void apply_withInvalidSdkPath_doesSetSdkPath() throws ConfigurationException {
     String sdkPath = "/some/sdk/path";
     appEngineCloudConfigurable.getCloudSdkPanel().setCloudSdkDirectoryText(sdkPath);
-    when(mockCloudSdkService.validateCloudSdk(anyString()))
+    when(mockCloudSdkValidator.validateCloudSdk(any()))
         .thenReturn(ImmutableSet.of(CLOUD_SDK_NOT_FOUND));
 
     appEngineCloudConfigurable.apply();

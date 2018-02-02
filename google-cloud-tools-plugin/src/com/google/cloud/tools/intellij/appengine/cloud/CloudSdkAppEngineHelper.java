@@ -35,6 +35,7 @@ import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService
 import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -108,7 +109,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       return Optional.empty();
     }
 
-    if (CloudSdkService.getInstance()
+    if (CloudSdkValidator.getInstance()
         .validateCloudSdk()
         .contains(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND)) {
       callback.errorOccurred(

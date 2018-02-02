@@ -21,8 +21,8 @@ import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibl
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.collect.Iterables;
 import com.intellij.execution.configurations.RuntimeConfigurationError;
@@ -236,7 +236,7 @@ public class AppEngineDeploymentConfiguration
 
   private void checkCommonConfig(AppEngineDeployable deployable) throws RuntimeConfigurationError {
     Set<CloudSdkValidationResult> sdkValidationResult =
-        CloudSdkService.getInstance().validateCloudSdk();
+        CloudSdkValidator.getInstance().validateCloudSdk();
     if (!sdkValidationResult.isEmpty()) {
       CloudSdkValidationResult result = Iterables.getFirst(sdkValidationResult, null);
       throw new RuntimeConfigurationError(
