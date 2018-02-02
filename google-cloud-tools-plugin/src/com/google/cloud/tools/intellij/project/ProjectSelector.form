@@ -34,7 +34,7 @@
               <component id="6cf34" class="com.intellij.ui.components.JBLabel" binding="projectAccountSeparatorLabel" custom-create="true">
                 <constraints>
                   <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-                  <gridbag weightx="0.0" weighty="0.0"/>
+                  <gridbag weightx="0.0" weighty="0.0" ipadx="2"/>
                 </constraints>
                 <properties>
                   <text value="/"/>

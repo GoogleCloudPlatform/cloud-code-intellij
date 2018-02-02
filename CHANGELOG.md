@@ -1,6 +1,19 @@
 # Release notes
 This page documents production updates to Cloud Tools for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## 18.2.1
+
+### Added
+  - Added Google Cloud Java client library discovery and addition from the IDE. [1806](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1806)
+  - Added ability to enable Google Cloud APIs from the IDE. [1807](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1807)
+  
+### Changed
+  - Updated the cloud project selector with a greatly improved user experience. [1719](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1719)
+  - Updated the cloud project selector so that the last selection is remembered and defaulted. [1812](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1812)
+
+### Fixed
+  - Fixed missing App Engine standard local run artifacts. [1625](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1625)
+
 ## 18.1.1
 
 ### Fixed

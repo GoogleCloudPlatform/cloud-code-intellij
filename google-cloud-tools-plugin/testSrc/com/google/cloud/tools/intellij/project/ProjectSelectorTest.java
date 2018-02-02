@@ -22,8 +22,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import java.awt.Component;
 import org.junit.Before;
@@ -40,6 +43,7 @@ public class ProjectSelectorTest {
   @Mock private ProjectSelectionDialog projectSelectionDialog;
   @Mock private Project mockIdeProject;
   @Mock private ActiveCloudProjectManager mockActiveCloudProjectManager;
+  @Mock @TestService private IntegratedGoogleLoginService mockLoginService;
 
   private static final CloudProject TEST_PROJECT =
       CloudProject.create("test-1", "test-1-id", "test@google.com");
@@ -56,6 +60,8 @@ public class ProjectSelectorTest {
     projectSelector.addProjectSelectionListener(projectSelectionListener);
 
     ActiveCloudProjectManager.setInstance(mockActiveCloudProjectManager);
+
+    when(mockLoginService.isLoggedIn()).thenReturn(true);
   }
 
   @Test
@@ -183,6 +189,43 @@ public class ProjectSelectorTest {
     projectSelector.loadActiveCloudProject();
 
     verify(projectSelectionListener).projectSelected(TEST_PROJECT);
+  }
+
+  @Test
+  public void validProject_no_LoggedInUsers_showLoginPrompt() {
+    when(mockLoginService.isLoggedIn()).thenReturn(false);
+    projectSelector.setSelectedProject(TEST_PROJECT);
+
+    assertThat(projectSelector.getAccountInfoLabel().getText())
+        .isEqualTo(GctBundle.message("cloud.project.selector.not.signed.in"));
+    assertThat(projectSelector.getAccountInfoLabel().getIcon()).isNull();
+  }
+
+  @Test
+  public void validProject_newLogIn_changesTo_AccountInformation() {
+    when(mockLoginService.isLoggedIn()).thenReturn(false);
+    projectSelector.setSelectedProject(TEST_PROJECT);
+    // log in now, fire event
+    when(mockLoginService.isLoggedIn()).thenReturn(true);
+    projectSelector.googleLoginListener.statusChanged();
+    // drain UI events.
+    ApplicationManager.getApplication().invokeAndWait(() -> {});
+
+    verifyUiStateForProject(TEST_PROJECT);
+  }
+
+  @Test
+  public void validProject_logOut_changesTo_loginPrompt() {
+    projectSelector.setSelectedProject(TEST_PROJECT);
+    // log out all users, notify login listeners.
+    when(mockLoginService.isLoggedIn()).thenReturn(false);
+    projectSelector.googleLoginListener.statusChanged();
+    // drain UI events.
+    ApplicationManager.getApplication().invokeAndWait(() -> {});
+
+    assertThat(projectSelector.getAccountInfoLabel().getText())
+        .isEqualTo(GctBundle.message("cloud.project.selector.not.signed.in"));
+    assertThat(projectSelector.getAccountInfoLabel().getIcon()).isNull();
   }
 
   private void verifyUiStateForProject(CloudProject project) {

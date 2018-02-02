@@ -107,15 +107,17 @@ public class AppEngineStandardSupportProvider extends FrameworkSupportInModulePr
   public static VirtualFile createFileFromTemplate(
       final String templateName, final VirtualFile parent, final String fileName) {
     parent.refresh(false, false);
+    VirtualFile file = parent.findChild(fileName);
+    if (file != null) {
+      return file;
+    }
+
     final FileTemplate template =
         FileTemplateManager.getDefaultInstance().getJ2eeTemplate(templateName);
     try {
       final String text =
           template.getText(FileTemplateManager.getDefaultInstance().getDefaultProperties());
-      VirtualFile file = parent.findChild(fileName);
-      if (file == null) {
-        file = parent.createChildData(AppEngineStandardSupportProvider.class, fileName);
-      }
+      file = parent.createChildData(AppEngineStandardSupportProvider.class, fileName);
       VfsUtil.saveText(file, text);
       return file;
     } catch (IOException ioe) {
