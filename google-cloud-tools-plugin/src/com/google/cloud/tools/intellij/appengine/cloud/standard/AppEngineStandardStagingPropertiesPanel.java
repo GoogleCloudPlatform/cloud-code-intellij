@@ -23,6 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import org.jetbrains.annotations.NotNull;
 
+/** A panel with the Google App Engine Standard staging flags */
 public class AppEngineStandardStagingPropertiesPanel {
 
   private JTextField compileEncodingTextField;
@@ -102,5 +103,4 @@ public class AppEngineStandardStagingPropertiesPanel {
     configuration.setEnableQuickstart(enableQuickstartCheckBox.isSelected());
     configuration.setJarSplittingExcludes(jarSplittingExcludesTextField.getText());
   }
-
 }

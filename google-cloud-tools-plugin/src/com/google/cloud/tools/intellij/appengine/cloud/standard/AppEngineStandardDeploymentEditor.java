@@ -62,11 +62,6 @@ public final class AppEngineStandardDeploymentEditor
         commonConfig.getAppEngineCostWarningPanel().setVisible(false);
       }
     }
-
-    // Which gets called first
-    stagingPanel = new AppEngineStandardStagingPropertiesPanel();
-    commonConfig.getParametersTabbedPane().add(GctBundle.message("appengine.deployment.staging.properties.tab.title"),
-        stagingPanel.getMainPanel());
   }
 
   @Override
@@ -107,5 +102,11 @@ public final class AppEngineStandardDeploymentEditor
 
   private void createUIComponents() {
     commonConfig = new AppEngineDeploymentConfigurationPanel(project);
+    stagingPanel = new AppEngineStandardStagingPropertiesPanel();
+    commonConfig
+        .getParametersTabbedPane()
+        .add(
+            GctBundle.message("appengine.deployment.staging.properties.tab.title"),
+            stagingPanel.getMainPanel());
   }
 }
