@@ -30,10 +30,13 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.FixedSizeButton;
 import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.components.JBLabel;
+import com.intellij.util.messages.MessageBusConnection;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.Icon;
 import javax.swing.JPanel;
@@ -70,6 +73,7 @@ public class ProjectSelector extends JPanel {
   private Project ideProject;
 
   @VisibleForTesting GoogleLoginListener googleLoginListener;
+  private Set<MessageBusConnection> messageBusConnections;
 
   /** @param ideProject IDE {@link Project} to be used to update active cloud project settings. */
   public ProjectSelector(@Nullable Project ideProject) {
@@ -87,14 +91,14 @@ public class ProjectSelector extends JPanel {
                     });
           }
         };
-    Stream.of(ProjectManager.getInstance().getOpenProjects())
-        .forEach(
-            project -> {
-              project
-                  .getMessageBus()
-                  .connect()
-                  .subscribe(GoogleLoginListener.GOOGLE_LOGIN_LISTENER_TOPIC, googleLoginListener);
-            });
+    messageBusConnections =
+        Stream.of(ProjectManager.getInstance().getOpenProjects())
+            .map(p -> p.getMessageBus().connect())
+            .collect(Collectors.toSet());
+    messageBusConnections.forEach(
+        connection ->
+            connection.subscribe(
+                GoogleLoginListener.GOOGLE_LOGIN_LISTENER_TOPIC, googleLoginListener));
   }
 
   /** Returns project selection or null if no project is selected. */
@@ -158,6 +162,13 @@ public class ProjectSelector extends JPanel {
   /** Returns the list of registered {@link ProjectSelectionListener ProjectSelectionListeners}. */
   public List<ProjectSelectionListener> getProjectSelectionListeners() {
     return projectSelectionListeners;
+  }
+
+  @Override
+  public void removeNotify() {
+    super.removeNotify();
+    messageBusConnections.forEach(MessageBusConnection::disconnect);
+    messageBusConnections.clear();
   }
 
   private void createUIComponents() {
