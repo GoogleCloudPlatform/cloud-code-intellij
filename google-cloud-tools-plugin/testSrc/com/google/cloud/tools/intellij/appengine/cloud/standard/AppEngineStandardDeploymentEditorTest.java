@@ -215,7 +215,7 @@ public final class AppEngineStandardDeploymentEditorTest {
   @Test
   public void applyEditorTo_doesSetCompileEncoding() throws Exception {
     String encoding = "UTF-8";
-    editor.getCommonConfig().getCompileEncodingTextField().setText(encoding);
+    editor.getStagingPanel().getCompileEncodingTextField().setText(encoding);
 
     editor.applyEditorTo(configuration);
 
@@ -224,7 +224,7 @@ public final class AppEngineStandardDeploymentEditorTest {
 
   @Test
   public void applyEditorTo_doesSetDeleteJsps() throws Exception {
-    editor.getCommonConfig().getDeleteJspsCheckBox().setSelected(true);
+    editor.getStagingPanel().getDeleteJspsCheckBox().setSelected(true);
 
     editor.applyEditorTo(configuration);
 
@@ -233,7 +233,7 @@ public final class AppEngineStandardDeploymentEditorTest {
 
   @Test
   public void applyEditorTo_doesSetDisableJarJsps() throws Exception {
-    editor.getCommonConfig().getDisableJarJspsCheckBox().setSelected(true);
+    editor.getStagingPanel().getDisableJarJspsCheckBox().setSelected(true);
 
     editor.applyEditorTo(configuration);
 
@@ -242,7 +242,7 @@ public final class AppEngineStandardDeploymentEditorTest {
 
   @Test
   public void applyEditorTo_doesSetDisableUpdateCheck() throws Exception {
-    editor.getCommonConfig().getDisableUpdateCheckCheckBox().setSelected(true);
+    editor.getStagingPanel().getDisableUpdateCheckCheckBox().setSelected(true);
 
     editor.applyEditorTo(configuration);
 
@@ -251,7 +251,7 @@ public final class AppEngineStandardDeploymentEditorTest {
 
   @Test
   public void applyEditorTo_doesSetEnableJarClasses() throws Exception {
-    editor.getCommonConfig().getEnableJarClassesCheckBox().setSelected(true);
+    editor.getStagingPanel().getEnableJarClassesCheckBox().setSelected(true);
 
     editor.applyEditorTo(configuration);
 
@@ -260,7 +260,7 @@ public final class AppEngineStandardDeploymentEditorTest {
 
   @Test
   public void applyEditorTo_doesSetEnableJarSplitting() throws Exception {
-    editor.getCommonConfig().getEnableJarSplittingCheckBox().setSelected(true);
+    editor.getStagingPanel().getEnableJarSplittingCheckBox().setSelected(true);
 
     editor.applyEditorTo(configuration);
 
@@ -269,7 +269,7 @@ public final class AppEngineStandardDeploymentEditorTest {
 
   @Test
   public void applyEditorTo_doesSetEnableQuickstart() throws Exception {
-    editor.getCommonConfig().getEnableQuickstartCheckBox().setSelected(true);
+    editor.getStagingPanel().getEnableQuickstartCheckBox().setSelected(true);
 
     editor.applyEditorTo(configuration);
 
@@ -279,7 +279,7 @@ public final class AppEngineStandardDeploymentEditorTest {
   @Test
   public void applyEditorTo_doesSetJarSplittingExcludes() throws Exception {
     String exclusions = "exclude.this";
-    editor.getCommonConfig().getJarSplittingExcludesTextField().setText(exclusions);
+    editor.getStagingPanel().getJarSplittingExcludesTextField().setText(exclusions);
 
     editor.applyEditorTo(configuration);
 
@@ -365,7 +365,7 @@ public final class AppEngineStandardDeploymentEditorTest {
 
     editor.resetEditorFrom(configuration);
 
-    assertThat(editor.getCommonConfig().getCompileEncodingTextField().getText())
+    assertThat(editor.getStagingPanel().getCompileEncodingTextField().getText())
         .isEqualTo(encoding);
   }
 
@@ -375,7 +375,7 @@ public final class AppEngineStandardDeploymentEditorTest {
 
     editor.resetEditorFrom(configuration);
 
-    assertThat(editor.getCommonConfig().getDeleteJspsCheckBox().isSelected()).isTrue();
+    assertThat(editor.getStagingPanel().getDeleteJspsCheckBox().isSelected()).isTrue();
   }
 
   @Test
@@ -384,7 +384,7 @@ public final class AppEngineStandardDeploymentEditorTest {
 
     editor.resetEditorFrom(configuration);
 
-    assertThat(editor.getCommonConfig().getDisableJarJspsCheckBox().isSelected()).isTrue();
+    assertThat(editor.getStagingPanel().getDisableJarJspsCheckBox().isSelected()).isTrue();
   }
 
   @Test
@@ -393,7 +393,7 @@ public final class AppEngineStandardDeploymentEditorTest {
 
     editor.resetEditorFrom(configuration);
 
-    assertThat(editor.getCommonConfig().getDisableUpdateCheckCheckBox().isSelected()).isTrue();
+    assertThat(editor.getStagingPanel().getDisableUpdateCheckCheckBox().isSelected()).isTrue();
   }
 
   @Test
@@ -402,7 +402,7 @@ public final class AppEngineStandardDeploymentEditorTest {
 
     editor.resetEditorFrom(configuration);
 
-    assertThat(editor.getCommonConfig().getEnableJarClassesCheckBox().isSelected()).isTrue();
+    assertThat(editor.getStagingPanel().getEnableJarClassesCheckBox().isSelected()).isTrue();
   }
 
   @Test
@@ -411,7 +411,7 @@ public final class AppEngineStandardDeploymentEditorTest {
 
     editor.resetEditorFrom(configuration);
 
-    assertThat(editor.getCommonConfig().getEnableJarSplittingCheckBox().isSelected()).isTrue();
+    assertThat(editor.getStagingPanel().getEnableJarSplittingCheckBox().isSelected()).isTrue();
   }
 
   @Test
@@ -420,7 +420,7 @@ public final class AppEngineStandardDeploymentEditorTest {
 
     editor.resetEditorFrom(configuration);
 
-    assertThat(editor.getCommonConfig().getEnableQuickstartCheckBox().isSelected()).isTrue();
+    assertThat(editor.getStagingPanel().getEnableQuickstartCheckBox().isSelected()).isTrue();
   }
 
   @Test
@@ -430,7 +430,7 @@ public final class AppEngineStandardDeploymentEditorTest {
 
     editor.resetEditorFrom(configuration);
 
-    assertThat(editor.getCommonConfig().getJarSplittingExcludesTextField().getText())
+    assertThat(editor.getStagingPanel().getJarSplittingExcludesTextField().getText())
         .isEqualTo(exclusions);
   }
 

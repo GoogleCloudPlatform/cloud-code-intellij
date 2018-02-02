@@ -21,6 +21,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfig
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfigurationPanel;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
+import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
@@ -32,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
 public final class AppEngineStandardDeploymentEditor
     extends SettingsEditor<AppEngineDeploymentConfiguration> {
   private AppEngineDeploymentConfigurationPanel commonConfig;
+  private AppEngineStandardStagingPropertiesPanel stagingPanel;
   private JPanel editorPanel;
 
   private Project project;
@@ -60,37 +62,24 @@ public final class AppEngineStandardDeploymentEditor
         commonConfig.getAppEngineCostWarningPanel().setVisible(false);
       }
     }
+
+    // Which gets called first
+    stagingPanel = new AppEngineStandardStagingPropertiesPanel();
+    commonConfig.getParametersTabbedPane().add(GctBundle.message("appengine.deployment.staging.properties.tab.title"),
+        stagingPanel.getMainPanel());
   }
 
   @Override
   protected void resetEditorFrom(@NotNull AppEngineDeploymentConfiguration configuration) {
     commonConfig.resetEditorFrom(configuration);
-    commonConfig.getCompileEncodingTextField().setText(configuration.getCompileEncoding());
-    commonConfig.getDeleteJspsCheckBox().setSelected(configuration.getDeleteJsps());
-    commonConfig.getDisableJarJspsCheckBox().setSelected(configuration.getDisableJarJsps());
-    commonConfig.getDisableUpdateCheckCheckBox().setSelected(configuration.getDisableUpdateCheck());
-    commonConfig.getEnableJarClassesCheckBox().setSelected(configuration.getEnableJarClasses());
-    commonConfig.getEnableJarSplittingCheckBox().setSelected(configuration.getEnableJarSplitting());
-    commonConfig.getEnableQuickstartCheckBox().setSelected(configuration.getEnableQuickstart());
-    commonConfig
-        .getJarSplittingExcludesTextField()
-        .setText(configuration.getJarSplittingExcludes());
+    stagingPanel.resetEditorFrom(configuration);
   }
 
   @Override
   protected void applyEditorTo(@NotNull AppEngineDeploymentConfiguration configuration) {
     commonConfig.applyEditorTo(configuration);
+    stagingPanel.applyEditorTo(configuration);
     commonConfig.setDeploymentProjectAndVersion(deploymentSource);
-
-    configuration.setCompileEncoding(commonConfig.getCompileEncodingTextField().getText());
-    configuration.setDeleteJsps(commonConfig.getDeleteJspsCheckBox().isSelected());
-    configuration.setDisableJarJsps(commonConfig.getDisableJarJspsCheckBox().isSelected());
-    configuration.setDisableUpdateCheck(commonConfig.getDisableUpdateCheckCheckBox().isSelected());
-    configuration.setEnableJarClasses(commonConfig.getEnableJarClassesCheckBox().isSelected());
-    configuration.setEnableJarSplitting(commonConfig.getEnableJarSplittingCheckBox().isSelected());
-    configuration.setEnableQuickstart(commonConfig.getEnableQuickstartCheckBox().isSelected());
-    configuration.setJarSplittingExcludes(
-        commonConfig.getJarSplittingExcludesTextField().getText());
 
     boolean isFlexCompat =
         AppEngineProjectService.getInstance().isFlexCompat(project, deploymentSource);
@@ -109,6 +98,11 @@ public final class AppEngineStandardDeploymentEditor
   @VisibleForTesting
   AppEngineDeploymentConfigurationPanel getCommonConfig() {
     return commonConfig;
+  }
+
+  @VisibleForTesting
+  AppEngineStandardStagingPropertiesPanel getStagingPanel() {
+    return stagingPanel;
   }
 
   private void createUIComponents() {

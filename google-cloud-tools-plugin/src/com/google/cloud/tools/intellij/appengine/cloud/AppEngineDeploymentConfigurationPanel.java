@@ -246,38 +246,6 @@ public final class AppEngineDeploymentConfigurationPanel {
     return promoteCheckbox;
   }
 
-  public JTextField getCompileEncodingTextField() {
-    return compileEncodingTextField;
-  }
-
-  public JCheckBox getDeleteJspsCheckBox() {
-    return deleteJspsCheckBox;
-  }
-
-  public JCheckBox getEnableJarClassesCheckBox() {
-    return enableJarClassesCheckBox;
-  }
-
-  public JCheckBox getDisableJarJspsCheckBox() {
-    return disableJarJspsCheckBox;
-  }
-
-  public JCheckBox getDisableUpdateCheckCheckBox() {
-    return disableUpdateCheckCheckBox;
-  }
-
-  public JCheckBox getEnableQuickstartCheckBox() {
-    return enableQuickstartCheckBox;
-  }
-
-  public JTextField getJarSplittingExcludesTextField() {
-    return jarSplittingExcldesTextField;
-  }
-
-  public JCheckBox getEnableJarSplittingCheckBox() {
-    return enableJarSplittingCheckBox;
-  }
-
   public JTabbedPane getParametersTabbedPane() {
     return parametersTabbedPane;
   }
