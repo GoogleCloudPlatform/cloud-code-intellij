@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.appengine.cloud.standard;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import java.awt.Component;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
