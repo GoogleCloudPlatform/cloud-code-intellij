@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.cloud.standard;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
+import com.google.common.annotations.VisibleForTesting;
 import java.awt.Component;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -35,38 +36,6 @@ public class AppEngineStandardStagingPropertiesPanel {
   private JCheckBox disableUpdateCheckCheckBox;
   private JTextField jarSplittingExcludesTextField;
   private JPanel mainPanel;
-
-  public JTextField getCompileEncodingTextField() {
-    return compileEncodingTextField;
-  }
-
-  public JCheckBox getDeleteJspsCheckBox() {
-    return deleteJspsCheckBox;
-  }
-
-  public JCheckBox getEnableJarClassesCheckBox() {
-    return enableJarClassesCheckBox;
-  }
-
-  public JCheckBox getDisableJarJspsCheckBox() {
-    return disableJarJspsCheckBox;
-  }
-
-  public JCheckBox getDisableUpdateCheckCheckBox() {
-    return disableUpdateCheckCheckBox;
-  }
-
-  public JCheckBox getEnableQuickstartCheckBox() {
-    return enableQuickstartCheckBox;
-  }
-
-  public JTextField getJarSplittingExcludesTextField() {
-    return jarSplittingExcludesTextField;
-  }
-
-  public JCheckBox getEnableJarSplittingCheckBox() {
-    return enableJarSplittingCheckBox;
-  }
 
   public Component getMainPanel() {
     return mainPanel;
@@ -102,5 +71,45 @@ public class AppEngineStandardStagingPropertiesPanel {
     configuration.setEnableJarSplitting(enableJarSplittingCheckBox.isSelected());
     configuration.setEnableQuickstart(enableQuickstartCheckBox.isSelected());
     configuration.setJarSplittingExcludes(jarSplittingExcludesTextField.getText());
+  }
+
+  @VisibleForTesting
+  public JTextField getCompileEncodingTextField() {
+    return compileEncodingTextField;
+  }
+
+  @VisibleForTesting
+  public JCheckBox getDeleteJspsCheckBox() {
+    return deleteJspsCheckBox;
+  }
+
+  @VisibleForTesting
+  public JCheckBox getEnableJarClassesCheckBox() {
+    return enableJarClassesCheckBox;
+  }
+
+  @VisibleForTesting
+  public JCheckBox getDisableJarJspsCheckBox() {
+    return disableJarJspsCheckBox;
+  }
+
+  @VisibleForTesting
+  public JCheckBox getDisableUpdateCheckCheckBox() {
+    return disableUpdateCheckCheckBox;
+  }
+
+  @VisibleForTesting
+  public JCheckBox getEnableQuickstartCheckBox() {
+    return enableQuickstartCheckBox;
+  }
+
+  @VisibleForTesting
+  public JTextField getJarSplittingExcludesTextField() {
+    return jarSplittingExcludesTextField;
+  }
+
+  @VisibleForTesting
+  public JCheckBox getEnableJarSplittingCheckBox() {
+    return enableJarSplittingCheckBox;
   }
 }
