@@ -27,10 +27,8 @@ import com.google.cloud.tools.managedcloudsdk.install.SdkInstaller;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.diagnostic.Logger;
-import java.lang.ref.WeakReference;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Iterator;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -39,14 +37,13 @@ import org.jetbrains.annotations.Nullable;
  */
 // TODO(ivanporty) implementation coming in the next PR
 public class ManagedCloudSdkService implements CloudSdkService {
-  private static Logger logger = Logger.getInstance(ManagedCloudSdkService.class);
+  private Logger logger = Logger.getInstance(ManagedCloudSdkService.class);
 
   private ManagedCloudSdk managedCloudSdk;
 
   private SdkStatus sdkStatus = SdkStatus.NOT_AVAILABLE;
 
-  private final Collection<WeakReference<SdkStatusUpdateListener>> weakRefListeners =
-      Lists.newArrayList();
+  private final Collection<SdkStatusUpdateListener> statusUpdateListeners = Lists.newArrayList();
 
   /** Called when this service becomes primary choice for serving Cloud SDK. */
   public void activate() {
@@ -65,7 +62,9 @@ public class ManagedCloudSdkService implements CloudSdkService {
   }
 
   @Override
-  public void setSdkHomePath(String path) {}
+  public void setSdkHomePath(String path) {
+    /* unsupported, to be removed. */
+  }
 
   @Override
   public SdkStatus getStatus() {
@@ -80,7 +79,12 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
   @Override
   public void addStatusUpdateListener(SdkStatusUpdateListener listener) {
-    weakRefListeners.add(new WeakReference<>(listener));
+    statusUpdateListeners.add(listener);
+  }
+
+  @Override
+  public void removeStatusUpdateListener(SdkStatusUpdateListener listener) {
+    statusUpdateListeners.remove(listener);
   }
 
   @VisibleForTesting
@@ -90,7 +94,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
   @VisibleForTesting
   void setLogger(Logger logger) {
-    ManagedCloudSdkService.logger = logger;
+    this.logger = logger;
   }
 
   private void updateStatus(SdkStatus sdkStatus) {
@@ -99,15 +103,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
   }
 
   private void notifyListeners(CloudSdkService sdkService, SdkStatus status) {
-    Iterator<WeakReference<SdkStatusUpdateListener>> refIterator = weakRefListeners.iterator();
-    while (refIterator.hasNext()) {
-      SdkStatusUpdateListener listener = refIterator.next().get();
-      if (listener == null /* GC-ed */) {
-        refIterator.remove();
-      } else {
-        listener.onSdkStatusChange(sdkService, status);
-      }
-    }
+    statusUpdateListeners.forEach(listener -> listener.onSdkStatusChange(sdkService, status));
   }
 
   /** Checks for Managed Cloud SDK status and creates/installs it if necessary. */

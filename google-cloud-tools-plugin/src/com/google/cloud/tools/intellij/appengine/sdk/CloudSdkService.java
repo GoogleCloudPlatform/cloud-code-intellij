@@ -45,6 +45,8 @@ public interface CloudSdkService {
 
   void addStatusUpdateListener(SdkStatusUpdateListener listener);
 
+  void removeStatusUpdateListener(SdkStatusUpdateListener listener);
+
   enum SdkStatus {
     READY,
     INSTALLING,

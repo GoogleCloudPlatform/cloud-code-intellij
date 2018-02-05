@@ -82,4 +82,9 @@ public class DefaultCloudSdkService implements CloudSdkService {
   public void addStatusUpdateListener(SdkStatusUpdateListener listener) {
     /* not supported. */
   }
+
+  @Override
+  public void removeStatusUpdateListener(SdkStatusUpdateListener listener) {
+    /* not supported. */
+  }
 }
