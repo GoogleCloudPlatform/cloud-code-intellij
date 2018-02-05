@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.apis;
 
+import com.google.api.services.iam.v1.Iam;
+import com.google.api.services.iam.v1.model.Role;
 import com.google.api.services.servicemanagement.ServiceManagement;
 import com.google.api.services.servicemanagement.model.EnableServiceRequest;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
@@ -28,6 +30,7 @@ import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
@@ -135,6 +138,28 @@ class CloudApiManager {
                 .setConsumerId(
                     String.format(SERVICE_REQUEST_PROJECT_PATTERN, cloudProject.projectId())))
         .execute();
+  }
+
+  /**
+   * Fetches the list of {@link Role} for the supplied {@link CloudProject} by querying the Iam API.
+   */
+  static List<Role> getServiceAccountRoles(CloudProject cloudProject) {
+    Optional<CredentialedUser> user =
+        Services.getLoginService().getLoggedInUser(cloudProject.googleUsername());
+
+    if (!user.isPresent()) {
+      LOG.error("Cannot enable APIs: logged in user not found.");
+      return ImmutableList.of();
+    }
+
+    Iam iam = GoogleApiClientFactory.getInstance().getIamClient(user.get().getCredential());
+
+    try {
+      return iam.roles().list().execute().getRoles();
+    } catch (IOException e) {
+      e.printStackTrace();
+      return ImmutableList.of();
+    }
   }
 
   private static void notifyApisEnabled(

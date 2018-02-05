@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.apis;
 
+import com.google.api.services.iam.v1.model.Role;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.libraries.CloudLibraries;
@@ -29,8 +30,11 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import git4idea.DialogManager;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.swing.JComponent;
 
 /** The dialog for adding GCP client libraries and managing GCP APIs. */
@@ -102,13 +106,16 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
   @Override
   protected void doOKAction() {
     CloudProject cloudProject = getCloudProject();
+    Set<CloudLibrary> selectedApis = getSelectedLibraries();
     Set<CloudLibrary> apisToEnable = getApisToEnable();
-    Set<CloudLibrary> apisNotEnabled = Sets.difference(getSelectedLibraries(), apisToEnable);
+    Set<CloudLibrary> apisNotEnabled = Sets.difference(selectedApis, apisToEnable);
 
     if (cloudProject != null && (!apisToEnable.isEmpty() || !apisNotEnabled.isEmpty())) {
+      Set<Role> roles = getServiceAccountRolesRoles(selectedApis);
+
       CloudApiManagementConfirmationDialog managementDialog =
           new CloudApiManagementConfirmationDialog(
-              getSelectedModule(), cloudProject, apisToEnable, apisNotEnabled);
+              getSelectedModule(), cloudProject, apisToEnable, apisNotEnabled, roles);
       DialogManager.show(managementDialog);
 
       if (managementDialog.isOK()) {
@@ -124,6 +131,29 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
     } else {
       super.doOKAction();
     }
+  }
+
+  /**
+   * Fetches all the available roles for the {@link CloudProject} and returns the set of roles
+   * corresponding to the selected client libraries.
+   *
+   * @param apis the set of {@link CloudLibrary apis} selected
+   * @return the set of {@link Role roles} corresponding to the selected apis
+   */
+  private Set<Role> getServiceAccountRolesRoles(Set<CloudLibrary> apis) {
+    List<Role> serviceAccountRoles = CloudApiManager.getServiceAccountRoles(getCloudProject());
+
+    Set<String> roleIds =
+        apis.stream()
+            .map(CloudLibrary::getServiceRoles)
+            .filter(Objects::nonNull)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toSet());
+
+    return serviceAccountRoles
+        .stream()
+        .filter(role -> roleIds.contains(role.getName()))
+        .collect(Collectors.toSet());
   }
 
   @Override
