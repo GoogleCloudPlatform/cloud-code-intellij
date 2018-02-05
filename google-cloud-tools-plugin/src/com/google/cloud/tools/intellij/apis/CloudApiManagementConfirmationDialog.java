@@ -50,6 +50,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import org.fest.util.VisibleForTesting;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -140,7 +141,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
     roleTable = new ServiceAccountRolesTable(roles);
   }
 
-  private final class ServiceAccountRolesTable extends JBTable {
+  private static final class ServiceAccountRolesTable extends JBTable {
     ServiceAccountRolesTable(Set<Role> roles) {
       super(new ServiceAccountRolesTableModel(roles));
       setDefaultRenderer(Role.class, new RoleNameRenderer());
@@ -221,5 +222,20 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
       Stream.of(listenerList.getListeners(TableModelListener.class))
           .forEach(listener -> listener.tableChanged(event));
     }
+  }
+
+  @VisibleForTesting
+  public JPanel getApisToEnablePanel() {
+    return apisToEnablePanel;
+  }
+
+  @VisibleForTesting
+  public JPanel getApisNotSelectedToEnablePanel() {
+    return apisNotSelectedToEnablePanel;
+  }
+
+  @VisibleForTesting
+  public JPanel getServiceAccountDetailsPanel() {
+    return serviceAccountDetailsPanel;
   }
 }
