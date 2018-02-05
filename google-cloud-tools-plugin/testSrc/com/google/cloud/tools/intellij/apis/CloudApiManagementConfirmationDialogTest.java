@@ -117,7 +117,7 @@ public class CloudApiManagementConfirmationDialogTest {
                   new CloudApiManagementConfirmationDialog(
                       module, cloudProject, libraries, ImmutableSet.of(), roles);
 
-              assertThat(dialog.getServiceAccountDetailsPanel().isVisible()).isTrue();
+              assertThat(dialog.getRolePanel().isVisible()).isTrue();
             });
   }
 
@@ -132,7 +132,7 @@ public class CloudApiManagementConfirmationDialogTest {
                   new CloudApiManagementConfirmationDialog(
                       module, cloudProject, libraries, ImmutableSet.of(), ImmutableSet.of());
 
-              assertThat(dialog.getServiceAccountDetailsPanel().isVisible()).isFalse();
+              assertThat(dialog.getRolePanel().isVisible()).isFalse();
             });
   }
 }

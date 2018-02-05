@@ -74,7 +74,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
   private JScrollPane serviceAccountDetailsPane;
   private JTable roleTable;
   private JScrollPane rolePane;
-  private JLabel rolesLabel;
+  private JPanel rolePanel;
 
   private final Set<Role> roles;
   private static final boolean UPDATE_SERVICE_ACCOUNT_DEFAULT = true;
@@ -119,14 +119,12 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
     populateLibraryList(apisNotSelectedToEnableList, apisNotToEnable);
 
     newServiceAccountCheckbox.addActionListener(
-        e ->
-            serviceAccountDetailsPane.setVisible(
-                ((JCheckBox) e.getSource()).isSelected() && !roles.isEmpty()));
+        e -> serviceAccountDetailsPane.setVisible(((JCheckBox) e.getSource()).isSelected()));
     newServiceAccountCheckbox.setSelected(UPDATE_SERVICE_ACCOUNT_DEFAULT);
-    serviceAccountDetailsPanel.setVisible(
-        newServiceAccountCheckbox.isSelected() && !roles.isEmpty());
+    serviceAccountDetailsPanel.setVisible(newServiceAccountCheckbox.isSelected());
     roleTable.setTableHeader(null);
     rolePane.setBorder(JBUI.Borders.empty());
+    rolePanel.setVisible(!roles.isEmpty());
   }
 
   @Nullable
@@ -236,6 +234,10 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
   @VisibleForTesting
   public JPanel getApisNotSelectedToEnablePanel() {
     return apisNotSelectedToEnablePanel;
+  }
+
+  public JPanel getRolePanel() {
+    return rolePanel;
   }
 
   @VisibleForTesting
