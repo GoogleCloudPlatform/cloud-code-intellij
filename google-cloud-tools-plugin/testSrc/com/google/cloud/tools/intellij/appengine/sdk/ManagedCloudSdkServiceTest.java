@@ -36,6 +36,7 @@ import com.google.cloud.tools.managedcloudsdk.components.SdkComponent;
 import com.google.cloud.tools.managedcloudsdk.components.SdkComponentInstaller;
 import com.google.cloud.tools.managedcloudsdk.install.SdkInstaller;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.intellij.openapi.application.ApplicationManager;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -113,6 +114,8 @@ public class ManagedCloudSdkServiceTest {
     Path mockSdkPath = Paths.get("/tools/gcloud");
     emulateMockSdkInstallationProcess(mockSdkPath);
     sdkService.install();
+    // drain UI event queue to get all sdk status updates.
+    ApplicationManager.getApplication().invokeAndWait(() -> {});
 
     ArgumentCaptor<SdkStatus> statusCaptor = ArgumentCaptor.forClass(SdkStatus.class);
     verify(mockStatusUpdateListener, times(2)).onSdkStatusChange(any(), statusCaptor.capture());
@@ -129,6 +132,8 @@ public class ManagedCloudSdkServiceTest {
     SdkInstaller mockInstaller = mockManagedCloudSdk.newInstaller();
     when(mockInstaller.install(any())).thenThrow(new IOException("IO Error"));
     sdkService.install();
+    // drain UI event queue to get all sdk status updates.
+    ApplicationManager.getApplication().invokeAndWait(() -> {});
 
     ArgumentCaptor<SdkStatus> statusCaptor = ArgumentCaptor.forClass(SdkStatus.class);
     verify(mockStatusUpdateListener, times(2)).onSdkStatusChange(any(), statusCaptor.capture());
@@ -147,6 +152,8 @@ public class ManagedCloudSdkServiceTest {
         .when(mockComponentInstaller)
         .installComponent(any(), any());
     sdkService.install();
+    // drain UI event queue to get all sdk status updates.
+    ApplicationManager.getApplication().invokeAndWait(() -> {});
 
     ArgumentCaptor<SdkStatus> statusCaptor = ArgumentCaptor.forClass(SdkStatus.class);
     verify(mockStatusUpdateListener, times(2)).onSdkStatusChange(any(), statusCaptor.capture());
