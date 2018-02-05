@@ -54,8 +54,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Dialog confirming GCP API management actions such as API enablement. Allows selection of a {@link
- * CloudProject CloudProject} on which to perform the actions.
+ * Dialog confirming GCP API management actions including API enablement and service account key
+ * management.
  */
 public class CloudApiManagementConfirmationDialog extends DialogWrapper {
 
