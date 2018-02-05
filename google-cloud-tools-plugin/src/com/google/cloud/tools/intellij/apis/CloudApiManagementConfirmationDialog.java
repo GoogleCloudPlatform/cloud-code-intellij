@@ -73,6 +73,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
   private JScrollPane serviceAccountDetailsPane;
   private JTable roleTable;
   private JScrollPane rolePane;
+  private JLabel rolesLabel;
 
   private final Set<Role> roles;
   private static final boolean UPDATE_SERVICE_ACCOUNT_DEFAULT = true;
@@ -118,6 +119,9 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
     newServiceAccountCheckbox.setSelected(UPDATE_SERVICE_ACCOUNT_DEFAULT);
     roleTable.setTableHeader(null);
     rolePane.setBorder(JBUI.Borders.empty());
+
+    rolePane.setVisible(!roles.isEmpty());
+    rolesLabel.setVisible(!roles.isEmpty());
   }
 
   @Nullable
