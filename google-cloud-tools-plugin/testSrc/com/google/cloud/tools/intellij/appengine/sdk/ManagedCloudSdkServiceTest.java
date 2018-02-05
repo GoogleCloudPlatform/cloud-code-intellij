@@ -18,11 +18,19 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.log.TestConsoleLogger;
+import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.managedcloudsdk.ManagedCloudSdk;
 import com.google.cloud.tools.managedcloudsdk.UnsupportedOsException;
+import com.google.cloud.tools.managedcloudsdk.components.SdkComponent;
+import com.google.common.util.concurrent.MoreExecutors;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.concurrent.ExecutorService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,10 +49,59 @@ public class ManagedCloudSdkServiceTest {
   @Before
   public void setUp() throws UnsupportedOsException {
     doReturn(mockManagedCloudSdk).when(sdkService).createManagedSdk();
+    sdkService.setLogger(new TestConsoleLogger());
+    // make sure everything in test is done synchronously
+    ExecutorService directExecutorService = MoreExecutors.newDirectExecutorService();
+    ThreadUtil.getInstance().setBackgroundExecutorService(directExecutorService);
   }
 
   @Test
   public void initial_service_notActivated_status_notAvailable() {
     assertThat(sdkService.getStatus()).isEqualTo(SdkStatus.NOT_AVAILABLE);
   }
+
+  @Test
+  public void initial_service_notActivated_path_isNull() {
+    assertThat((Object) sdkService.getSdkHomePath()).isNull();
+  }
+
+  @Test
+  public void activate_service_sdkInstalled_status_ready() {
+    Path mockSdkPath = Paths.get("/tools/gcloud");
+    makeMockSdkInstalled(mockSdkPath);
+
+    sdkService.activate();
+
+    assertThat(sdkService.getStatus()).isEqualTo(SdkStatus.READY);
+  }
+
+  @Test
+  public void activate_service_sdkInstalled_sdkPath_valid() {
+    Path mockSdkPath = Paths.get("/tools/gcloud");
+    makeMockSdkInstalled(mockSdkPath);
+
+    sdkService.activate();
+
+    assertThat((Object) sdkService.getSdkHomePath()).isEqualTo(mockSdkPath);
+  }
+
+  /** Mocks managed SDK as if installed and having App Engine Component. */
+  private void makeMockSdkInstalled(Path mockSdkPath) {
+    try {
+      when(mockManagedCloudSdk.isInstalled()).thenReturn(true);
+      when(mockManagedCloudSdk.hasComponent(SdkComponent.APP_ENGINE_JAVA)).thenReturn(true);
+      when(mockManagedCloudSdk.getSdkHome()).thenReturn(mockSdkPath);
+    } catch (Exception ex) {
+      // shouldn't happen in the tests.
+      throw new AssertionError(ex);
+    }
+  }
+
+  /*@Test
+  public void realInstall() {
+    ManagedCloudSdkService realService = new ManagedCloudSdkService();
+    realService.setLogger(new TestConsoleLogger());
+    realService.activate();
+    System.out.println(realService.getSdkHomePath());
+  }*/
 }

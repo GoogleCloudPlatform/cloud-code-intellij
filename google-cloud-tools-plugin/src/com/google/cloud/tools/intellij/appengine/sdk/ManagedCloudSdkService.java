@@ -22,6 +22,7 @@ import com.google.cloud.tools.managedcloudsdk.ManagedSdkVerificationException;
 import com.google.cloud.tools.managedcloudsdk.ManagedSdkVersionMismatchException;
 import com.google.cloud.tools.managedcloudsdk.MessageListener;
 import com.google.cloud.tools.managedcloudsdk.UnsupportedOsException;
+import com.google.cloud.tools.managedcloudsdk.components.SdkComponent;
 import com.google.cloud.tools.managedcloudsdk.install.SdkInstaller;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
@@ -38,11 +39,11 @@ import org.jetbrains.annotations.Nullable;
  */
 // TODO(ivanporty) implementation coming in the next PR
 public class ManagedCloudSdkService implements CloudSdkService {
-  private static final Logger logger = Logger.getInstance(ManagedCloudSdkService.class);
+  private static Logger logger = Logger.getInstance(ManagedCloudSdkService.class);
 
   private ManagedCloudSdk managedCloudSdk;
 
-  private SdkStatus sdkStatus;
+  private SdkStatus sdkStatus = SdkStatus.NOT_AVAILABLE;
 
   private final Collection<WeakReference<SdkStatusUpdateListener>> weakRefListeners =
       Lists.newArrayList();
@@ -55,7 +56,12 @@ public class ManagedCloudSdkService implements CloudSdkService {
   @Nullable
   @Override
   public Path getSdkHomePath() {
-    return null;
+    switch (sdkStatus) {
+      case READY:
+        return managedCloudSdk.getSdkHome();
+      default:
+        return null;
+    }
   }
 
   @Override
@@ -63,7 +69,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
   @Override
   public SdkStatus getStatus() {
-    return SdkStatus.NOT_AVAILABLE;
+    return sdkStatus;
   }
 
   @Override
@@ -80,6 +86,11 @@ public class ManagedCloudSdkService implements CloudSdkService {
   @VisibleForTesting
   ManagedCloudSdk createManagedSdk() throws UnsupportedOsException {
     return ManagedCloudSdk.newManagedSdk();
+  }
+
+  @VisibleForTesting
+  void setLogger(Logger logger) {
+    ManagedCloudSdkService.logger = logger;
   }
 
   private void updateStatus(SdkStatus sdkStatus) {
@@ -114,9 +125,9 @@ public class ManagedCloudSdkService implements CloudSdkService {
     boolean managedSdkInstalled = false;
     try {
       managedSdkInstalled = managedCloudSdk.isInstalled();
-    } catch (ManagedSdkVerificationException | ManagedSdkVersionMismatchException e) {
-      // TODO ??
-      logger.error("Error while checking Cloud SDK status", e);
+    } catch (ManagedSdkVerificationException | ManagedSdkVersionMismatchException ex) {
+      // TODO is recoverable?
+      logger.error("Error while checking Cloud SDK status", ex);
     }
 
     if (!managedSdkInstalled) {
@@ -128,13 +139,41 @@ public class ManagedCloudSdkService implements CloudSdkService {
         return;
       }
 
-      MessageListener messageListener = rawString -> {};
+      MessageListener sdkInstallListener = logger::info;
 
+      updateStatus(SdkStatus.INSTALLING);
       try {
-        sdkInstaller.install(messageListener);
+        sdkInstaller.install(sdkInstallListener);
       } catch (Exception ex) {
-        ex.printStackTrace();
+        logger.error("Error while installing managed Cloud SDK", ex);
+        updateStatus(SdkStatus.NOT_AVAILABLE);
+        return;
       }
     }
+
+    boolean hasAppEngineJava = false;
+    try {
+      hasAppEngineJava = managedCloudSdk.hasComponent(SdkComponent.APP_ENGINE_JAVA);
+    } catch (ManagedSdkVerificationException ex) {
+      // TODO is recoverable?
+      logger.error("Error while checking Cloud SDK status", ex);
+    }
+
+    if (!hasAppEngineJava) {
+      MessageListener appEngineInstallListener = logger::info;
+
+      try {
+        managedCloudSdk
+            .newComponentInstaller()
+            .installComponent(SdkComponent.APP_ENGINE_JAVA, appEngineInstallListener);
+      } catch (Exception ex) {
+        logger.error("Error while installing managed Cloud SDK App Engine Java component", ex);
+        updateStatus(SdkStatus.NOT_AVAILABLE);
+        return;
+      }
+    }
+
+    updateStatus(SdkStatus.READY);
+    logger.info("Managed Google Cloud SDK successfully installed.");
   }
 }
