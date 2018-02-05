@@ -24,9 +24,11 @@ import org.apache.log4j.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/** IJ based diagnostic logger for tests, collects log messages into a buffer. */
+/** IJ based diagnostic logger for tests, collects log messages into a buffer. Thread-safe. */
 public class TestInMemoryLogger extends Logger {
+  @SuppressWarnings("JdkObsolete")
   private final StringBuffer messages = new StringBuffer();
+
   @Override
   public boolean isDebugEnabled() {
     return true;

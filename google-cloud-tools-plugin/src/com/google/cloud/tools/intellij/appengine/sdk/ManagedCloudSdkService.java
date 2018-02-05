@@ -29,6 +29,7 @@ import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -38,8 +39,8 @@ import org.jetbrains.annotations.Nullable;
  * {@link CloudSdkService} providing SDK that is managed and automatically installable, see {@link
  * com.google.cloud.tools.managedcloudsdk.ManagedCloudSdk}.
  *
- * <p>Some methods ({@link #install()} do their work on background thread which result in listeners
- * methods being called on arbitrary thread.
+ * <p>Some methods ({@link #install()} do their work on background thread but listeners methods are
+ * always called on EDT thread. This class is not thread-safe, must be used on UI thread.
  */
 public class ManagedCloudSdkService implements CloudSdkService {
   private Logger logger = Logger.getInstance(ManagedCloudSdkService.class);
@@ -80,9 +81,8 @@ public class ManagedCloudSdkService implements CloudSdkService {
     return sdkStatus;
   }
 
-  // synchronized to prevent accidental start of multiple installation jobs.
   @Override
-  public synchronized boolean install() {
+  public boolean install() {
     // check if installation is already running first, to prevent multiple jobs running.
     if (runningInstallationJob == null) {
       runningInstallationJob =
@@ -138,8 +138,12 @@ public class ManagedCloudSdkService implements CloudSdkService {
   }
 
   private void updateStatus(SdkStatus sdkStatus) {
-    this.sdkStatus = sdkStatus;
-    notifyListeners(this, sdkStatus);
+    ApplicationManager.getApplication()
+        .invokeLater(
+            () -> {
+              this.sdkStatus = sdkStatus;
+              notifyListeners(this, sdkStatus);
+            });
   }
 
   private void notifyListeners(CloudSdkService sdkService, SdkStatus status) {
