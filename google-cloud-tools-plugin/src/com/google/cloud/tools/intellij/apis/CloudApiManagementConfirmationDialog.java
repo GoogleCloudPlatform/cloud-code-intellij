@@ -96,9 +96,12 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
     init();
     setTitle(GctBundle.message("cloud.apis.management.dialog.title"));
 
-    apiEnablementPanel.setBorder(IdeBorderFactory.createTitledBorder("API Enablement"));
+    apiEnablementPanel.setBorder(
+        IdeBorderFactory.createTitledBorder(
+            GctBundle.message("cloud.apis.management.dialog.enablement.header")));
     serviceAccountPanel.setBorder(
-        IdeBorderFactory.createTitledBorder("Service Account Key Management"));
+        IdeBorderFactory.createTitledBorder(
+            GctBundle.message("cloud.apis.management.dialog.serviceaccount.header")));
 
     serviceAccountDetailsPane.setBorder(JBUI.Borders.empty());
 
