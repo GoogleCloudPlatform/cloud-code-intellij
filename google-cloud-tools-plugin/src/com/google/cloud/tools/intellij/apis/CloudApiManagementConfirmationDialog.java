@@ -115,13 +115,10 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
     populateLibraryList(apisNotSelectedToEnableList, apisNotToEnable);
 
     newServiceAccountCheckbox.addActionListener(
-        e -> serviceAccountDetailsPanel.setVisible(((JCheckBox) e.getSource()).isSelected()));
+        e -> serviceAccountDetailsPane.setVisible(((JCheckBox) e.getSource()).isSelected()));
     newServiceAccountCheckbox.setSelected(UPDATE_SERVICE_ACCOUNT_DEFAULT);
     roleTable.setTableHeader(null);
     rolePane.setBorder(JBUI.Borders.empty());
-
-    rolePane.setVisible(!roles.isEmpty());
-    rolesLabel.setVisible(!roles.isEmpty());
   }
 
   @Nullable
