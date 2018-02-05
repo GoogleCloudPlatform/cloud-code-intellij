@@ -26,6 +26,9 @@ import com.google.cloud.tools.managedcloudsdk.components.SdkComponent;
 import com.google.cloud.tools.managedcloudsdk.install.SdkInstaller;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.intellij.openapi.diagnostic.Logger;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -33,9 +36,11 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * {@link CloudSdkService} providing SDK that is managed and automatically installable, see {@link
- * com.google.cloud.tools.managedcloudsdk.ManagedCloudSdk}
+ * com.google.cloud.tools.managedcloudsdk.ManagedCloudSdk}.
+ *
+ * <p>Some methods ({@link #install()} do their work on background thread which result in listeners
+ * methods being called on arbitrary thread.
  */
-// TODO(ivanporty) implementation coming in the next PR
 public class ManagedCloudSdkService implements CloudSdkService {
   private Logger logger = Logger.getInstance(ManagedCloudSdkService.class);
 
@@ -45,8 +50,12 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
   private final Collection<SdkStatusUpdateListener> statusUpdateListeners = Lists.newArrayList();
 
-  /** Called when this service becomes primary choice for serving Cloud SDK. */
+  private volatile ListenableFuture<Path> runningInstallationJob;
+
+  @Override
   public void activate() {
+    // TODO track event that custom SDK is activated and used.
+
     install();
   }
 
@@ -71,9 +80,34 @@ public class ManagedCloudSdkService implements CloudSdkService {
     return sdkStatus;
   }
 
+  // synchronized to prevent accidental start of multiple installation jobs.
   @Override
-  public boolean install() {
-    ThreadUtil.getInstance().executeInBackground(this::installSynchronously);
+  public synchronized boolean install() {
+    // check if installation is already running first, to prevent multiple jobs running.
+    if (runningInstallationJob == null) {
+      runningInstallationJob =
+          ThreadUtil.getInstance().executeInBackground(this::installSynchronously);
+      Futures.addCallback(
+          runningInstallationJob,
+          new FutureCallback<Path>() {
+            @Override
+            public void onSuccess(Path path) {
+              logger.info("Managed Google Cloud SDK successfully installed.");
+              // TODO report success of installation in UI.
+
+              runningInstallationJob = null;
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+              logger.info("Managed Google Cloud SDK installation cancelled.");
+              // TODO report cancellation of installation in UI.
+
+              runningInstallationJob = null;
+            }
+          });
+    }
+
     return true;
   }
 
@@ -85,6 +119,12 @@ public class ManagedCloudSdkService implements CloudSdkService {
   @Override
   public void removeStatusUpdateListener(SdkStatusUpdateListener listener) {
     statusUpdateListeners.remove(listener);
+  }
+
+  public void cancelInstall() {
+    if (runningInstallationJob != null) {
+      runningInstallationJob.cancel(true);
+    }
   }
 
   @VisibleForTesting
@@ -107,14 +147,14 @@ public class ManagedCloudSdkService implements CloudSdkService {
   }
 
   /** Checks for Managed Cloud SDK status and creates/installs it if necessary. */
-  private void installSynchronously() {
+  private Path installSynchronously() {
     if (managedCloudSdk == null) {
       try {
         managedCloudSdk = createManagedSdk();
       } catch (UnsupportedOsException osex) {
         managedCloudSdk = null;
         updateStatus(SdkStatus.NOT_AVAILABLE);
-        return;
+        return null;
       }
     }
 
@@ -126,24 +166,27 @@ public class ManagedCloudSdkService implements CloudSdkService {
       logger.error("Error while checking Cloud SDK status", ex);
     }
 
+    Path installedManagedSdkPath = null;
+
     if (!managedSdkInstalled) {
       SdkInstaller sdkInstaller;
       try {
         sdkInstaller = managedCloudSdk.newInstaller();
       } catch (UnsupportedOsException e) {
         updateStatus(SdkStatus.NOT_AVAILABLE);
-        return;
+        return null;
       }
 
       MessageListener sdkInstallListener = logger::info;
 
       updateStatus(SdkStatus.INSTALLING);
+
       try {
-        sdkInstaller.install(sdkInstallListener);
+        installedManagedSdkPath = sdkInstaller.install(sdkInstallListener);
       } catch (Exception ex) {
         logger.error("Error while installing managed Cloud SDK", ex);
         updateStatus(SdkStatus.NOT_AVAILABLE);
-        return;
+        return null;
       }
     }
 
@@ -165,11 +208,12 @@ public class ManagedCloudSdkService implements CloudSdkService {
       } catch (Exception ex) {
         logger.error("Error while installing managed Cloud SDK App Engine Java component", ex);
         updateStatus(SdkStatus.NOT_AVAILABLE);
-        return;
+        return installedManagedSdkPath;
       }
     }
 
     updateStatus(SdkStatus.READY);
-    logger.info("Managed Google Cloud SDK successfully installed.");
+
+    return installedManagedSdkPath;
   }
 }

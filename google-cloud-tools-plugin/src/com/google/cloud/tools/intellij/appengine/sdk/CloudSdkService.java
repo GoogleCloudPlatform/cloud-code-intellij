@@ -27,6 +27,9 @@ public interface CloudSdkService {
     return ServiceManager.getService(CloudSdkService.class);
   }
 
+  /** Called when this service becomes primary choice for serving Cloud SDK. */
+  void activate();
+
   @Nullable
   Path getSdkHomePath();
 

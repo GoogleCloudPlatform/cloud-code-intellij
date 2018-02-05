@@ -17,13 +17,16 @@
 package com.google.cloud.tools.intellij.testing.log;
 
 import com.intellij.openapi.diagnostic.Logger;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Arrays;
 import org.apache.log4j.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/** IJ based diagnostic logger for tests, logs everything into console. */
-public class TestConsoleLogger extends Logger {
+/** IJ based diagnostic logger for tests, collects log messages into a buffer. */
+public class TestInMemoryLogger extends Logger {
+  private final StringBuffer messages = new StringBuffer();
   @Override
   public boolean isDebugEnabled() {
     return true;
@@ -31,48 +34,54 @@ public class TestConsoleLogger extends Logger {
 
   @Override
   public void debug(String message) {
-    System.out.println(message);
+    messages.append(message);
   }
 
   @Override
   public void debug(@Nullable Throwable t) {
     if (t != null) {
-      t.printStackTrace();
+      StringWriter stringWriter = new StringWriter();
+      t.printStackTrace(new PrintWriter(stringWriter));
+      messages.append(stringWriter.toString());
     }
   }
 
   @Override
   public void debug(String message, @Nullable Throwable t) {
-    System.out.println(message);
+    debug(message);
     debug(t);
   }
 
   @Override
   public void info(String message) {
-    System.out.println(message);
+    debug(message);
   }
 
   @Override
   public void info(String message, @Nullable Throwable t) {
-    System.out.println(message);
+    debug(message);
     debug(t);
   }
 
   @Override
   public void warn(String message, @Nullable Throwable t) {
-    System.out.println(message);
+    debug(message);
     debug(t);
   }
 
   @Override
   public void error(String message, @Nullable Throwable t, @NotNull String... details) {
-    System.out.println(message);
-    System.out.println(Arrays.toString(details));
+    debug(message);
+    debug(Arrays.toString(details));
     debug(t);
   }
 
   @Override
   public void setLevel(Level level) {
     /* unsupported */
+  }
+
+  public String getMessages() {
+    return messages.toString();
   }
 }

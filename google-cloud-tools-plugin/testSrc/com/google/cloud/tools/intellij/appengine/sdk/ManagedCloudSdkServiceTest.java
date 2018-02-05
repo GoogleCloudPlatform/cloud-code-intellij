@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -26,10 +27,11 @@ import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
-import com.google.cloud.tools.intellij.testing.log.TestConsoleLogger;
+import com.google.cloud.tools.intellij.testing.log.TestInMemoryLogger;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.managedcloudsdk.ManagedCloudSdk;
 import com.google.cloud.tools.managedcloudsdk.UnsupportedOsException;
+import com.google.cloud.tools.managedcloudsdk.command.CommandExecutionException;
 import com.google.cloud.tools.managedcloudsdk.components.SdkComponent;
 import com.google.cloud.tools.managedcloudsdk.components.SdkComponentInstaller;
 import com.google.cloud.tools.managedcloudsdk.install.SdkInstaller;
@@ -60,7 +62,7 @@ public class ManagedCloudSdkServiceTest {
   @Before
   public void setUp() throws UnsupportedOsException {
     doReturn(mockManagedCloudSdk).when(sdkService).createManagedSdk();
-    sdkService.setLogger(new TestConsoleLogger());
+    sdkService.setLogger(new TestInMemoryLogger());
     // make sure everything in test is done synchronously
     ExecutorService directExecutorService = MoreExecutors.newDirectExecutorService();
     ThreadUtil.getInstance().setBackgroundExecutorService(directExecutorService);
@@ -135,6 +137,24 @@ public class ManagedCloudSdkServiceTest {
         .isEqualTo(Arrays.asList(SdkStatus.INSTALLING, SdkStatus.NOT_AVAILABLE));
   }
 
+  @Test
+  public void install_appEngineException_changesSdkStatus_inProgress() throws Exception {
+    sdkService.addStatusUpdateListener(mockStatusUpdateListener);
+    Path mockSdkPath = Paths.get("/tools/gcloud");
+    emulateMockSdkInstallationProcess(mockSdkPath);
+    SdkComponentInstaller mockComponentInstaller = mockManagedCloudSdk.newComponentInstaller();
+    doThrow(new CommandExecutionException(new UnsupportedOperationException()))
+        .when(mockComponentInstaller)
+        .installComponent(any(), any());
+    sdkService.install();
+
+    ArgumentCaptor<SdkStatus> statusCaptor = ArgumentCaptor.forClass(SdkStatus.class);
+    verify(mockStatusUpdateListener, times(2)).onSdkStatusChange(any(), statusCaptor.capture());
+
+    assertThat(statusCaptor.getAllValues())
+        .isEqualTo(Arrays.asList(SdkStatus.INSTALLING, SdkStatus.NOT_AVAILABLE));
+  }
+
   /** Mocks managed SDK as if installed and having App Engine Component. */
   private void makeMockSdkInstalled(Path mockSdkPath) {
     try {
@@ -165,7 +185,7 @@ public class ManagedCloudSdkServiceTest {
   /*@Test
   public void realInstall() {
     ManagedCloudSdkService realService = new ManagedCloudSdkService();
-    realService.setLogger(new TestConsoleLogger());
+    realService.setLogger(new TestInMemoryLogger());
     realService.activate();
     System.out.println(realService.getSdkHomePath());
   }*/
