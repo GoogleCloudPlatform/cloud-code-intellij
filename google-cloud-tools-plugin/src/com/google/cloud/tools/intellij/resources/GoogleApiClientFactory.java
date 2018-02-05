@@ -55,8 +55,7 @@ public abstract class GoogleApiClientFactory {
    *
    * @param httpRequestInitializer optional HttpRequestInitializer
    */
-  public abstract Iam getIamClient(
-      @Nullable HttpRequestInitializer httpRequestInitializer);
+  public abstract Iam getIamClient(@Nullable HttpRequestInitializer httpRequestInitializer);
 
   /**
    * Creates a new instance of a {@link Appengine} client.
