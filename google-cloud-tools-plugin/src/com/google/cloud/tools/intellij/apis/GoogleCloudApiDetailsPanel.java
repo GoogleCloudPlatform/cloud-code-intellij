@@ -40,8 +40,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import org.jetbrains.annotations.Nullable;
 
 /** The form-bound class for the Cloud API details panel. */
@@ -161,22 +159,6 @@ public final class GoogleCloudApiDetailsPanel {
   private void createUIComponents() {
     descriptionTextPane = new JTextPane();
     descriptionTextPane.setOpaque(false);
-    descriptionTextPane
-        .getDocument()
-        .addDocumentListener(
-            new DocumentListener() {
-              @Override
-              public void insertUpdate(DocumentEvent e) {
-                descriptionTextPane.setSize(
-                    descriptionTextPane.getWidth(), descriptionTextPane.getPreferredSize().height);
-              }
-
-              @Override
-              public void removeUpdate(DocumentEvent e) {}
-
-              @Override
-              public void changedUpdate(DocumentEvent e) {}
-            });
 
     linksTextPane = new JTextPane();
     linksTextPane.setOpaque(false);
@@ -213,6 +195,8 @@ public final class GoogleCloudApiDetailsPanel {
 
     nameLabel.setText(currentCloudLibrary.getName());
     descriptionTextPane.setText(currentCloudLibrary.getDescription());
+    descriptionTextPane.setSize(
+        descriptionTextPane.getWidth(), descriptionTextPane.getPreferredSize().height);
 
     if (currentCloudLibrary.getClients() != null) {
       CloudLibraryUtils.getFirstJavaClient(currentCloudLibrary)
