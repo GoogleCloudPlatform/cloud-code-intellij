@@ -111,7 +111,7 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
     Set<CloudLibrary> apisNotEnabled = Sets.difference(selectedApis, apisToEnable);
 
     if (cloudProject != null && (!apisToEnable.isEmpty() || !apisNotEnabled.isEmpty())) {
-      Set<Role> roles = getServiceAccountRolesRoles(selectedApis);
+      Set<Role> roles = getServiceAccountRoles(selectedApis);
 
       CloudApiManagementConfirmationDialog managementDialog =
           new CloudApiManagementConfirmationDialog(
@@ -140,7 +140,7 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
    * @param apis the set of {@link CloudLibrary apis} selected
    * @return the set of {@link Role roles} corresponding to the selected apis
    */
-  private Set<Role> getServiceAccountRolesRoles(Set<CloudLibrary> apis) {
+  private Set<Role> getServiceAccountRoles(Set<CloudLibrary> apis) {
     List<Role> serviceAccountRoles = CloudApiManager.getServiceAccountRoles(getCloudProject());
 
     Set<String> roleIds =
