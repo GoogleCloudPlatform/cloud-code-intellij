@@ -39,7 +39,7 @@ public class CloudApiManagementConfirmationDialogTest {
 
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
   @TestFixture private IdeaProjectTestFixture testFixture;
-  @TestModule Module module;
+  @TestModule private Module module;
 
   private static final CloudProject cloudProject = CloudProject.create("name", "id", "user");
 
