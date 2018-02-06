@@ -23,6 +23,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
@@ -59,6 +60,7 @@ public class ManagedCloudSdkServiceTest {
   @Mock private ManagedCloudSdk mockManagedCloudSdk;
 
   @Mock private CloudSdkService.SdkStatusUpdateListener mockStatusUpdateListener;
+  private final Path MOCK_SDK_PATH = Paths.get("/tools/gcloud");
 
   @Before
   public void setUp() throws UnsupportedOsException {
@@ -91,28 +93,34 @@ public class ManagedCloudSdkServiceTest {
 
   @Test
   public void activate_service_sdkInstalled_sdkPath_valid() {
-    Path mockSdkPath = Paths.get("/tools/gcloud");
-    makeMockSdkInstalled(mockSdkPath);
+    makeMockSdkInstalled(MOCK_SDK_PATH);
 
     sdkService.activate();
 
-    assertThat((Object) sdkService.getSdkHomePath()).isEqualTo(mockSdkPath);
+    assertThat((Object) sdkService.getSdkHomePath()).isEqualTo(MOCK_SDK_PATH);
   }
 
   @Test
   public void install_isSupported() {
-    Path mockSdkPath = Paths.get("/tools/gcloud");
-    makeMockSdkInstalled(mockSdkPath);
+    makeMockSdkInstalled(MOCK_SDK_PATH);
 
     assertThat(sdkService.install()).isTrue();
+  }
+
+  @Test
+  public void removeListener_does_remove() {
+    sdkService.addStatusUpdateListener(mockStatusUpdateListener);
+    sdkService.removeStatusUpdateListener(mockStatusUpdateListener);
+    emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
+
+    verifyNoMoreInteractions(mockStatusUpdateListener);
   }
 
   @Test
   public void successful_install_changesSdkStatus_inProgress() {
     sdkService.addStatusUpdateListener(mockStatusUpdateListener);
 
-    Path mockSdkPath = Paths.get("/tools/gcloud");
-    emulateMockSdkInstallationProcess(mockSdkPath);
+    emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
     sdkService.install();
     // drain UI event queue to get all sdk status updates.
     ApplicationManager.getApplication().invokeAndWait(() -> {});
@@ -127,8 +135,7 @@ public class ManagedCloudSdkServiceTest {
   @Test
   public void install_thenException_changesSdkStatus_inProgress() throws Exception {
     sdkService.addStatusUpdateListener(mockStatusUpdateListener);
-    Path mockSdkPath = Paths.get("/tools/gcloud");
-    emulateMockSdkInstallationProcess(mockSdkPath);
+    emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
     SdkInstaller mockInstaller = mockManagedCloudSdk.newInstaller();
     when(mockInstaller.install(any())).thenThrow(new IOException("IO Error"));
     sdkService.install();
@@ -145,8 +152,7 @@ public class ManagedCloudSdkServiceTest {
   @Test
   public void install_appEngineException_changesSdkStatus_inProgress() throws Exception {
     sdkService.addStatusUpdateListener(mockStatusUpdateListener);
-    Path mockSdkPath = Paths.get("/tools/gcloud");
-    emulateMockSdkInstallationProcess(mockSdkPath);
+    emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
     SdkComponentInstaller mockComponentInstaller = mockManagedCloudSdk.newComponentInstaller();
     doThrow(new CommandExecutionException(new UnsupportedOperationException()))
         .when(mockComponentInstaller)
