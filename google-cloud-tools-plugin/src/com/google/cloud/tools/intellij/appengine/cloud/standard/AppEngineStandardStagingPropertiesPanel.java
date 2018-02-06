@@ -18,14 +18,21 @@ package com.google.cloud.tools.intellij.appengine.cloud.standard;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
 import com.google.common.annotations.VisibleForTesting;
+import com.intellij.ide.BrowserUtil;
 import java.awt.Component;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import org.jetbrains.annotations.NotNull;
 
 /** A panel with the Google App Engine Standard staging flags */
 public class AppEngineStandardStagingPropertiesPanel {
+
+  private static final String STAGING_PARAMETERS_URL =
+      "https://github.com/GoogleCloudPlatform/gcloud-maven-plugin#application-deployment-goal";
 
   private JTextField compileEncodingTextField;
   private JCheckBox deleteJspsCheckBox;
@@ -36,6 +43,17 @@ public class AppEngineStandardStagingPropertiesPanel {
   private JCheckBox disableUpdateCheckCheckBox;
   private JTextField jarSplittingExcludesTextField;
   private JPanel mainPanel;
+  private JLabel helpIcon;
+
+  public AppEngineStandardStagingPropertiesPanel() {
+    helpIcon.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        BrowserUtil.browse(STAGING_PARAMETERS_URL);
+      }
+    });
+  }
+
 
   public Component getMainPanel() {
     return mainPanel;
