@@ -157,7 +157,7 @@ class CloudApiManager {
     try {
       return iam.roles().list().execute().getRoles();
     } catch (IOException e) {
-      e.printStackTrace();
+      LOG.warn("Exception occurred attempting to fetch service account roles");
       return ImmutableList.of();
     }
   }
