@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 /** IJ based diagnostic logger for tests, collects log messages into a buffer. Thread-safe. */
 public class TestInMemoryLogger extends Logger {
   @SuppressWarnings("JdkObsolete")
+  // use string buffer for thread-safe logging
   private final StringBuffer messages = new StringBuffer();
 
   @Override
