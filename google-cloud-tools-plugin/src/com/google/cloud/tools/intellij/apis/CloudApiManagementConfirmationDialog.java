@@ -32,6 +32,7 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import java.awt.Component;
 import java.awt.Graphics;
+import java.awt.event.ActionListener;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.SortedMap;
@@ -118,8 +119,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
     populateLibraryList(apisToEnableList, apisToEnable);
     populateLibraryList(apisNotSelectedToEnableList, apisNotToEnable);
 
-    newServiceAccountCheckbox.addActionListener(
-        e -> serviceAccountDetailsPane.setVisible(((JCheckBox) e.getSource()).isSelected()));
+    newServiceAccountCheckbox.addActionListener(newServiceAccountClickHandler());
     newServiceAccountCheckbox.setSelected(UPDATE_SERVICE_ACCOUNT_DEFAULT);
     serviceAccountDetailsPanel.setVisible(newServiceAccountCheckbox.isSelected());
     roleTable.setTableHeader(null);
@@ -131,6 +131,10 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
   @Override
   protected JComponent createCenterPanel() {
     return panel;
+  }
+
+  private ActionListener newServiceAccountClickHandler() {
+    return e -> serviceAccountDetailsPane.setVisible(((JCheckBox) e.getSource()).isSelected());
   }
 
   private void populateLibraryList(JList<String> list, Set<CloudLibrary> libraries) {
