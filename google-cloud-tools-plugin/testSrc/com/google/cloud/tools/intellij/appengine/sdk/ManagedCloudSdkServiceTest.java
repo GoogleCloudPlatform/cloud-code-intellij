@@ -178,6 +178,16 @@ public class ManagedCloudSdkServiceTest {
         .isEqualTo(Arrays.asList(SdkStatus.INSTALLING, SdkStatus.NOT_AVAILABLE));
   }
 
+  @Test
+  public void interruptedInstall_logs_installCancelled() throws InterruptedException {
+    doThrow(new InterruptedException()).when(sdkService).installSynchronously();
+
+    emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
+    sdkService.install();
+
+    assertThat(testInMemoryLogger.getMessages()).contains("installation cancelled");
+  }
+
   /** Mocks managed SDK as if installed and having App Engine Component. */
   private void makeMockSdkInstalled(Path mockSdkPath) {
     try {
@@ -204,12 +214,4 @@ public class ManagedCloudSdkServiceTest {
       throw new AssertionError(ex);
     }
   }
-
-  /*@Test
-  public void realInstall() {
-    ManagedCloudSdkService realService = new ManagedCloudSdkService();
-    realService.setLogger(new TestInMemoryLogger());
-    realService.activate();
-    System.out.println(realService.getSdkHomePath());
-  }*/
 }

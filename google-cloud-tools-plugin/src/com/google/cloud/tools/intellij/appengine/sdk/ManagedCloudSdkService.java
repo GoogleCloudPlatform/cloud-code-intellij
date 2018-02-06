@@ -137,22 +137,14 @@ public class ManagedCloudSdkService implements CloudSdkService {
     this.logger = logger;
   }
 
-  private void updateStatus(SdkStatus sdkStatus) {
-    // may be called from install job thread, make sure listeners receive update on UI thread.
-    ApplicationManager.getApplication()
-        .invokeLater(
-            () -> {
-              this.sdkStatus = sdkStatus;
-              notifyListeners(this, sdkStatus);
-            });
-  }
-
-  private void notifyListeners(CloudSdkService sdkService, SdkStatus status) {
-    statusUpdateListeners.forEach(listener -> listener.onSdkStatusChange(sdkService, status));
-  }
-
-  /** Checks for Managed Cloud SDK status and creates/installs it if necessary. */
-  private Path installSynchronously() {
+  /**
+   * Checks for Managed Cloud SDK status and creates/installs it if necessary.
+   *
+   * @throws InterruptedException if Managed Cloud SDK has been interrupted by {@link
+   *     #cancelInstall()}
+   */
+  @VisibleForTesting
+  Path installSynchronously() throws InterruptedException {
     if (managedCloudSdk == null) {
       try {
         managedCloudSdk = createManagedSdk();
@@ -188,6 +180,8 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
       try {
         installedManagedSdkPath = sdkInstaller.install(sdkInstallListener);
+      } catch (InterruptedException iex) {
+        throw iex;
       } catch (Exception ex) {
         logger.error("Error while installing managed Cloud SDK", ex);
         updateStatus(SdkStatus.NOT_AVAILABLE);
@@ -199,8 +193,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
     try {
       hasAppEngineJava = managedCloudSdk.hasComponent(SdkComponent.APP_ENGINE_JAVA);
     } catch (ManagedSdkVerificationException ex) {
-      // TODO is recoverable?
-      logger.error("Error while checking Cloud SDK status", ex);
+      logger.error("Error while checking App Engine status, will attempt to re-install", ex);
     }
 
     if (!hasAppEngineJava) {
@@ -210,6 +203,8 @@ public class ManagedCloudSdkService implements CloudSdkService {
         managedCloudSdk
             .newComponentInstaller()
             .installComponent(SdkComponent.APP_ENGINE_JAVA, appEngineInstallListener);
+      } catch (InterruptedException iex) {
+        throw iex;
       } catch (Exception ex) {
         logger.error("Error while installing managed Cloud SDK App Engine Java component", ex);
         updateStatus(SdkStatus.NOT_AVAILABLE);
@@ -220,5 +215,19 @@ public class ManagedCloudSdkService implements CloudSdkService {
     updateStatus(SdkStatus.READY);
 
     return installedManagedSdkPath;
+  }
+
+  private void updateStatus(SdkStatus sdkStatus) {
+    // may be called from install job thread, make sure listeners receive update on UI thread.
+    ApplicationManager.getApplication()
+        .invokeLater(
+            () -> {
+              this.sdkStatus = sdkStatus;
+              notifyListeners(this, sdkStatus);
+            });
+  }
+
+  private void notifyListeners(CloudSdkService sdkService, SdkStatus status) {
+    statusUpdateListeners.forEach(listener -> listener.onSdkStatusChange(sdkService, status));
   }
 }
