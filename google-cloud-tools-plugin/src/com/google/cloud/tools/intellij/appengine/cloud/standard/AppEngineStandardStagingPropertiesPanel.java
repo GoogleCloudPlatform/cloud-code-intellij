@@ -46,14 +46,14 @@ public class AppEngineStandardStagingPropertiesPanel {
   private JLabel helpIcon;
 
   public AppEngineStandardStagingPropertiesPanel() {
-    helpIcon.addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseClicked(MouseEvent e) {
-        BrowserUtil.browse(STAGING_PARAMETERS_URL);
-      }
-    });
+    helpIcon.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseClicked(MouseEvent e) {
+            BrowserUtil.browse(STAGING_PARAMETERS_URL);
+          }
+        });
   }
-
 
   public Component getMainPanel() {
     return mainPanel;
