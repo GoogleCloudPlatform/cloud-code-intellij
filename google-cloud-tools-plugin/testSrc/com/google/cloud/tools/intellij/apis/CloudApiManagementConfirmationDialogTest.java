@@ -166,4 +166,71 @@ public class CloudApiManagementConfirmationDialogTest {
               assertThat(dialog.getSelectedRoles()).containsExactlyElementsIn(roles);
             });
   }
+
+  @Test
+  public void serviceAccount_whenServiceAccountNameEmpty_showsValidationError() {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              CloudApiManagementConfirmationDialog dialog =
+                  new CloudApiManagementConfirmationDialog(
+                      module,
+                      cloudProject,
+                      ImmutableSet.of(),
+                      ImmutableSet.of(),
+                      ImmutableSet.of());
+
+              dialog.getServiceAccountNameTextField().setText("");
+              dialog.getServiceKeyPathSelector().setText("/some/path");
+
+              assertThat(dialog.doValidate()).isNotNull();
+              assertThat(dialog.doValidate().component)
+                  .isEqualTo(dialog.getServiceAccountNameTextField());
+            });
+  }
+
+  @Test
+  public void serviceAccount_whenServiceKeyPathEmpty_showsValidationError() {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              CloudApiManagementConfirmationDialog dialog =
+                  new CloudApiManagementConfirmationDialog(
+                      module,
+                      cloudProject,
+                      ImmutableSet.of(),
+                      ImmutableSet.of(),
+                      ImmutableSet.of());
+
+              dialog.getServiceKeyPathSelector().setText("");
+              dialog.getServiceAccountNameTextField().setText("my-name");
+
+              assertThat(dialog.doValidate()).isNotNull();
+              assertThat(dialog.doValidate().component)
+                  .isEqualTo(dialog.getServiceKeyPathSelector());
+            });
+  }
+
+  @Test
+  public void
+      serviceAccount_whenCreateServiceAccountUnchecked_andFieldsEmpty_showsNoValidationError() {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              CloudApiManagementConfirmationDialog dialog =
+                  new CloudApiManagementConfirmationDialog(
+                      module,
+                      cloudProject,
+                      ImmutableSet.of(),
+                      ImmutableSet.of(),
+                      ImmutableSet.of());
+
+              dialog.getNewServiceAccountCheckbox().setSelected(false);
+
+              dialog.getServiceKeyPathSelector().setText("");
+              dialog.getServiceAccountNameTextField().setText("");
+
+              assertThat(dialog.doValidate()).isNull();
+            });
+  }
 }
