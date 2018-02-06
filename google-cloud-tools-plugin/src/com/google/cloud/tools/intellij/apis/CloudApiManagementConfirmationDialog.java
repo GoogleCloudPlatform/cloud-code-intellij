@@ -36,7 +36,6 @@ import java.util.Comparator;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.stream.Stream;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
@@ -46,8 +45,6 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import org.fest.util.VisibleForTesting;
@@ -181,6 +178,8 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
 
     private final SortedMap<Role, Boolean> roleMap =
         new TreeMap<>(Comparator.comparing(Role::getName));
+    private static final int ROLE_NAME_COL_INDEX = 0;
+    private static final int ROLE_ENABLED_COL_INDEX = 1;
 
     ServiceAccountRolesTableModel(Set<Role> roles) {
       roleMap.putAll(Maps.toMap(roles, role -> true));
@@ -198,17 +197,17 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-      return columnIndex == 0 ? Role.class : Boolean.class;
+      return columnIndex == ROLE_NAME_COL_INDEX ? Role.class : Boolean.class;
     }
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-      return columnIndex == 1;
+      return columnIndex == ROLE_ENABLED_COL_INDEX;
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-      if (columnIndex == 0) {
+      if (columnIndex == ROLE_NAME_COL_INDEX) {
         return roleMap.keySet().toArray()[rowIndex];
       }
       return roleMap.values().toArray()[rowIndex];
@@ -216,16 +215,8 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
 
     @Override
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
-      if (columnIndex == 0) {
-        throw new RuntimeException();
-      }
-
       Role role = (Role) roleMap.keySet().toArray()[rowIndex];
       roleMap.put(role, (boolean) value);
-
-      TableModelEvent event = new TableModelEvent(this, rowIndex);
-      Stream.of(listenerList.getListeners(TableModelListener.class))
-          .forEach(listener -> listener.tableChanged(event));
     }
   }
 
