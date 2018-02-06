@@ -89,19 +89,19 @@ public class ManagedCloudSdkService implements CloudSdkService {
           ThreadUtil.getInstance().executeInBackground(this::installSynchronously);
       Futures.addCallback(
           runningInstallationJob,
-          new FutureCallback<Path>() {
+          new FutureCallback<>() {
             @Override
             public void onSuccess(Path path) {
               logger.info("Managed Google Cloud SDK successfully installed.");
-              // TODO report success of installation in UI.
 
               runningInstallationJob = null;
             }
 
             @Override
-            public void onFailure(Throwable throwable) {
-              logger.info("Managed Google Cloud SDK installation cancelled.");
-              // TODO report cancellation of installation in UI.
+            public void onFailure(Throwable t) {
+              if (t instanceof InterruptedException) {
+                logger.info("Managed Google Cloud SDK installation cancelled.");
+              }
 
               runningInstallationJob = null;
             }
@@ -138,6 +138,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
   }
 
   private void updateStatus(SdkStatus sdkStatus) {
+    // may be called from install job thread, make sure listeners receive update on UI thread.
     ApplicationManager.getApplication()
         .invokeLater(
             () -> {
