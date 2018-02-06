@@ -55,12 +55,13 @@ public class ManagedCloudSdkServiceTest {
 
   @Rule public CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
 
+  private final Path MOCK_SDK_PATH = Paths.get("/tools/gcloud");
+
   @Spy private ManagedCloudSdkService sdkService;
 
   @Mock private ManagedCloudSdk mockManagedCloudSdk;
 
   @Mock private CloudSdkService.SdkStatusUpdateListener mockStatusUpdateListener;
-  private final Path MOCK_SDK_PATH = Paths.get("/tools/gcloud");
 
   @Before
   public void setUp() throws UnsupportedOsException {
@@ -83,8 +84,7 @@ public class ManagedCloudSdkServiceTest {
 
   @Test
   public void activate_service_sdkInstalled_status_ready() {
-    Path mockSdkPath = Paths.get("/tools/gcloud");
-    makeMockSdkInstalled(mockSdkPath);
+    makeMockSdkInstalled(MOCK_SDK_PATH);
 
     sdkService.activate();
 
