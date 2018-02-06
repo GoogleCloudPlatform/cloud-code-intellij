@@ -89,10 +89,10 @@ public class ManagedCloudSdkService implements CloudSdkService {
           ThreadUtil.getInstance().executeInBackground(this::installSynchronously);
       Futures.addCallback(
           runningInstallationJob,
-          new FutureCallback<>() {
+          new FutureCallback<Path>() {
             @Override
             public void onSuccess(Path path) {
-              logger.info("Managed Google Cloud SDK successfully installed.");
+              logger.info("Managed Google Cloud SDK successfully installed at: " + path);
 
               runningInstallationJob = null;
             }
@@ -156,8 +156,8 @@ public class ManagedCloudSdkService implements CloudSdkService {
     if (managedCloudSdk == null) {
       try {
         managedCloudSdk = createManagedSdk();
-      } catch (UnsupportedOsException osex) {
-        managedCloudSdk = null;
+      } catch (UnsupportedOsException ex) {
+        logger.error("Unsupported OS for Managed Cloud SDK", ex);
         updateStatus(SdkStatus.NOT_AVAILABLE);
         return null;
       }
@@ -167,8 +167,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
     try {
       managedSdkInstalled = managedCloudSdk.isInstalled();
     } catch (ManagedSdkVerificationException | ManagedSdkVersionMismatchException ex) {
-      // TODO is recoverable?
-      logger.error("Error while checking Cloud SDK status", ex);
+      logger.error("Error while checking Cloud SDK status, will attempt to re-install", ex);
     }
 
     Path installedManagedSdkPath = null;
@@ -177,12 +176,13 @@ public class ManagedCloudSdkService implements CloudSdkService {
       SdkInstaller sdkInstaller;
       try {
         sdkInstaller = managedCloudSdk.newInstaller();
-      } catch (UnsupportedOsException e) {
+      } catch (UnsupportedOsException ex) {
+        logger.error("Unsupported OS for Managed Cloud SDK", ex);
         updateStatus(SdkStatus.NOT_AVAILABLE);
         return null;
       }
 
-      MessageListener sdkInstallListener = logger::info;
+      MessageListener sdkInstallListener = logger::trace;
 
       updateStatus(SdkStatus.INSTALLING);
 
@@ -204,7 +204,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
     }
 
     if (!hasAppEngineJava) {
-      MessageListener appEngineInstallListener = logger::info;
+      MessageListener appEngineInstallListener = logger::trace;
 
       try {
         managedCloudSdk
@@ -213,7 +213,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
       } catch (Exception ex) {
         logger.error("Error while installing managed Cloud SDK App Engine Java component", ex);
         updateStatus(SdkStatus.NOT_AVAILABLE);
-        return installedManagedSdkPath;
+        return null;
       }
     }
 

@@ -63,10 +63,12 @@ public class ManagedCloudSdkServiceTest {
 
   @Mock private CloudSdkService.SdkStatusUpdateListener mockStatusUpdateListener;
 
+  private final TestInMemoryLogger testInMemoryLogger = new TestInMemoryLogger();
+
   @Before
   public void setUp() throws UnsupportedOsException {
     doReturn(mockManagedCloudSdk).when(sdkService).createManagedSdk();
-    sdkService.setLogger(new TestInMemoryLogger());
+    sdkService.setLogger(testInMemoryLogger);
     // make sure everything in test is done synchronously
     ExecutorService directExecutorService = MoreExecutors.newDirectExecutorService();
     ThreadUtil.getInstance().setBackgroundExecutorService(directExecutorService);
@@ -114,6 +116,14 @@ public class ManagedCloudSdkServiceTest {
     emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
 
     verifyNoMoreInteractions(mockStatusUpdateListener);
+  }
+
+  @Test
+  public void successful_install_writesLog() {
+    emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
+    sdkService.install();
+
+    assertThat(testInMemoryLogger.getMessages()).contains("successfully installed");
   }
 
   @Test
