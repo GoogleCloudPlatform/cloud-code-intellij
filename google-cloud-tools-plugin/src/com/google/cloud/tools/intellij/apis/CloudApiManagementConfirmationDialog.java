@@ -83,7 +83,10 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
    * Initializes the Cloud API management confirmation dialog.
    *
    * @param module the {@link Module} the client libraries are added to
+   * @param cloudProject the {@link CloudProject} on which the API will be managed
    * @param apisToEnable the set of APIs to be enabled on GCP
+   * @param apisNotToEnable the set of APIs that won't be enabled on GCP
+   * @param roles the set of roles corresponding to the selected client libraries
    */
   CloudApiManagementConfirmationDialog(
       Module module,
