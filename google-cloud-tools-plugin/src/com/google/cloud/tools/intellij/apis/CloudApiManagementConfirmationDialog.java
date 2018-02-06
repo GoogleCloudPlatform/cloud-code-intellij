@@ -20,6 +20,7 @@ import com.google.api.services.iam.v1.model.Role;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -34,6 +35,7 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.ActionListener;
 import java.util.Comparator;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -127,6 +129,10 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
     rolePanel.setVisible(!roles.isEmpty());
   }
 
+  Set<Role> getSelectedRoles() {
+    return ((ServiceAccountRolesTableModel) roleTable.getModel()).getSelectedRoles();
+  }
+
   @Nullable
   @Override
   protected JComponent createCenterPanel() {
@@ -189,6 +195,15 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
       roleMap.putAll(Maps.toMap(roles, role -> true));
     }
 
+    Set<Role> getSelectedRoles() {
+      return roleMap
+          .entrySet()
+          .stream()
+          .filter(Entry::getValue)
+          .map(Entry::getKey)
+          .collect(ImmutableSet.toImmutableSet());
+    }
+
     @Override
     public int getRowCount() {
       return roleMap.size();
@@ -239,7 +254,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
   }
 
   @VisibleForTesting
-  public JPanel getServiceAccountDetailsPanel() {
-    return serviceAccountDetailsPanel;
+  public JTable getRoleTable() {
+    return roleTable;
   }
 }

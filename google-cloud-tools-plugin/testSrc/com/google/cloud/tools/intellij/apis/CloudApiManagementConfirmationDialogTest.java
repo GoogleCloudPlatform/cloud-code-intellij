@@ -30,6 +30,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import java.util.Set;
+import javax.swing.table.TableModel;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -133,6 +134,36 @@ public class CloudApiManagementConfirmationDialogTest {
                       module, cloudProject, libraries, ImmutableSet.of(), ImmutableSet.of());
 
               assertThat(dialog.getRolePanel().isVisible()).isFalse();
+            });
+  }
+
+  @Test
+  public void roleTable_whenRolesExist_isPopulated_andAllSelectedByDefault() {
+    Set<CloudLibrary> librariesNotToEnable =
+        ImmutableSet.of(TestCloudLibrary.createEmpty().toCloudLibrary());
+
+    Role role1 = new Role();
+    role1.setName("my_role");
+    role1.setTitle("My Role");
+    Role role2 = new Role();
+    role2.setName("my_role_2");
+    role2.setTitle("My Role 2");
+    Set<Role> roles = ImmutableSet.of(role1, role2);
+
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              CloudApiManagementConfirmationDialog dialog =
+                  new CloudApiManagementConfirmationDialog(
+                      module, cloudProject, ImmutableSet.of(), librariesNotToEnable, roles);
+
+              TableModel model = dialog.getRoleTable().getModel();
+              assertThat(model.getRowCount()).isEqualTo(2);
+
+              Set<Role> allValues =
+                  ImmutableSet.of((Role) model.getValueAt(0, 0), (Role) model.getValueAt(1, 0));
+              assertThat(allValues).containsExactlyElementsIn(roles);
+              assertThat(dialog.getSelectedRoles()).containsExactlyElementsIn(roles);
             });
   }
 }
