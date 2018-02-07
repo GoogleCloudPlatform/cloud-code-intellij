@@ -155,11 +155,6 @@ class CloudApiManager {
     }
 
     ProgressIndicator progress = ProgressManager.getInstance().getProgressIndicator();
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
 
     CreateServiceAccountRequest request = new CreateServiceAccountRequest();
     ServiceAccount serviceAccount = new ServiceAccount();
@@ -222,7 +217,6 @@ class CloudApiManager {
           Base64.decodeBase64(key.getPrivateKeyData()));
     } catch (IOException e) {
       e.printStackTrace();
-      throw new RuntimeException("service account f up", e);
     }
 
     notifyServiceAccountCreated(project);
