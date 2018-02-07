@@ -39,6 +39,7 @@ import com.intellij.util.ui.UIUtil;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.Comparator;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -159,7 +160,8 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
         return new ValidationInfo(
             GctBundle.message("cloud.apis.management.dialog.serviceaccount.name.error"),
             serviceAccountNameTextField);
-      } else if (StringUtils.isEmpty(serviceKeyPathSelector.getText())) {
+      } else if (StringUtils.isEmpty(serviceKeyPathSelector.getText())
+          || !isValidDirectory(serviceKeyPathSelector.getText())) {
         return new ValidationInfo(
             GctBundle.message("cloud.apis.management.dialog.serviceaccount.key.path.error"),
             serviceKeyPathSelector);
@@ -191,6 +193,11 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
 
   private void createUIComponents() {
     roleTable = new ServiceAccountRolesTable(roles);
+  }
+
+  private static boolean isValidDirectory(String path) {
+    File file = new File(path);
+    return file.exists() && file.isDirectory() && file.canWrite();
   }
 
   private static final class ServiceAccountRolesTable extends JBTable {

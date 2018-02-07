@@ -21,6 +21,8 @@ import static com.google.common.truth.Truth.assertThat;
 import com.google.api.services.iam.v1.model.Role;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.TestDirectory;
+import com.google.cloud.tools.intellij.testing.TestFile;
 import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.google.cloud.tools.intellij.testing.TestModule;
 import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary;
@@ -29,6 +31,7 @@ import com.google.common.collect.ImmutableSet;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
+import java.io.File;
 import java.util.Set;
 import javax.swing.table.TableModel;
 import org.junit.Rule;
@@ -40,6 +43,9 @@ public class CloudApiManagementConfirmationDialogTest {
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
   @TestFixture private IdeaProjectTestFixture testFixture;
   @TestModule private Module module;
+
+  @TestDirectory(name = "testDir")
+  private File testDir;
 
   private static final CloudProject cloudProject = CloudProject.create("name", "id", "user");
 
@@ -168,6 +174,26 @@ public class CloudApiManagementConfirmationDialogTest {
   }
 
   @Test
+  public void serviceAccount_whenFieldsCorrectlyPopulated_showsNoValidationError() {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              CloudApiManagementConfirmationDialog dialog =
+                  new CloudApiManagementConfirmationDialog(
+                      module,
+                      cloudProject,
+                      ImmutableSet.of(),
+                      ImmutableSet.of(),
+                      ImmutableSet.of());
+
+              dialog.getServiceAccountNameTextField().setText("my-name");
+              dialog.getServiceKeyPathSelector().setText(testDir.getPath());
+
+              assertThat(dialog.doValidate()).isNull();
+            });
+  }
+
+  @Test
   public void serviceAccount_whenServiceAccountNameEmpty_showsValidationError() {
     ApplicationManager.getApplication()
         .invokeAndWait(
@@ -231,6 +257,26 @@ public class CloudApiManagementConfirmationDialogTest {
               dialog.getServiceAccountNameTextField().setText("");
 
               assertThat(dialog.doValidate()).isNull();
+            });
+  }
+
+  @Test
+  public void serviceAccount_whenKeyDownloadPathInvalid_showsValidationError() {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              CloudApiManagementConfirmationDialog dialog =
+                  new CloudApiManagementConfirmationDialog(
+                      module,
+                      cloudProject,
+                      ImmutableSet.of(),
+                      ImmutableSet.of(),
+                      ImmutableSet.of());
+
+              dialog.getServiceKeyPathSelector().setText("/some/invalid/path");
+              dialog.getServiceAccountNameTextField().setText("my-name");
+
+              assertThat(dialog.doValidate()).isNotNull();
             });
   }
 }
