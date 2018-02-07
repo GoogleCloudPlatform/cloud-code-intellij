@@ -51,8 +51,9 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -77,7 +78,7 @@ class CloudApiManager {
           null,
           GoogleCloudToolsIcons.CLOUD);
 
-  private static final DateTimeFormatter SERVICE_ACCOUNT_ID_TIMESTAMP_FORMAT =
+  private static final DateTimeFormatter SERVICE_ACCOUNT_TIMESTAMP_FORMAT =
       DateTimeFormatter.ofPattern("yyMMddHHmmss");
 
   private static final String SERVICE_REQUEST_PROJECT_PATTERN = "project:%s";
@@ -214,11 +215,11 @@ class CloudApiManager {
       CreateServiceAccountKeyRequest keyRequest = new CreateServiceAccountKeyRequest();
       ServiceAccountKey key = iam.projects().serviceAccounts().keys()
           .create(newServiceAccount.getName(), keyRequest).execute();
-      String jsonKey = new String(Base64.decodeBase64(key.getPrivateKeyData()),
-          StandardCharsets.UTF_8);
 
-      // TODO create file with contents
-      System.out.println(jsonKey);
+      Files.write(
+          Paths.get(downloadDir.toString(),
+              cloudProject.projectName() + "-" + getTimestamp() + ".json"),
+          Base64.decodeBase64(key.getPrivateKeyData()));
     } catch (IOException e) {
       e.printStackTrace();
       throw new RuntimeException("service account f up", e);
@@ -280,11 +281,15 @@ class CloudApiManager {
    */
   private static String createServiceAccountId(String prefix) {
     int maxLen = 30;
-    String timestamp = SERVICE_ACCOUNT_ID_TIMESTAMP_FORMAT.format(ZonedDateTime.now());
+    String timestamp = getTimestamp();
     int maxPrefixLen = maxLen - timestamp.length() - 1;
     String trimmedPrefix =
         prefix.length() <= maxPrefixLen ? prefix : prefix.substring(0, maxPrefixLen);
     return String.format("%s-%s", trimmedPrefix, timestamp);
+  }
+
+  private static String getTimestamp() {
+    return SERVICE_ACCOUNT_TIMESTAMP_FORMAT.format(ZonedDateTime.now());
   }
 
   private static void notifyApisEnabled(
