@@ -46,10 +46,12 @@ import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -211,15 +213,16 @@ class CloudApiManager {
       ServiceAccountKey key = iam.projects().serviceAccounts().keys()
           .create(newServiceAccount.getName(), keyRequest).execute();
 
+      Path keyPath = Paths.get(downloadDir.toString(),
+          cloudProject.projectName() + "-" + getTimestamp() + ".json");
       Files.write(
-          Paths.get(downloadDir.toString(),
-              cloudProject.projectName() + "-" + getTimestamp() + ".json"),
+          keyPath,
           Base64.decodeBase64(key.getPrivateKeyData()));
+
+      notifyServiceAccountCreated(project, name, keyPath);
     } catch (IOException e) {
       e.printStackTrace();
     }
-
-    notifyServiceAccountCreated(project);
   }
 
   private static void enableApi(
@@ -318,17 +321,20 @@ class CloudApiManager {
     notification.notify(project);
   }
 
-  private static void notifyServiceAccountCreated(Project project) {
+  private static void notifyServiceAccountCreated(Project project, String name, Path downloadDir) {
     Notification notification =
         NOTIFICATION_GROUP.createNotification(
             GctBundle.message("cloud.apis.service.account.created.title"),
             null /*subtitle*/,
-            //            GctBundle.message(
-            //                "cloud.apis.enabled.message", cloudProjectId,
-            // joinApiNames(libraries)),
-            "the service account was created and the key was downloaded",
+            "Service account " + name + " was created",
             NotificationType.INFORMATION);
     notification.notify(project);
+
+    ApplicationManager.getApplication().invokeLater(() ->
+        Messages.showInfoMessage("Your service account key was downloaded to " + downloadDir
+                + "\n\nTo access the APIs locally set the following environment variable of your "
+                + "local dev server to point to the key:\n\nGOOGLE_APPLICATION_CREDENTIALS",
+            "Service Account Key Created"));
   }
 
   private static String joinApiNames(Set<CloudLibrary> apis) {
