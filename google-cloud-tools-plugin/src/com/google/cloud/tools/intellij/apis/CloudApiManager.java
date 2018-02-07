@@ -20,11 +20,11 @@ import com.google.api.services.cloudresourcemanager.CloudResourceManager;
 import com.google.api.services.cloudresourcemanager.model.Binding;
 import com.google.api.services.cloudresourcemanager.model.GetIamPolicyRequest;
 import com.google.api.services.cloudresourcemanager.model.Policy;
+import com.google.api.services.cloudresourcemanager.model.SetIamPolicyRequest;
 import com.google.api.services.iam.v1.Iam;
 import com.google.api.services.iam.v1.model.CreateServiceAccountRequest;
 import com.google.api.services.iam.v1.model.Role;
 import com.google.api.services.iam.v1.model.ServiceAccount;
-import com.google.api.services.iam.v1.model.SetIamPolicyRequest;
 import com.google.api.services.servicemanagement.ServiceManagement;
 import com.google.api.services.servicemanagement.model.EnableServiceRequest;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
@@ -58,8 +58,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.fest.util.Lists;
 
-/** Cloud API manager responsible for API management tasks on GCP such as API enablement. */
+/**
+ * Cloud API manager responsible for API management tasks on GCP such as API enablement.
+ */
 class CloudApiManager {
+
   private static final Logger LOG = Logger.getInstance(CloudApiManager.class);
 
   private static final NotificationGroup NOTIFICATION_GROUP =
@@ -76,7 +79,8 @@ class CloudApiManager {
   private static final String SERVICE_REQUEST_PROJECT_PATTERN = "project:%s";
   private static final String SERVICE_ACCOUNT_CREATE_REQUEST_PROJECT_PATTERN = "projects/%s";
 
-  private CloudApiManager() {}
+  private CloudApiManager() {
+  }
 
   /**
    * Enables the supplied set of {@link CloudLibrary CloudLibraries} on GCP.
@@ -196,11 +200,11 @@ class CloudApiManager {
       bindings.addAll(additionalBindings);
 
       SetIamPolicyRequest policyRequest = new SetIamPolicyRequest();
-      com.google.api.services.iam.v1.model.Policy newPolicy =
-          new com.google.api.services.iam.v1.model.Policy();
+      Policy newPolicy = new Policy();
       newPolicy.setBindings(bindings);
       policyRequest.setPolicy(newPolicy);
 
+      resourceManager.projects().setIamPolicy(cloudProject.projectId(), policyRequest).execute();
     } catch (IOException e) {
       e.printStackTrace();
       throw new RuntimeException("service account f up", e);
