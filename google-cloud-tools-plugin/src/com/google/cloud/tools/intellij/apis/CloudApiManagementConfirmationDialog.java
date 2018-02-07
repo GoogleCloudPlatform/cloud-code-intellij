@@ -57,6 +57,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import org.apache.commons.lang3.StringUtils;
@@ -87,6 +88,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
   private JPanel rolePanel;
   private JTextField serviceAccountNameTextField;
   private TextFieldWithBrowseButton serviceKeyPathSelector;
+  private JTextPane serviceAccountInfoPane;
 
   private final Set<Role> roles;
   private static final boolean UPDATE_SERVICE_ACCOUNT_DEFAULT = true;
@@ -120,6 +122,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
             GctBundle.message("cloud.apis.management.dialog.serviceaccount.header")));
 
     serviceAccountDetailsPane.setBorder(JBUI.Borders.empty());
+    serviceAccountInfoPane.setBackground(serviceAccountPanel.getBackground());
 
     enableConfirmationLabel.setText(
         GctBundle.message(
