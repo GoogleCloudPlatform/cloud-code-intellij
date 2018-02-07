@@ -22,8 +22,11 @@ import com.google.cloud.tools.managedcloudsdk.ManagedSdkVerificationException;
 import com.google.cloud.tools.managedcloudsdk.ManagedSdkVersionMismatchException;
 import com.google.cloud.tools.managedcloudsdk.MessageListener;
 import com.google.cloud.tools.managedcloudsdk.UnsupportedOsException;
+import com.google.cloud.tools.managedcloudsdk.command.CommandExecutionException;
+import com.google.cloud.tools.managedcloudsdk.command.CommandExitException;
 import com.google.cloud.tools.managedcloudsdk.components.SdkComponent;
-import com.google.cloud.tools.managedcloudsdk.install.SdkInstaller;
+import com.google.cloud.tools.managedcloudsdk.install.SdkInstallerException;
+import com.google.cloud.tools.managedcloudsdk.install.UnknownArchiveTypeException;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
@@ -31,6 +34,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import org.jetbrains.annotations.Nullable;
@@ -86,7 +90,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
     // check if installation is already running first, to prevent multiple jobs running.
     if (runningInstallationJob == null || runningInstallationJob.isDone()) {
       runningInstallationJob =
-          ThreadUtil.getInstance().executeInBackground(this::installSynchronously);
+          ThreadUtil.getInstance().executeInBackground(this::installManagedSdk);
       Futures.addCallback(
           runningInstallationJob,
           new FutureCallback<Path>() {
@@ -142,8 +146,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
    * @throws InterruptedException if Managed Cloud SDK has been interrupted by {@link
    *     #cancelInstall()}
    */
-  @VisibleForTesting
-  Path installSynchronously() throws InterruptedException {
+  private Path installManagedSdk() throws InterruptedException {
     if (managedCloudSdk == null) {
       try {
         managedCloudSdk = createManagedSdk();
@@ -154,6 +157,44 @@ public class ManagedCloudSdkService implements CloudSdkService {
       }
     }
 
+    updateStatus(SdkStatus.INSTALLING);
+
+    Path installedManagedSdkPath;
+    try {
+      installedManagedSdkPath = installSdk();
+    } catch (InterruptedException iex) {
+      updateStatus(SdkStatus.NOT_AVAILABLE);
+      throw iex;
+    } catch (UnsupportedOsException ex) {
+      logger.error("Unsupported OS for Managed Cloud SDK", ex);
+      updateStatus(SdkStatus.NOT_AVAILABLE);
+      return null;
+    } catch (Exception ex) {
+      logger.error("Error while installing managed Cloud SDK", ex);
+      updateStatus(SdkStatus.NOT_AVAILABLE);
+      return null;
+    }
+
+    try {
+      installAppEngineJavaComponent();
+    } catch (InterruptedException iex) {
+      updateStatus(SdkStatus.NOT_AVAILABLE);
+      throw iex;
+    } catch (Exception ex) {
+      logger.error("Error while installing managed Cloud SDK App Engine Java component", ex);
+      updateStatus(SdkStatus.NOT_AVAILABLE);
+      return null;
+    }
+
+    updateStatus(SdkStatus.READY);
+
+    return installedManagedSdkPath;
+  }
+
+  /** Installs core managed SDK if needed and returns its path if successful. */
+  private Path installSdk()
+      throws UnsupportedOsException, CommandExecutionException, InterruptedException, IOException,
+          CommandExitException, SdkInstallerException, UnknownArchiveTypeException {
     boolean managedSdkInstalled = false;
     try {
       managedSdkInstalled = managedCloudSdk.isInstalled();
@@ -161,33 +202,17 @@ public class ManagedCloudSdkService implements CloudSdkService {
       logger.error("Error while checking Cloud SDK status, will attempt to re-install", ex);
     }
 
-    Path installedManagedSdkPath = null;
-
     if (!managedSdkInstalled) {
-      SdkInstaller sdkInstaller;
-      try {
-        sdkInstaller = managedCloudSdk.newInstaller();
-      } catch (UnsupportedOsException ex) {
-        logger.error("Unsupported OS for Managed Cloud SDK", ex);
-        updateStatus(SdkStatus.NOT_AVAILABLE);
-        return null;
-      }
-
       MessageListener sdkInstallListener = logger::trace;
 
-      updateStatus(SdkStatus.INSTALLING);
-
-      try {
-        installedManagedSdkPath = sdkInstaller.install(sdkInstallListener);
-      } catch (InterruptedException iex) {
-        throw iex;
-      } catch (Exception ex) {
-        logger.error("Error while installing managed Cloud SDK", ex);
-        updateStatus(SdkStatus.NOT_AVAILABLE);
-        return null;
-      }
+      return managedCloudSdk.newInstaller().install(sdkInstallListener);
     }
 
+    return managedCloudSdk.getSdkHome();
+  }
+
+  private void installAppEngineJavaComponent()
+      throws InterruptedException, CommandExitException, CommandExecutionException {
     boolean hasAppEngineJava = false;
     try {
       hasAppEngineJava = managedCloudSdk.hasComponent(SdkComponent.APP_ENGINE_JAVA);
@@ -198,22 +223,10 @@ public class ManagedCloudSdkService implements CloudSdkService {
     if (!hasAppEngineJava) {
       MessageListener appEngineInstallListener = logger::trace;
 
-      try {
-        managedCloudSdk
-            .newComponentInstaller()
-            .installComponent(SdkComponent.APP_ENGINE_JAVA, appEngineInstallListener);
-      } catch (InterruptedException iex) {
-        throw iex;
-      } catch (Exception ex) {
-        logger.error("Error while installing managed Cloud SDK App Engine Java component", ex);
-        updateStatus(SdkStatus.NOT_AVAILABLE);
-        return null;
-      }
+      managedCloudSdk
+          .newComponentInstaller()
+          .installComponent(SdkComponent.APP_ENGINE_JAVA, appEngineInstallListener);
     }
-
-    updateStatus(SdkStatus.READY);
-
-    return installedManagedSdkPath;
   }
 
   private void updateStatus(SdkStatus sdkStatus) {

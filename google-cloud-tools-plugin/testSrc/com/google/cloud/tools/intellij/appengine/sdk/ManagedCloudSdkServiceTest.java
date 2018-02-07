@@ -183,11 +183,15 @@ public class ManagedCloudSdkServiceTest {
   }
 
   @Test
-  public void interruptedInstall_status_notAvailable() throws InterruptedException {
-    doThrow(new InterruptedException()).when(sdkService).installSynchronously();
-
+  public void interruptedInstall_status_notAvailable() throws Exception {
     emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
+    SdkInstaller sdkInstaller = mockManagedCloudSdk.newInstaller();
+    when(sdkInstaller.install(any())).thenThrow(new InterruptedException());
+    when(mockManagedCloudSdk.newInstaller()).thenReturn(sdkInstaller);
+
     sdkService.install();
+    // drain UI event queue to get all sdk status updates.
+    ApplicationManager.getApplication().invokeAndWait(() -> {});
 
     assertThat(sdkService.getStatus()).isEqualTo(SdkStatus.NOT_AVAILABLE);
   }
