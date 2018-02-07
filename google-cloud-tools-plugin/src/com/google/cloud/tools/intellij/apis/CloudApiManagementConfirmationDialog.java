@@ -22,8 +22,13 @@ import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.openapi.ui.ValidationInfo;
+import com.intellij.openapi.vfs.VfsUtil;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.BooleanTableCellEditor;
 import com.intellij.ui.BooleanTableCellRenderer;
 import com.intellij.ui.IdeBorderFactory;
@@ -34,6 +39,7 @@ import com.intellij.util.ui.UIUtil;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.Comparator;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -48,8 +54,10 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import org.apache.commons.lang3.StringUtils;
 import org.fest.util.VisibleForTesting;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -75,6 +83,8 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
   private JTable roleTable;
   private JScrollPane rolePane;
   private JPanel rolePanel;
+  private JTextField serviceAccountNameTextField;
+  private TextFieldWithBrowseButton serviceKeyPathSelector;
 
   private final Set<Role> roles;
   private static final boolean UPDATE_SERVICE_ACCOUNT_DEFAULT = true;
@@ -127,10 +137,40 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
     roleTable.setTableHeader(null);
     rolePane.setBorder(JBUI.Borders.empty());
     rolePanel.setVisible(!roles.isEmpty());
+
+    serviceAccountNameTextField.setText(module.getName());
+
+    serviceKeyPathSelector.addBrowseFolderListener(
+        GctBundle.message("cloud.apis.management.dialog.serviceaccount.key.browser.title"),
+        null /*description*/,
+        null /*project - null on purpose so that the path isn't defaulted to the project root*/,
+        FileChooserDescriptorFactory.createSingleFolderDescriptor());
+    serviceKeyPathSelector.setText(getDefaultServiceKeyPath());
   }
 
   Set<Role> getSelectedRoles() {
     return ((ServiceAccountRolesTableModel) roleTable.getModel()).getSelectedRoles();
+  }
+
+  @Nullable
+  @Override
+  protected ValidationInfo doValidate() {
+    if (newServiceAccountCheckbox.isSelected()) {
+      if (StringUtils.isEmpty(serviceAccountNameTextField.getText())) {
+        return new ValidationInfo(
+            GctBundle.message("cloud.apis.management.dialog.serviceaccount.name.error"),
+            serviceAccountNameTextField);
+      } else if (StringUtils.isEmpty(serviceKeyPathSelector.getText())) {
+        return new ValidationInfo(
+            GctBundle.message("cloud.apis.management.dialog.serviceaccount.key.path.empty.error"),
+            serviceKeyPathSelector);
+      } else if (!isValidDirectory(serviceKeyPathSelector.getText())) {
+        return new ValidationInfo(
+            GctBundle.message("cloud.apis.management.dialog.serviceaccount.key.path.invalid.error"),
+            serviceKeyPathSelector);
+      }
+    }
+    return super.doValidate();
   }
 
   @Nullable
@@ -143,6 +183,11 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
     return e -> serviceAccountDetailsPane.setVisible(((JCheckBox) e.getSource()).isSelected());
   }
 
+  private String getDefaultServiceKeyPath() {
+    VirtualFile homeVirtualFile = VfsUtil.getUserHomeDir();
+    return homeVirtualFile == null ? "" : homeVirtualFile.getPath();
+  }
+
   private void populateLibraryList(JList<String> list, Set<CloudLibrary> libraries) {
     DefaultListModel<String> listModel = new DefaultListModel<>();
     libraries.forEach(library -> listModel.addElement(library.getName()));
@@ -151,6 +196,11 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
 
   private void createUIComponents() {
     roleTable = new ServiceAccountRolesTable(roles);
+  }
+
+  private static boolean isValidDirectory(String path) {
+    File file = new File(path);
+    return file.exists() && file.isDirectory() && file.canWrite();
   }
 
   private static final class ServiceAccountRolesTable extends JBTable {
@@ -256,5 +306,20 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
   @VisibleForTesting
   public JTable getRoleTable() {
     return roleTable;
+  }
+
+  @VisibleForTesting
+  public JCheckBox getNewServiceAccountCheckbox() {
+    return newServiceAccountCheckbox;
+  }
+
+  @VisibleForTesting
+  public JTextField getServiceAccountNameTextField() {
+    return serviceAccountNameTextField;
+  }
+
+  @VisibleForTesting
+  public TextFieldWithBrowseButton getServiceKeyPathSelector() {
+    return serviceKeyPathSelector;
   }
 }
