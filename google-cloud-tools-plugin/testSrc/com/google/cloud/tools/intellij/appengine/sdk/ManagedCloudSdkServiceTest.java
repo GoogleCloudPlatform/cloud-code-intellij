@@ -63,12 +63,10 @@ public class ManagedCloudSdkServiceTest {
 
   @Mock private CloudSdkService.SdkStatusUpdateListener mockStatusUpdateListener;
 
-  private final TestInMemoryLogger testInMemoryLogger = new TestInMemoryLogger();
-
   @Before
   public void setUp() throws UnsupportedOsException {
     doReturn(mockManagedCloudSdk).when(sdkService).createManagedSdk();
-    sdkService.setLogger(testInMemoryLogger);
+    sdkService.setLogger(new TestInMemoryLogger());
     // make sure everything in test is done synchronously
     ExecutorService directExecutorService = MoreExecutors.newDirectExecutorService();
     ThreadUtil.getInstance().setBackgroundExecutorService(directExecutorService);
@@ -89,6 +87,8 @@ public class ManagedCloudSdkServiceTest {
     makeMockSdkInstalled(MOCK_SDK_PATH);
 
     sdkService.activate();
+    // drain UI event queue to get all sdk status updates.
+    ApplicationManager.getApplication().invokeAndWait(() -> {});
 
     assertThat(sdkService.getStatus()).isEqualTo(SdkStatus.READY);
   }
@@ -98,6 +98,8 @@ public class ManagedCloudSdkServiceTest {
     makeMockSdkInstalled(MOCK_SDK_PATH);
 
     sdkService.activate();
+    // drain UI event queue to get all sdk status updates.
+    ApplicationManager.getApplication().invokeAndWait(() -> {});
 
     assertThat((Object) sdkService.getSdkHomePath()).isEqualTo(MOCK_SDK_PATH);
   }
@@ -122,6 +124,8 @@ public class ManagedCloudSdkServiceTest {
   public void successful_install_returnsValidSdkPath() {
     emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
     sdkService.install();
+    // drain UI event queue to get all sdk status updates.
+    ApplicationManager.getApplication().invokeAndWait(() -> {});
 
     assertThat((Object) sdkService.getSdkHomePath()).isEqualTo(MOCK_SDK_PATH);
   }
