@@ -119,11 +119,11 @@ public class ManagedCloudSdkServiceTest {
   }
 
   @Test
-  public void successful_install_writesLog() {
+  public void successful_install_returnsValidSdkPath() {
     emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
     sdkService.install();
 
-    assertThat(testInMemoryLogger.getMessages()).contains("successfully installed");
+    assertThat((Object) sdkService.getSdkHomePath()).isEqualTo(MOCK_SDK_PATH);
   }
 
   @Test
@@ -179,13 +179,13 @@ public class ManagedCloudSdkServiceTest {
   }
 
   @Test
-  public void interruptedInstall_logs_installCancelled() throws InterruptedException {
+  public void interruptedInstall_status_notAvailable() throws InterruptedException {
     doThrow(new InterruptedException()).when(sdkService).installSynchronously();
 
     emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
     sdkService.install();
 
-    assertThat(testInMemoryLogger.getMessages()).contains("installation cancelled");
+    assertThat(sdkService.getStatus()).isEqualTo(SdkStatus.NOT_AVAILABLE);
   }
 
   /** Mocks managed SDK as if installed and having App Engine Component. */
@@ -200,14 +200,18 @@ public class ManagedCloudSdkServiceTest {
     }
   }
 
+  /** Mocks successful installation process with all steps included (SDK, App Engine Java). */
   private void emulateMockSdkInstallationProcess(Path mockSdkPath) {
     try {
       when(mockManagedCloudSdk.isInstalled()).thenReturn(false);
       SdkInstaller mockInstaller = mock(SdkInstaller.class);
       when(mockManagedCloudSdk.newInstaller()).thenReturn(mockInstaller);
+      when(mockInstaller.install(any())).thenReturn(mockSdkPath);
+
       when(mockManagedCloudSdk.hasComponent(SdkComponent.APP_ENGINE_JAVA)).thenReturn(false);
       SdkComponentInstaller mockComponentInstaller = mock(SdkComponentInstaller.class);
       when(mockManagedCloudSdk.newComponentInstaller()).thenReturn(mockComponentInstaller);
+
       when(mockManagedCloudSdk.getSdkHome()).thenReturn(mockSdkPath);
     } catch (Exception ex) {
       // shouldn't happen in the tests.
