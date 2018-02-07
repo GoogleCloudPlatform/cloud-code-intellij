@@ -160,10 +160,13 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
         return new ValidationInfo(
             GctBundle.message("cloud.apis.management.dialog.serviceaccount.name.error"),
             serviceAccountNameTextField);
-      } else if (StringUtils.isEmpty(serviceKeyPathSelector.getText())
-          || !isValidDirectory(serviceKeyPathSelector.getText())) {
+      } else if (StringUtils.isEmpty(serviceKeyPathSelector.getText())) {
         return new ValidationInfo(
-            GctBundle.message("cloud.apis.management.dialog.serviceaccount.key.path.error"),
+            GctBundle.message("cloud.apis.management.dialog.serviceaccount.key.path.empty.error"),
+            serviceKeyPathSelector);
+      } else if (!isValidDirectory(serviceKeyPathSelector.getText())) {
+        return new ValidationInfo(
+            GctBundle.message("cloud.apis.management.dialog.serviceaccount.key.path.invalid.error"),
             serviceKeyPathSelector);
       }
     }
