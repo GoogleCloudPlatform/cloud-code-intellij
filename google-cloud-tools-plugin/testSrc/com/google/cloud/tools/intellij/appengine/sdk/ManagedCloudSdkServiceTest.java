@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -37,7 +38,6 @@ import com.google.cloud.tools.managedcloudsdk.components.SdkComponent;
 import com.google.cloud.tools.managedcloudsdk.components.SdkComponentInstaller;
 import com.google.cloud.tools.managedcloudsdk.install.SdkInstaller;
 import com.google.common.util.concurrent.MoreExecutors;
-import com.intellij.openapi.application.ApplicationManager;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -70,6 +70,14 @@ public class ManagedCloudSdkServiceTest {
     // make sure everything in test is done synchronously
     ExecutorService directExecutorService = MoreExecutors.newDirectExecutorService();
     ThreadUtil.getInstance().setBackgroundExecutorService(directExecutorService);
+    // run UI updates synchronously
+    doAnswer(
+            invocation -> {
+              ((Runnable) invocation.getArgument(0)).run();
+              return null;
+            })
+        .when(sdkService)
+        .invokeOnApplicationUIThread(any());
   }
 
   @Test
@@ -87,8 +95,6 @@ public class ManagedCloudSdkServiceTest {
     makeMockSdkInstalled(MOCK_SDK_PATH);
 
     sdkService.activate();
-    // drain UI event queue to get all sdk status updates.
-    ApplicationManager.getApplication().invokeAndWait(() -> {});
 
     assertThat(sdkService.getStatus()).isEqualTo(SdkStatus.READY);
   }
@@ -98,8 +104,6 @@ public class ManagedCloudSdkServiceTest {
     makeMockSdkInstalled(MOCK_SDK_PATH);
 
     sdkService.activate();
-    // drain UI event queue to get all sdk status updates.
-    ApplicationManager.getApplication().invokeAndWait(() -> {});
 
     assertThat((Object) sdkService.getSdkHomePath()).isEqualTo(MOCK_SDK_PATH);
   }
@@ -124,8 +128,6 @@ public class ManagedCloudSdkServiceTest {
   public void successful_install_returnsValidSdkPath() {
     emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
     sdkService.install();
-    // drain UI event queue to get all sdk status updates.
-    ApplicationManager.getApplication().invokeAndWait(() -> {});
 
     assertThat((Object) sdkService.getSdkHomePath()).isEqualTo(MOCK_SDK_PATH);
   }
@@ -136,8 +138,6 @@ public class ManagedCloudSdkServiceTest {
 
     emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
     sdkService.install();
-    // drain UI event queue to get all sdk status updates.
-    ApplicationManager.getApplication().invokeAndWait(() -> {});
 
     ArgumentCaptor<SdkStatus> statusCaptor = ArgumentCaptor.forClass(SdkStatus.class);
     verify(mockStatusUpdateListener, times(2)).onSdkStatusChange(any(), statusCaptor.capture());
@@ -153,8 +153,6 @@ public class ManagedCloudSdkServiceTest {
     SdkInstaller mockInstaller = mockManagedCloudSdk.newInstaller();
     when(mockInstaller.install(any())).thenThrow(new IOException("IO Error"));
     sdkService.install();
-    // drain UI event queue to get all sdk status updates.
-    ApplicationManager.getApplication().invokeAndWait(() -> {});
 
     ArgumentCaptor<SdkStatus> statusCaptor = ArgumentCaptor.forClass(SdkStatus.class);
     verify(mockStatusUpdateListener, times(2)).onSdkStatusChange(any(), statusCaptor.capture());
@@ -172,8 +170,6 @@ public class ManagedCloudSdkServiceTest {
         .when(mockComponentInstaller)
         .installComponent(any(), any());
     sdkService.install();
-    // drain UI event queue to get all sdk status updates.
-    ApplicationManager.getApplication().invokeAndWait(() -> {});
 
     ArgumentCaptor<SdkStatus> statusCaptor = ArgumentCaptor.forClass(SdkStatus.class);
     verify(mockStatusUpdateListener, times(2)).onSdkStatusChange(any(), statusCaptor.capture());
@@ -190,8 +186,6 @@ public class ManagedCloudSdkServiceTest {
     when(mockManagedCloudSdk.newInstaller()).thenReturn(sdkInstaller);
 
     sdkService.install();
-    // drain UI event queue to get all sdk status updates.
-    ApplicationManager.getApplication().invokeAndWait(() -> {});
 
     assertThat(sdkService.getStatus()).isEqualTo(SdkStatus.NOT_AVAILABLE);
   }

@@ -139,6 +139,11 @@ public class ManagedCloudSdkService implements CloudSdkService {
     this.logger = logger;
   }
 
+  @VisibleForTesting
+  void invokeOnApplicationUIThread(Runnable runnable) {
+    ApplicationManager.getApplication().invokeLater(runnable);
+  }
+
   /**
    * Checks for Managed Cloud SDK status and creates/installs it if necessary.
    *
@@ -231,12 +236,11 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
   private void updateStatus(SdkStatus sdkStatus) {
     // may be called from install job thread, make sure listeners receive update on UI thread.
-    ApplicationManager.getApplication()
-        .invokeLater(
-            () -> {
-              this.sdkStatus = sdkStatus;
-              notifyListeners(this, sdkStatus);
-            });
+    invokeOnApplicationUIThread(
+        () -> {
+          this.sdkStatus = sdkStatus;
+          notifyListeners(this, sdkStatus);
+        });
   }
 
   private void notifyListeners(CloudSdkService sdkService, SdkStatus status) {
