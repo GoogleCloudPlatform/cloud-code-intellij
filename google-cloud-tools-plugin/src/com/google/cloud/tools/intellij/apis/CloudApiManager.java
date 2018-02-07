@@ -16,15 +16,18 @@
 
 package com.google.cloud.tools.intellij.apis;
 
+import com.google.api.client.util.Base64;
 import com.google.api.services.cloudresourcemanager.CloudResourceManager;
 import com.google.api.services.cloudresourcemanager.model.Binding;
 import com.google.api.services.cloudresourcemanager.model.GetIamPolicyRequest;
 import com.google.api.services.cloudresourcemanager.model.Policy;
 import com.google.api.services.cloudresourcemanager.model.SetIamPolicyRequest;
 import com.google.api.services.iam.v1.Iam;
+import com.google.api.services.iam.v1.model.CreateServiceAccountKeyRequest;
 import com.google.api.services.iam.v1.model.CreateServiceAccountRequest;
 import com.google.api.services.iam.v1.model.Role;
 import com.google.api.services.iam.v1.model.ServiceAccount;
+import com.google.api.services.iam.v1.model.ServiceAccountKey;
 import com.google.api.services.servicemanagement.ServiceManagement;
 import com.google.api.services.servicemanagement.model.EnableServiceRequest;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
@@ -48,6 +51,7 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -205,6 +209,16 @@ class CloudApiManager {
       policyRequest.setPolicy(newPolicy);
 
       resourceManager.projects().setIamPolicy(cloudProject.projectId(), policyRequest).execute();
+
+      // create the key
+      CreateServiceAccountKeyRequest keyRequest = new CreateServiceAccountKeyRequest();
+      ServiceAccountKey key = iam.projects().serviceAccounts().keys()
+          .create(newServiceAccount.getName(), keyRequest).execute();
+      String jsonKey = new String(Base64.decodeBase64(key.getPrivateKeyData()),
+          StandardCharsets.UTF_8);
+
+      // TODO create file with contents
+      System.out.println(jsonKey);
     } catch (IOException e) {
       e.printStackTrace();
       throw new RuntimeException("service account f up", e);
