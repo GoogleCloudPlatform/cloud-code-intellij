@@ -145,7 +145,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
         null /*description*/,
         null /*project - null on purpose so that the path isn't defaulted to the project root*/,
         FileChooserDescriptorFactory.createSingleFolderDescriptor());
-    serviceKeyPathSelector.setText(getServiceKeyPathSelectorDefaultText());
+    serviceKeyPathSelector.setText(getDefaultServiceKeyPath());
   }
 
   Set<Role> getSelectedRoles() {
@@ -183,7 +183,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
     return e -> serviceAccountDetailsPane.setVisible(((JCheckBox) e.getSource()).isSelected());
   }
 
-  private String getServiceKeyPathSelectorDefaultText() {
+  private String getDefaultServiceKeyPath() {
     VirtualFile homeVirtualFile = VfsUtil.getUserHomeDir();
     return homeVirtualFile == null ? "" : homeVirtualFile.getPath();
   }
