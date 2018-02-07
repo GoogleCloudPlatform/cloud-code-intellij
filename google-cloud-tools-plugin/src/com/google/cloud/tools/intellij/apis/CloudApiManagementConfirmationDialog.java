@@ -40,6 +40,8 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -152,6 +154,14 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
     return ((ServiceAccountRolesTableModel) roleTable.getModel()).getSelectedRoles();
   }
 
+  String getServiceAccountName() {
+    return serviceAccountNameTextField.getText().trim();
+  }
+
+  Path getServiceAccountKeyDownloadPath() {
+    return Paths.get(serviceKeyPathSelector.getText().trim());
+  }
+
   @Nullable
   @Override
   protected ValidationInfo doValidate() {
@@ -164,7 +174,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
         return new ValidationInfo(
             GctBundle.message("cloud.apis.management.dialog.serviceaccount.key.path.empty.error"),
             serviceKeyPathSelector);
-      } else if (!isValidDirectory(serviceKeyPathSelector.getText())) {
+      } else if (!isValidDirectory(serviceKeyPathSelector.getText().trim())) {
         return new ValidationInfo(
             GctBundle.message("cloud.apis.management.dialog.serviceaccount.key.path.invalid.error"),
             serviceKeyPathSelector);
@@ -198,6 +208,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
     roleTable = new ServiceAccountRolesTable(roles);
   }
 
+  // TODO refactor to use Path API since the new getter return a Path
   private static boolean isValidDirectory(String path) {
     File file = new File(path);
     return file.exists() && file.isDirectory() && file.canWrite();

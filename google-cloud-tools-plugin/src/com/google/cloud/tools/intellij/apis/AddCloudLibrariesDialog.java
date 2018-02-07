@@ -126,6 +126,20 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
                 true /*canBeCanceled*/,
                 project);
 
+        ProgressManager.getInstance()
+            .runProcessWithProgressSynchronously(
+                () ->
+                    CloudApiManager.createServiceAccountAndDownloadKey(
+                        managementDialog.getSelectedRoles(),
+                        managementDialog.getServiceAccountName(),
+                        managementDialog.getServiceAccountKeyDownloadPath(),
+                        cloudProject,
+                        project),
+                "Creating service account ....",
+                //                GctBundle.message("cloud.apis.enable.progress.title"),
+                true /*canBeCanceled*/,
+                project);
+
         super.doOKAction();
       }
     } else {
