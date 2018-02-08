@@ -61,6 +61,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
   public void activate() {
     // TODO track event that custom SDK is activated and used.
 
+    initManagedSdk();
     install();
   }
 
@@ -87,6 +88,10 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
   @Override
   public boolean install() {
+    if (managedCloudSdk == null) {
+      return false;
+    }
+
     // check if installation is already running first, to prevent multiple jobs running.
     if (runningInstallationJob == null || runningInstallationJob.isDone()) {
       runningInstallationJob =
@@ -129,6 +134,33 @@ public class ManagedCloudSdkService implements CloudSdkService {
     }
   }
 
+  public void update() {
+    if (managedCloudSdk == null) {
+      return;
+    }
+
+    if (runningInstallationJob == null || runningInstallationJob.isDone()) {
+      runningInstallationJob = ThreadUtil.getInstance().executeInBackground(this::updateManagedSdk);
+      Futures.addCallback(
+          runningInstallationJob,
+          new FutureCallback<Path>() {
+            @Override
+            public void onSuccess(@javax.annotation.Nullable Path path) {
+              if (path != null) {
+                logger.info("Managed Google Cloud SDK successfully updated at: " + path);
+              }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+              if (t instanceof InterruptedException) {
+                logger.info("Managed Google Cloud SDK update cancelled.");
+              }
+            }
+          });
+    }
+  }
+
   @VisibleForTesting
   ManagedCloudSdk createManagedSdk() throws UnsupportedOsException {
     return ManagedCloudSdk.newManagedSdk();
@@ -145,6 +177,18 @@ public class ManagedCloudSdkService implements CloudSdkService {
     ApplicationManager.getApplication().invokeLater(runnable);
   }
 
+  @VisibleForTesting
+  void initManagedSdk() {
+    if (managedCloudSdk == null) {
+      try {
+        managedCloudSdk = createManagedSdk();
+      } catch (UnsupportedOsException ex) {
+        logger.error("Unsupported OS for Managed Cloud SDK", ex);
+        updateStatus(SdkStatus.NOT_AVAILABLE);
+      }
+    }
+  }
+
   /**
    * Checks for Managed Cloud SDK status and creates/installs it if necessary.
    *
@@ -154,16 +198,6 @@ public class ManagedCloudSdkService implements CloudSdkService {
    */
   // TODO(ivanporty) simplify exception handling once all their use cases are clear.
   private Path installManagedSdk() throws InterruptedException {
-    if (managedCloudSdk == null) {
-      try {
-        managedCloudSdk = createManagedSdk();
-      } catch (UnsupportedOsException ex) {
-        logger.error("Unsupported OS for Managed Cloud SDK", ex);
-        updateStatus(SdkStatus.NOT_AVAILABLE);
-        return null;
-      }
-    }
-
     updateStatus(SdkStatus.INSTALLING);
 
     Path installedManagedSdkPath;
@@ -234,6 +268,20 @@ public class ManagedCloudSdkService implements CloudSdkService {
           .newComponentInstaller()
           .installComponent(SdkComponent.APP_ENGINE_JAVA, appEngineInstallListener);
     }
+  }
+
+  private Path updateManagedSdk() throws Exception {
+    updateStatus(SdkStatus.INSTALLING);
+
+    if (!managedCloudSdk.isUpToDate()) {
+      MessageListener sdkUpdateListener = logger::debug;
+
+      managedCloudSdk.newUpdater().update(sdkUpdateListener);
+    }
+
+    updateStatus(SdkStatus.READY);
+
+    return managedCloudSdk.getSdkHome();
   }
 
   private void updateStatus(SdkStatus sdkStatus) {

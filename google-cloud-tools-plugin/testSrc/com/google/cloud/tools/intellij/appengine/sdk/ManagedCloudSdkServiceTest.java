@@ -68,6 +68,7 @@ public class ManagedCloudSdkServiceTest {
     doReturn(mockManagedCloudSdk).when(sdkService).createManagedSdk();
     // TODO(ivanporty) remove once test logging system is done via CloudToolsRule
     sdkService.setLogger(new TestInMemoryLogger());
+    sdkService.initManagedSdk();
     // make sure everything in test is done synchronously
     ExecutorService directExecutorService = MoreExecutors.newDirectExecutorService();
     ThreadUtil.getInstance().setBackgroundExecutorService(directExecutorService);
