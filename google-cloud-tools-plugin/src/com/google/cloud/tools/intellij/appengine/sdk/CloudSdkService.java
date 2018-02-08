@@ -27,6 +27,9 @@ public interface CloudSdkService {
     return ServiceManager.getService(CloudSdkService.class);
   }
 
+  /** Called when this service becomes primary choice for serving Cloud SDK. */
+  void activate();
+
   @Nullable
   Path getSdkHomePath();
 
@@ -36,9 +39,16 @@ public interface CloudSdkService {
 
   SdkStatus getStatus();
 
-  boolean installAutomatically();
+  /**
+   * Asks SDK service to attempt install and prepare Cloud SDK if it's not ready for use yet.
+   *
+   * @return true if install is supported and started, false if install is not supported.
+   */
+  boolean install();
 
   void addStatusUpdateListener(SdkStatusUpdateListener listener);
+
+  void removeStatusUpdateListener(SdkStatusUpdateListener listener);
 
   enum SdkStatus {
     READY,
@@ -47,6 +57,7 @@ public interface CloudSdkService {
     NOT_AVAILABLE
   }
 
+  /** Interface to receive SDK service updates like changes from installing to available. */
   interface SdkStatusUpdateListener {
     void onSdkStatusChange(CloudSdkService sdkService, SdkStatus status);
   }
