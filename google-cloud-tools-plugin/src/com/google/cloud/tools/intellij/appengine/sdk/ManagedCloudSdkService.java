@@ -152,6 +152,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
    * @throws InterruptedException if Managed Cloud SDK has been interrupted by {@link
    *     #cancelInstall()}
    */
+  // TODO(ivanporty) simplify exception handling once all their use cases are clear.
   private Path installManagedSdk() throws InterruptedException {
     if (managedCloudSdk == null) {
       try {
