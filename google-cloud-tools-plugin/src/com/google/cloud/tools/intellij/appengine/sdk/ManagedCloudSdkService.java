@@ -139,6 +139,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
     }
 
     if (managedSdkBackgroundJob == null || managedSdkBackgroundJob.isDone()) {
+      updateStatus(SdkStatus.INSTALLING);
       managedSdkBackgroundJob = ThreadUtil.getInstance().executeInBackground(managedSdkTask);
       Futures.addCallback(managedSdkBackgroundJob, new ManagedSdkJobListener(jobType));
     }
@@ -154,12 +155,8 @@ public class ManagedCloudSdkService implements CloudSdkService {
    *     #cancelInstallOrUpdate()} ()}
    */
   private Path installManagedSdk() throws Exception {
-    updateStatus(SdkStatus.INSTALLING);
-
     Path installedManagedSdkPath = installSdk();
     installAppEngineJavaComponent();
-
-    updateStatus(SdkStatus.READY);
 
     return installedManagedSdkPath;
   }
@@ -186,15 +183,11 @@ public class ManagedCloudSdkService implements CloudSdkService {
   }
 
   private Path updateManagedSdk() throws Exception {
-    updateStatus(SdkStatus.INSTALLING);
-
     if (!managedCloudSdk.isUpToDate()) {
       MessageListener sdkUpdateListener = logger::debug;
 
       managedCloudSdk.newUpdater().update(sdkUpdateListener);
     }
-
-    updateStatus(SdkStatus.READY);
 
     return managedCloudSdk.getSdkHome();
   }
@@ -212,7 +205,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
     statusUpdateListeners.forEach(listener -> listener.onSdkStatusChange(sdkService, status));
   }
 
-  private enum ManagedSdkJobType {
+  enum ManagedSdkJobType {
     INSTALL,
     UPDATE
   }
@@ -227,6 +220,10 @@ public class ManagedCloudSdkService implements CloudSdkService {
     @Override
     public void onSuccess(Path path) {
       logger.info("Managed Google Cloud SDK successfully installed/updated at: " + path);
+
+      updateStatus(SdkStatus.READY);
+
+      ManagedCloudSdkServiceUiPresenter.getInstance().notifyManagedSdkJobSuccess(jobType);
     }
 
     @Override
@@ -240,7 +237,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
     }
 
     private void handleJobCancellation() {
-      logger.info("Managed Google Cloud SDK update cancelled.");
+      logger.info("Managed Google Cloud SDK install/update cancelled.");
       // interrupted install means not available, but interrupted update does not change status.
       switch (jobType) {
         case INSTALL:
