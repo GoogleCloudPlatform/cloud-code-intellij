@@ -38,9 +38,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.swing.JComponent;
 
-/**
- * The dialog for adding GCP client libraries and managing GCP APIs.
- */
+/** The dialog for adding GCP client libraries and managing GCP APIs. */
 final class AddCloudLibrariesDialog extends DialogWrapper {
 
   private static final Logger logger = Logger.getInstance(AddCloudLibrariesAction.class);
@@ -78,30 +76,22 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
     setOKActionEnabled(isReadyToSubmit());
   }
 
-  /**
-   * Returns the selected {@link Module}.
-   */
+  /** Returns the selected {@link Module}. */
   Module getSelectedModule() {
     return cloudApiSelectorPanel.getSelectedModule();
   }
 
-  /**
-   * Returns the set of selected {@link CloudLibrary CloudLibraries}.
-   */
+  /** Returns the set of selected {@link CloudLibrary CloudLibraries}. */
   Set<CloudLibrary> getSelectedLibraries() {
     return cloudApiSelectorPanel.getSelectedLibraries();
   }
 
-  /**
-   * Returns the selected {@link CloudProject}.
-   */
+  /** Returns the selected {@link CloudProject}. */
   CloudProject getCloudProject() {
     return cloudApiSelectorPanel.getCloudProject();
   }
 
-  /**
-   * Returns the set of {@link CloudLibrary APIs} to enable.
-   */
+  /** Returns the set of {@link CloudLibrary APIs} to enable. */
   Set<CloudLibrary> getApisToEnable() {
     return cloudApiSelectorPanel.getApisToEnable();
   }
@@ -131,7 +121,8 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
 
       if (managementDialog.isOK()) {
         runApiEnablement(apisToEnable);
-        runServiceAccountManagement(managementDialog.getSelectedRoles(),
+        runServiceAccountManagement(
+            managementDialog.getSelectedRoles(),
             managementDialog.getServiceAccountName(),
             managementDialog.getServiceAccountKeyDownloadPath());
 
@@ -163,8 +154,8 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
    * @param serviceAccountName the name of the service account
    * @param serviceAccountKeyDownloadPath the {@link Path} to the chosen download folder
    */
-  private void runServiceAccountManagement(Set<Role> selectedRoles, String serviceAccountName,
-      Path serviceAccountKeyDownloadPath) {
+  private void runServiceAccountManagement(
+      Set<Role> selectedRoles, String serviceAccountName, Path serviceAccountKeyDownloadPath) {
     ProgressManager.getInstance()
         .runProcessWithProgressSynchronously(
             () ->

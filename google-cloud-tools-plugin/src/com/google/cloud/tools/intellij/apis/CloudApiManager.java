@@ -65,9 +65,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.fest.util.Lists;
 
-/**
- * Cloud API manager responsible for API management tasks on GCP such as API enablement.
- */
+/** Cloud API manager responsible for API management tasks on GCP such as API enablement. */
 class CloudApiManager {
 
   private static final Logger LOG = Logger.getInstance(CloudApiManager.class);
@@ -86,8 +84,7 @@ class CloudApiManager {
   private static final String SERVICE_REQUEST_PROJECT_PATTERN = "project:%s";
   private static final String SERVICE_ACCOUNT_CREATE_REQUEST_PROJECT_PATTERN = "projects/%s";
 
-  private CloudApiManager() {
-  }
+  private CloudApiManager() {}
 
   /**
    * Enables the supplied set of {@link CloudLibrary CloudLibraries} on GCP.
@@ -210,14 +207,17 @@ class CloudApiManager {
 
       // create the key
       CreateServiceAccountKeyRequest keyRequest = new CreateServiceAccountKeyRequest();
-      ServiceAccountKey key = iam.projects().serviceAccounts().keys()
-          .create(newServiceAccount.getName(), keyRequest).execute();
+      ServiceAccountKey key =
+          iam.projects()
+              .serviceAccounts()
+              .keys()
+              .create(newServiceAccount.getName(), keyRequest)
+              .execute();
 
-      Path keyPath = Paths.get(downloadDir.toString(),
-          cloudProject.projectName() + "-" + getTimestamp() + ".json");
-      Files.write(
-          keyPath,
-          Base64.decodeBase64(key.getPrivateKeyData()));
+      Path keyPath =
+          Paths.get(
+              downloadDir.toString(), cloudProject.projectName() + "-" + getTimestamp() + ".json");
+      Files.write(keyPath, Base64.decodeBase64(key.getPrivateKeyData()));
 
       notifyServiceAccountCreated(project, name, keyPath);
     } catch (IOException e) {
@@ -330,11 +330,15 @@ class CloudApiManager {
             NotificationType.INFORMATION);
     notification.notify(project);
 
-    ApplicationManager.getApplication().invokeLater(() ->
-        Messages.showInfoMessage("Your service account key was downloaded to " + downloadDir
-                + "\n\nTo access the APIs locally set the following environment variable of your "
-                + "local dev server to point to the key:\n\nGOOGLE_APPLICATION_CREDENTIALS",
-            "Service Account Key Created"));
+    ApplicationManager.getApplication()
+        .invokeLater(
+            () ->
+                Messages.showInfoMessage(
+                    "Your service account key was downloaded to "
+                        + downloadDir
+                        + "\n\nTo access the APIs locally set the following environment variable of your "
+                        + "local dev server to point to the key:\n\nGOOGLE_APPLICATION_CREDENTIALS",
+                    "Service Account Key Created"));
   }
 
   private static String joinApiNames(Set<CloudLibrary> apis) {
