@@ -25,6 +25,9 @@ import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationType;
 
+/**
+ * Helper class for {@link ManagedCloudSdkService}, provides UI notifications and progress updates.
+ */
 public class ManagedCloudSdkServiceUiPresenter {
   private static ManagedCloudSdkServiceUiPresenter instance =
       new ManagedCloudSdkServiceUiPresenter();

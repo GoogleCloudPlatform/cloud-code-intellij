@@ -37,8 +37,9 @@ import org.jetbrains.annotations.Nullable;
  * {@link CloudSdkService} providing SDK that is managed and automatically installable, see {@link
  * com.google.cloud.tools.managedcloudsdk.ManagedCloudSdk}.
  *
- * <p>Some methods ({@link #install()} do their work on background thread but listeners methods are
- * always called on EDT thread. This class is not thread-safe, must be used on UI thread.
+ * <p>Some methods ({@link #install()}, {@link #update()} ()}) do their work on background thread
+ * but listeners methods are always called on EDT thread. This class is not thread-safe, must be
+ * used on UI thread.
  */
 public class ManagedCloudSdkService implements CloudSdkService {
   private Logger logger = Logger.getInstance(ManagedCloudSdkService.class);
@@ -133,6 +134,13 @@ public class ManagedCloudSdkService implements CloudSdkService {
     }
   }
 
+  /**
+   * Runs managed SDK install/update code on background job and handles success/errors.
+   *
+   * @param jobType Install/update
+   * @param managedSdkTask Task to execute.
+   * @return True of task started, false if Managed SDK is not supported at all.
+   */
   private boolean executeManagedSdkJob(ManagedSdkJobType jobType, Callable<Path> managedSdkTask) {
     if (managedCloudSdk == null) {
       return false;
