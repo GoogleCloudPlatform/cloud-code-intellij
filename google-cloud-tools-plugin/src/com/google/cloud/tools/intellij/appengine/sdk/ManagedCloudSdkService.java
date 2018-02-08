@@ -18,15 +18,9 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.managedcloudsdk.ManagedCloudSdk;
-import com.google.cloud.tools.managedcloudsdk.ManagedSdkVerificationException;
-import com.google.cloud.tools.managedcloudsdk.ManagedSdkVersionMismatchException;
 import com.google.cloud.tools.managedcloudsdk.MessageListener;
 import com.google.cloud.tools.managedcloudsdk.UnsupportedOsException;
-import com.google.cloud.tools.managedcloudsdk.command.CommandExecutionException;
-import com.google.cloud.tools.managedcloudsdk.command.CommandExitException;
 import com.google.cloud.tools.managedcloudsdk.components.SdkComponent;
-import com.google.cloud.tools.managedcloudsdk.install.SdkInstallerException;
-import com.google.cloud.tools.managedcloudsdk.install.UnknownArchiveTypeException;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
@@ -34,9 +28,9 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.concurrent.Callable;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -55,7 +49,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
   private final Collection<SdkStatusUpdateListener> statusUpdateListeners = Lists.newArrayList();
 
-  private volatile ListenableFuture<Path> runningInstallationJob;
+  private volatile ListenableFuture<Path> managedSdkBackgroundJob;
 
   @Override
   public void activate() {
@@ -88,34 +82,11 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
   @Override
   public boolean install() {
-    if (managedCloudSdk == null) {
-      return false;
-    }
+    return executeManagedSdkJob(ManagedSdkJobType.INSTALL, this::installManagedSdk);
+  }
 
-    // check if installation is already running first, to prevent multiple jobs running.
-    if (runningInstallationJob == null || runningInstallationJob.isDone()) {
-      runningInstallationJob =
-          ThreadUtil.getInstance().executeInBackground(this::installManagedSdk);
-      Futures.addCallback(
-          runningInstallationJob,
-          new FutureCallback<Path>() {
-            @Override
-            public void onSuccess(Path path) {
-              if (path != null) {
-                logger.info("Managed Google Cloud SDK successfully installed at: " + path);
-              }
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-              if (t instanceof InterruptedException) {
-                logger.info("Managed Google Cloud SDK installation cancelled.");
-              }
-            }
-          });
-    }
-
-    return true;
+  public boolean update() {
+    return executeManagedSdkJob(ManagedSdkJobType.UPDATE, this::updateManagedSdk);
   }
 
   @Override
@@ -128,36 +99,9 @@ public class ManagedCloudSdkService implements CloudSdkService {
     statusUpdateListeners.remove(listener);
   }
 
-  public void cancelInstall() {
-    if (runningInstallationJob != null) {
-      runningInstallationJob.cancel(true);
-    }
-  }
-
-  public void update() {
-    if (managedCloudSdk == null) {
-      return;
-    }
-
-    if (runningInstallationJob == null || runningInstallationJob.isDone()) {
-      runningInstallationJob = ThreadUtil.getInstance().executeInBackground(this::updateManagedSdk);
-      Futures.addCallback(
-          runningInstallationJob,
-          new FutureCallback<Path>() {
-            @Override
-            public void onSuccess(@javax.annotation.Nullable Path path) {
-              if (path != null) {
-                logger.info("Managed Google Cloud SDK successfully updated at: " + path);
-              }
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-              if (t instanceof InterruptedException) {
-                logger.info("Managed Google Cloud SDK update cancelled.");
-              }
-            }
-          });
+  public void cancelInstallOrUpdate() {
+    if (managedSdkBackgroundJob != null) {
+      managedSdkBackgroundJob.cancel(true);
     }
   }
 
@@ -189,43 +133,31 @@ public class ManagedCloudSdkService implements CloudSdkService {
     }
   }
 
+  private boolean executeManagedSdkJob(ManagedSdkJobType jobType, Callable<Path> managedSdkTask) {
+    if (managedCloudSdk == null) {
+      return false;
+    }
+
+    if (managedSdkBackgroundJob == null || managedSdkBackgroundJob.isDone()) {
+      managedSdkBackgroundJob = ThreadUtil.getInstance().executeInBackground(managedSdkTask);
+      Futures.addCallback(managedSdkBackgroundJob, new ManagedSdkJobListener(jobType));
+    }
+
+    return true;
+  }
+
   /**
    * Checks for Managed Cloud SDK status and creates/installs it if necessary.
    *
    * @return Path of the installed managed SDK, null if error occurred while installing.
    * @throws InterruptedException if Managed Cloud SDK has been interrupted by {@link
-   *     #cancelInstall()}
+   *     #cancelInstallOrUpdate()} ()}
    */
-  // TODO(ivanporty) simplify exception handling once all their use cases are clear.
-  private Path installManagedSdk() throws InterruptedException {
+  private Path installManagedSdk() throws Exception {
     updateStatus(SdkStatus.INSTALLING);
 
-    Path installedManagedSdkPath;
-    try {
-      installedManagedSdkPath = installSdk();
-    } catch (InterruptedException iex) {
-      updateStatus(SdkStatus.NOT_AVAILABLE);
-      throw iex;
-    } catch (UnsupportedOsException ex) {
-      logger.error("Unsupported OS for Managed Cloud SDK", ex);
-      updateStatus(SdkStatus.NOT_AVAILABLE);
-      return null;
-    } catch (Exception ex) {
-      logger.error("Error while installing managed Cloud SDK", ex);
-      updateStatus(SdkStatus.NOT_AVAILABLE);
-      return null;
-    }
-
-    try {
-      installAppEngineJavaComponent();
-    } catch (InterruptedException iex) {
-      updateStatus(SdkStatus.NOT_AVAILABLE);
-      throw iex;
-    } catch (Exception ex) {
-      logger.error("Error while installing managed Cloud SDK App Engine Java component", ex);
-      updateStatus(SdkStatus.NOT_AVAILABLE);
-      return null;
-    }
+    Path installedManagedSdkPath = installSdk();
+    installAppEngineJavaComponent();
 
     updateStatus(SdkStatus.READY);
 
@@ -233,17 +165,8 @@ public class ManagedCloudSdkService implements CloudSdkService {
   }
 
   /** Installs core managed SDK if needed and returns its path if successful. */
-  private Path installSdk()
-      throws UnsupportedOsException, CommandExecutionException, InterruptedException, IOException,
-          CommandExitException, SdkInstallerException, UnknownArchiveTypeException {
-    boolean managedSdkInstalled = false;
-    try {
-      managedSdkInstalled = managedCloudSdk.isInstalled();
-    } catch (ManagedSdkVerificationException | ManagedSdkVersionMismatchException ex) {
-      logger.error("Error while checking Cloud SDK status, will attempt to re-install", ex);
-    }
-
-    if (!managedSdkInstalled) {
+  private Path installSdk() throws Exception {
+    if (!managedCloudSdk.isInstalled()) {
       MessageListener sdkInstallListener = logger::debug;
 
       return managedCloudSdk.newInstaller().install(sdkInstallListener);
@@ -252,16 +175,8 @@ public class ManagedCloudSdkService implements CloudSdkService {
     return managedCloudSdk.getSdkHome();
   }
 
-  private void installAppEngineJavaComponent()
-      throws InterruptedException, CommandExitException, CommandExecutionException {
-    boolean hasAppEngineJava = false;
-    try {
-      hasAppEngineJava = managedCloudSdk.hasComponent(SdkComponent.APP_ENGINE_JAVA);
-    } catch (ManagedSdkVerificationException ex) {
-      logger.error("Error while checking App Engine status, will attempt to re-install", ex);
-    }
-
-    if (!hasAppEngineJava) {
+  private void installAppEngineJavaComponent() throws Exception {
+    if (!managedCloudSdk.hasComponent(SdkComponent.APP_ENGINE_JAVA)) {
       MessageListener appEngineInstallListener = logger::debug;
 
       managedCloudSdk
@@ -295,5 +210,45 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
   private void notifyListeners(CloudSdkService sdkService, SdkStatus status) {
     statusUpdateListeners.forEach(listener -> listener.onSdkStatusChange(sdkService, status));
+  }
+
+  private enum ManagedSdkJobType {
+    INSTALL,
+    UPDATE
+  }
+
+  private final class ManagedSdkJobListener implements FutureCallback<Path> {
+    private final ManagedSdkJobType jobType;
+
+    private ManagedSdkJobListener(ManagedSdkJobType jobType) {
+      this.jobType = jobType;
+    }
+
+    @Override
+    public void onSuccess(Path path) {
+      logger.info("Managed Google Cloud SDK successfully installed/updated at: " + path);
+    }
+
+    @Override
+    public void onFailure(Throwable t) {
+      if (t instanceof InterruptedException) {
+        handleJobCancellation();
+      } else {
+        logger.error("Error while installing/updating managed Cloud SDK", t);
+        updateStatus(SdkStatus.NOT_AVAILABLE);
+      }
+    }
+
+    private void handleJobCancellation() {
+      logger.info("Managed Google Cloud SDK update cancelled.");
+      // interrupted install means not available, but interrupted update does not change status.
+      switch (jobType) {
+        case INSTALL:
+          updateStatus(SdkStatus.NOT_AVAILABLE);
+          break;
+        case UPDATE:
+          break;
+      }
+    }
   }
 }
