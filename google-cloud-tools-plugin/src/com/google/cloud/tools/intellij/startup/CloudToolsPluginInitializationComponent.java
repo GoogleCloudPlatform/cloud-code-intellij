@@ -49,8 +49,6 @@ public class CloudToolsPluginInitializationComponent implements ApplicationCompo
 
     new ConflictingAppEnginePluginCheck().notifyIfConflicting();
     new GoogleAccountPluginUninstaller().uninstallIfPresent();
-
-
   }
 
   private void initErrorReporting(
