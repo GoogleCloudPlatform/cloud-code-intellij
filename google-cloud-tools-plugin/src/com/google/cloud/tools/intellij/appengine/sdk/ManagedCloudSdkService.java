@@ -140,6 +140,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
   }
 
   @VisibleForTesting
+  // TODO(ivanporty) move into ThreadUtil common test code.
   void invokeOnApplicationUIThread(Runnable runnable) {
     ApplicationManager.getApplication().invokeLater(runnable);
   }
