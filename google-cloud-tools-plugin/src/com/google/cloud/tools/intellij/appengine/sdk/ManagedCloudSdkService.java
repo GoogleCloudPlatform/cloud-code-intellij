@@ -208,7 +208,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
     }
 
     if (!managedSdkInstalled) {
-      MessageListener sdkInstallListener = logger::trace;
+      MessageListener sdkInstallListener = logger::debug;
 
       return managedCloudSdk.newInstaller().install(sdkInstallListener);
     }
@@ -226,7 +226,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
     }
 
     if (!hasAppEngineJava) {
-      MessageListener appEngineInstallListener = logger::trace;
+      MessageListener appEngineInstallListener = logger::debug;
 
       managedCloudSdk
           .newComponentInstaller()
