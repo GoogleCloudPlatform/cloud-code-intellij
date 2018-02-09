@@ -17,8 +17,11 @@
 package com.google.cloud.tools.intellij.appengine.cloud.standard;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
+import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.ide.BrowserUtil;
+import com.intellij.ui.components.JBTextField;
+import com.intellij.util.ui.StatusText;
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -34,16 +37,17 @@ public class AppEngineStandardStagingPropertiesPanel {
   private static final String STAGING_PARAMETERS_URL =
       "https://github.com/GoogleCloudPlatform/gcloud-maven-plugin#application-deployment-goal";
 
-  private JTextField compileEncodingTextField;
+  private JBTextField compileEncodingTextField;
   private JCheckBox deleteJspsCheckBox;
   private JCheckBox enableJarClassesCheckBox;
   private JCheckBox disableJarJspsCheckBox;
   private JCheckBox enableJarSplittingCheckBox;
   private JCheckBox enableQuickstartCheckBox;
   private JCheckBox disableUpdateCheckCheckBox;
-  private JTextField jarSplittingExcludesTextField;
+  private JBTextField jarSplittingExcludesTextField;
   private JPanel mainPanel;
   private JLabel helpIcon;
+  private JLabel jarSplittingExcludesLabel;
 
   public AppEngineStandardStagingPropertiesPanel() {
     helpIcon.addMouseListener(
@@ -53,6 +57,8 @@ public class AppEngineStandardStagingPropertiesPanel {
             BrowserUtil.browse(STAGING_PARAMETERS_URL);
           }
         });
+
+    enableJarSplittingCheckBox.addChangeListener(e -> refreshJarSplittingComponents());
   }
 
   public Component getMainPanel() {
@@ -89,6 +95,20 @@ public class AppEngineStandardStagingPropertiesPanel {
     configuration.setEnableJarSplitting(enableJarSplittingCheckBox.isSelected());
     configuration.setEnableQuickstart(enableQuickstartCheckBox.isSelected());
     configuration.setJarSplittingExcludes(jarSplittingExcludesTextField.getText());
+  }
+
+  private void refreshJarSplittingComponents() {
+    boolean jarSplittingEnabled = enableJarSplittingCheckBox.isSelected();
+    jarSplittingExcludesLabel.setEnabled(jarSplittingEnabled);
+    jarSplittingExcludesTextField.setEnabled(jarSplittingEnabled);
+
+    StatusText emptyText = jarSplittingExcludesTextField.getEmptyText();
+    if (jarSplittingEnabled) {
+      emptyText.clear();
+    } else {
+      emptyText.setText(
+          GctBundle.message("appengine.deployment.staging.jar.splitting.excludes.emptyText"));
+    }
   }
 
   @VisibleForTesting

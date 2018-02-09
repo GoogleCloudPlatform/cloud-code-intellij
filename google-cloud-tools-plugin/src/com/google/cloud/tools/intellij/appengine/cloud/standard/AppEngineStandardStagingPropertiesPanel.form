@@ -16,7 +16,7 @@
           <text resource-bundle="messages/CloudToolsBundle" key="appengine.deployment.staging.compile.encoding"/>
         </properties>
       </component>
-      <component id="9082e" class="javax.swing.JTextField" binding="compileEncodingTextField">
+      <component id="9082e" class="com.intellij.ui.components.JBTextField" binding="compileEncodingTextField">
         <constraints>
           <grid row="0" column="2" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>
@@ -24,11 +24,12 @@
         </constraints>
         <properties/>
       </component>
-      <component id="beac9" class="javax.swing.JLabel">
+      <component id="beac9" class="javax.swing.JLabel" binding="jarSplittingExcludesLabel">
         <constraints>
           <grid row="1" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <enabled value="false"/>
           <text resource-bundle="messages/CloudToolsBundle" key="appengine.deployment.staging.jar.splitting.excludes"/>
         </properties>
       </component>
@@ -80,13 +81,15 @@
           <text resource-bundle="messages/CloudToolsBundle" key="appengine.deployment.staging.disable.update.check"/>
         </properties>
       </component>
-      <component id="81d98" class="javax.swing.JTextField" binding="jarSplittingExcludesTextField">
+      <component id="81d98" class="com.intellij.ui.components.JBTextField" binding="jarSplittingExcludesTextField">
         <constraints>
           <grid row="1" column="2" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>
           </grid>
         </constraints>
-        <properties/>
+        <properties>
+          <enabled value="false"/>
+        </properties>
       </component>
       <component id="af60" class="javax.swing.JLabel" binding="helpIcon">
         <constraints>
