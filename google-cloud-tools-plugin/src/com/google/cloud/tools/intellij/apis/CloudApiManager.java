@@ -155,74 +155,93 @@ class CloudApiManager {
 
     ProgressIndicator progress = ProgressManager.getInstance().getProgressIndicator();
 
+    try {
+      ServiceAccount serviceAccount = createServiceAccount(user.get(), name, cloudProject);
+      addRolesToServiceAccount(user.get(), serviceAccount, roles, cloudProject);
+      ServiceAccountKey serviceAccountKey = createServiceAccountKey(user.get(), serviceAccount);
+      Path keyPath = writeServiceAccountKey(serviceAccountKey, downloadDir, cloudProject);
+
+      notifyServiceAccountCreated(project, name, keyPath);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private static ServiceAccount createServiceAccount(
+      CredentialedUser user, String name, CloudProject cloudProject) throws IOException {
     CreateServiceAccountRequest request = new CreateServiceAccountRequest();
     ServiceAccount serviceAccount = new ServiceAccount();
     serviceAccount.setDisplayName(name);
     request.setServiceAccount(serviceAccount);
     request.setAccountId(createServiceAccountId(name));
 
-    Iam iam = GoogleApiClientFactory.getInstance().getIamClient(user.get().getCredential());
+    Iam iam = GoogleApiClientFactory.getInstance().getIamClient(user.getCredential());
+
+    return iam.projects()
+        .serviceAccounts()
+        .create(
+            String.format(SERVICE_ACCOUNT_CREATE_REQUEST_PROJECT_PATTERN, cloudProject.projectId()),
+            request)
+        .execute();
+  }
+
+  private static void addRolesToServiceAccount(
+      CredentialedUser user,
+      ServiceAccount serviceAccount,
+      Set<Role> roles,
+      CloudProject cloudProject)
+      throws IOException {
     CloudResourceManager resourceManager =
-        GoogleApiClientFactory.getInstance()
-            .getCloudResourceManagerClient(user.get().getCredential());
+        GoogleApiClientFactory.getInstance().getCloudResourceManagerClient(user.getCredential());
 
-    try {
-      ServiceAccount newServiceAccount =
-          iam.projects()
-              .serviceAccounts()
-              .create(
-                  String.format(
-                      SERVICE_ACCOUNT_CREATE_REQUEST_PROJECT_PATTERN, cloudProject.projectId()),
-                  request)
-              .execute();
+    Policy existingPolicy =
+        resourceManager
+            .projects()
+            .getIamPolicy(cloudProject.projectId(), new GetIamPolicyRequest())
+            .execute();
+    List<Binding> bindings = Lists.newArrayList(existingPolicy.getBindings());
 
-      Policy existingPolicy =
-          resourceManager
-              .projects()
-              .getIamPolicy(cloudProject.projectId(), new GetIamPolicyRequest())
-              .execute();
-      List<Binding> bindings = Lists.newArrayList(existingPolicy.getBindings());
+    List<Binding> additionalBindings =
+        roles
+            .stream()
+            .map(
+                role -> {
+                  Binding binding = new Binding();
+                  binding.setRole(role.getName());
+                  binding.setMembers(
+                      ImmutableList.of("serviceAccount:" + serviceAccount.getEmail()));
+                  return binding;
+                })
+            .collect(Collectors.toList());
 
-      List<Binding> additionalBindings =
-          roles
-              .stream()
-              .map(
-                  role -> {
-                    Binding binding = new Binding();
-                    binding.setRole(role.getName());
-                    binding.setMembers(
-                        ImmutableList.of("serviceAccount:" + newServiceAccount.getEmail()));
-                    return binding;
-                  })
-              .collect(Collectors.toList());
+    bindings.addAll(additionalBindings);
 
-      bindings.addAll(additionalBindings);
+    SetIamPolicyRequest policyRequest = new SetIamPolicyRequest();
+    Policy newPolicy = new Policy();
+    newPolicy.setBindings(bindings);
+    policyRequest.setPolicy(newPolicy);
 
-      SetIamPolicyRequest policyRequest = new SetIamPolicyRequest();
-      Policy newPolicy = new Policy();
-      newPolicy.setBindings(bindings);
-      policyRequest.setPolicy(newPolicy);
+    resourceManager.projects().setIamPolicy(cloudProject.projectId(), policyRequest).execute();
+  }
 
-      resourceManager.projects().setIamPolicy(cloudProject.projectId(), policyRequest).execute();
+  private static ServiceAccountKey createServiceAccountKey(
+      CredentialedUser user, ServiceAccount serviceAccount) throws IOException {
+    Iam iam = GoogleApiClientFactory.getInstance().getIamClient(user.getCredential());
 
-      // create the key
-      CreateServiceAccountKeyRequest keyRequest = new CreateServiceAccountKeyRequest();
-      ServiceAccountKey key =
-          iam.projects()
-              .serviceAccounts()
-              .keys()
-              .create(newServiceAccount.getName(), keyRequest)
-              .execute();
+    CreateServiceAccountKeyRequest keyRequest = new CreateServiceAccountKeyRequest();
+    return iam.projects()
+        .serviceAccounts()
+        .keys()
+        .create(serviceAccount.getName(), keyRequest)
+        .execute();
+  }
 
-      Path keyPath =
-          Paths.get(
-              downloadDir.toString(), cloudProject.projectName() + "-" + getTimestamp() + ".json");
-      Files.write(keyPath, Base64.decodeBase64(key.getPrivateKeyData()));
-
-      notifyServiceAccountCreated(project, name, keyPath);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+  private static Path writeServiceAccountKey(
+      ServiceAccountKey key, Path downloadDir, CloudProject cloudProject) throws IOException {
+    Path keyPath =
+        Paths.get(
+            downloadDir.toString(), cloudProject.projectName() + "-" + getTimestamp() + ".json");
+    return Files.write(keyPath, Base64.decodeBase64(key.getPrivateKeyData()));
   }
 
   private static void enableApi(
