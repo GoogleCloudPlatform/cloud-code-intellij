@@ -34,12 +34,14 @@ import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestFile;
 import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.google.cloud.tools.intellij.testing.TestModule;
+import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModulePointerManager;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import java.io.File;
+import javax.swing.JTabbedPane;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -444,5 +446,13 @@ public final class AppEngineFlexibleDeploymentEditorTest {
     editor.fireStateChange();
 
     assertThat(editor.getStagedArtifactNameTextField().getEmptyText().getText()).isEmpty();
+  }
+
+  @Test
+  public void parametersTabbedPane_hasOneTab() {
+    JTabbedPane parametersTabbedPane = editor.getCommonConfig().getParametersTabbedPane();
+    assertThat(parametersTabbedPane.getTabCount()).isEqualTo(1);
+    assertThat(parametersTabbedPane.getTitleAt(0))
+        .isEqualTo(GctBundle.message("appengine.deployment.parameters.tab.title"));
   }
 }

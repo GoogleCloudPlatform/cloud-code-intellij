@@ -75,6 +75,15 @@ public class AppEngineDeploymentConfiguration
   private String stagedArtifactName;
   private boolean stagedArtifactNameLegacy;
 
+  private String compileEncoding;
+  private boolean deleteJsps;
+  private boolean disableJarJsps;
+  private boolean disableUpdateCheck;
+  private boolean enableJarClasses;
+  private boolean enableJarSplitting;
+  private boolean enableQuickstart;
+  private String jarSplittingExcludes;
+
   @Attribute("cloudProjectName")
   public String getCloudProjectName() {
     return cloudProjectName;
@@ -128,6 +137,78 @@ public class AppEngineDeploymentConfiguration
   @Attribute(STAGED_ARTIFACT_NAME_LEGACY)
   public boolean isStagedArtifactNameLegacy() {
     return stagedArtifactNameLegacy;
+  }
+
+  @Attribute("compileEncoding")
+  public String getCompileEncoding() {
+    return compileEncoding;
+  }
+
+  public void setCompileEncoding(String compileEncoding) {
+    this.compileEncoding = compileEncoding;
+  }
+
+  @Attribute("deleteJsps")
+  public boolean getDeleteJsps() {
+    return deleteJsps;
+  }
+
+  public void setDeleteJsps(boolean deleteJsps) {
+    this.deleteJsps = deleteJsps;
+  }
+
+  @Attribute("disableJsps")
+  public boolean getDisableJarJsps() {
+    return disableJarJsps;
+  }
+
+  public void setDisableJarJsps(boolean disableJarJsps) {
+    this.disableJarJsps = disableJarJsps;
+  }
+
+  @Attribute("disableUpdateCheck")
+  public boolean getDisableUpdateCheck() {
+    return disableUpdateCheck;
+  }
+
+  public void setDisableUpdateCheck(boolean disableUpdate) {
+    this.disableUpdateCheck = disableUpdate;
+  }
+
+  @Attribute("enableJarClasses")
+  public boolean getEnableJarClasses() {
+    return enableJarClasses;
+  }
+
+  public void setEnableJarClasses(boolean enableJarClasses) {
+    this.enableJarClasses = enableJarClasses;
+  }
+
+  @Attribute("enableJarSplitting")
+  public boolean getEnableJarSplitting() {
+    return enableJarSplitting;
+  }
+
+  public void setEnableJarSplitting(boolean enableJarSplitting) {
+    this.enableJarSplitting = enableJarSplitting;
+  }
+
+  @Attribute("enableQuickstart")
+  public boolean getEnableQuickstart() {
+    return enableQuickstart;
+  }
+
+  public void setEnableQuickstart(boolean enableQuickstart) {
+    this.enableQuickstart = enableQuickstart;
+  }
+
+  @Attribute("jarSplittingExcludes")
+  public String getJarSplittingExcludes() {
+    return jarSplittingExcludes;
+  }
+
+  public void setJarSplittingExcludes(String jarSplittingExcludes) {
+    this.jarSplittingExcludes = jarSplittingExcludes;
   }
 
   public void setDeployAllConfigs(boolean deployAllConfigs) {

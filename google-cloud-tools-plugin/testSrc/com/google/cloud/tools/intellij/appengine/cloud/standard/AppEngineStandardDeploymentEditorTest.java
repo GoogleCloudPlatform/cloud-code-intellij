@@ -30,8 +30,10 @@ import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.google.cloud.tools.intellij.testing.TestService;
+import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
+import javax.swing.JTabbedPane;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -280,5 +282,15 @@ public final class AppEngineStandardDeploymentEditorTest {
 
     CloudProject expectedProject = CloudProject.create(projectId, projectId, EMAIL);
     verify(projectSelector).setSelectedProject(expectedProject);
+  }
+
+  @Test
+  public void parametersTabbedPane_hasTwoTabs() {
+    JTabbedPane parametersTabbedPane = editor.getCommonConfig().getParametersTabbedPane();
+    assertThat(parametersTabbedPane.getTabCount()).isEqualTo(2);
+    assertThat(parametersTabbedPane.getTitleAt(0))
+        .isEqualTo(GctBundle.message("appengine.deployment.parameters.tab.title"));
+    assertThat(parametersTabbedPane.getTitleAt(1))
+        .isEqualTo(GctBundle.message("appengine.deployment.staging.properties.tab.title"));
   }
 }

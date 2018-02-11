@@ -33,6 +33,7 @@ import java.util.Optional;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import org.jetbrains.annotations.NotNull;
 
 /** Common App Engine deployment configuration UI shared by flexible and standard deployments. */
@@ -52,6 +53,7 @@ public final class AppEngineDeploymentConfigurationPanel {
   private HyperlinkLabel appEngineCostWarningLabel;
   private JLabel serviceLabel;
   private JCheckBox hiddenValidationTrigger;
+  private JTabbedPane parametersTabbedPane;
 
   private final Project ideProject;
 
@@ -226,6 +228,10 @@ public final class AppEngineDeploymentConfigurationPanel {
 
   public JCheckBox getPromoteCheckbox() {
     return promoteCheckbox;
+  }
+
+  public JTabbedPane getParametersTabbedPane() {
+    return parametersTabbedPane;
   }
 
   @VisibleForTesting

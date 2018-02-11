@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandardStagingPropertiesPanel">
+  <grid id="27dc6" binding="mainPanel" layout-manager="GridLayoutManager" row-count="6" column-count="5" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="10" left="10" bottom="10" right="10"/>
+    <constraints>
+      <xy x="20" y="20" width="666" height="207"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <component id="17c07" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="messages/CloudToolsBundle" key="appengine.deployment.staging.compile.encoding"/>
+        </properties>
+      </component>
+      <component id="9082e" class="com.intellij.ui.components.JBTextField" binding="compileEncodingTextField">
+        <constraints>
+          <grid row="0" column="2" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="150" height="-1"/>
+          </grid>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="beac9" class="javax.swing.JLabel" binding="jarSplittingExcludesLabel">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <enabled value="true"/>
+          <text resource-bundle="messages/CloudToolsBundle" key="appengine.deployment.staging.jar.splitting.excludes"/>
+        </properties>
+      </component>
+      <component id="82de9" class="javax.swing.JCheckBox" binding="deleteJspsCheckBox" default-binding="true">
+        <constraints>
+          <grid row="2" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="messages/CloudToolsBundle" key="appengine.deployment.staging.delete.jsps"/>
+        </properties>
+      </component>
+      <component id="23431" class="javax.swing.JCheckBox" binding="enableJarClassesCheckBox" default-binding="true">
+        <constraints>
+          <grid row="2" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="messages/CloudToolsBundle" key="appengine.deployment.staging.enable.jar.classes"/>
+        </properties>
+      </component>
+      <component id="645da" class="javax.swing.JCheckBox" binding="disableJarJspsCheckBox" default-binding="true">
+        <constraints>
+          <grid row="3" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="messages/CloudToolsBundle" key="appengine.deployment.staging.disable.jar.jsps"/>
+        </properties>
+      </component>
+      <component id="3ad0f" class="javax.swing.JCheckBox" binding="enableJarSplittingCheckBox">
+        <constraints>
+          <grid row="3" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="messages/CloudToolsBundle" key="appengine.deployment.staging.enable.jar.splitting"/>
+        </properties>
+      </component>
+      <component id="c1703" class="javax.swing.JCheckBox" binding="enableQuickstartCheckBox" default-binding="true">
+        <constraints>
+          <grid row="4" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="messages/CloudToolsBundle" key="appengine.deployment.staging.enable.quickstart"/>
+        </properties>
+      </component>
+      <component id="e4d87" class="javax.swing.JCheckBox" binding="disableUpdateCheckCheckBox" default-binding="true">
+        <constraints>
+          <grid row="4" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="messages/CloudToolsBundle" key="appengine.deployment.staging.disable.update.check"/>
+        </properties>
+      </component>
+      <component id="81d98" class="com.intellij.ui.components.JBTextField" binding="jarSplittingExcludesTextField">
+        <constraints>
+          <grid row="1" column="2" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="150" height="-1"/>
+          </grid>
+        </constraints>
+        <properties>
+          <enabled value="true"/>
+        </properties>
+      </component>
+      <component id="af60" class="javax.swing.JLabel" binding="helpIcon">
+        <constraints>
+          <grid row="5" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <icon value="general/help_small.png"/>
+          <text value=""/>
+        </properties>
+      </component>
+    </children>
+  </grid>
+</form>

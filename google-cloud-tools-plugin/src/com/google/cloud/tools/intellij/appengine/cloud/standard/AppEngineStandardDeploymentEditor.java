@@ -21,6 +21,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfig
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfigurationPanel;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
+import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
@@ -32,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
 public final class AppEngineStandardDeploymentEditor
     extends SettingsEditor<AppEngineDeploymentConfiguration> {
   private AppEngineDeploymentConfigurationPanel commonConfig;
+  private AppEngineStandardStagingPropertiesPanel stagingPanel;
   private JPanel editorPanel;
 
   private Project project;
@@ -65,11 +67,13 @@ public final class AppEngineStandardDeploymentEditor
   @Override
   protected void resetEditorFrom(@NotNull AppEngineDeploymentConfiguration configuration) {
     commonConfig.resetEditorFrom(configuration);
+    stagingPanel.resetEditorFrom(configuration);
   }
 
   @Override
   protected void applyEditorTo(@NotNull AppEngineDeploymentConfiguration configuration) {
     commonConfig.applyEditorTo(configuration);
+    stagingPanel.applyEditorTo(configuration);
     commonConfig.setDeploymentProjectAndVersion(deploymentSource);
 
     boolean isFlexCompat =
@@ -91,7 +95,18 @@ public final class AppEngineStandardDeploymentEditor
     return commonConfig;
   }
 
+  @VisibleForTesting
+  AppEngineStandardStagingPropertiesPanel getStagingPanel() {
+    return stagingPanel;
+  }
+
   private void createUIComponents() {
     commonConfig = new AppEngineDeploymentConfigurationPanel(project);
+    stagingPanel = new AppEngineStandardStagingPropertiesPanel();
+    commonConfig
+        .getParametersTabbedPane()
+        .add(
+            GctBundle.message("appengine.deployment.staging.properties.tab.title"),
+            stagingPanel.getMainPanel());
   }
 }
