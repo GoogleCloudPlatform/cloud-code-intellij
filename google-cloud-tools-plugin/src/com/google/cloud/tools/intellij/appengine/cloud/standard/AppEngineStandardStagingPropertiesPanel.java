@@ -58,6 +58,7 @@ public class AppEngineStandardStagingPropertiesPanel {
           }
         });
 
+    refreshJarSplittingComponents();
     enableJarSplittingCheckBox.addChangeListener(e -> refreshJarSplittingComponents());
   }
 
