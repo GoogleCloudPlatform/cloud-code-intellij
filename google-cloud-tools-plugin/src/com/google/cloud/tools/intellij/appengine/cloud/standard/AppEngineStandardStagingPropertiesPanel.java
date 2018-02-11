@@ -143,7 +143,7 @@ public class AppEngineStandardStagingPropertiesPanel {
   }
 
   @VisibleForTesting
-  public JTextField getJarSplittingExcludesTextField() {
+  public JBTextField getJarSplittingExcludesTextField() {
     return jarSplittingExcludesTextField;
   }
 
