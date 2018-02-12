@@ -173,21 +173,33 @@ class CloudApiManager {
       int numSteps = roles.isEmpty() ? 3 : 4;
       double step = 1;
 
-      setProgress(progress, "Creating a new service account named: " + name, step / numSteps);
+      setProgress(
+          progress,
+          GctBundle.message("cloud.apis.service.account.create.account.progress.message", name),
+          step / numSteps);
       step++;
       ServiceAccount serviceAccount = createServiceAccount(user.get(), name, cloudProject);
 
       if (!roles.isEmpty()) {
-        setProgress(progress, "Adding roles to service account", step / numSteps);
+        setProgress(
+            progress,
+            GctBundle.message("cloud.apis.service.account.add.roles.progress.message"),
+            step / numSteps);
         step++;
         addRolesToServiceAccount(user.get(), serviceAccount, roles, cloudProject);
       }
 
-      setProgress(progress, "Creating a service account key", step / numSteps);
+      setProgress(
+          progress,
+          GctBundle.message("cloud.apis.service.account.create.key.progress.message"),
+          step / numSteps);
       step++;
       ServiceAccountKey serviceAccountKey = createServiceAccountKey(user.get(), serviceAccount);
 
-      setProgress(progress, "Downloading the service account key", step / numSteps);
+      setProgress(
+          progress,
+          GctBundle.message("cloud.apis.service.account.download.key.progress.message"),
+          step / numSteps);
       Path keyPath = writeServiceAccountKey(serviceAccountKey, downloadDir, cloudProject);
 
       notifyServiceAccountCreated(project, name, keyPath);
