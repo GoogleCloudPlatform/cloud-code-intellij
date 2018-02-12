@@ -204,7 +204,8 @@ class CloudApiManager {
 
       notifyServiceAccountCreated(project, name, keyPath);
     } catch (IOException e) {
-      e.printStackTrace();
+      LOG.warn(
+          "Exception occurred attempting to create service account on GCP and download its key", e);
     }
   }
 
