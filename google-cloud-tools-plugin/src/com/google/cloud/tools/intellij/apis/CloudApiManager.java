@@ -276,6 +276,11 @@ class CloudApiManager {
     resourceManager.projects().setIamPolicy(cloudProject.projectId(), policyRequest).execute();
   }
 
+  /**
+   * Given an {@link ServiceAccount}, return the singleton list of strings representing the service
+   * account member requesting access to the resource. Used to pass into {@link
+   * Binding#setMembers(List)}.
+   */
   private static List<String> createServiceAccountMemberBindings(ServiceAccount serviceAccount) {
     return ImmutableList.of(SERVICE_ACCOUNT_ROLE_REQUEST_PREFIX + serviceAccount.getEmail());
   }
