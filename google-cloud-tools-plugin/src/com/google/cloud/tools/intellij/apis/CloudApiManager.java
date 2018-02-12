@@ -46,12 +46,10 @@ import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationType;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -419,15 +417,6 @@ class CloudApiManager {
             GctBundle.message("cloud.apis.service.account.created.message", name),
             NotificationType.INFORMATION);
     notification.notify(project);
-
-    ApplicationManager.getApplication()
-        .invokeLater(
-            () ->
-                Messages.showMessageDialog(
-                    GctBundle.message(
-                        "cloud.apis.service.account.key.downloaded.message", downloadDir),
-                    GctBundle.message("cloud.apis.service.account.key.downloaded.title"),
-                    GoogleCloudToolsIcons.CLOUD));
   }
 
   private static String joinApiNames(Set<CloudLibrary> apis) {
