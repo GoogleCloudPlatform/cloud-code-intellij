@@ -35,6 +35,11 @@ public class DefaultCloudSdkService implements CloudSdkService {
   private PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
   private static final String CLOUD_SDK_PROPERTY_KEY = "GCT_CLOUD_SDK_HOME_PATH";
 
+  @Override
+  public void activate() {
+    // TODO track event that custom SDK is activated and used.
+  }
+
   @Nullable
   @Override
   public Path getSdkHomePath() {
@@ -74,12 +79,17 @@ public class DefaultCloudSdkService implements CloudSdkService {
   }
 
   @Override
-  public boolean installAutomatically() {
+  public boolean install() {
     return false; /* not supported. */
   }
 
   @Override
   public void addStatusUpdateListener(SdkStatusUpdateListener listener) {
+    /* not supported. */
+  }
+
+  @Override
+  public void removeStatusUpdateListener(SdkStatusUpdateListener listener) {
     /* not supported. */
   }
 }
