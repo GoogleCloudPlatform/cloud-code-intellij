@@ -120,7 +120,7 @@ class CloudApiManager {
           return;
         }
 
-        showProgress(
+        updateProgress(
             progress,
             GctBundle.message(
                 "cloud.apis.enable.progress.message",
@@ -171,7 +171,7 @@ class CloudApiManager {
       int numSteps = roles.isEmpty() ? 3 : 4;
       double step = 1;
 
-      showProgress(
+      updateProgress(
           progress,
           GctBundle.message("cloud.apis.service.account.create.account.progress.message", name),
           step / numSteps);
@@ -179,7 +179,7 @@ class CloudApiManager {
       ServiceAccount serviceAccount = createServiceAccount(user.get(), name, cloudProject);
 
       if (!roles.isEmpty()) {
-        showProgress(
+        updateProgress(
             progress,
             GctBundle.message("cloud.apis.service.account.add.roles.progress.message"),
             step / numSteps);
@@ -187,14 +187,14 @@ class CloudApiManager {
         addRolesToServiceAccount(user.get(), serviceAccount, roles, cloudProject);
       }
 
-      showProgress(
+      updateProgress(
           progress,
           GctBundle.message("cloud.apis.service.account.create.key.progress.message"),
           step / numSteps);
       step++;
       ServiceAccountKey serviceAccountKey = createServiceAccountKey(user.get(), serviceAccount);
 
-      showProgress(
+      updateProgress(
           progress,
           GctBundle.message("cloud.apis.service.account.download.key.progress.message"),
           step / numSteps);
@@ -423,7 +423,7 @@ class CloudApiManager {
     return apis.stream().map(CloudLibrary::getName).collect(Collectors.joining("<br>"));
   }
 
-  private static void showProgress(ProgressIndicator indicator, String message, double fraction) {
+  private static void updateProgress(ProgressIndicator indicator, String message, double fraction) {
     indicator.setText(message);
     indicator.setFraction(fraction);
   }
