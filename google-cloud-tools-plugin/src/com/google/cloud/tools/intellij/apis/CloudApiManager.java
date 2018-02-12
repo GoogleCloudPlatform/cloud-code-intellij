@@ -83,6 +83,7 @@ class CloudApiManager {
 
   private static final String SERVICE_REQUEST_PROJECT_PATTERN = "project:%s";
   private static final String SERVICE_ACCOUNT_CREATE_REQUEST_PROJECT_PATTERN = "projects/%s";
+  private static final String SERVICE_ACCOUNT_ROLE_REQUEST_PREFIX = "serviceAccount:";
 
   private CloudApiManager() {}
 
@@ -143,6 +144,17 @@ class CloudApiManager {
     }
   }
 
+  /**
+   * Creates a new {@link ServiceAccount}, adds the supplied set of {@link Role roles} to it, and
+   * creates and downloads the service account private key to the user's file system.
+   *
+   * @param roles the set of {@link Role} to add to the new service account
+   * @param name the name of the new service account to be created
+   * @param downloadDir the {@link Path} of the download directory of the service account private
+   *     key json file
+   * @param cloudProject the current {@link CloudProject}
+   * @param project the current {@link Project}
+   */
   static void createServiceAccountAndDownloadKey(
       Set<Role> roles, String name, Path downloadDir, CloudProject cloudProject, Project project) {
     Optional<CredentialedUser> user =
@@ -167,6 +179,7 @@ class CloudApiManager {
     }
   }
 
+  /** Creates a new {@link ServiceAccount} for the given {@link CloudProject} using the IAM API. */
   private static ServiceAccount createServiceAccount(
       CredentialedUser user, String name, CloudProject cloudProject) throws IOException {
     CreateServiceAccountRequest request = new CreateServiceAccountRequest();
@@ -185,6 +198,18 @@ class CloudApiManager {
         .execute();
   }
 
+  /**
+   * Adds a set of {@link Role roles} to a {@link ServiceAccount}.
+   *
+   * <p>This is done by fetching the cloud project's existing IAM Policy, adding the new roles to
+   * the given service account, and then writing the updated policy back to the cloud project.
+   *
+   * @param user the current {@link CredentialedUser}
+   * @param serviceAccount the {@link ServiceAccount} to which to add roles
+   * @param roles the set of {@link Role} to be added to the service account
+   * @param cloudProject the current {@link CloudProject}
+   * @throws IOException if the API call fails to update the IAM policy
+   */
   private static void addRolesToServiceAccount(
       CredentialedUser user,
       ServiceAccount serviceAccount,
@@ -209,7 +234,8 @@ class CloudApiManager {
                   Binding binding = new Binding();
                   binding.setRole(role.getName());
                   binding.setMembers(
-                      ImmutableList.of("serviceAccount:" + serviceAccount.getEmail()));
+                      ImmutableList.of(
+                          SERVICE_ACCOUNT_ROLE_REQUEST_PREFIX + serviceAccount.getEmail()));
                   return binding;
                 })
             .collect(Collectors.toList());
@@ -224,6 +250,10 @@ class CloudApiManager {
     resourceManager.projects().setIamPolicy(cloudProject.projectId(), policyRequest).execute();
   }
 
+  /**
+   * Using the supplied {@link ServiceAccount}, this creates and returns a new {@link
+   * ServiceAccountKey}.
+   */
   private static ServiceAccountKey createServiceAccountKey(
       CredentialedUser user, ServiceAccount serviceAccount) throws IOException {
     Iam iam = GoogleApiClientFactory.getInstance().getIamClient(user.getCredential());
@@ -236,6 +266,17 @@ class CloudApiManager {
         .execute();
   }
 
+  /**
+   * Writes the service account private key data in JSON form to the filesystem. The private key
+   * itself is contained within the {@link ServiceAccountKey} returned from the IAM API. The json
+   * key is encoded within {@link ServiceAccountKey#getPrivateKeyData()} in base64.
+   *
+   * @param key the {@link ServiceAccountKey} containing the base64 encoding of the json private key
+   * @param downloadDir the {@link Path} on the file system to download the ky
+   * @param cloudProject the {@link CloudProject} associated with this service account
+   * @return the {@link Path} to the service account key that was written
+   * @throws IOException if the an IO error occurs when writing the file
+   */
   private static Path writeServiceAccountKey(
       ServiceAccountKey key, Path downloadDir, CloudProject cloudProject) throws IOException {
     Path keyPath =
