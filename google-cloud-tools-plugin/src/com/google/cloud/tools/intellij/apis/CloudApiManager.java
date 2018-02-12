@@ -423,10 +423,11 @@ class CloudApiManager {
     ApplicationManager.getApplication()
         .invokeLater(
             () ->
-                Messages.showInfoMessage(
+                Messages.showMessageDialog(
                     GctBundle.message(
                         "cloud.apis.service.account.key.downloaded.message", downloadDir),
-                    GctBundle.message("cloud.apis.service.account.key.downloaded.title")));
+                    GctBundle.message("cloud.apis.service.account.key.downloaded.title"),
+                    GoogleCloudToolsIcons.CLOUD));
   }
 
   private static String joinApiNames(Set<CloudLibrary> apis) {
