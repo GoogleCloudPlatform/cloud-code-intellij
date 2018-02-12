@@ -415,7 +415,7 @@ class CloudApiManager {
         NOTIFICATION_GROUP.createNotification(
             GctBundle.message("cloud.apis.service.account.created.title"),
             null /*subtitle*/,
-            "Service account " + name + " was created",
+            GctBundle.message("cloud.apis.service.account.created.message", name),
             NotificationType.INFORMATION);
     notification.notify(project);
 
@@ -423,11 +423,9 @@ class CloudApiManager {
         .invokeLater(
             () ->
                 Messages.showInfoMessage(
-                    "Your service account key was downloaded to "
-                        + downloadDir
-                        + "\n\nTo access the APIs locally set the following environment variable of your "
-                        + "local dev server to point to the key:\n\nGOOGLE_APPLICATION_CREDENTIALS",
-                    "Service Account Key Created"));
+                    GctBundle.message(
+                        "cloud.apis.service.account.key.downloaded.message", downloadDir),
+                    GctBundle.message("cloud.apis.service.account.key.downloaded.title")));
   }
 
   private static String joinApiNames(Set<CloudLibrary> apis) {
