@@ -122,11 +122,13 @@ class CloudApiManager {
           return;
         }
 
-        setApiEnableProgress(
+        setProgress(
             progress,
-            library.getName(),
-            cloudProject.projectName(),
-            (double) i / libraryList.size());
+            GctBundle.message(
+                "cloud.apis.enable.progress.message",
+                library.getName(),
+                cloudProject.projectName()),
+            (double) (i + 1) / libraryList.size());
         enableApi(library, cloudProject, user.get());
 
         enabledApis.add(library);
@@ -168,9 +170,24 @@ class CloudApiManager {
     ProgressIndicator progress = ProgressManager.getInstance().getProgressIndicator();
 
     try {
+      int numSteps = roles.isEmpty() ? 3 : 4;
+      double step = 1;
+
+      setProgress(progress, "Creating a new service account named: " + name, step / numSteps);
+      step++;
       ServiceAccount serviceAccount = createServiceAccount(user.get(), name, cloudProject);
-      addRolesToServiceAccount(user.get(), serviceAccount, roles, cloudProject);
+
+      if (!roles.isEmpty()) {
+        setProgress(progress, "Adding roles to service account", step / numSteps);
+        step++;
+        addRolesToServiceAccount(user.get(), serviceAccount, roles, cloudProject);
+      }
+
+      setProgress(progress, "Creating a service account key", step / numSteps);
+      step++;
       ServiceAccountKey serviceAccountKey = createServiceAccountKey(user.get(), serviceAccount);
+
+      setProgress(progress, "Downloading the service account key", step / numSteps);
       Path keyPath = writeServiceAccountKey(serviceAccountKey, downloadDir, cloudProject);
 
       notifyServiceAccountCreated(project, name, keyPath);
@@ -405,10 +422,8 @@ class CloudApiManager {
     return apis.stream().map(CloudLibrary::getName).collect(Collectors.joining("<br>"));
   }
 
-  private static void setApiEnableProgress(
-      ProgressIndicator indicator, String apiName, String cloudProjectName, double fraction) {
-    indicator.setText(
-        GctBundle.message("cloud.apis.enable.progress.message", apiName, cloudProjectName));
+  private static void setProgress(ProgressIndicator indicator, String message, double fraction) {
+    indicator.setText(message);
     indicator.setFraction(fraction);
   }
 }
