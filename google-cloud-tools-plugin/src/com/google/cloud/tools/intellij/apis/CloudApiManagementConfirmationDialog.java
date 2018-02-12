@@ -39,7 +39,6 @@ import com.intellij.util.ui.UIUtil;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
