@@ -126,7 +126,7 @@ class CloudApiManager {
                 "cloud.apis.enable.progress.message",
                 library.getName(),
                 cloudProject.projectName()),
-            (double) (i + 1) / libraryList.size());
+            (double) i / libraryList.size());
         enableApi(library, cloudProject, user.get());
 
         enabledApis.add(library);
@@ -169,7 +169,7 @@ class CloudApiManager {
 
     try {
       int numSteps = roles.isEmpty() ? 3 : 4;
-      double step = 1;
+      double step = 0;
 
       updateProgress(
           progress,
