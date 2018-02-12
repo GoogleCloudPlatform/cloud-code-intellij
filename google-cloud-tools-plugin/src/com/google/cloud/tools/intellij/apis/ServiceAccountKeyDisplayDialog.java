@@ -37,6 +37,7 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
   private JLabel credentialEnvVarLabel;
   private JButton copyToClipboardButton;
   private static final String CREDENTIAL_ENV_VAR_KEY = "GOOGLE_APPLICATION_CREDENTIALS";
+  private static final String ENV_VAR_DISPLAY_FORMAT = "%s=%s";
 
   ServiceAccountKeyDisplayDialog(@Nullable Project project, String downloadPath) {
     super(project);
@@ -45,7 +46,9 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
     setTitle(GctBundle.message("cloud.apis.service.account.key.downloaded.title"));
     downloadPathLabel.setText(downloadPath);
 
-    String credentialEnvVar = CREDENTIAL_ENV_VAR_KEY + "=" + downloadPath;
+    // TODO fix the value: it should be the path to the key, not its containing directory
+    String credentialEnvVar =
+        String.format(ENV_VAR_DISPLAY_FORMAT, CREDENTIAL_ENV_VAR_KEY, downloadPath);
     credentialEnvVarLabel.setText(credentialEnvVar);
 
     copyToClipboardButton.addActionListener(new CopyToClipboardActionListener(credentialEnvVar));
