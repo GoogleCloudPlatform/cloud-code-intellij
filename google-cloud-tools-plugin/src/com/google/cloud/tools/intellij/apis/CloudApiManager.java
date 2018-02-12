@@ -261,9 +261,7 @@ class CloudApiManager {
                 role -> {
                   Binding binding = new Binding();
                   binding.setRole(role.getName());
-                  binding.setMembers(
-                      ImmutableList.of(
-                          SERVICE_ACCOUNT_ROLE_REQUEST_PREFIX + serviceAccount.getEmail()));
+                  binding.setMembers(createServiceAccountMemberBindings(serviceAccount));
                   return binding;
                 })
             .collect(Collectors.toList());
@@ -276,6 +274,10 @@ class CloudApiManager {
     policyRequest.setPolicy(newPolicy);
 
     resourceManager.projects().setIamPolicy(cloudProject.projectId(), policyRequest).execute();
+  }
+
+  private static List<String> createServiceAccountMemberBindings(ServiceAccount serviceAccount) {
+    return ImmutableList.of(SERVICE_ACCOUNT_ROLE_REQUEST_PREFIX + serviceAccount.getEmail());
   }
 
   /**
