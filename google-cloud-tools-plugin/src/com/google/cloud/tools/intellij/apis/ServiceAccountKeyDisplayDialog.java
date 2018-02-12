@@ -46,7 +46,6 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
     setTitle(GctBundle.message("cloud.apis.service.account.key.downloaded.title"));
     downloadPathLabel.setText(downloadPath);
 
-    // TODO fix the value: it should be the path to the key, not its containing directory
     String credentialEnvVar =
         String.format(ENV_VAR_DISPLAY_FORMAT, CREDENTIAL_ENV_VAR_KEY, downloadPath);
     credentialEnvVarLabel.setText(credentialEnvVar);

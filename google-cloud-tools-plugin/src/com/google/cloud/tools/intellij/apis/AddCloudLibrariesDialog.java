@@ -127,11 +127,6 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
             managementDialog.getServiceAccountKeyDownloadPath());
 
         super.doOKAction();
-
-        ServiceAccountKeyDisplayDialog keyDialog =
-            new ServiceAccountKeyDisplayDialog(
-                project, managementDialog.getServiceAccountKeyDownloadPath().toString());
-        DialogManager.show(keyDialog);
       }
     } else {
       super.doOKAction();
