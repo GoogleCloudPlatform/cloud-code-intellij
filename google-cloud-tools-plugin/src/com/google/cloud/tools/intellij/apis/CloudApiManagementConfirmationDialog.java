@@ -40,6 +40,8 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
@@ -211,10 +213,14 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
     roleTable = new ServiceAccountRolesTable(roles);
   }
 
-  // TODO refactor to use Path API since the new getter return a Path
-  private static boolean isValidDirectory(String path) {
-    File file = new File(path);
-    return file.exists() && file.isDirectory() && file.canWrite();
+  private static boolean isValidDirectory(String pathString) {
+    Path path;
+    try {
+      path = Paths.get(pathString);
+    } catch (InvalidPathException ipe) {
+      return false;
+    }
+    return Files.exists(path) && Files.isDirectory(path) && Files.isWritable(path);
   }
 
   private static final class ServiceAccountRolesTable extends JBTable {
