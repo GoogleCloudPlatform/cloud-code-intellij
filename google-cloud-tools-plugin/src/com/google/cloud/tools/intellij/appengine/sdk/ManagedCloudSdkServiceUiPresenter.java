@@ -45,22 +45,28 @@ public class ManagedCloudSdkServiceUiPresenter {
   }
 
   public void notifyManagedSdkJobSuccess(ManagedSdkJobType jobType) {
-    String message;
-    switch (jobType) {
-      case UPDATE:
-        message = GctBundle.message("managedsdk.update.success");
-        break;
-      default:
-        message = GctBundle.message("managedsdk.install.success");
-        break;
-    }
+    String message = GctBundle.message("managedsdk.success." + jobType.name().toLowerCase());
+    showNotification(message, NotificationType.INFORMATION);
+  }
 
+  public void notifyManagedSdkJobFailure(ManagedSdkJobType jobType, String errorMessage) {
+    String message =
+        GctBundle.message("managedsdk.failure." + jobType.name().toLowerCase(), errorMessage);
+    showNotification(message, NotificationType.ERROR);
+  }
+
+  public void notifyManagedSdkJobCancellation(ManagedSdkJobType jobType) {
+    String message = GctBundle.message("managedsdk.cancel." + jobType.name().toLowerCase());
+    showNotification(message, NotificationType.WARNING);
+  }
+
+  private void showNotification(String message, NotificationType notificationType) {
     Notification notification =
         NOTIFICATION_GROUP.createNotification(
             GctBundle.message("managedsdk.notifications.title"),
             null /*subtitle*/,
             message,
-            NotificationType.INFORMATION);
+            notificationType);
     notification.notify(null);
   }
 }

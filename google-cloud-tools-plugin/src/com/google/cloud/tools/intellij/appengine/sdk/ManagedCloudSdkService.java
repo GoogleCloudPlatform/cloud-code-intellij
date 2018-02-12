@@ -124,6 +124,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
     ApplicationManager.getApplication().invokeLater(runnable);
   }
 
+  /** Creates managed SDK and checks for fatal errors. */
   @VisibleForTesting
   void initManagedSdk() {
     if (managedCloudSdk == null) {
@@ -237,6 +238,10 @@ public class ManagedCloudSdkService implements CloudSdkService {
     UPDATE
   }
 
+  /**
+   * Managed SDK Job future listener, handles success/error logic, logs errors, shows notifications
+   * to a user, updates SDK service statuses.
+   */
   private final class ManagedSdkJobListener implements FutureCallback<Path> {
     private final ManagedSdkJobType jobType;
 
@@ -260,6 +265,9 @@ public class ManagedCloudSdkService implements CloudSdkService {
       } else {
         logger.error("Error while installing/updating managed Cloud SDK", t);
         updateStatus(SdkStatus.NOT_AVAILABLE);
+
+        ManagedCloudSdkServiceUiPresenter.getInstance()
+            .notifyManagedSdkJobFailure(jobType, t.toString());
       }
     }
 
@@ -273,6 +281,8 @@ public class ManagedCloudSdkService implements CloudSdkService {
         case UPDATE:
           break;
       }
+
+      ManagedCloudSdkServiceUiPresenter.getInstance().notifyManagedSdkJobCancellation(jobType);
     }
   }
 }
