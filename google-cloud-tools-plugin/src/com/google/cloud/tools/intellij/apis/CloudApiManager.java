@@ -79,9 +79,10 @@ class CloudApiManager {
   private static final DateTimeFormatter SERVICE_ACCOUNT_TIMESTAMP_FORMAT =
       DateTimeFormatter.ofPattern("yyMMddHHmmss");
 
-  private static final String SERVICE_REQUEST_PROJECT_PATTERN = "project:%s";
-  private static final String SERVICE_ACCOUNT_CREATE_REQUEST_PROJECT_PATTERN = "projects/%s";
+  private static final String SERVICE_REQUEST_PROJECT_FORMAT = "project:%s";
+  private static final String SERVICE_ACCOUNT_CREATE_REQUEST_PROJECT_FORMAT = "projects/%s";
   private static final String SERVICE_ACCOUNT_ROLE_REQUEST_PREFIX = "serviceAccount:";
+  private static final String SERVICE_ACCOUNT_KEY_FILE_NAME_FORMAT = "%s-%s.json";
 
   private CloudApiManager() {}
 
@@ -221,7 +222,7 @@ class CloudApiManager {
     return iam.projects()
         .serviceAccounts()
         .create(
-            String.format(SERVICE_ACCOUNT_CREATE_REQUEST_PROJECT_PATTERN, cloudProject.projectId()),
+            String.format(SERVICE_ACCOUNT_CREATE_REQUEST_PROJECT_FORMAT, cloudProject.projectId()),
             request)
         .execute();
   }
@@ -315,9 +316,12 @@ class CloudApiManager {
   private static Path writeServiceAccountKey(
       ServiceAccountKey key, Path downloadDir, CloudProject cloudProject) throws IOException {
     Path keyPath =
-        Paths.get(
-            downloadDir.toString(), cloudProject.projectName() + "-" + getTimestamp() + ".json");
+        Paths.get(downloadDir.toString(), getServiceAccountKeyName(cloudProject.projectName()));
     return Files.write(keyPath, Base64.decodeBase64(key.getPrivateKeyData()));
+  }
+
+  private static String getServiceAccountKeyName(String cloudProjectName) {
+    return String.format(SERVICE_ACCOUNT_KEY_FILE_NAME_FORMAT, cloudProjectName, getTimestamp());
   }
 
   private static void enableApi(
@@ -337,7 +341,7 @@ class CloudApiManager {
             library.getServiceName(),
             new EnableServiceRequest()
                 .setConsumerId(
-                    String.format(SERVICE_REQUEST_PROJECT_PATTERN, cloudProject.projectId())))
+                    String.format(SERVICE_REQUEST_PROJECT_FORMAT, cloudProject.projectId())))
         .execute();
   }
 
