@@ -18,6 +18,8 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.managedcloudsdk.ManagedCloudSdk;
+import com.google.cloud.tools.managedcloudsdk.ManagedSdkVerificationException;
+import com.google.cloud.tools.managedcloudsdk.ManagedSdkVersionMismatchException;
 import com.google.cloud.tools.managedcloudsdk.MessageListener;
 import com.google.cloud.tools.managedcloudsdk.UnsupportedOsException;
 import com.google.cloud.tools.managedcloudsdk.components.SdkComponent;
@@ -171,7 +173,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
   /** Installs core managed SDK if needed and returns its path if successful. */
   private Path installSdk() throws Exception {
-    if (!managedCloudSdk.isInstalled()) {
+    if (!safeCheckSdkStatus(() -> managedCloudSdk.isInstalled())) {
       MessageListener sdkInstallListener = logger::debug;
 
       return managedCloudSdk.newInstaller().install(sdkInstallListener);
@@ -181,7 +183,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
   }
 
   private void installAppEngineJavaComponent() throws Exception {
-    if (!managedCloudSdk.hasComponent(SdkComponent.APP_ENGINE_JAVA)) {
+    if (!safeCheckSdkStatus(() -> managedCloudSdk.hasComponent(SdkComponent.APP_ENGINE_JAVA))) {
       MessageListener appEngineInstallListener = logger::debug;
 
       managedCloudSdk
@@ -191,13 +193,30 @@ public class ManagedCloudSdkService implements CloudSdkService {
   }
 
   private Path updateManagedSdk() throws Exception {
-    if (!managedCloudSdk.isUpToDate()) {
+    if (!safeCheckSdkStatus(() -> managedCloudSdk.isUpToDate())) {
       MessageListener sdkUpdateListener = logger::debug;
 
       managedCloudSdk.newUpdater().update(sdkUpdateListener);
     }
 
     return managedCloudSdk.getSdkHome();
+  }
+
+  /**
+   * Checks SDK status (installed, up-to-date, has component), catching non-fatal exceptions which
+   * does not mean SDK cannot be updated or re-installed. Other exceptions are propagated to the
+   * caller.
+   *
+   * @param statusCallable Status check code, returns SDK status result.
+   * @return Status of SDK check, false if non-fatal exception was caught.
+   */
+  private boolean safeCheckSdkStatus(Callable<Boolean> statusCallable) throws Exception {
+    try {
+      return statusCallable.call();
+    } catch (ManagedSdkVerificationException | ManagedSdkVersionMismatchException ex) {
+      logger.error("Unable to check status of existing Managed Cloud SDK, will re-install", ex);
+    }
+    return false;
   }
 
   private void updateStatus(SdkStatus sdkStatus) {
