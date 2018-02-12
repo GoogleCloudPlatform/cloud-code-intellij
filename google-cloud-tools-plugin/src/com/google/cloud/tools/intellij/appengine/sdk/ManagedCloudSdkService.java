@@ -273,12 +273,13 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
     private void handleJobCancellation() {
       logger.info("Managed Google Cloud SDK install/update cancelled.");
-      // interrupted install means not available, but interrupted update does not change status.
+      // interrupted install means not available, but interrupted update means SDK still available.
       switch (jobType) {
         case INSTALL:
           updateStatus(SdkStatus.NOT_AVAILABLE);
           break;
         case UPDATE:
+          updateStatus(SdkStatus.READY);
           break;
       }
 

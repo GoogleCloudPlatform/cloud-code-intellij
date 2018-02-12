@@ -34,9 +34,11 @@ import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.managedcloudsdk.ManagedCloudSdk;
 import com.google.cloud.tools.managedcloudsdk.UnsupportedOsException;
 import com.google.cloud.tools.managedcloudsdk.command.CommandExecutionException;
+import com.google.cloud.tools.managedcloudsdk.command.CommandExitException;
 import com.google.cloud.tools.managedcloudsdk.components.SdkComponent;
 import com.google.cloud.tools.managedcloudsdk.components.SdkComponentInstaller;
 import com.google.cloud.tools.managedcloudsdk.install.SdkInstaller;
+import com.google.cloud.tools.managedcloudsdk.update.SdkUpdater;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -149,7 +151,7 @@ public class ManagedCloudSdkServiceTest {
   }
 
   @Test
-  public void install_thenException_changesSdkStatus_inProgress() throws Exception {
+  public void failed_install_changesSdkStatus_inProgress() throws Exception {
     sdkService.addStatusUpdateListener(mockStatusUpdateListener);
     emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
     SdkInstaller mockInstaller = mockManagedCloudSdk.newInstaller();
@@ -164,7 +166,7 @@ public class ManagedCloudSdkServiceTest {
   }
 
   @Test
-  public void install_appEngineException_changesSdkStatus_inProgress() throws Exception {
+  public void failed_install_appEngineException_changesSdkStatus_inProgress() throws Exception {
     sdkService.addStatusUpdateListener(mockStatusUpdateListener);
     emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
     SdkComponentInstaller mockComponentInstaller = mockManagedCloudSdk.newComponentInstaller();
@@ -192,6 +194,55 @@ public class ManagedCloudSdkServiceTest {
     assertThat(sdkService.getStatus()).isEqualTo(SdkStatus.NOT_AVAILABLE);
   }
 
+  @Test
+  public void successful_update_changesSdkStatus_inProgress() {
+    makeMockSdkInstalled(MOCK_SDK_PATH);
+    emulateMockSdkUpdateProcess();
+
+    sdkService.addStatusUpdateListener(mockStatusUpdateListener);
+    sdkService.update();
+
+    ArgumentCaptor<SdkStatus> statusCaptor = ArgumentCaptor.forClass(SdkStatus.class);
+    verify(mockStatusUpdateListener, times(2)).onSdkStatusChange(any(), statusCaptor.capture());
+
+    assertThat(statusCaptor.getAllValues())
+        .isEqualTo(Arrays.asList(SdkStatus.INSTALLING, SdkStatus.READY));
+  }
+
+  @Test
+  public void interrupted_update_keepsSdkStatus_available() throws Exception {
+    makeMockSdkInstalled(MOCK_SDK_PATH);
+    emulateMockSdkUpdateProcess();
+    SdkUpdater mockUpdater = mockManagedCloudSdk.newUpdater();
+    doThrow(new InterruptedException()).when(mockUpdater).update(any());
+
+    sdkService.addStatusUpdateListener(mockStatusUpdateListener);
+    sdkService.update();
+
+    ArgumentCaptor<SdkStatus> statusCaptor = ArgumentCaptor.forClass(SdkStatus.class);
+    verify(mockStatusUpdateListener, times(2)).onSdkStatusChange(any(), statusCaptor.capture());
+
+    assertThat(statusCaptor.getAllValues())
+        .isEqualTo(Arrays.asList(SdkStatus.INSTALLING, SdkStatus.READY));
+  }
+
+  @Test
+  public void failed_update_makesSdkStatus_notAvailable() throws Exception {
+    makeMockSdkInstalled(MOCK_SDK_PATH);
+    emulateMockSdkUpdateProcess();
+    SdkUpdater mockUpdater = mockManagedCloudSdk.newUpdater();
+    doThrow(new CommandExitException(-1, "")).when(mockUpdater).update(any());
+
+    sdkService.addStatusUpdateListener(mockStatusUpdateListener);
+    sdkService.update();
+
+    ArgumentCaptor<SdkStatus> statusCaptor = ArgumentCaptor.forClass(SdkStatus.class);
+    verify(mockStatusUpdateListener, times(2)).onSdkStatusChange(any(), statusCaptor.capture());
+
+    assertThat(statusCaptor.getAllValues())
+        .isEqualTo(Arrays.asList(SdkStatus.INSTALLING, SdkStatus.NOT_AVAILABLE));
+  }
+
   /** Mocks managed SDK as if installed and having App Engine Component. */
   private void makeMockSdkInstalled(Path mockSdkPath) {
     try {
@@ -217,6 +268,18 @@ public class ManagedCloudSdkServiceTest {
       when(mockManagedCloudSdk.newComponentInstaller()).thenReturn(mockComponentInstaller);
 
       when(mockManagedCloudSdk.getSdkHome()).thenReturn(mockSdkPath);
+    } catch (Exception ex) {
+      // shouldn't happen in the tests.
+      throw new AssertionError(ex);
+    }
+  }
+
+  /** Mocks out-of-date SDK and update process. */
+  private void emulateMockSdkUpdateProcess() {
+    try {
+      when(mockManagedCloudSdk.isUpToDate()).thenReturn(false);
+      SdkUpdater mockUpdater = mock(SdkUpdater.class);
+      when(mockManagedCloudSdk.newUpdater()).thenReturn(mockUpdater);
     } catch (Exception ex) {
       // shouldn't happen in the tests.
       throw new AssertionError(ex);
