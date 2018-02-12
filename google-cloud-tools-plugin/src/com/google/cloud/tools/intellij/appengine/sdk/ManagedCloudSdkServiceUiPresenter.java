@@ -20,6 +20,7 @@ import com.google.cloud.tools.intellij.appengine.sdk.ManagedCloudSdkService.Mana
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.annotations.VisibleForTesting;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
@@ -42,6 +43,11 @@ public class ManagedCloudSdkServiceUiPresenter {
 
   static ManagedCloudSdkServiceUiPresenter getInstance() {
     return instance;
+  }
+
+  @VisibleForTesting
+  static void setInstance(ManagedCloudSdkServiceUiPresenter uiPresenter) {
+    ManagedCloudSdkServiceUiPresenter.instance = uiPresenter;
   }
 
   public void notifyManagedSdkJobSuccess(ManagedSdkJobType jobType) {
