@@ -145,7 +145,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
    *
    * @param jobType Install/update
    * @param managedSdkTask Task to execute.
-   * @return True of task started, false if Managed SDK is not supported at all.
+   * @return {@code true} if task started, {@code false} if Managed SDK is not supported at all.
    */
   private boolean executeManagedSdkJob(ManagedSdkJobType jobType, Callable<Path> managedSdkTask) {
     if (managedCloudSdk == null) {
