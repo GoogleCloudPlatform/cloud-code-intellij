@@ -59,7 +59,6 @@ public class ManagedCloudSdkService implements CloudSdkService {
     // TODO track event that custom SDK is activated and used.
 
     initManagedSdk();
-    install();
   }
 
   @Nullable
@@ -124,19 +123,18 @@ public class ManagedCloudSdkService implements CloudSdkService {
     ApplicationManager.getApplication().invokeLater(runnable);
   }
 
-  /** Creates managed SDK and checks for fatal errors. */
+  /** Creates managed SDK, installs if necessary, and checks for fatal errors. */
   @VisibleForTesting
   void initManagedSdk() {
-    if (managedCloudSdk == null) {
-      try {
-        managedCloudSdk = createManagedSdk();
-      } catch (UnsupportedOsException ex) {
-        String errorMessage = "Unsupported OS for Managed Cloud SDK";
-        logger.warn(errorMessage, ex);
-        updateStatus(SdkStatus.NOT_AVAILABLE);
-        ManagedCloudSdkServiceUiPresenter.getInstance()
-            .notifyManagedSdkJobFailure(ManagedSdkJobType.INSTALL, errorMessage);
-      }
+    try {
+      managedCloudSdk = createManagedSdk();
+      install();
+    } catch (UnsupportedOsException ex) {
+      String errorMessage = "Unsupported OS for Managed Cloud SDK";
+      logger.warn(errorMessage, ex);
+      updateStatus(SdkStatus.NOT_AVAILABLE);
+      ManagedCloudSdkServiceUiPresenter.getInstance()
+          .notifyManagedSdkJobFailure(ManagedSdkJobType.INSTALL, errorMessage);
     }
   }
 

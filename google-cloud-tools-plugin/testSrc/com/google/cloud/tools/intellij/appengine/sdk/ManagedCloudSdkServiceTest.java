@@ -73,7 +73,6 @@ public class ManagedCloudSdkServiceTest {
     doReturn(mockManagedCloudSdk).when(sdkService).createManagedSdk();
     // TODO(ivanporty) remove once test logging system is done via CloudToolsRule
     sdkService.setLogger(new TestInMemoryLogger());
-    sdkService.initManagedSdk();
     // make sure everything in test is done synchronously
     ExecutorService directExecutorService = MoreExecutors.newDirectExecutorService();
     ThreadUtil.getInstance().setBackgroundExecutorService(directExecutorService);
@@ -87,16 +86,18 @@ public class ManagedCloudSdkServiceTest {
         .invokeOnApplicationUIThread(any());
     // replace UI presenter for verifications
     ManagedCloudSdkServiceUiPresenter.setInstance(mockUiPresenter);
+    // init SDK, most tests require initialized state.
+    sdkService.initManagedSdk();
   }
 
   @Test
   public void initial_service_notActivated_status_notAvailable() {
-    assertThat(sdkService.getStatus()).isEqualTo(SdkStatus.NOT_AVAILABLE);
+    assertThat(new ManagedCloudSdkService().getStatus()).isEqualTo(SdkStatus.NOT_AVAILABLE);
   }
 
   @Test
   public void initial_service_notActivated_path_isNull() {
-    assertThat((Object) sdkService.getSdkHomePath()).isNull();
+    assertThat((Object) new ManagedCloudSdkService().getSdkHomePath()).isNull();
   }
 
   @Test
