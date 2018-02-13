@@ -38,8 +38,6 @@ dependencies {
     testCompile(project(':common-test-lib'))
 }
 
-jar.archiveName = "google-account.jar"
-
 configurations {
     // these are already obtained from google-api-java-client-min-repackaged
     compile.exclude group: 'com.google.api-client', module: 'google-api-client'
