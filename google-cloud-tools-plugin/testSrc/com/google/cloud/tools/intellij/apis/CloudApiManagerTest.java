@@ -86,7 +86,7 @@ public class CloudApiManagerTest {
   private ServiceAccountKey serviceAccountKey;
   private Policy policy;
 
-  @TestDirectory(name = "downlaodDir")
+  @TestDirectory(name = "downloadDir")
   private File downloadDir;
 
   private static final String CLOUD_PROJECT_NAME = "my-cloud-project";
