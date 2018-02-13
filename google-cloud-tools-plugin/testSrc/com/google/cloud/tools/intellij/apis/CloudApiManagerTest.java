@@ -42,6 +42,8 @@ import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.intellij.notification.Notification;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
@@ -52,6 +54,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 
 /** Tests for {@link CloudApiManager} */
@@ -77,6 +80,8 @@ public class CloudApiManagerTest {
   @Mock private ServiceAccounts.Create serviceAccountCreate;
   @Mock private Keys.Create keysCreate;
 
+  @Mock Notifications notifications;
+
   private ServiceAccount serviceAccount;
   private ServiceAccountKey serviceAccountKey;
   private Policy policy;
@@ -85,6 +90,7 @@ public class CloudApiManagerTest {
   private File downloadDir;
 
   private static final String CLOUD_PROJECT_NAME = "my-cloud-project";
+  private static final String SERVICE_ACCOUNT_NAME = "my-service-account";
   private final CloudProject cloudProject = CloudProject.create(CLOUD_PROJECT_NAME, "id", "user");
 
   @Before
@@ -99,19 +105,24 @@ public class CloudApiManagerTest {
     setupFakePolicy();
     setupMockIamClient();
     setupMockResourceManagerClient();
+
+    testFixture
+        .getProject()
+        .getMessageBus()
+        .connect()
+        .subscribe(Notifications.TOPIC, notifications);
   }
 
   @Test
   public void createServiceAccountAndDownloadKey_withNoRoles_createsKey() {
     Set<Role> roles = ImmutableSet.of();
     CloudApiManager.createServiceAccountAndDownloadKey(
-        roles, "my-roles", downloadDir.toPath(), cloudProject, testFixture.getProject());
+        roles, SERVICE_ACCOUNT_NAME, downloadDir.toPath(), cloudProject, testFixture.getProject());
 
     verify(progressIndicator, times(3)).setText(anyString());
     verify(progressIndicator, times(3)).setFraction(anyDouble());
 
     String[] contents = downloadDir.list();
-
     assertThat(contents.length).isEqualTo(1);
     assertThat(contents[0]).startsWith(CLOUD_PROJECT_NAME);
   }
@@ -122,15 +133,29 @@ public class CloudApiManagerTest {
     role.setName("my-role");
     Set<Role> roles = ImmutableSet.of(role);
     CloudApiManager.createServiceAccountAndDownloadKey(
-        roles, "my-roles", downloadDir.toPath(), cloudProject, testFixture.getProject());
+        roles, SERVICE_ACCOUNT_NAME, downloadDir.toPath(), cloudProject, testFixture.getProject());
 
     verify(progressIndicator, times(4)).setText(anyString());
     verify(progressIndicator, times(4)).setFraction(anyDouble());
 
     String[] contents = downloadDir.list();
-
     assertThat(contents.length).isEqualTo(1);
     assertThat(contents[0]).startsWith(CLOUD_PROJECT_NAME);
+  }
+
+  @Test
+  public void createServiceAccountAndDownloadKey_whenThrowingException_notifiesUser()
+      throws IOException {
+    when(serviceAccountCreate.execute()).thenThrow(new IOException());
+
+    Set<Role> roles = ImmutableSet.of();
+    CloudApiManager.createServiceAccountAndDownloadKey(
+        roles, SERVICE_ACCOUNT_NAME, downloadDir.toPath(), cloudProject, testFixture.getProject());
+
+    ArgumentCaptor<Notification> captor = ArgumentCaptor.forClass(Notification.class);
+    verify(notifications).notify(captor.capture());
+    assertThat(captor.getAllValues().size()).isEqualTo(1);
+    assertThat(captor.getValue().getTitle()).isEqualTo("Error Creating Service Account");
   }
 
   private void setupMockIamClient() throws IOException {
