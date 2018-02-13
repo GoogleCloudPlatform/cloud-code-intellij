@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.util;
+package com.google.cloud.tools.intellij.core.analytics;
 
 /** Class defining client-side event actions we want to track. */
 public class GctTracking {

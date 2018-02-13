@@ -13,9 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-include 'google-cloud-tools-plugin'
-include 'common-lib'
-include 'common-test-lib'
-include 'google-cloud-tools-plugin:ultimate'
-include 'google-cloud-tools-plugin:google-account'
-include 'google-cloud-tools-plugin:google-cloud-core'
+
+// Use IntelliJ src structure for now
+sourceSets.main.java.srcDirs = ['src']
+sourceSets.main.resources.srcDirs = ['resources']
+sourceSets.test.java.srcDirs = ['testSrc']
+sourceSets.test.resources.srcDirs = ['testResources']
+
+dependencies {
+    compile(project(':common-lib'),  project(':google-cloud-tools-plugin:google-account'))
+
+    testCompile(project(':common-test-lib'))
+}
+
+configurations {
+    // this is already obtained from google-api-java-client-min-repackaged
+    compile.exclude group: 'com.google.api-client', module: 'google-api-client'
+    tests
+}

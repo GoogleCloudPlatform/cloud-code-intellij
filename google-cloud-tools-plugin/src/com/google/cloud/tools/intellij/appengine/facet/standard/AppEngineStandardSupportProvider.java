@@ -23,7 +23,7 @@ import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
-import com.google.cloud.tools.intellij.util.GctTracking;
+import com.google.cloud.tools.intellij.core.analytics.GctTracking;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetType;

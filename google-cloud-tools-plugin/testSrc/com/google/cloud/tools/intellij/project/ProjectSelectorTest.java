@@ -22,10 +22,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.core.GoogleCloudCoreMessageBundle;
 import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import java.awt.Component;
@@ -197,7 +197,7 @@ public class ProjectSelectorTest {
     projectSelector.setSelectedProject(TEST_PROJECT);
 
     assertThat(projectSelector.getAccountInfoLabel().getText())
-        .isEqualTo(GctBundle.message("cloud.project.selector.not.signed.in"));
+        .isEqualTo(GoogleCloudCoreMessageBundle.message("cloud.project.selector.not.signed.in"));
     assertThat(projectSelector.getAccountInfoLabel().getIcon()).isNull();
   }
 
@@ -224,14 +224,15 @@ public class ProjectSelectorTest {
     ApplicationManager.getApplication().invokeAndWait(() -> {});
 
     assertThat(projectSelector.getAccountInfoLabel().getText())
-        .isEqualTo(GctBundle.message("cloud.project.selector.not.signed.in"));
+        .isEqualTo(GoogleCloudCoreMessageBundle.message("cloud.project.selector.not.signed.in"));
     assertThat(projectSelector.getAccountInfoLabel().getIcon()).isNull();
   }
 
   private void verifyUiStateForProject(CloudProject project) {
     if (project == null) {
       assertThat(projectSelector.getProjectNameLabel().getHyperlinkText())
-          .isEqualTo(GctBundle.getString("cloud.project.selector.no.selected.project"));
+          .isEqualTo(
+              GoogleCloudCoreMessageBundle.getString("cloud.project.selector.no.selected.project"));
       // no account information UI is visible/populated.
       assertThat(projectSelector.getProjectAccountSeparatorLabel().isVisible()).isFalse();
       assertThat(projectSelector.getAccountInfoLabel().getHyperlinkText()).isEmpty();

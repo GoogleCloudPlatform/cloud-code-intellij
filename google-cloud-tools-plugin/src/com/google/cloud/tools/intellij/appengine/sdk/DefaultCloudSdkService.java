@@ -19,7 +19,7 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
-import com.google.cloud.tools.intellij.util.GctTracking;
+import com.google.cloud.tools.intellij.core.analytics.GctTracking;
 import com.google.common.base.Strings;
 import com.intellij.ide.util.PropertiesComponent;
 import java.nio.file.Path;
