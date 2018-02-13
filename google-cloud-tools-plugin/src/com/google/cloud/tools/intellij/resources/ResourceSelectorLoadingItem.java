@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.resources;
 
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
+import com.google.cloud.tools.intellij.core.GoogleCloudCoreIcons;
 import com.intellij.ui.components.JBLabel;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -57,7 +57,7 @@ class ResourceSelectorLoadingItem extends JPanel {
   // timer ticks.
   public void snap() {
     long currentMilliseconds = System.nanoTime() / 1000000;
-    int frame = (int) (currentMilliseconds / 100) % GoogleCloudToolsIcons.STEP_ICONS.size();
-    progressIcon.setIcon(GoogleCloudToolsIcons.STEP_ICONS.get(frame));
+    int frame = (int) (currentMilliseconds / 100) % GoogleCloudCoreIcons.STEP_ICONS.size();
+    progressIcon.setIcon(GoogleCloudCoreIcons.STEP_ICONS.get(frame));
   }
 }

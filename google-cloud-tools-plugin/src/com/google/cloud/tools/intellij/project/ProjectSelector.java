@@ -16,12 +16,12 @@
 
 package com.google.cloud.tools.intellij.project;
 
+import com.google.cloud.tools.intellij.core.GoogleCloudCoreMessageBundle;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.GoogleLoginListener;
 import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.login.ui.GoogleLoginIcons;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.intellij.openapi.application.ApplicationManager;
@@ -174,7 +174,7 @@ public class ProjectSelector extends JPanel {
   private void createUIComponents() {
     projectNameLabel = new HyperlinkLabelWithStateAccess();
     projectNameLabel.setHyperlinkText(
-        GctBundle.getString("cloud.project.selector.no.selected.project"));
+        GoogleCloudCoreMessageBundle.getString("cloud.project.selector.no.selected.project"));
     projectNameLabel.addHyperlinkListener(
         (event) -> {
           if (event.getEventType() == EventType.ACTIVATED) {
@@ -205,7 +205,8 @@ public class ProjectSelector extends JPanel {
     browseButton = new FixedSizeButton(wrapperBorderPanel);
     browseButton.addActionListener((actionEvent) -> handleOpenProjectSelectionDialog());
     browseButton.setFocusable(true);
-    browseButton.setToolTipText(GctBundle.getString("cloud.project.selector.open.dialog.tooltip"));
+    browseButton.setToolTipText(
+        GoogleCloudCoreMessageBundle.getString("cloud.project.selector.open.dialog.tooltip"));
   }
 
   @VisibleForTesting
@@ -226,7 +227,7 @@ public class ProjectSelector extends JPanel {
 
   private void updateEmptySelection() {
     projectNameLabel.setHyperlinkText(
-        GctBundle.getString("cloud.project.selector.no.selected.project"));
+        GoogleCloudCoreMessageBundle.getString("cloud.project.selector.no.selected.project"));
     accountInfoLabel.setHyperlinkText("");
     accountInfoLabel.setIcon(null);
     projectAccountSeparatorLabel.setVisible(false);
@@ -244,7 +245,8 @@ public class ProjectSelector extends JPanel {
         loginService.getLoggedInUser(selection.googleUsername());
 
     if (!loginService.isLoggedIn()) {
-      accountInfoLabel.setHyperlinkText(GctBundle.message("cloud.project.selector.not.signed.in"));
+      accountInfoLabel.setHyperlinkText(
+          GoogleCloudCoreMessageBundle.message("cloud.project.selector.not.signed.in"));
     } else if (loggedInUser.isPresent()) {
       accountInfoLabel.setHyperlinkText(
           String.format(
