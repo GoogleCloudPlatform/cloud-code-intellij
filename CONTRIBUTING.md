@@ -50,7 +50,7 @@ Other useful targets while developing include:
 * $ ./gradlew test: run tests
 * $ ./gradlew check: run static analysis tools
 * $ ./gradlew clean: remove all build artifacts
-* $ ./gradlew runIdea: run IntelliJ preconfigured with the plugins from this project.
+* $ ./gradlew runIde: run IntelliJ preconfigured with the plugins from this project.
 
 ## Configuring and Debugging in IntelliJ
 
