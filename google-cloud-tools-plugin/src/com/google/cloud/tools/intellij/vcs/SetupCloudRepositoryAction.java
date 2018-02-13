@@ -18,11 +18,11 @@ package com.google.cloud.tools.intellij.vcs;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.core.analytics.GctTracking;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
-import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
 import com.intellij.ide.util.PropertiesComponent;

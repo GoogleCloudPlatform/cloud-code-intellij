@@ -16,8 +16,8 @@
 
 package com.google.cloud.tools.intellij.apis;
 
+import com.google.cloud.tools.intellij.core.GoogleCloudCoreIcons;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
@@ -189,7 +189,7 @@ public final class GoogleCloudApiDetailsPanel {
     if (currentCloudLibrary.getIcon() == null) {
       icon.setIcon(null);
     } else {
-      icon.setIcon(GoogleCloudToolsIcons.LOADING);
+      icon.setIcon(GoogleCloudCoreIcons.LOADING);
       loadImageAsync(currentCloudLibrary.getIcon(), icon::setIcon);
     }
 

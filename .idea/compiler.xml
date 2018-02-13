@@ -13,12 +13,16 @@
       <entry name="!?*.clj" />
     </wildcardResourcePatterns>
     <bytecodeTargetLevel>
+      <module name="cloud-storage_main" target="1.8" />
+      <module name="cloud-storage_test" target="1.8" />
       <module name="common-lib_main" target="1.8" />
       <module name="common-lib_test" target="1.8" />
       <module name="common-test-lib_main" target="1.8" />
       <module name="common-test-lib_test" target="1.8" />
       <module name="google-account_main" target="1.8" />
       <module name="google-account_test" target="1.8" />
+      <module name="google-cloud-core_main" target="1.8" />
+      <module name="google-cloud-core_test" target="1.8" />
       <module name="google-cloud-tools-plugin_main" target="1.8" />
       <module name="google-cloud-tools-plugin_test" target="1.8" />
       <module name="ultimate_main" target="1.8" />
