@@ -47,6 +47,7 @@ import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
@@ -168,7 +169,8 @@ class CloudApiManager {
       return;
     }
 
-    ProgressIndicator progress = ProgressManager.getInstance().getProgressIndicator();
+    ProgressIndicator progress =
+        ServiceManager.getService(ProgressManager.class).getProgressIndicator();
 
     try {
       int numSteps = roles.isEmpty() ? 3 : 4;
