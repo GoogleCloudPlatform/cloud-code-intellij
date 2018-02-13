@@ -207,6 +207,7 @@ class CloudApiManager {
     } catch (IOException e) {
       LOG.warn(
           "Exception occurred attempting to create service account on GCP and download its key", e);
+      notifyServiceAccountError(project, name);
     }
   }
 
@@ -438,6 +439,16 @@ class CloudApiManager {
                   new ServiceAccountKeyDisplayDialog(project, downloadDir.toString());
               DialogManager.show(keyDialog);
             });
+  }
+
+  private static void notifyServiceAccountError(Project project, String name) {
+    Notification notification =
+        NOTIFICATION_GROUP.createNotification(
+            GctBundle.message("cloud.apis.service.account.created.error.title"),
+            null /*subtitle*/,
+            GctBundle.message("cloud.apis.service.account.created.error.message", name),
+            NotificationType.INFORMATION);
+    notification.notify(project);
   }
 
   private static String joinApiNames(Set<CloudLibrary> apis) {
