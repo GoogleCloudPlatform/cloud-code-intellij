@@ -131,8 +131,11 @@ public class ManagedCloudSdkService implements CloudSdkService {
       try {
         managedCloudSdk = createManagedSdk();
       } catch (UnsupportedOsException ex) {
-        logger.error("Unsupported OS for Managed Cloud SDK", ex);
+        String errorMessage = "Unsupported OS for Managed Cloud SDK";
+        logger.warn(errorMessage, ex);
         updateStatus(SdkStatus.NOT_AVAILABLE);
+        ManagedCloudSdkServiceUiPresenter.getInstance()
+            .notifyManagedSdkJobFailure(ManagedSdkJobType.INSTALL, errorMessage);
       }
     }
   }
@@ -215,7 +218,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
     try {
       return statusCallable.call();
     } catch (ManagedSdkVerificationException | ManagedSdkVersionMismatchException ex) {
-      logger.error("Unable to check status of existing Managed Cloud SDK, will re-install", ex);
+      logger.warn("Unable to check status of existing Managed Cloud SDK, will re-install", ex);
     }
     return false;
   }
@@ -263,7 +266,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
       if (t instanceof InterruptedException) {
         handleJobCancellation();
       } else {
-        logger.error("Error while installing/updating managed Cloud SDK", t);
+        logger.warn("Error while installing/updating managed Cloud SDK", t);
         updateStatus(SdkStatus.NOT_AVAILABLE);
 
         ManagedCloudSdkServiceUiPresenter.getInstance()
