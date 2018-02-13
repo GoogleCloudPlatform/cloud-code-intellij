@@ -275,11 +275,30 @@ public class ManagedCloudSdkServiceTest {
   }
 
   @Test
-  public void failed_update_makesSdkStatus_notAvailable() throws Exception {
+  public void failed_update_validSdk_sdkStatus_available() throws Exception {
     makeMockSdkInstalled(MOCK_SDK_PATH);
     emulateMockSdkUpdateProcess();
     SdkUpdater mockUpdater = mockManagedCloudSdk.newUpdater();
     doThrow(new CommandExitException(-1, "")).when(mockUpdater).update(any());
+
+    sdkService.addStatusUpdateListener(mockStatusUpdateListener);
+    sdkService.update();
+
+    ArgumentCaptor<SdkStatus> statusCaptor = ArgumentCaptor.forClass(SdkStatus.class);
+    verify(mockStatusUpdateListener, times(2)).onSdkStatusChange(any(), statusCaptor.capture());
+
+    assertThat(statusCaptor.getAllValues())
+        .isEqualTo(Arrays.asList(SdkStatus.INSTALLING, SdkStatus.READY));
+  }
+
+  @Test
+  public void failed_update_invalidSdk_makesSdkStatus_notAvailable() throws Exception {
+    makeMockSdkInstalled(MOCK_SDK_PATH);
+    emulateMockSdkUpdateProcess();
+    SdkUpdater mockUpdater = mockManagedCloudSdk.newUpdater();
+    doThrow(new CommandExitException(-1, "")).when(mockUpdater).update(any());
+    // update breaks SDK
+    when(mockManagedCloudSdk.isInstalled()).thenReturn(false);
 
     sdkService.addStatusUpdateListener(mockStatusUpdateListener);
     sdkService.update();

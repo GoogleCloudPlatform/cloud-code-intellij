@@ -264,29 +264,37 @@ public class ManagedCloudSdkService implements CloudSdkService {
     @Override
     public void onFailure(Throwable t) {
       if (t instanceof InterruptedException) {
-        handleJobCancellation();
+        logger.info("Managed Google Cloud SDK install/update cancelled.");
+
+        ManagedCloudSdkServiceUiPresenter.getInstance().notifyManagedSdkJobCancellation(jobType);
       } else {
         logger.warn("Error while installing/updating managed Cloud SDK", t);
-        updateStatus(SdkStatus.NOT_AVAILABLE);
 
         ManagedCloudSdkServiceUiPresenter.getInstance()
             .notifyManagedSdkJobFailure(jobType, t.toString());
       }
-    }
 
-    private void handleJobCancellation() {
-      logger.info("Managed Google Cloud SDK install/update cancelled.");
-      // interrupted install means not available, but interrupted update means SDK still available.
+      // failed or interrupted update might still keep SDK itself installed.
       switch (jobType) {
         case INSTALL:
           updateStatus(SdkStatus.NOT_AVAILABLE);
           break;
         case UPDATE:
-          updateStatus(SdkStatus.READY);
+          checkSdkStatusAfterFailedUpdate();
           break;
       }
+    }
+  }
 
-      ManagedCloudSdkServiceUiPresenter.getInstance().notifyManagedSdkJobCancellation(jobType);
+  private void checkSdkStatusAfterFailedUpdate() {
+    try {
+      if (managedCloudSdk.isInstalled()) {
+        updateStatus(SdkStatus.READY);
+      } else {
+        updateStatus(SdkStatus.NOT_AVAILABLE);
+      }
+    } catch (Exception ex) {
+      updateStatus(SdkStatus.NOT_AVAILABLE);
     }
   }
 }
