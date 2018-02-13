@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
+import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.managedcloudsdk.ManagedCloudSdk;
 import com.google.cloud.tools.managedcloudsdk.ManagedSdkVerificationException;
@@ -130,11 +131,11 @@ public class ManagedCloudSdkService implements CloudSdkService {
       managedCloudSdk = createManagedSdk();
       install();
     } catch (UnsupportedOsException ex) {
-      String errorMessage = "Unsupported OS for Managed Cloud SDK";
-      logger.warn(errorMessage, ex);
+      logger.warn("Unsupported OS for Managed Cloud SDK", ex);
       updateStatus(SdkStatus.NOT_AVAILABLE);
       ManagedCloudSdkServiceUiPresenter.getInstance()
-          .notifyManagedSdkJobFailure(ManagedSdkJobType.INSTALL, errorMessage);
+          .notifyManagedSdkJobFailure(
+              ManagedSdkJobType.INSTALL, GctBundle.message("managedsdk.unsupported.os"));
     }
   }
 
