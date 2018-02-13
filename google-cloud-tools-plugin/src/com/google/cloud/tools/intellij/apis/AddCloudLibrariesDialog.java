@@ -30,6 +30,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import git4idea.DialogManager;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -119,18 +120,54 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
       DialogManager.show(managementDialog);
 
       if (managementDialog.isOK()) {
-        ProgressManager.getInstance()
-            .runProcessWithProgressSynchronously(
-                () -> CloudApiManager.enableApis(apisToEnable, cloudProject, project),
-                GctBundle.message("cloud.apis.enable.progress.title"),
-                true /*canBeCanceled*/,
-                project);
+        runApiEnablement(apisToEnable);
+        runServiceAccountManagement(
+            managementDialog.getSelectedRoles(),
+            managementDialog.getServiceAccountName(),
+            managementDialog.getServiceAccountKeyDownloadPath());
 
         super.doOKAction();
       }
     } else {
       super.doOKAction();
     }
+  }
+
+  /**
+   * Runs the process that enables the set of {@link CloudLibrary apis} on GCP.
+   *
+   * @param apisToEnable the APIs selected by the user for enablement
+   */
+  private void runApiEnablement(Set<CloudLibrary> apisToEnable) {
+    ProgressManager.getInstance()
+        .runProcessWithProgressSynchronously(
+            () -> CloudApiManager.enableApis(apisToEnable, getCloudProject(), project),
+            GctBundle.message("cloud.apis.enable.progress.title"),
+            true /*canBeCanceled*/,
+            project);
+  }
+
+  /**
+   * Runs the process that creates the service account and generates the service account key file.
+   *
+   * @param selectedRoles the {@link Role roles} selected by the user
+   * @param serviceAccountName the name of the service account
+   * @param serviceAccountKeyDownloadPath the {@link Path} to the chosen download folder
+   */
+  private void runServiceAccountManagement(
+      Set<Role> selectedRoles, String serviceAccountName, Path serviceAccountKeyDownloadPath) {
+    ProgressManager.getInstance()
+        .runProcessWithProgressSynchronously(
+            () ->
+                CloudApiManager.createServiceAccountAndDownloadKey(
+                    selectedRoles,
+                    serviceAccountName,
+                    serviceAccountKeyDownloadPath,
+                    getCloudProject(),
+                    project),
+            GctBundle.message("cloud.apis.service.account.create.progress.title"),
+            true /*canBeCanceled*/,
+            project);
   }
 
   /**

@@ -16,8 +16,18 @@
 
 package com.google.cloud.tools.intellij.apis;
 
+import com.google.api.client.util.Base64;
+import com.google.api.services.cloudresourcemanager.CloudResourceManager;
+import com.google.api.services.cloudresourcemanager.model.Binding;
+import com.google.api.services.cloudresourcemanager.model.GetIamPolicyRequest;
+import com.google.api.services.cloudresourcemanager.model.Policy;
+import com.google.api.services.cloudresourcemanager.model.SetIamPolicyRequest;
 import com.google.api.services.iam.v1.Iam;
+import com.google.api.services.iam.v1.model.CreateServiceAccountKeyRequest;
+import com.google.api.services.iam.v1.model.CreateServiceAccountRequest;
 import com.google.api.services.iam.v1.model.Role;
+import com.google.api.services.iam.v1.model.ServiceAccount;
+import com.google.api.services.iam.v1.model.ServiceAccountKey;
 import com.google.api.services.servicemanagement.ServiceManagement;
 import com.google.api.services.servicemanagement.model.EnableServiceRequest;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
@@ -36,19 +46,29 @@ import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
+import git4idea.DialogManager;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.fest.util.Lists;
 
 /** Cloud API manager responsible for API management tasks on GCP such as API enablement. */
 class CloudApiManager {
+
   private static final Logger LOG = Logger.getInstance(CloudApiManager.class);
 
   private static final NotificationGroup NOTIFICATION_GROUP =
@@ -58,7 +78,14 @@ class CloudApiManager {
           true,
           null,
           GoogleCloudToolsIcons.CLOUD);
-  private static final String SERVICE_REQUEST_PROJECT_PATTERN = "project:%s";
+
+  private static final DateTimeFormatter SERVICE_ACCOUNT_TIMESTAMP_FORMAT =
+      DateTimeFormatter.ofPattern("yyMMddHHmmss");
+
+  private static final String SERVICE_REQUEST_PROJECT_FORMAT = "project:%s";
+  private static final String SERVICE_ACCOUNT_CREATE_REQUEST_PROJECT_FORMAT = "projects/%s";
+  private static final String SERVICE_ACCOUNT_ROLE_REQUEST_PREFIX = "serviceAccount:";
+  private static final String SERVICE_ACCOUNT_KEY_FILE_NAME_FORMAT = "%s-%s.json";
 
   private CloudApiManager() {}
 
@@ -97,10 +124,12 @@ class CloudApiManager {
           return;
         }
 
-        setApiEnableProgress(
+        updateProgress(
             progress,
-            library.getName(),
-            cloudProject.projectName(),
+            GctBundle.message(
+                "cloud.apis.enable.progress.message",
+                library.getName(),
+                cloudProject.projectName()),
             (double) i / libraryList.size());
         enableApi(library, cloudProject, user.get());
 
@@ -117,6 +146,187 @@ class CloudApiManager {
     if (!enabledApis.isEmpty()) {
       notifyApisEnabled(enabledApis, cloudProject.projectId(), project);
     }
+  }
+
+  /**
+   * Creates a new {@link ServiceAccount}, adds the supplied set of {@link Role roles} to it, and
+   * creates and downloads the service account private key to the user's file system.
+   *
+   * @param roles the set of {@link Role} to add to the new service account
+   * @param name the name of the new service account to be created
+   * @param downloadDir the {@link Path} of the download directory of the service account private
+   *     key json file
+   * @param cloudProject the current {@link CloudProject}
+   * @param project the current {@link Project}
+   */
+  static void createServiceAccountAndDownloadKey(
+      Set<Role> roles, String name, Path downloadDir, CloudProject cloudProject, Project project) {
+    Optional<CredentialedUser> user =
+        Services.getLoginService().getLoggedInUser(cloudProject.googleUsername());
+
+    if (!user.isPresent()) {
+      LOG.error("Cannot enable APIs: logged in user not found.");
+      return;
+    }
+
+    ProgressIndicator progress =
+        ServiceManager.getService(ProgressManager.class).getProgressIndicator();
+
+    try {
+      int numSteps = roles.isEmpty() ? 3 : 4;
+      double step = 0;
+
+      updateProgress(
+          progress,
+          GctBundle.message("cloud.apis.service.account.create.account.progress.message", name),
+          step / numSteps);
+      step++;
+      ServiceAccount serviceAccount = createServiceAccount(user.get(), name, cloudProject);
+
+      if (!roles.isEmpty()) {
+        updateProgress(
+            progress,
+            GctBundle.message("cloud.apis.service.account.add.roles.progress.message"),
+            step / numSteps);
+        step++;
+        addRolesToServiceAccount(user.get(), serviceAccount, roles, cloudProject);
+      }
+
+      updateProgress(
+          progress,
+          GctBundle.message("cloud.apis.service.account.create.key.progress.message"),
+          step / numSteps);
+      step++;
+      ServiceAccountKey serviceAccountKey = createServiceAccountKey(user.get(), serviceAccount);
+
+      updateProgress(
+          progress,
+          GctBundle.message("cloud.apis.service.account.download.key.progress.message"),
+          step / numSteps);
+      Path keyPath = writeServiceAccountKey(serviceAccountKey, downloadDir, cloudProject);
+
+      notifyServiceAccountCreated(project, name, keyPath);
+    } catch (IOException e) {
+      LOG.warn(
+          "Exception occurred attempting to create service account on GCP and download its key", e);
+      notifyServiceAccountError(project, name, e.toString());
+    }
+  }
+
+  /** Creates a new {@link ServiceAccount} for the given {@link CloudProject} using the IAM API. */
+  private static ServiceAccount createServiceAccount(
+      CredentialedUser user, String name, CloudProject cloudProject) throws IOException {
+    CreateServiceAccountRequest request = new CreateServiceAccountRequest();
+    ServiceAccount serviceAccount = new ServiceAccount();
+    serviceAccount.setDisplayName(name);
+    request.setServiceAccount(serviceAccount);
+    request.setAccountId(createServiceAccountId(name));
+
+    Iam iam = GoogleApiClientFactory.getInstance().getIamClient(user.getCredential());
+
+    return iam.projects()
+        .serviceAccounts()
+        .create(
+            String.format(SERVICE_ACCOUNT_CREATE_REQUEST_PROJECT_FORMAT, cloudProject.projectId()),
+            request)
+        .execute();
+  }
+
+  /**
+   * Adds a set of {@link Role roles} to a {@link ServiceAccount}.
+   *
+   * <p>This is done by fetching the cloud project's existing IAM Policy, adding the new roles to
+   * the given service account, and then writing the updated policy back to the cloud project.
+   *
+   * @param user the current {@link CredentialedUser}
+   * @param serviceAccount the {@link ServiceAccount} to which to add roles
+   * @param roles the set of {@link Role} to be added to the service account
+   * @param cloudProject the current {@link CloudProject}
+   * @throws IOException if the API call fails to update the IAM policy
+   */
+  private static void addRolesToServiceAccount(
+      CredentialedUser user,
+      ServiceAccount serviceAccount,
+      Set<Role> roles,
+      CloudProject cloudProject)
+      throws IOException {
+    CloudResourceManager resourceManager =
+        GoogleApiClientFactory.getInstance().getCloudResourceManagerClient(user.getCredential());
+
+    Policy existingPolicy =
+        resourceManager
+            .projects()
+            .getIamPolicy(cloudProject.projectId(), new GetIamPolicyRequest())
+            .execute();
+    List<Binding> bindings = Lists.newArrayList(existingPolicy.getBindings());
+
+    List<Binding> additionalBindings =
+        roles
+            .stream()
+            .map(
+                role -> {
+                  Binding binding = new Binding();
+                  binding.setRole(role.getName());
+                  binding.setMembers(createServiceAccountMemberBindings(serviceAccount));
+                  return binding;
+                })
+            .collect(Collectors.toList());
+
+    bindings.addAll(additionalBindings);
+
+    SetIamPolicyRequest policyRequest = new SetIamPolicyRequest();
+    Policy newPolicy = new Policy();
+    newPolicy.setBindings(bindings);
+    policyRequest.setPolicy(newPolicy);
+
+    resourceManager.projects().setIamPolicy(cloudProject.projectId(), policyRequest).execute();
+  }
+
+  /**
+   * Given an {@link ServiceAccount}, return the singleton list of strings representing the service
+   * account member requesting access to the resource. Used to pass into {@link
+   * Binding#setMembers(List)}.
+   */
+  private static List<String> createServiceAccountMemberBindings(ServiceAccount serviceAccount) {
+    return ImmutableList.of(SERVICE_ACCOUNT_ROLE_REQUEST_PREFIX + serviceAccount.getEmail());
+  }
+
+  /**
+   * Using the supplied {@link ServiceAccount}, this creates and returns a new {@link
+   * ServiceAccountKey}.
+   */
+  private static ServiceAccountKey createServiceAccountKey(
+      CredentialedUser user, ServiceAccount serviceAccount) throws IOException {
+    Iam iam = GoogleApiClientFactory.getInstance().getIamClient(user.getCredential());
+
+    CreateServiceAccountKeyRequest keyRequest = new CreateServiceAccountKeyRequest();
+    return iam.projects()
+        .serviceAccounts()
+        .keys()
+        .create(serviceAccount.getName(), keyRequest)
+        .execute();
+  }
+
+  /**
+   * Writes the service account private key data in JSON form to the filesystem. The private key
+   * itself is contained within the {@link ServiceAccountKey} returned from the IAM API. The json
+   * key is encoded within {@link ServiceAccountKey#getPrivateKeyData()} in base64.
+   *
+   * @param key the {@link ServiceAccountKey} containing the base64 encoding of the json private key
+   * @param downloadDir the {@link Path} on the file system to download the ky
+   * @param cloudProject the {@link CloudProject} associated with this service account
+   * @return the {@link Path} to the service account key that was written
+   * @throws IOException if the an IO error occurs when writing the file
+   */
+  private static Path writeServiceAccountKey(
+      ServiceAccountKey key, Path downloadDir, CloudProject cloudProject) throws IOException {
+    Path keyPath =
+        Paths.get(downloadDir.toString(), getServiceAccountKeyName(cloudProject.projectName()));
+    return Files.write(keyPath, Base64.decodeBase64(key.getPrivateKeyData()));
+  }
+
+  private static String getServiceAccountKeyName(String cloudProjectName) {
+    return String.format(SERVICE_ACCOUNT_KEY_FILE_NAME_FORMAT, cloudProjectName, getTimestamp());
   }
 
   private static void enableApi(
@@ -136,7 +346,7 @@ class CloudApiManager {
             library.getServiceName(),
             new EnableServiceRequest()
                 .setConsumerId(
-                    String.format(SERVICE_REQUEST_PROJECT_PATTERN, cloudProject.projectId())))
+                    String.format(SERVICE_REQUEST_PROJECT_FORMAT, cloudProject.projectId())))
         .execute();
   }
 
@@ -160,6 +370,27 @@ class CloudApiManager {
       LOG.warn("Exception occurred attempting to fetch service account roles");
       return ImmutableList.of();
     }
+  }
+
+  /**
+   * Creates the unique ID of the service account.
+   *
+   * <p>Must be less than 30 characters.
+   *
+   * @param prefix the name chosen by the user for the service account
+   * @return an ID that is a combination of the prefix and a timestamp
+   */
+  private static String createServiceAccountId(String prefix) {
+    int maxLen = 30;
+    String timestamp = getTimestamp();
+    int maxPrefixLen = maxLen - timestamp.length() - 1;
+    String trimmedPrefix =
+        prefix.length() <= maxPrefixLen ? prefix : prefix.substring(0, maxPrefixLen);
+    return String.format("%s-%s", trimmedPrefix, timestamp);
+  }
+
+  private static String getTimestamp() {
+    return SERVICE_ACCOUNT_TIMESTAMP_FORMAT.format(ZonedDateTime.now());
   }
 
   private static void notifyApisEnabled(
@@ -194,14 +425,41 @@ class CloudApiManager {
     notification.notify(project);
   }
 
+  private static void notifyServiceAccountCreated(Project project, String name, Path downloadDir) {
+    Notification notification =
+        NOTIFICATION_GROUP.createNotification(
+            GctBundle.message("cloud.apis.service.account.created.title"),
+            null /*subtitle*/,
+            GctBundle.message("cloud.apis.service.account.created.message", name),
+            NotificationType.INFORMATION);
+    notification.notify(project);
+
+    ApplicationManager.getApplication()
+        .invokeLater(
+            () -> {
+              ServiceAccountKeyDisplayDialog keyDialog =
+                  new ServiceAccountKeyDisplayDialog(project, downloadDir.toString());
+              DialogManager.show(keyDialog);
+            });
+  }
+
+  private static void notifyServiceAccountError(Project project, String name, String errorMessage) {
+    Notification notification =
+        NOTIFICATION_GROUP.createNotification(
+            GctBundle.message("cloud.apis.service.account.created.error.title"),
+            null /*subtitle*/,
+            GctBundle.message(
+                "cloud.apis.service.account.created.error.message", name, errorMessage),
+            NotificationType.ERROR);
+    notification.notify(project);
+  }
+
   private static String joinApiNames(Set<CloudLibrary> apis) {
     return apis.stream().map(CloudLibrary::getName).collect(Collectors.joining("<br>"));
   }
 
-  private static void setApiEnableProgress(
-      ProgressIndicator indicator, String apiName, String cloudProjectName, double fraction) {
-    indicator.setText(
-        GctBundle.message("cloud.apis.enable.progress.message", apiName, cloudProjectName));
+  private static void updateProgress(ProgressIndicator indicator, String message, double fraction) {
+    indicator.setText(message);
     indicator.setFraction(fraction);
   }
 }

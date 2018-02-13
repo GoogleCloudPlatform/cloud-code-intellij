@@ -39,7 +39,10 @@ import com.intellij.util.ui.UIUtil;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.ActionListener;
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -55,6 +58,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import org.apache.commons.lang3.StringUtils;
@@ -85,6 +89,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
   private JPanel rolePanel;
   private JTextField serviceAccountNameTextField;
   private TextFieldWithBrowseButton serviceKeyPathSelector;
+  private JTextPane serviceAccountInfoPane;
 
   private final Set<Role> roles;
   private static final boolean UPDATE_SERVICE_ACCOUNT_DEFAULT = true;
@@ -118,6 +123,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
             GctBundle.message("cloud.apis.management.dialog.serviceaccount.header")));
 
     serviceAccountDetailsPane.setBorder(JBUI.Borders.empty());
+    serviceAccountInfoPane.setBackground(serviceAccountPanel.getBackground());
 
     enableConfirmationLabel.setText(
         GctBundle.message(
@@ -152,6 +158,14 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
     return ((ServiceAccountRolesTableModel) roleTable.getModel()).getSelectedRoles();
   }
 
+  String getServiceAccountName() {
+    return serviceAccountNameTextField.getText().trim();
+  }
+
+  Path getServiceAccountKeyDownloadPath() {
+    return Paths.get(serviceKeyPathSelector.getText().trim());
+  }
+
   @Nullable
   @Override
   protected ValidationInfo doValidate() {
@@ -164,7 +178,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
         return new ValidationInfo(
             GctBundle.message("cloud.apis.management.dialog.serviceaccount.key.path.empty.error"),
             serviceKeyPathSelector);
-      } else if (!isValidDirectory(serviceKeyPathSelector.getText())) {
+      } else if (!isValidDirectory(serviceKeyPathSelector.getText().trim())) {
         return new ValidationInfo(
             GctBundle.message("cloud.apis.management.dialog.serviceaccount.key.path.invalid.error"),
             serviceKeyPathSelector);
@@ -198,9 +212,14 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
     roleTable = new ServiceAccountRolesTable(roles);
   }
 
-  private static boolean isValidDirectory(String path) {
-    File file = new File(path);
-    return file.exists() && file.isDirectory() && file.canWrite();
+  private static boolean isValidDirectory(String pathString) {
+    Path path;
+    try {
+      path = Paths.get(pathString);
+    } catch (InvalidPathException ipe) {
+      return false;
+    }
+    return Files.exists(path) && Files.isDirectory(path) && Files.isWritable(path);
   }
 
   private static final class ServiceAccountRolesTable extends JBTable {
