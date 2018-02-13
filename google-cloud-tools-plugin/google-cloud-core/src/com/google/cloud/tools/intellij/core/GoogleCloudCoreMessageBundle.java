@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.PropertyKey;
 
-/** Resources and messages that are used commonly across the Cloud Tools plugin **/
+/** Resources and messages that are used commonly across the Cloud Tools plugin * */
 public class GoogleCloudCoreMessageBundle {
 
   @NonNls private static final String BUNDLE_NAME = "messages.CoreMessageBundle";

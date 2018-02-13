@@ -23,11 +23,10 @@ import java.util.List;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
-
 /**
  * Icons that are used commonly across the Cloud Tools plugin feature-set.
  *
- * TODO: Look into auto-generation: http://youtrack.jetbrains.com/issue/IDEA-103558
+ * <p>TODO: Look into auto-generation: http://youtrack.jetbrains.com/issue/IDEA-103558
  */
 public class GoogleCloudCoreIcons {
 
