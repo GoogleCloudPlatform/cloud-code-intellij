@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.debugger.ui;
 
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.core.analytics.GctTracking;
 import com.google.cloud.tools.intellij.debugger.CloudDebugProcessState;
 import com.google.cloud.tools.intellij.debugger.ProjectRepositoryState;
 import com.google.cloud.tools.intellij.debugger.ProjectRepositoryValidator;
@@ -25,7 +26,6 @@ import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
-import com.google.cloud.tools.intellij.util.GctTracking;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.intellij.dvcs.DvcsUtil;

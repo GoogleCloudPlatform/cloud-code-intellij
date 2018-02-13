@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.facet.flexible;
 
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
-import com.google.cloud.tools.intellij.util.GctTracking;
+import com.google.cloud.tools.intellij.core.analytics.GctTracking;
 import com.google.common.collect.ImmutableList;
 import com.intellij.facet.FacetType;
 import com.intellij.framework.detection.FacetBasedFrameworkDetector;

@@ -17,13 +17,14 @@
 package com.google.cloud.tools.intellij.project;
 
 import com.google.api.services.cloudresourcemanager.model.Project;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.core.GoogleCloudCoreMessageBundle;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
 /** Model for project list table in {@link ProjectSelectionDialog}. */
 class ProjectListTableModel extends AbstractTableModel {
+
   private static final int PROJECT_NAME_COLUMN = 0;
   private static final int PROJECT_ID_COLUMN = 1;
 
@@ -55,9 +56,11 @@ class ProjectListTableModel extends AbstractTableModel {
   public String getColumnName(int column) {
     switch (column) {
       case PROJECT_NAME_COLUMN:
-        return GctBundle.getString("cloud.project.selector.project.list.project.name.column");
+        return GoogleCloudCoreMessageBundle.getString(
+            "cloud.project.selector.project.list.project.name.column");
       case PROJECT_ID_COLUMN:
-        return GctBundle.getString("cloud.project.selector.project.list.project.id.column");
+        return GoogleCloudCoreMessageBundle.getString(
+            "cloud.project.selector.project.list.project.id.column");
       default:
         return "";
     }

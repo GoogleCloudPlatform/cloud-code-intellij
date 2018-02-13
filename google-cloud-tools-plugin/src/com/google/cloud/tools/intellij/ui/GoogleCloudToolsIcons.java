@@ -16,12 +16,8 @@
 
 package com.google.cloud.tools.intellij.ui;
 
-import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.util.IconLoader;
-import java.util.ArrayList;
-import java.util.List;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 
 /**
  * Note: This file should be auto generated once build/scripts/icons.gant is part of CE.
@@ -29,14 +25,10 @@ import javax.swing.ImageIcon;
  */
 public final class GoogleCloudToolsIcons {
 
-  private static final int STEPS_COUNT = 12;
-
   public static final Icon APP_ENGINE = load("/icons/appEngine.png"); // 16x16
   public static final Icon CLOUD = load("/icons/cloudPlatform.png");
   public static final Icon CLOUD_STORAGE = load("/icons/cloudStorage.png");
   public static final Icon CLOUD_STORAGE_BUCKET = load("/icons/cloudStorageBucket.png");
-  public static final Icon REFRESH = load("/icons/refresh.png");
-  public static final ImmutableList<Icon> STEP_ICONS = findStepIcons("/icons/step_");
   public static final Icon CLOUD_BREAKPOINT_FINAL = load("/icons/cloudsnapshotfinal.png");
   public static final Icon CLOUD_BREAKPOINT = load("/icons/cloudbreakpoint.png");
   public static final Icon CLOUD_BREAKPOINT_CHECKED = load("/icons/cloudbreakpointchecked.png");
@@ -46,24 +38,11 @@ public final class GoogleCloudToolsIcons {
   public static final Icon CLOUD_DEBUG_REACTIVATE_BREAKPOINT =
       load("/icons/debugreactivatebreakpoint.png");
   public static final Icon CLOUD_DEBUG_DELETE_ALL_BREAKPOINTS = load("/icons/debugdeleteall.png");
-  public static final Icon LOADING = loadGif("/icons/loading.gif");
   public static final Icon STACKDRIVER_DEBUGGER = load("/icons/stackdriverdebugger.png");
   public static final Icon FEEDBACK = load("/icons/cloudtoolsfeedback.png");
 
   private static Icon load(String path) {
     return IconLoader.getIcon(path, GoogleCloudToolsIcons.class);
-  }
-
-  private static Icon loadGif(String path) {
-    return new ImageIcon(GoogleCloudToolsIcons.class.getResource(path));
-  }
-
-  private static ImmutableList<Icon> findStepIcons(String prefix) {
-    List<Icon> icons = new ArrayList(STEPS_COUNT);
-    for (int i = 0; i < STEPS_COUNT; i++) {
-      icons.add(IconLoader.getIcon(prefix + (i + 1) + ".png"));
-    }
-    return new ImmutableList.Builder<Icon>().addAll(icons).build();
   }
 
   private GoogleCloudToolsIcons() {

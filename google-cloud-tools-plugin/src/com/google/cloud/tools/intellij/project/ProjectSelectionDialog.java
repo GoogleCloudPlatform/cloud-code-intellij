@@ -17,12 +17,12 @@
 package com.google.cloud.tools.intellij.project;
 
 import com.google.api.services.cloudresourcemanager.model.Project;
+import com.google.cloud.tools.intellij.core.GoogleCloudCoreIcons;
+import com.google.cloud.tools.intellij.core.GoogleCloudCoreMessageBundle;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.GoogleLoginListener;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.login.ui.GoogleLoginIcons;
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
@@ -114,7 +114,8 @@ public class ProjectSelectionDialog {
     if (dialogWrapper == null) {
       dialogWrapper = new ProjectSelectionDialogWrapper();
 
-      dialogWrapper.setTitle(GctBundle.getString("cloud.project.selector.dialog.title"));
+      dialogWrapper.setTitle(
+          GoogleCloudCoreMessageBundle.getString("cloud.project.selector.dialog.title"));
       // disabled unless project is selected in the list.
       dialogWrapper.setOKActionEnabled(false);
       // install additional dialog only/IDEA UI.
@@ -500,7 +501,7 @@ public class ProjectSelectionDialog {
   private final class RefreshAction extends AbstractAction {
 
     private RefreshAction() {
-      putValue(Action.SMALL_ICON, GoogleCloudToolsIcons.REFRESH);
+      putValue(Action.SMALL_ICON, GoogleCloudCoreIcons.REFRESH);
     }
 
     @Override
