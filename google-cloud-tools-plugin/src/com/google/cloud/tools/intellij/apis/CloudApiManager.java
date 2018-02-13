@@ -449,7 +449,7 @@ class CloudApiManager {
             GctBundle.message("cloud.apis.service.account.created.error.title"),
             null /*subtitle*/,
             GctBundle.message("cloud.apis.service.account.created.error.message", name),
-            NotificationType.INFORMATION);
+            NotificationType.ERROR);
     notification.notify(project);
   }
 
