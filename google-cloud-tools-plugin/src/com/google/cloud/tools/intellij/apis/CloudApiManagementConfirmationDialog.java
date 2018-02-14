@@ -81,7 +81,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
   private JLabel wontEnableConfirmationLabel;
   private JPanel apiEnablementPanel;
   private JPanel serviceAccountPanel;
-  private JCheckBox newServiceAccountCheckbox;
+  private JCheckBox createNewServiceAccountCheckbox;
   private JPanel serviceAccountDetailsPanel;
   private JScrollPane serviceAccountDetailsPane;
   private JTable roleTable;
@@ -137,9 +137,9 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
     populateLibraryList(apisToEnableList, apisToEnable);
     populateLibraryList(apisNotSelectedToEnableList, apisNotToEnable);
 
-    newServiceAccountCheckbox.addActionListener(newServiceAccountClickHandler());
-    newServiceAccountCheckbox.setSelected(UPDATE_SERVICE_ACCOUNT_DEFAULT);
-    serviceAccountDetailsPanel.setVisible(newServiceAccountCheckbox.isSelected());
+    createNewServiceAccountCheckbox.addActionListener(newServiceAccountClickHandler());
+    createNewServiceAccountCheckbox.setSelected(UPDATE_SERVICE_ACCOUNT_DEFAULT);
+    serviceAccountDetailsPanel.setVisible(createNewServiceAccountCheckbox.isSelected());
     roleTable.setTableHeader(null);
     rolePane.setBorder(JBUI.Borders.empty());
     rolePanel.setVisible(!roles.isEmpty());
@@ -158,6 +158,10 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
     return ((ServiceAccountRolesTableModel) roleTable.getModel()).getSelectedRoles();
   }
 
+  boolean isCreateNewServiceAccount() {
+    return createNewServiceAccountCheckbox.isSelected();
+  }
+
   String getServiceAccountName() {
     return serviceAccountNameTextField.getText().trim();
   }
@@ -169,7 +173,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
   @Nullable
   @Override
   protected ValidationInfo doValidate() {
-    if (newServiceAccountCheckbox.isSelected()) {
+    if (createNewServiceAccountCheckbox.isSelected()) {
       if (StringUtils.isEmpty(serviceAccountNameTextField.getText())) {
         return new ValidationInfo(
             GctBundle.message("cloud.apis.management.dialog.serviceaccount.name.error"),
@@ -328,8 +332,8 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
   }
 
   @VisibleForTesting
-  public JCheckBox getNewServiceAccountCheckbox() {
-    return newServiceAccountCheckbox;
+  public JCheckBox getCreateNewServiceAccountCheckbox() {
+    return createNewServiceAccountCheckbox;
   }
 
   @VisibleForTesting

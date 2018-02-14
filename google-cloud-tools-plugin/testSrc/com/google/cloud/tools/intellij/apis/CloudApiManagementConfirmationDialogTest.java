@@ -250,7 +250,7 @@ public class CloudApiManagementConfirmationDialogTest {
                       ImmutableSet.of(),
                       ImmutableSet.of());
 
-              dialog.getNewServiceAccountCheckbox().setSelected(false);
+              dialog.getCreateNewServiceAccountCheckbox().setSelected(false);
 
               dialog.getServiceKeyPathSelector().setText("");
               dialog.getServiceAccountNameTextField().setText("");
