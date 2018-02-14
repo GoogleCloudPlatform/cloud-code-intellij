@@ -18,10 +18,10 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
+import com.google.cloud.tools.managedcloudsdk.ConsoleListener;
 import com.google.cloud.tools.managedcloudsdk.ManagedCloudSdk;
 import com.google.cloud.tools.managedcloudsdk.ManagedSdkVerificationException;
 import com.google.cloud.tools.managedcloudsdk.ManagedSdkVersionMismatchException;
-import com.google.cloud.tools.managedcloudsdk.MessageListener;
 import com.google.cloud.tools.managedcloudsdk.UnsupportedOsException;
 import com.google.cloud.tools.managedcloudsdk.components.SdkComponent;
 import com.google.common.annotations.VisibleForTesting;
@@ -177,9 +177,11 @@ public class ManagedCloudSdkService implements CloudSdkService {
   /** Installs core managed SDK if needed and returns its path if successful. */
   private Path installSdk() throws Exception {
     if (!safeCheckSdkStatus(() -> managedCloudSdk.isInstalled())) {
-      MessageListener sdkInstallListener = logger::debug;
+      ConsoleListener sdkConsoleListener = logger::debug;
 
-      return managedCloudSdk.newInstaller().install(sdkInstallListener);
+      return managedCloudSdk
+          .newInstaller()
+          .install(new ManagedCloudSdkProgressListener(), sdkConsoleListener);
     }
 
     return managedCloudSdk.getSdkHome();
@@ -187,17 +189,17 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
   private void installAppEngineJavaComponent() throws Exception {
     if (!safeCheckSdkStatus(() -> managedCloudSdk.hasComponent(SdkComponent.APP_ENGINE_JAVA))) {
-      MessageListener appEngineInstallListener = logger::debug;
+      ConsoleListener appEngineConsoleListener = logger::debug;
 
       managedCloudSdk
           .newComponentInstaller()
-          .installComponent(SdkComponent.APP_ENGINE_JAVA, appEngineInstallListener);
+          .installComponent(SdkComponent.APP_ENGINE_JAVA, appEngineConsoleListener);
     }
   }
 
   private Path updateManagedSdk() throws Exception {
     if (!safeCheckSdkStatus(() -> managedCloudSdk.isUpToDate())) {
-      MessageListener sdkUpdateListener = logger::debug;
+      ConsoleListener sdkUpdateListener = logger::debug;
 
       managedCloudSdk.newUpdater().update(sdkUpdateListener);
     }

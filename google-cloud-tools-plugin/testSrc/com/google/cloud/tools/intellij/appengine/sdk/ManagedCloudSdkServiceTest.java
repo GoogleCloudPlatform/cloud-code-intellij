@@ -169,7 +169,7 @@ public class ManagedCloudSdkServiceTest {
     sdkService.addStatusUpdateListener(mockStatusUpdateListener);
     emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
     SdkInstaller mockInstaller = mockManagedCloudSdk.newInstaller();
-    when(mockInstaller.install(any())).thenThrow(new IOException("IO Error"));
+    when(mockInstaller.install(any(), any())).thenThrow(new IOException("IO Error"));
     sdkService.install();
 
     ArgumentCaptor<SdkStatus> statusCaptor = ArgumentCaptor.forClass(SdkStatus.class);
@@ -184,7 +184,7 @@ public class ManagedCloudSdkServiceTest {
     emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
     SdkInstaller mockInstaller = mockManagedCloudSdk.newInstaller();
     IOException ioException = new IOException("IO Error");
-    when(mockInstaller.install(any())).thenThrow(ioException);
+    when(mockInstaller.install(any(), any())).thenThrow(ioException);
 
     sdkService.install();
 
@@ -213,7 +213,7 @@ public class ManagedCloudSdkServiceTest {
   public void interruptedInstall_status_notAvailable() throws Exception {
     emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
     SdkInstaller sdkInstaller = mockManagedCloudSdk.newInstaller();
-    when(sdkInstaller.install(any())).thenThrow(new InterruptedException());
+    when(sdkInstaller.install(any(), any())).thenThrow(new InterruptedException());
     when(mockManagedCloudSdk.newInstaller()).thenReturn(sdkInstaller);
 
     sdkService.install();
@@ -225,7 +225,7 @@ public class ManagedCloudSdkServiceTest {
   public void interruptedInstall_showsCancelNotification() throws Exception {
     emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
     SdkInstaller sdkInstaller = mockManagedCloudSdk.newInstaller();
-    when(sdkInstaller.install(any())).thenThrow(new InterruptedException());
+    when(sdkInstaller.install(any(), any())).thenThrow(new InterruptedException());
     when(mockManagedCloudSdk.newInstaller()).thenReturn(sdkInstaller);
 
     sdkService.install();
@@ -329,7 +329,7 @@ public class ManagedCloudSdkServiceTest {
       when(mockManagedCloudSdk.isInstalled()).thenReturn(false);
       SdkInstaller mockInstaller = mock(SdkInstaller.class);
       when(mockManagedCloudSdk.newInstaller()).thenReturn(mockInstaller);
-      when(mockInstaller.install(any())).thenReturn(mockSdkPath);
+      when(mockInstaller.install(any(), any())).thenReturn(mockSdkPath);
 
       when(mockManagedCloudSdk.hasComponent(SdkComponent.APP_ENGINE_JAVA)).thenReturn(false);
       SdkComponentInstaller mockComponentInstaller = mock(SdkComponentInstaller.class);
