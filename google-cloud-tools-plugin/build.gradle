@@ -49,7 +49,6 @@ project.afterEvaluate {
 
 dependencies {
     compile(project(':common-lib'))
-    compile(project(':google-cloud-tools-plugin:google-account'))
     compile(project(':google-cloud-tools-plugin:google-cloud-core'))
 
     compile 'com.google.apis:google-api-services-clouddebugger:v2-rev7-1.21.0'
