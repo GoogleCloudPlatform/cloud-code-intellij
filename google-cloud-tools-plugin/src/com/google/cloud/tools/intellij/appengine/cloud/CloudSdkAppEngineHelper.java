@@ -21,7 +21,6 @@ import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
-import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineExecutor;
@@ -39,6 +38,7 @@ import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
+import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
@@ -241,8 +241,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       throw new AppEngineException("Failed to create application default credentials.");
     }
 
-    CloudToolsPluginInfoService pluginInfoService =
-        ServiceManager.getService(CloudToolsPluginInfoService.class);
+    PluginInfoService pluginInfoService = ServiceManager.getService(PluginInfoService.class);
 
     CloudSdk.Builder sdkBuilder =
         new CloudSdk.Builder()

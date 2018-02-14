@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij;
+package com.google.cloud.tools.intellij.service;
 
+import com.google.cloud.tools.intellij.Feature;
 import com.google.cloud.tools.intellij.flags.FlagReader;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.util.IntelliJPlatform;
@@ -28,25 +29,27 @@ import com.intellij.util.PlatformUtils;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 
-/** Subclasses of this class will inherit a full implementation of the {@link PluginInfoService}. */
+/** Provides useful metadata about the Google Cloud Tools plugin. */
 // Don't expose PluginId in this service's API as it has a private
 // constructor and makes testing impossible.
-public abstract class BasePluginInfoService implements PluginInfoService {
+public class DefaultPluginInfoService implements PluginInfoService {
 
+  private static final String CLIENT_VERSION_PREFIX = "google.com/intellij/v";
   private static final String PLUGIN_NAME_EXTERNAL = "gcloud-intellij";
+
   private final String userAgent;
   private final IdeaPluginDescriptor plugin;
   private final FlagReader flagReader;
 
-  protected BasePluginInfoService(@NotNull String pluginUserAgentName, @NotNull String pluginId) {
+  public DefaultPluginInfoService() {
     this(
-        pluginUserAgentName,
-        PluginManager.getPlugin(PluginId.getId(pluginId)),
+        "gcloud-intellij-cloud-tools-plugin",
+        PluginManager.getPlugin(PluginId.getId("com.google.gct.core")),
         new PropertiesFileFlagReader());
   }
 
   @VisibleForTesting
-  BasePluginInfoService(
+  DefaultPluginInfoService(
       @NotNull String pluginUserAgentName,
       @NotNull IdeaPluginDescriptor plugin,
       @NotNull FlagReader flagReader) {
@@ -58,6 +61,14 @@ public abstract class BasePluginInfoService implements PluginInfoService {
   @Override
   public String getUserAgent() {
     return userAgent;
+  }
+
+  /**
+   * TODO(patflynn): Figure out if this is necessary. {@code userAgent} contains this information.
+   */
+  @Override
+  public String getClientVersionForCloudDebugger() {
+    return CLIENT_VERSION_PREFIX + getPluginVersion();
   }
 
   @Override

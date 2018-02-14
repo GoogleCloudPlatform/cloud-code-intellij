@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij;
 
+import com.google.cloud.tools.intellij.service.DefaultPluginInfoService;
 import com.google.cloud.tools.intellij.util.IntelliJPlatform;
 import com.google.common.collect.ImmutableSet;
 import java.util.Set;
@@ -46,8 +47,8 @@ public enum GctFeature implements Feature {
    * the feature is always on for, regardless of whether a flag is passed as a resource or system
    * property.
    *
-   * <p>Look at {@link BasePluginInfoService#shouldEnable(Feature)} to review how this configuration
-   * is checked.
+   * <p>Look at {@link DefaultPluginInfoService#shouldEnable(Feature)} to review how this
+   * configuration is checked.
    *
    * @param supportedPlatforms any platforms passed here will automatically enable this feature for
    *     all users of that platform

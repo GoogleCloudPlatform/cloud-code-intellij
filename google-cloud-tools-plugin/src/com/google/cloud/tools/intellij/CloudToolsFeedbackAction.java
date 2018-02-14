@@ -20,6 +20,7 @@ import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
+import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.net.UrlEscapers;
@@ -64,8 +65,7 @@ public class CloudToolsFeedbackAction extends DumbAwareAction {
   }
 
   private static String formatUrl() {
-    String pluginVersion =
-        ServiceManager.getService(CloudToolsPluginInfoService.class).getPluginVersion();
+    String pluginVersion = ServiceManager.getService(PluginInfoService.class).getPluginVersion();
 
     String issueBody =
         MessageFormat.format(

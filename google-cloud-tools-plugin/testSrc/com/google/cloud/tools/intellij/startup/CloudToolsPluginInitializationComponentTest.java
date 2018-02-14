@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.ApplicationPluginInfoService;
-import com.google.cloud.tools.intellij.CloudToolsPluginConfigurationService;
-import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
+import com.google.cloud.tools.intellij.service.PluginConfigurationService;
+import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 import com.intellij.openapi.actionSystem.ActionManager;
 import org.junit.Before;
@@ -37,8 +37,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class CloudToolsPluginInitializationComponentTest extends BasePluginTestCase {
 
   private static final String PLUGIN_ID_STRING = "com.google.gct.core";
-  @Mock CloudToolsPluginInfoService pluginInfoService;
-  @Mock CloudToolsPluginConfigurationService pluginConfigurationService;
+  @Mock PluginInfoService pluginInfoService;
+  @Mock PluginConfigurationService pluginConfigurationService;
   @Mock ActionManager actionManager;
   @Mock ApplicationPluginInfoService applicationInfoService;
 
@@ -46,8 +46,8 @@ public class CloudToolsPluginInitializationComponentTest extends BasePluginTestC
 
   @Before
   public void registerMockServices() {
-    registerService(CloudToolsPluginInfoService.class, pluginInfoService);
-    registerService(CloudToolsPluginConfigurationService.class, pluginConfigurationService);
+    registerService(PluginInfoService.class, pluginInfoService);
+    registerService(PluginConfigurationService.class, pluginConfigurationService);
     registerService(ActionManager.class, actionManager);
     registerService(ApplicationPluginInfoService.class, applicationInfoService);
     testComponent = new CloudToolsPluginInitializationComponent();
