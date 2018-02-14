@@ -23,9 +23,9 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.cloud.tools.intellij.PluginConfigurationService;
-import com.google.cloud.tools.intellij.PluginInfoService;
 import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
+import com.google.cloud.tools.intellij.service.PluginConfigurationService;
+import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.Application;

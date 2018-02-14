@@ -26,7 +26,7 @@ import com.google.api.services.clouddebugger.v2.model.GerritSourceContext;
 import com.google.api.services.clouddebugger.v2.model.GitSourceContext;
 import com.google.api.services.clouddebugger.v2.model.ListDebuggeesResponse;
 import com.google.api.services.clouddebugger.v2.model.SourceContext;
-import com.google.cloud.tools.intellij.PluginInfoService;
+import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.dvcs.DvcsUtil;
 import com.intellij.execution.configurations.GeneralCommandLine;

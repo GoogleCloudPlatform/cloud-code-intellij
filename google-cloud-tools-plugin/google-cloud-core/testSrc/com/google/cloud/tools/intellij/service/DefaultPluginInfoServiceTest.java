@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij;
+package com.google.cloud.tools.intellij.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.Feature;
 import com.google.cloud.tools.intellij.flags.FlagReader;
 import com.google.cloud.tools.intellij.util.IntelliJPlatform;
 import com.google.common.collect.ImmutableSet;
@@ -33,21 +34,21 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-/** Tests for {@link BasePluginInfoService}. */
+/** Tests for {@link DefaultPluginInfoService}. */
 @RunWith(MockitoJUnitRunner.class)
-public class BasePluginInfoServiceTest {
+public class DefaultPluginInfoServiceTest {
 
   private static final String TEST_VERSION = "1.0";
   private static final String USER_AGENT_NAME = "testUserAgentName";
   @Mock private IdeaPluginDescriptor mockPlugin;
   @Mock private FlagReader flagReader;
-  private BasePluginInfoService underTest;
+  private DefaultPluginInfoService underTest;
 
   @Before
   public void setup() {
     when(mockPlugin.getVersion()).thenReturn(TEST_VERSION);
     underTest =
-        new BasePluginInfoService(USER_AGENT_NAME, mockPlugin, flagReader) {
+        new DefaultPluginInfoService(USER_AGENT_NAME, mockPlugin, flagReader) {
           @NotNull
           @Override
           IntelliJPlatform getCurrentPlatform() {

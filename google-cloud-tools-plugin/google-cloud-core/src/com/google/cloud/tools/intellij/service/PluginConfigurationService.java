@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,17 @@
 
 package com.google.cloud.tools.intellij.service;
 
-import com.google.cloud.tools.intellij.DefaultPluginConfigurationService;
+import com.intellij.openapi.extensions.ExtensionPointName;
 
-/** This is the instance to use for release of this plugin to IntelliJ. */
-public class DefaultAccountPluginConfigurationService extends DefaultPluginConfigurationService {}
+/**
+ * An IntelliJ Application Service for Google plugins to perform common plugin configurations, such
+ * as enabling certain features or turning on/off error reporting.
+ */
+public interface PluginConfigurationService {
+
+  /** Registers an extension using the IJ API. */
+  <T> void registerExtension(ExtensionPointName<T> extensionPoint, T extension);
+
+  /** Turn on Google Feedback Error reporting for the pluginId provided. */
+  void enabledGoogleFeedbackErrorReporting(String pluginId);
+}

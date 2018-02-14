@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.analytics;
 
-import com.google.cloud.tools.intellij.PluginInfoService;
+import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.common.base.Joiner;
 import com.google.common.base.Joiner.MapJoiner;
 import com.google.common.collect.ImmutableList;

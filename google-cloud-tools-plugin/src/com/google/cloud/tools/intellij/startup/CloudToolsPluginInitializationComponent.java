@@ -16,8 +16,8 @@
 
 package com.google.cloud.tools.intellij.startup;
 
-import com.google.cloud.tools.intellij.PluginConfigurationService;
-import com.google.cloud.tools.intellij.PluginInfoService;
+import com.google.cloud.tools.intellij.service.PluginConfigurationService;
+import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.components.ServiceManager;
 import org.jetbrains.annotations.NotNull;

@@ -23,7 +23,7 @@ import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger.Debuggees
 import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger.Debuggees.Breakpoints;
 import com.google.api.services.clouddebugger.v2.model.Breakpoint;
 import com.google.api.services.clouddebugger.v2.model.ListBreakpointsResponse;
-import com.google.cloud.tools.intellij.PluginInfoService;
+import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
