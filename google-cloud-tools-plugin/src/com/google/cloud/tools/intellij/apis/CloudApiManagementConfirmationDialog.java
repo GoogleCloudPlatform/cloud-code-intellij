@@ -174,9 +174,23 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
   @Override
   protected ValidationInfo doValidate() {
     if (createNewServiceAccountCheckbox.isSelected()) {
-      if (StringUtils.isEmpty(serviceAccountNameTextField.getText())) {
+      String name = serviceAccountNameTextField.getText().trim();
+
+      if (StringUtils.isEmpty(name)) {
         return new ValidationInfo(
-            GctBundle.message("cloud.apis.management.dialog.serviceaccount.name.error"),
+            GctBundle.message("cloud.apis.management.dialog.serviceaccount.name.empty.error"),
+            serviceAccountNameTextField);
+      } else if (!(name.length() <= CloudApiManager.SERVICE_ACCOUNT_NAME_MAX_LEN)) {
+        return new ValidationInfo(
+            GctBundle.message(
+                "cloud.apis.management.dialog.serviceaccount.name.len.error",
+                CloudApiManager.SERVICE_ACCOUNT_NAME_MAX_LEN),
+            serviceAccountNameTextField);
+      } else if (!CloudApiManager.SERVICE_ACCOUNT_ID_PATTERN.matcher(name).matches()) {
+        return new ValidationInfo(
+            GctBundle.message(
+                "cloud.apis.management.dialog.serviceaccount.name.regex.error",
+                CloudApiManager.SERVICE_ACCOUNT_ID_PATTERN.toString()),
             serviceAccountNameTextField);
       } else if (StringUtils.isEmpty(serviceKeyPathSelector.getText())) {
         return new ValidationInfo(
