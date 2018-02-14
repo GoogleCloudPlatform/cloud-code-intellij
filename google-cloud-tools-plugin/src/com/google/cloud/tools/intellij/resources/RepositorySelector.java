@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.resources;
 
-import com.google.cloud.tools.intellij.core.GoogleCloudCoreIcons;
+import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.project.CloudProject;
