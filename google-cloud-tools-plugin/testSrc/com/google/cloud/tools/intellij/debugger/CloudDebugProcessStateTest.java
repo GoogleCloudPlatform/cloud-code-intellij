@@ -25,7 +25,7 @@ import com.google.api.services.clouddebugger.v2.model.FormatMessage;
 import com.google.api.services.clouddebugger.v2.model.ListBreakpointsResponse;
 import com.google.api.services.clouddebugger.v2.model.SourceLocation;
 import com.google.api.services.clouddebugger.v2.model.StatusMessage;
-import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
+import com.google.cloud.tools.intellij.PluginInfoService;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
 import com.google.cloud.tools.intellij.testing.TestUtils;
@@ -271,8 +271,7 @@ public class CloudDebugProcessStateTest extends UsefulTestCase {
     when(list.setStripResults(Boolean.TRUE)).thenReturn(list);
     when(list.setWaitToken(null)).thenReturn(list);
     when(list.setClientVersion(
-            ServiceManager.getService(CloudToolsPluginInfoService.class)
-                .getClientVersionForCloudDebugger()))
+            ServiceManager.getService(PluginInfoService.class).getClientVersionForCloudDebugger()))
         .thenReturn(list);
     when(list.execute())
         .thenAnswer(

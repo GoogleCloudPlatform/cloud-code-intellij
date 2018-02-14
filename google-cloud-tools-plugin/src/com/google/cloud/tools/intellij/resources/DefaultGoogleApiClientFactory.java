@@ -28,7 +28,7 @@ import com.google.api.services.servicemanagement.ServiceManagement;
 import com.google.auth.oauth2.UserCredentials;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
-import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
+import com.google.cloud.tools.intellij.PluginInfoService;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.intellij.openapi.components.ServiceManager;
@@ -86,6 +86,6 @@ public class DefaultGoogleApiClientFactory extends GoogleApiClientFactory {
   }
 
   private String getApplicationName() {
-    return ServiceManager.getService(CloudToolsPluginInfoService.class).getUserAgent();
+    return ServiceManager.getService(PluginInfoService.class).getUserAgent();
   }
 }

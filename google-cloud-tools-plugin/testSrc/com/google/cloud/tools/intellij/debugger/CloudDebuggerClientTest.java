@@ -22,7 +22,7 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger;
-import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
+import com.google.cloud.tools.intellij.PluginInfoService;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
@@ -40,13 +40,13 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class CloudDebuggerClientTest extends BasePluginTestCase {
 
-  @Mock CloudToolsPluginInfoService mockInfoService;
+  @Mock PluginInfoService mockInfoService;
 
   @Before
   public void setUp() {
     IntegratedGoogleLoginService mockLogin = Mockito.mock(IntegratedGoogleLoginService.class);
     registerService(IntegratedGoogleLoginService.class, mockLogin);
-    registerService(CloudToolsPluginInfoService.class, mockInfoService);
+    registerService(PluginInfoService.class, mockInfoService);
     LinkedHashMap<String, CredentialedUser> allUsers =
         new LinkedHashMap<String, CredentialedUser>();
     CredentialedUser user = Mockito.mock(CredentialedUser.class);

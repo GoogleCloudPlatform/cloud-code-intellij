@@ -20,7 +20,7 @@ import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger;
 import com.google.api.services.clouddebugger.v2.model.Debuggee;
 import com.google.api.services.clouddebugger.v2.model.ListDebuggeesResponse;
-import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
+import com.google.cloud.tools.intellij.PluginInfoService;
 import com.google.cloud.tools.intellij.debugger.CloudDebugProcessState;
 import com.google.cloud.tools.intellij.debugger.CloudDebuggerClient;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
@@ -166,7 +166,7 @@ class ProjectDebuggeeBinding {
                           .list()
                           .setProject(projectNumber)
                           .setClientVersion(
-                              ServiceManager.getService(CloudToolsPluginInfoService.class)
+                              ServiceManager.getService(PluginInfoService.class)
                                   .getClientVersionForCloudDebugger())
                           .execute();
                   isCdbQueried = true;

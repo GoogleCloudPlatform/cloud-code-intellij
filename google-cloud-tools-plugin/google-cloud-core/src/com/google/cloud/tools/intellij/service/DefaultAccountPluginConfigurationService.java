@@ -19,5 +19,4 @@ package com.google.cloud.tools.intellij.service;
 import com.google.cloud.tools.intellij.DefaultPluginConfigurationService;
 
 /** This is the instance to use for release of this plugin to IntelliJ. */
-public class DefaultAccountPluginConfigurationService extends DefaultPluginConfigurationService
-    implements AccountPluginConfigurationService {}
+public class DefaultAccountPluginConfigurationService extends DefaultPluginConfigurationService {}

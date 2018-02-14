@@ -24,7 +24,7 @@ import com.google.api.services.clouddebugger.v2.model.GetBreakpointResponse;
 import com.google.api.services.clouddebugger.v2.model.ListBreakpointsResponse;
 import com.google.api.services.clouddebugger.v2.model.SetBreakpointResponse;
 import com.google.api.services.clouddebugger.v2.model.SourceLocation;
-import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
+import com.google.cloud.tools.intellij.PluginInfoService;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
@@ -109,7 +109,7 @@ public class CloudDebugProcessStateController {
                 .breakpoints()
                 .delete(debuggeeId, breakpointId)
                 .setClientVersion(
-                    ServiceManager.getService(CloudToolsPluginInfoService.class)
+                    ServiceManager.getService(PluginInfoService.class)
                         .getClientVersionForCloudDebugger())
                 .execute();
           } catch (IOException ex) {
@@ -196,7 +196,7 @@ public class CloudDebugProcessStateController {
                         .breakpoints()
                         .get(state.getDebuggeeId(), id)
                         .setClientVersion(
-                            ServiceManager.getService(CloudToolsPluginInfoService.class)
+                            ServiceManager.getService(PluginInfoService.class)
                                 .getClientVersionForCloudDebugger())
                         .execute();
                 Breakpoint result = response.getBreakpoint();
@@ -256,7 +256,7 @@ public class CloudDebugProcessStateController {
                         .breakpoints()
                         .set(debuggeeId, serverBreakpoint)
                         .setClientVersion(
-                            ServiceManager.getService(CloudToolsPluginInfoService.class)
+                            ServiceManager.getService(PluginInfoService.class)
                                 .getClientVersionForCloudDebugger())
                         .execute();
 
@@ -386,7 +386,7 @@ public class CloudDebugProcessStateController {
               .setStripResults(Boolean.TRUE)
               .setWaitToken(CloudDebugConfigType.useWaitToken() ? tokenToSend : null)
               .setClientVersion(
-                  ServiceManager.getService(CloudToolsPluginInfoService.class)
+                  ServiceManager.getService(PluginInfoService.class)
                       .getClientVersionForCloudDebugger())
               .execute();
 

@@ -64,8 +64,7 @@ public class CloudToolsFeedbackAction extends DumbAwareAction {
   }
 
   private static String formatUrl() {
-    String pluginVersion =
-        ServiceManager.getService(CloudToolsPluginInfoService.class).getPluginVersion();
+    String pluginVersion = ServiceManager.getService(PluginInfoService.class).getPluginVersion();
 
     String issueBody =
         MessageFormat.format(

@@ -32,6 +32,7 @@ import org.jetbrains.annotations.NotNull;
 // Don't expose PluginId in this service's API as it has a private
 // constructor and makes testing impossible.
 public abstract class BasePluginInfoService implements PluginInfoService {
+  private static final String CLIENT_VERSION_PREFIX = "google.com/intellij/v";
 
   private static final String PLUGIN_NAME_EXTERNAL = "gcloud-intellij";
   private final String userAgent;
@@ -58,6 +59,14 @@ public abstract class BasePluginInfoService implements PluginInfoService {
   @Override
   public String getUserAgent() {
     return userAgent;
+  }
+
+  /**
+   * TODO(patflynn): Figure out if this is necessary. {@code userAgent} contains this information.
+   */
+  @Override
+  public String getClientVersionForCloudDebugger() {
+    return CLIENT_VERSION_PREFIX + getPluginVersion();
   }
 
   @Override

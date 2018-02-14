@@ -23,9 +23,9 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.PluginConfigurationService;
+import com.google.cloud.tools.intellij.PluginInfoService;
 import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
-import com.google.cloud.tools.intellij.service.AccountPluginConfigurationService;
-import com.google.cloud.tools.intellij.service.AccountPluginInfoService;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.Application;
@@ -41,16 +41,16 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class AccountPluginInitializationComponentTest extends BasePluginTestCase {
 
   private static final String PLUGIN_ID_STRING = "com.google.gct.core";
-  @Mock AccountPluginInfoService pluginInfoService;
-  @Mock AccountPluginConfigurationService pluginConfigurationService;
+  @Mock PluginInfoService pluginInfoService;
+  @Mock PluginConfigurationService pluginConfigurationService;
   @Mock IntegratedGoogleLoginService googleLoginService;
 
   AccountPluginInitializationComponent testComponent;
 
   @Before
   public void registerMockServices() {
-    registerService(AccountPluginInfoService.class, pluginInfoService);
-    registerService(AccountPluginConfigurationService.class, pluginConfigurationService);
+    registerService(PluginInfoService.class, pluginInfoService);
+    registerService(PluginConfigurationService.class, pluginConfigurationService);
     registerService(IntegratedGoogleLoginService.class, googleLoginService);
     testComponent = new AccountPluginInitializationComponent();
   }

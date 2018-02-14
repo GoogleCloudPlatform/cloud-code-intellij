@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.analytics;
 
-import com.google.cloud.tools.intellij.service.AccountPluginInfoService;
+import com.google.cloud.tools.intellij.PluginInfoService;
 import com.google.common.base.Joiner;
 import com.google.common.base.Joiner.MapJoiner;
 import com.google.common.collect.ImmutableList;
@@ -106,7 +106,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
   public GoogleUsageTracker() {
     analyticsId = UsageTrackerManager.getInstance().getAnalyticsProperty();
 
-    AccountPluginInfoService pluginInfo = ServiceManager.getService(AccountPluginInfoService.class);
+    PluginInfoService pluginInfo = ServiceManager.getService(PluginInfoService.class);
     externalPluginName = pluginInfo.getExternalPluginName();
     userAgent = pluginInfo.getUserAgent();
     String intellijPlatformName = PlatformUtils.getPlatformPrefix();

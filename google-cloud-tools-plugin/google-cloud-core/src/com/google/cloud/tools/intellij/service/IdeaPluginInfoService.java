@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij;
+package com.google.cloud.tools.intellij.service;
 
-/** The default configuration service implementation for Google Cloud plugins in IntelliJ. */
-public class DefaultCloudToolsPluginConfigurationService extends DefaultPluginConfigurationService
-    implements CloudToolsPluginConfigurationService {}
+import com.google.cloud.tools.intellij.BasePluginInfoService;
+
+/** The singleton instance of this class provides plugin metadata for the Google Account plugin. */
+public class IdeaPluginInfoService extends BasePluginInfoService {
+
+  protected IdeaPluginInfoService() {
+    super("gcloud-intellij-cloud-tools-plugin", "com.google.gct.core");
+  }
+}

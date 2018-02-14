@@ -47,4 +47,12 @@ public interface PluginInfoService {
    * this plugin.
    */
   boolean shouldEnableErrorFeedbackReporting();
+
+  /**
+   * Returns the fully qualified version of the plugin for specifying in Cloud Debugger API
+   * requests.
+   *
+   * @return "google.com/intellij/v{currentPluginVersion}"
+   */
+  String getClientVersionForCloudDebugger();
 }
