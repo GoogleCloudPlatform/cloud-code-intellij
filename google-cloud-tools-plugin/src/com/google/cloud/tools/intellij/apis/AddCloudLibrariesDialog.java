@@ -111,7 +111,7 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
     Set<CloudLibrary> apisToEnable = getApisToEnable();
     Set<CloudLibrary> apisNotEnabled = Sets.difference(selectedApis, apisToEnable);
 
-    if (cloudProject != null && (!apisToEnable.isEmpty() || !apisNotEnabled.isEmpty())) {
+    if (cloudProject != null) {
       Set<Role> roles = getServiceAccountRoles(selectedApis);
 
       CloudApiManagementConfirmationDialog managementDialog =
@@ -120,7 +120,9 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
       DialogManager.show(managementDialog);
 
       if (managementDialog.isOK()) {
-        runApiEnablement(apisToEnable);
+        if (!apisToEnable.isEmpty()) {
+          runApiEnablement(apisToEnable);
+        }
 
         if (managementDialog.isCreateServiceNewServiceAccount()) {
           runServiceAccountManagement(
