@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.project;
 
-import com.google.cloud.tools.intellij.core.GoogleCloudCoreMessageBundle;
+import com.google.cloud.tools.intellij.GoogleCloudCoreMessageBundle;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.login.util.AccountMessageBundle;
 import com.google.cloud.tools.intellij.resources.BaseGoogleLoginUi;
