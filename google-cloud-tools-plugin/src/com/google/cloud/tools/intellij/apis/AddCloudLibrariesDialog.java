@@ -124,7 +124,7 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
           runApiEnablement(apisToEnable);
         }
 
-        if (managementDialog.isCreateServiceNewServiceAccount()) {
+        if (managementDialog.isCreateNewServiceAccount()) {
           runServiceAccountManagement(
               managementDialog.getSelectedRoles(),
               managementDialog.getServiceAccountName(),

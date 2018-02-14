@@ -158,7 +158,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
     return ((ServiceAccountRolesTableModel) roleTable.getModel()).getSelectedRoles();
   }
 
-  boolean isCreateServiceNewServiceAccount() {
+  boolean isCreateNewServiceAccount() {
     return createNewServiceAccountCheckbox.isSelected();
   }
 
