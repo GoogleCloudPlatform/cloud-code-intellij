@@ -180,7 +180,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
         return new ValidationInfo(
             GctBundle.message("cloud.apis.management.dialog.serviceaccount.name.empty.error"),
             serviceAccountNameTextField);
-      } else if (!(name.length() <= CloudApiManager.SERVICE_ACCOUNT_NAME_MAX_LEN)) {
+      } else if (name.length() > CloudApiManager.SERVICE_ACCOUNT_NAME_MAX_LEN) {
         return new ValidationInfo(
             GctBundle.message(
                 "cloud.apis.management.dialog.serviceaccount.name.len.error",
