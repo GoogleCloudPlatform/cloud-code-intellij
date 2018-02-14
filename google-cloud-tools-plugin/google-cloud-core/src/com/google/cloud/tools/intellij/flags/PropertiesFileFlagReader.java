@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@ import java.util.Properties;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Use an instance of this class to read flags provided to your plugin through a {@code
- * config.properties} file placed in your plugin's resource root directory.
+ * Use an instance of this class to read com.google.cloud.tools.intellij.flags provided to your
+ * plugin through a {@code config.properties} file placed in your plugin's resource root directory.
  */
 public class PropertiesFileFlagReader implements FlagReader {
   private static final Logger LOGGER = Logger.getInstance(PropertiesFileFlagReader.class);

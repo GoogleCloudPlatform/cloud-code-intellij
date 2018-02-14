@@ -26,10 +26,9 @@ $ git clone https://github.com/GoogleCloudPlatform/gcloud-intellij.git
 Cloning into 'gcloud-intellij'...
 ```
 
-There are four modules:
+There are two modules:
 
-* google-cloud-tools: Cloud debugger and code inspections
-* common-lib: Code shared between the above two
+* google-cloud-tools-plugin: the full cloud tools plugin
 * common-test-lib: test infrastructure code
 
 When adding new dependencies, the jar files are loaded from Maven Central
@@ -46,11 +45,11 @@ google-cloud-tools-plugin/build/distributions.
 
 Other useful targets while developing include:
 
-* $ ./gradlew compileJava: compile
-* $ ./gradlew test: run tests
-* $ ./gradlew check: run static analysis tools
-* $ ./gradlew clean: remove all build artifacts
-* $ ./gradlew runIde: run IntelliJ preconfigured with the plugins from this project.
+* `$ ./gradlew compileJava` - compile
+* `$ ./gradlew test` - run tests
+* `$ ./gradlew check` - run static analysis tools
+* `$ ./gradlew clean` - remove all build artifacts
+* `$ ./gradlew :google-cloud-tools-plugin:runIde` - run IntelliJ preconfigured with the plugins from this project.
 
 ## Configuring and Debugging in IntelliJ
 
