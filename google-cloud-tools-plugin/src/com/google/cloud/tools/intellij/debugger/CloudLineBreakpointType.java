@@ -17,8 +17,8 @@
 package com.google.cloud.tools.intellij.debugger;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
+import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
-import com.google.cloud.tools.intellij.core.analytics.GctTracking;
 import com.google.cloud.tools.intellij.debugger.ui.BreakpointConfigurationPanel;
 import com.google.cloud.tools.intellij.debugger.ui.BreakpointErrorStatusPanel;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;

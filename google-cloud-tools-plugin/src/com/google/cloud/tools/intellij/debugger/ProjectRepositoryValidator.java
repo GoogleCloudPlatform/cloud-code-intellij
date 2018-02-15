@@ -26,7 +26,7 @@ import com.google.api.services.clouddebugger.v2.model.GerritSourceContext;
 import com.google.api.services.clouddebugger.v2.model.GitSourceContext;
 import com.google.api.services.clouddebugger.v2.model.ListDebuggeesResponse;
 import com.google.api.services.clouddebugger.v2.model.SourceContext;
-import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
+import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.dvcs.DvcsUtil;
 import com.intellij.execution.configurations.GeneralCommandLine;
@@ -127,7 +127,7 @@ public class ProjectRepositoryValidator {
                 .list()
                 .setProject(processState.getProjectNumber())
                 .setClientVersion(
-                    ServiceManager.getService(CloudToolsPluginInfoService.class)
+                    ServiceManager.getService(PluginInfoService.class)
                         .getClientVersionForCloudDebugger())
                 .execute();
         for (Debuggee debuggee : debuggees.getDebuggees()) {

@@ -16,8 +16,8 @@
 
 package com.google.cloud.tools.intellij.startup;
 
-import com.google.cloud.tools.intellij.CloudToolsPluginConfigurationService;
-import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
+import com.google.cloud.tools.intellij.service.PluginConfigurationService;
+import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.components.ServiceManager;
 import org.jetbrains.annotations.NotNull;
@@ -38,10 +38,9 @@ public class CloudToolsPluginInitializationComponent implements ApplicationCompo
 
   @Override
   public void initComponent() {
-    CloudToolsPluginConfigurationService pluginConfigurationService =
-        ServiceManager.getService(CloudToolsPluginConfigurationService.class);
-    CloudToolsPluginInfoService pluginInfoService =
-        ServiceManager.getService(CloudToolsPluginInfoService.class);
+    PluginConfigurationService pluginConfigurationService =
+        ServiceManager.getService(PluginConfigurationService.class);
+    PluginInfoService pluginInfoService = ServiceManager.getService(PluginInfoService.class);
 
     if (pluginInfoService.shouldEnableErrorFeedbackReporting()) {
       initErrorReporting(pluginConfigurationService, pluginInfoService);
@@ -52,8 +51,7 @@ public class CloudToolsPluginInitializationComponent implements ApplicationCompo
   }
 
   private void initErrorReporting(
-      CloudToolsPluginConfigurationService pluginConfigurationService,
-      CloudToolsPluginInfoService pluginInfoService) {
+      PluginConfigurationService pluginConfigurationService, PluginInfoService pluginInfoService) {
     pluginConfigurationService.enabledGoogleFeedbackErrorReporting(pluginInfoService.getPluginId());
   }
 }

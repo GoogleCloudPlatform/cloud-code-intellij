@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.project;
 
 import com.google.api.services.cloudresourcemanager.model.Project;
-import com.google.cloud.tools.intellij.core.GoogleCloudCoreMessageBundle;
+import com.google.cloud.tools.intellij.GoogleCloudCoreMessageBundle;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;

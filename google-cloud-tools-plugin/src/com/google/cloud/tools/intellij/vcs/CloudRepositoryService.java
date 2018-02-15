@@ -27,8 +27,8 @@ import com.google.api.client.util.Preconditions;
 import com.google.api.services.source.Source;
 import com.google.api.services.source.SourceRequest;
 import com.google.api.services.source.model.ListReposResponse;
-import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
+import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.intellij.openapi.components.ServiceManager;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -57,8 +57,7 @@ public class CloudRepositoryService {
           };
 
       HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-      String userAgent =
-          ServiceManager.getService(CloudToolsPluginInfoService.class).getUserAgent();
+      String userAgent = ServiceManager.getService(PluginInfoService.class).getUserAgent();
 
       Source source =
           new Source.Builder(httpTransport, JacksonFactory.getDefaultInstance(), initializer)
