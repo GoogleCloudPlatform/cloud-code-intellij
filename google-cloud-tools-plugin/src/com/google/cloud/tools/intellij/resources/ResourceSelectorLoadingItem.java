@@ -27,7 +27,7 @@ import javax.swing.SwingConstants;
 import org.jetbrains.annotations.NotNull;
 
 /** Displays UI similar to "loading..." when an resource manager call is in progress. */
-class ResourceSelectorLoadingItem extends JPanel {
+public class ResourceSelectorLoadingItem extends JPanel {
 
   private JLabel progressIcon;
 

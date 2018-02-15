@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,18 @@
 package com.google.cloud.tools.intellij.resources;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import org.jetbrains.annotations.NotNull;
 
-/** This model item is shown when a resource manager call is outstanding. */
-public class ResourceLoadingModelItem extends DefaultMutableTreeNode {}
+/** This model item is shown when a resource manager call returns an empty result. */
+public class ResourceEmptyModelItem extends DefaultMutableTreeNode {
+
+  private String message;
+
+  public ResourceEmptyModelItem(@NotNull String message) {
+    this.message = message;
+  }
+
+  public String getMessage() {
+    return message;
+  }
+}
