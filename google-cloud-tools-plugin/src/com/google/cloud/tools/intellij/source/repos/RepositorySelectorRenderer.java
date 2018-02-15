@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.resources;
+package com.google.cloud.tools.intellij.source.repos;
 
+import com.google.cloud.tools.intellij.resources.ResourceEmptyModelItem;
+import com.google.cloud.tools.intellij.resources.ResourceErrorModelItem;
+import com.google.cloud.tools.intellij.resources.ResourceLoadingModelItem;
+import com.google.cloud.tools.intellij.resources.ResourceSelectorEmptyItem;
+import com.google.cloud.tools.intellij.resources.ResourceSelectorErrorItem;
+import com.google.cloud.tools.intellij.resources.ResourceSelectorLoadingItem;
 import com.intellij.ui.JBColor;
 import java.awt.Component;
 import javax.swing.JTree;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,19 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.resources;
+package com.google.cloud.tools.intellij.source.repos;
 
-import javax.swing.tree.DefaultMutableTreeNode;
+import com.intellij.ui.components.JBLabel;
+import javax.swing.BorderFactory;
+import javax.swing.SwingConstants;
 
-/** This model item is shown when a resource manager call is outstanding. */
-public class ResourceLoadingModelItem extends DefaultMutableTreeNode {}
+/** UI for node in the repository selector representing a single GCP repository. */
+public class RepositoryItem extends JBLabel {
+
+  public RepositoryItem() {
+    setBorder(BorderFactory.createEmptyBorder(2, 15, 2, 0));
+    setOpaque(false);
+    setHorizontalAlignment(SwingConstants.LEFT);
+    setVerticalAlignment(SwingConstants.CENTER);
+  }
+}
