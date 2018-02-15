@@ -76,7 +76,8 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
             AppEngineServerModel runConfiguration;
 
             try {
-              // Getting the clone so the debug flags aren't added to the persisted settings.
+              // Getting the clone so the debug flags aren't added
+              // to the persisted settings.
               runConfiguration = (AppEngineServerModel) commonModel.getServerModel().clone();
             } catch (CloneNotSupportedException ee) {
               throw new ExecutionException(ee);
@@ -84,7 +85,8 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
 
             Map<String, String> environment = Maps.newHashMap(configuredEnvironment);
 
-            // IntelliJ appends the JVM flags to the environment variables, keyed by an empty
+            // IntelliJ appends the JVM flags to the environment
+            // variables, keyed by an empty
             // string; so we need extract them here.
             String jvmFlags = environment.get(JVM_FLAGS_ENVIRONMENT_KEY);
             if (jvmFlags != null) {
