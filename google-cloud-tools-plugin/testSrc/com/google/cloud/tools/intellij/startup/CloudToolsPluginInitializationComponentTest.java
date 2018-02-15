@@ -17,15 +17,22 @@
 package com.google.cloud.tools.intellij.startup;
 
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
 import com.google.cloud.tools.intellij.service.ApplicationPluginInfoService;
 import com.google.cloud.tools.intellij.service.PluginConfigurationService;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,6 +48,7 @@ public class CloudToolsPluginInitializationComponentTest extends BasePluginTestC
   @Mock PluginConfigurationService pluginConfigurationService;
   @Mock ActionManager actionManager;
   @Mock ApplicationPluginInfoService applicationInfoService;
+  @Mock IntegratedGoogleLoginService googleLoginService;
 
   CloudToolsPluginInitializationComponent testComponent;
 
@@ -50,6 +58,8 @@ public class CloudToolsPluginInitializationComponentTest extends BasePluginTestC
     registerService(PluginConfigurationService.class, pluginConfigurationService);
     registerService(ActionManager.class, actionManager);
     registerService(ApplicationPluginInfoService.class, applicationInfoService);
+    registerService(IntegratedGoogleLoginService.class, googleLoginService);
+
     testComponent = new CloudToolsPluginInitializationComponent();
   }
 
@@ -66,5 +76,32 @@ public class CloudToolsPluginInitializationComponentTest extends BasePluginTestC
     when(pluginInfoService.shouldEnableErrorFeedbackReporting()).thenReturn(false);
     testComponent.initComponent();
     verify(pluginConfigurationService, never()).enabledGoogleFeedbackErrorReporting(anyString());
+  }
+
+  @Test
+  public void testInitComponent_usageTrackingIsEnabled() {
+    Application mockApplication = spy(ApplicationManager.getApplication());
+    when(mockApplication.isUnitTestMode()).thenReturn(false);
+    ApplicationManager.setApplication(mockApplication, mock(Disposable.class));
+    testComponent = spy(new CloudToolsPluginInitializationComponent());
+    doNothing().when(testComponent).configureUsageTracking();
+    testComponent.initComponent();
+    verify(testComponent).configureUsageTracking();
+  }
+
+  @Test
+  public void testInitComponent_usageTrackingIsDisabled() {
+    Application mockApplication = spy(ApplicationManager.getApplication());
+    when(mockApplication.isUnitTestMode()).thenReturn(true);
+    ApplicationManager.setApplication(mockApplication, mock(Disposable.class));
+    testComponent = spy(new CloudToolsPluginInitializationComponent());
+    testComponent.initComponent();
+    verify(testComponent, never()).configureUsageTracking();
+  }
+
+  @Test
+  public void testInitComponent_loginServiceIsInitialized() {
+    testComponent.initComponent();
+    verify(googleLoginService).loadPersistedCredentials();
   }
 }
