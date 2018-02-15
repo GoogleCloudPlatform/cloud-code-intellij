@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.source.repos;
+package com.google.cloud.tools.intellij.csr;
 
 import com.intellij.ui.components.JBLabel;
 import javax.swing.BorderFactory;

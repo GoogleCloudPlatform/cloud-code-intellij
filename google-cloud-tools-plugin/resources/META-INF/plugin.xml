@@ -369,8 +369,8 @@
 
     <implicitUsageProvider implementation="com.google.cloud.tools.intellij.appengine.validation.EndpointImplicitUsageProvider"/>
 
-    <checkoutProvider implementation="com.google.cloud.tools.intellij.source.repos.GcpCheckoutProvider"/>
-    <vcsPopupProvider implementation="com.google.cloud.tools.intellij.source.repos.GcpQuickListContentProvider"/>
+    <checkoutProvider implementation="com.google.cloud.tools.intellij.csr.GcpCheckoutProvider"/>
+    <vcsPopupProvider implementation="com.google.cloud.tools.intellij.csr.GcpQuickListContentProvider"/>
 
     <dom.fileDescription
             implementation="com.google.cloud.tools.intellij.appengine.descriptor.dom.AppEngineStandardWebFileDescriptor"/>
@@ -401,7 +401,7 @@
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.application.GoogleApiClientAppEngineAdminService"/>
     <applicationService serviceInterface="com.google.cloud.tools.intellij.resources.GoogleApiClientFactory"
                         serviceImplementation="com.google.cloud.tools.intellij.resources.DefaultGoogleApiClientFactory"/>
-    <applicationService serviceImplementation="com.google.cloud.tools.intellij.source.repos.CloudRepositoryService"/>
+    <applicationService serviceImplementation="com.google.cloud.tools.intellij.csr.CloudRepositoryService"/>
 
     <!-- App Engine Cloud and Deployment Sources Configuration-->
     <remoteServer.type
@@ -489,7 +489,7 @@
   </extensions>
 
   <extensions defaultExtensionNs="Git4Idea">
-    <GitHttpAuthDataProvider implementation="com.google.cloud.tools.intellij.source.repos.GcpHttpAuthDataProvider" />
+    <GitHttpAuthDataProvider implementation="com.google.cloud.tools.intellij.csr.GcpHttpAuthDataProvider" />
   </extensions>
 
   <extensions defaultExtensionNs="com.google.gct.core">
@@ -515,7 +515,7 @@
     <action id="AddSnapshotLocation" class="com.google.cloud.tools.intellij.debugger.actions.ToggleSnapshotLocationAction"/>
 
     <action id="GoogleCloudTools.UploadSourceToGCP"
-            class="com.google.cloud.tools.intellij.source.repos.SetupCloudRepositoryAction">
+            class="com.google.cloud.tools.intellij.csr.SetupCloudRepositoryAction">
       <add-to-group group-id="Vcs.Import"/>
     </action>
 

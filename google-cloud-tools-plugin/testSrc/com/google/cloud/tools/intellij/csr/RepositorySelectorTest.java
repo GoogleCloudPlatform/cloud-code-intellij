@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.source.repos;
+package com.google.cloud.tools.intellij.csr;
 
 import static com.intellij.testFramework.UsefulTestCase.assertInstanceOf;
 import static com.intellij.testFramework.UsefulTestCase.assertNotEmpty;
@@ -28,14 +28,14 @@ import static org.mockito.Mockito.when;
 
 import com.google.api.services.source.model.ListReposResponse;
 import com.google.api.services.source.model.Repo;
+import com.google.cloud.tools.intellij.csr.CloudRepositoryService.CloudRepositoryServiceException;
+import com.google.cloud.tools.intellij.csr.RepositorySelector.ProjectNotSelectedPanel;
+import com.google.cloud.tools.intellij.csr.RepositorySelector.RepositoryPanel;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.resources.ResourceEmptyModelItem;
 import com.google.cloud.tools.intellij.resources.ResourceErrorModelItem;
-import com.google.cloud.tools.intellij.source.repos.CloudRepositoryService.CloudRepositoryServiceException;
-import com.google.cloud.tools.intellij.source.repos.RepositorySelector.ProjectNotSelectedPanel;
-import com.google.cloud.tools.intellij.source.repos.RepositorySelector.RepositoryPanel;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
 import com.intellij.openapi.application.ApplicationManager;
@@ -56,7 +56,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.picocontainer.MutablePicoContainer;
 
-/** Tests for {@link com.google.cloud.tools.intellij.source.repos.RepositorySelector}. */
+/** Tests for {@link RepositorySelector}. */
 public class RepositorySelectorTest {
 
   @Rule public CloudToolsRule cloudToolsRule = new CloudToolsRule(this);

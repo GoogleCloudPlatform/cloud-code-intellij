@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.source.repos;
+package com.google.cloud.tools.intellij.csr;
 
 import com.google.api.services.source.model.Repo;
 import com.google.cloud.tools.intellij.login.CredentialedUser;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.source.repos;
+package com.google.cloud.tools.intellij.csr;
 
 import com.intellij.openapi.util.text.StringUtil;
 import git4idea.repo.GitRepository;
