@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.vcs;
+package com.google.cloud.tools.intellij.csr;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
-import com.google.cloud.tools.intellij.resources.RepositorySelector;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.dvcs.ui.DvcsBundle;
 import com.intellij.ide.impl.ProjectUtil;
