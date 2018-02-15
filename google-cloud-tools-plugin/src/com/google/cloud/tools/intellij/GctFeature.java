@@ -31,7 +31,7 @@ public enum GctFeature implements Feature {
 
   /**
    * Deprecating but not removing this feature as it serves as a useful sample and it's kinda nice
-   * to see the {@code GctFeature} history of com.google.cloud.tools.intellij.flags in this enum.
+   * to see the {@code GctFeature} history of flags in this enum.
    */
   @Deprecated
   APPENGINE_FLEX(null, "feature.appengine.flex", "ct4ij.feature.appengine.flex");

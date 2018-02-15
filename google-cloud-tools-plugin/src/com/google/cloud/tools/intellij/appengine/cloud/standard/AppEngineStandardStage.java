@@ -66,8 +66,7 @@ public class AppEngineStandardStage {
         helper.createSdk(
             loggingHandler, startListener, outputListener, outputListener, onStageComplete);
 
-    // TODO determine the default set of com.google.cloud.tools.intellij.flags we want to set for AE
-    // standard staging
+    // TODO determine the default set of flags we want to set for AE standard staging
     DefaultStageStandardConfiguration stageConfig = new DefaultStageStandardConfiguration();
     stageConfig.setEnableJarSplitting(true);
     // TODO(joaomartins): Change File to Path on library configs.

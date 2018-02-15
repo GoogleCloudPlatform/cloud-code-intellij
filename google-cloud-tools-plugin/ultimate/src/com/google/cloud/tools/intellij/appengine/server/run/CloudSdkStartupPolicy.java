@@ -85,7 +85,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
 
             Map<String, String> environment = Maps.newHashMap(configuredEnvironment);
 
-            // IntelliJ appends the JVM com.google.cloud.tools.intellij.flags to the environment
+            // IntelliJ appends the JVM flags to the environment
             // variables, keyed by an empty
             // string; so we need extract them here.
             String jvmFlags = environment.get(JVM_FLAGS_ENVIRONMENT_KEY);

@@ -43,9 +43,9 @@ import org.jetbrains.annotations.NotNull;
  * the built artifact to "target.jar" or "target.war", depending on the type of artifact that was
  * built.
  *
- * <p>This conversion com.google.cloud.tools.intellij.flags all deployment configurations with a
- * legacy bit that will be checked upon deployment. If set, the staged artifact name will be
- * explicitly set to "target.jar" or "target.war" so the functionality is preserved.
+ * <p>This conversion flags all deployment configurations with a legacy bit that will be checked
+ * upon deployment. If set, the staged artifact name will be explicitly set to "target.jar" or
+ * "target.war" so the functionality is preserved.
  */
 public final class StagedArtifactNameConverterProvider extends ConverterProvider {
 
