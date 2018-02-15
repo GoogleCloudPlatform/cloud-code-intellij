@@ -181,7 +181,10 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
       return managedCloudSdk
           .newInstaller()
-          .install(new ManagedCloudSdkProgressListener(), sdkConsoleListener);
+          .install(
+              ManagedCloudSdkServiceUiPresenter.getInstance()
+                  .createProgressListener(ManagedSdkJobType.INSTALL),
+              sdkConsoleListener);
     }
 
     return managedCloudSdk.getSdkHome();

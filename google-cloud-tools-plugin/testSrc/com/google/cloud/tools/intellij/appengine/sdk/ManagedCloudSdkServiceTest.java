@@ -33,6 +33,7 @@ import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.log.TestInMemoryLogger;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.managedcloudsdk.ManagedCloudSdk;
+import com.google.cloud.tools.managedcloudsdk.ProgressListener;
 import com.google.cloud.tools.managedcloudsdk.UnsupportedOsException;
 import com.google.cloud.tools.managedcloudsdk.command.CommandExecutionException;
 import com.google.cloud.tools.managedcloudsdk.command.CommandExitException;
@@ -86,6 +87,7 @@ public class ManagedCloudSdkServiceTest {
         .invokeOnApplicationUIThread(any());
     // replace UI presenter for verifications
     ManagedCloudSdkServiceUiPresenter.setInstance(mockUiPresenter);
+    when(mockUiPresenter.createProgressListener(any())).thenReturn(mock(ProgressListener.class));
     // init SDK, most tests require initialized state.
     sdkService.initManagedSdk();
   }
