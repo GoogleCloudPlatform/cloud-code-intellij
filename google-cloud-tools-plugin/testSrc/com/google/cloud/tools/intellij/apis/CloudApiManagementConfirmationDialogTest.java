@@ -200,6 +200,7 @@ public class CloudApiManagementConfirmationDialogTest {
     verifyServiceAccount_showsValidationError_withFields("my$name", testDir.getPath());
     verifyServiceAccount_doesNotShowValidationError_withFields("my-name", testDir.getPath());
     verifyServiceAccount_doesNotShowValidationError_withFields("my-name99", testDir.getPath());
+    verifyServiceAccount_doesNotShowValidationError_withFields("MY-NAME", testDir.getPath());
   }
 
   @Test
