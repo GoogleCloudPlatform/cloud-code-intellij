@@ -189,8 +189,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
             serviceAccountNameTextField);
       } else if (!CloudApiManager.SERVICE_ACCOUNT_ID_PATTERN.matcher(name).matches()) {
         return new ValidationInfo(
-            GctBundle.message(
-                "cloud.apis.management.dialog.serviceaccount.name.regex.error"),
+            GctBundle.message("cloud.apis.management.dialog.serviceaccount.name.regex.error"),
             serviceAccountNameTextField);
       } else if (StringUtils.isEmpty(path)) {
         return new ValidationInfo(
@@ -252,9 +251,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
       setRowHeight(25);
     }
 
-    /**
-     * See {@link com.intellij.ide.plugins.PluginTable#paint(Graphics)} for reasoning.
-     */
+    /** See {@link com.intellij.ide.plugins.PluginTable#paint(Graphics)} for reasoning. */
     @Override
     public void paint(@NotNull Graphics g) {
       super.paint(g);
