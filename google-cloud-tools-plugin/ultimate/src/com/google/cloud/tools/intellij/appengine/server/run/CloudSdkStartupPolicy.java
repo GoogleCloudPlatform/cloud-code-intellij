@@ -76,7 +76,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
             AppEngineServerModel runConfiguration;
 
             try {
-              // Getting the clone so the debug com.google.cloud.tools.intellij.flags aren't added
+              // Getting the clone so the debug flags aren't added
               // to the persisted settings.
               runConfiguration = (AppEngineServerModel) commonModel.getServerModel().clone();
             } catch (CloneNotSupportedException ee) {
@@ -92,7 +92,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
             if (jvmFlags != null) {
               runConfiguration.appendJvmFlags(Arrays.asList(jvmFlags.trim().split(" ")));
             }
-            // We don't want to pass the jvm com.google.cloud.tools.intellij.flags to the dev server
+            // We don't want to pass the jvm flags to the dev server
             // environment
             environment.remove(JVM_FLAGS_ENVIRONMENT_KEY);
 
