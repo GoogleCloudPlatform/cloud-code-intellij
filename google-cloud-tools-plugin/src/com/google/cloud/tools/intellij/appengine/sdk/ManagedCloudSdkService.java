@@ -22,6 +22,7 @@ import com.google.cloud.tools.managedcloudsdk.ConsoleListener;
 import com.google.cloud.tools.managedcloudsdk.ManagedCloudSdk;
 import com.google.cloud.tools.managedcloudsdk.ManagedSdkVerificationException;
 import com.google.cloud.tools.managedcloudsdk.ManagedSdkVersionMismatchException;
+import com.google.cloud.tools.managedcloudsdk.ProgressListener;
 import com.google.cloud.tools.managedcloudsdk.UnsupportedOsException;
 import com.google.cloud.tools.managedcloudsdk.components.SdkComponent;
 import com.google.common.annotations.VisibleForTesting;
@@ -194,9 +195,15 @@ public class ManagedCloudSdkService implements CloudSdkService {
     if (!safeCheckSdkStatus(() -> managedCloudSdk.hasComponent(SdkComponent.APP_ENGINE_JAVA))) {
       ConsoleListener appEngineConsoleListener = logger::debug;
 
+      ProgressListener appEngineProgressListener =
+          ManagedCloudSdkServiceUiPresenter.getInstance()
+              .createProgressListener(ManagedSdkJobType.INSTALL);
+      appEngineProgressListener.start("Installing App Engine Java", ProgressListener.UNKNOWN);
       managedCloudSdk
           .newComponentInstaller()
           .installComponent(SdkComponent.APP_ENGINE_JAVA, appEngineConsoleListener);
+
+      appEngineProgressListener.done();
     }
   }
 

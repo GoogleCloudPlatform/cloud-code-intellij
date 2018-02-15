@@ -24,7 +24,8 @@ import com.intellij.openapi.progress.util.ProgressWindow;
 class ManagedCloudSdkProgressListener implements ProgressListener {
 
   private ProgressWindow progressIndicator;
-  private long totalWork;
+  private double totalWork;
+  private double lastUpdatedGlobalDoneFraction;
 
   @Override
   public void start(String message, long totalWork) {
@@ -33,26 +34,32 @@ class ManagedCloudSdkProgressListener implements ProgressListener {
     ApplicationManager.getApplication()
         .invokeLater(
             () -> {
+              System.out.println("start.main: " + totalWork);
+
               progressIndicator = new ProgressWindow(true, null);
               progressIndicator.start();
 
               setProgressText(message);
-            });
 
-    System.out.println("start.main: " + totalWork);
+              if (totalWork == UNKNOWN) {
+                progressIndicator.setIndeterminate(true);
+              }
+            });
   }
 
   @Override
   public void update(long workDone) {
-    System.out.println("update.main: " + workDone);
     ApplicationManager.getApplication()
         .invokeLater(
             () -> {
+              System.out.println("update.main: " + workDone);
               if (workDone == ProgressListener.UNKNOWN) {
                 progressIndicator.setIndeterminate(true);
               } else {
                 progressIndicator.setIndeterminate(false);
-                progressIndicator.setFraction(workDone / totalWork);
+                lastUpdatedGlobalDoneFraction = workDone / totalWork;
+                progressIndicator.setFraction(lastUpdatedGlobalDoneFraction);
+                System.out.println("main fraction: " + lastUpdatedGlobalDoneFraction);
               }
             });
   }
@@ -64,19 +71,19 @@ class ManagedCloudSdkProgressListener implements ProgressListener {
 
   @Override
   public void done() {
-    System.out.println("done.");
     ApplicationManager.getApplication()
         .invokeLater(
             () -> {
               progressIndicator.stop();
               progressIndicator.dispose();
+              System.out.println("done.");
             });
   }
 
   @Override
   public ProgressListener newChild(long allocation) {
     System.out.println("child.allocation: " + allocation);
-    return new ChildProgressListener(totalWork, allocation);
+    return new ChildProgressListener(allocation);
   }
 
   private void setProgressText(String message) {
@@ -90,30 +97,51 @@ class ManagedCloudSdkProgressListener implements ProgressListener {
   /** Progress listener for child activities, updates the same progress indicator. */
   private final class ChildProgressListener implements ProgressListener {
 
-    private final long totalWork;
-    private final long allocation;
+    private double childTotalWork;
+    private final double globalProgressAllocation;
 
-    private ChildProgressListener(long totalWork, long allocation) {
-      this.totalWork = totalWork;
-      this.allocation = allocation;
+    private ChildProgressListener(double globalProgressAllocation) {
+      this.globalProgressAllocation = globalProgressAllocation;
     }
 
     @Override
     public void start(String message, long totalWork) {
-      System.out.println("start.child: " + totalWork + ", allocated: " + allocation);
+      System.out.println("start.child: " + totalWork + ", allocated: " + globalProgressAllocation);
+      childTotalWork = totalWork;
 
       setProgressText(message);
-    }
-
-    @Override
-    public void update(long workDone) {
-      System.out.println("update.child: " + workDone + ", allocated: " + allocation);
 
       ApplicationManager.getApplication()
           .invokeLater(
               () -> {
-                double allocationFraction = (double) workDone * allocation / totalWork;
-                progressIndicator.setFraction(allocationFraction);
+                if (totalWork == UNKNOWN) {
+                  progressIndicator.setIndeterminate(true);
+                }
+              });
+    }
+
+    @Override
+    public void update(long workDone) {
+      ApplicationManager.getApplication()
+          .invokeLater(
+              () -> {
+                System.out.println(
+                    "update.child: " + workDone + ", allocated: " + globalProgressAllocation);
+
+                if (workDone != ProgressListener.UNKNOWN) {
+                  double globalWorkRatio = globalProgressAllocation / totalWork;
+                  double childWorkFraction = workDone / childTotalWork;
+                  double globalWorkFraction = childWorkFraction * globalWorkRatio;
+                  System.out.println("global ratio: " + globalWorkRatio);
+                  System.out.println("child work done %: " + childWorkFraction);
+                  System.out.println("added to global work %: " + globalWorkFraction);
+                  lastUpdatedGlobalDoneFraction += globalWorkFraction;
+                  progressIndicator.setFraction(lastUpdatedGlobalDoneFraction);
+                  System.out.println("global % done: " + lastUpdatedGlobalDoneFraction);
+                } else {
+                  // pass unknown state to parent listener.
+                  ManagedCloudSdkProgressListener.this.update(UNKNOWN);
+                }
               });
     }
 
@@ -129,7 +157,7 @@ class ManagedCloudSdkProgressListener implements ProgressListener {
 
     @Override
     public ProgressListener newChild(long childAllocation) {
-      return new ChildProgressListener(allocation, childAllocation);
+      return new ChildProgressListener(childAllocation);
     }
   }
 }
