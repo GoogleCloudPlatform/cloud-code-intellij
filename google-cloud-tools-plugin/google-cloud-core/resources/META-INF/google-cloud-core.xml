@@ -16,11 +16,6 @@
 
 <idea-plugin>
   <application-components>
-    <component>
-      <implementation-class>
-        com.google.cloud.tools.intellij.startup.AccountPluginInitializationComponent
-      </implementation-class>
-    </component>
   </application-components>
 
   <project-components>
