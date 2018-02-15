@@ -174,7 +174,8 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
   @Override
   protected ValidationInfo doValidate() {
     if (createNewServiceAccountCheckbox.isSelected()) {
-      String name = serviceAccountNameTextField.getText().trim().toLowerCase();
+      String name = getServiceAccountName();
+      String path = getServiceAccountKeyDownloadPath().toString();
 
       if (StringUtils.isEmpty(name)) {
         return new ValidationInfo(
@@ -191,11 +192,11 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
             GctBundle.message(
                 "cloud.apis.management.dialog.serviceaccount.name.regex.error"),
             serviceAccountNameTextField);
-      } else if (StringUtils.isEmpty(serviceKeyPathSelector.getText())) {
+      } else if (StringUtils.isEmpty(path)) {
         return new ValidationInfo(
             GctBundle.message("cloud.apis.management.dialog.serviceaccount.key.path.empty.error"),
             serviceKeyPathSelector);
-      } else if (!isValidDirectory(serviceKeyPathSelector.getText().trim())) {
+      } else if (!isValidDirectory(path)) {
         return new ValidationInfo(
             GctBundle.message("cloud.apis.management.dialog.serviceaccount.key.path.invalid.error"),
             serviceKeyPathSelector);
