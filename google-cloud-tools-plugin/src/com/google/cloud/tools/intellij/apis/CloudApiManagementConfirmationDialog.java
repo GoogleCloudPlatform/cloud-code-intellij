@@ -163,7 +163,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
   }
 
   String getServiceAccountName() {
-    return serviceAccountNameTextField.getText().trim();
+    return serviceAccountNameTextField.getText().trim().toLowerCase();
   }
 
   Path getServiceAccountKeyDownloadPath() {
@@ -174,7 +174,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
   @Override
   protected ValidationInfo doValidate() {
     if (createNewServiceAccountCheckbox.isSelected()) {
-      String name = serviceAccountNameTextField.getText().trim();
+      String name = serviceAccountNameTextField.getText().trim().toLowerCase();
 
       if (StringUtils.isEmpty(name)) {
         return new ValidationInfo(
