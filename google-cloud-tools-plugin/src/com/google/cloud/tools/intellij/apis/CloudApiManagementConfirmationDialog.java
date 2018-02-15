@@ -163,7 +163,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
   }
 
   String getServiceAccountName() {
-    return serviceAccountNameTextField.getText().trim();
+    return serviceAccountNameTextField.getText().trim().toLowerCase();
   }
 
   Path getServiceAccountKeyDownloadPath() {
@@ -174,15 +174,28 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
   @Override
   protected ValidationInfo doValidate() {
     if (createNewServiceAccountCheckbox.isSelected()) {
-      if (StringUtils.isEmpty(serviceAccountNameTextField.getText())) {
+      String name = getServiceAccountName();
+      String path = getServiceAccountKeyDownloadPath().toString();
+
+      if (StringUtils.isEmpty(name)) {
         return new ValidationInfo(
-            GctBundle.message("cloud.apis.management.dialog.serviceaccount.name.error"),
+            GctBundle.message("cloud.apis.management.dialog.serviceaccount.name.empty.error"),
             serviceAccountNameTextField);
-      } else if (StringUtils.isEmpty(serviceKeyPathSelector.getText())) {
+      } else if (name.length() > CloudApiManager.SERVICE_ACCOUNT_NAME_MAX_LEN) {
+        return new ValidationInfo(
+            GctBundle.message(
+                "cloud.apis.management.dialog.serviceaccount.name.len.error",
+                CloudApiManager.SERVICE_ACCOUNT_NAME_MAX_LEN),
+            serviceAccountNameTextField);
+      } else if (!CloudApiManager.SERVICE_ACCOUNT_ID_PATTERN.matcher(name).matches()) {
+        return new ValidationInfo(
+            GctBundle.message("cloud.apis.management.dialog.serviceaccount.name.regex.error"),
+            serviceAccountNameTextField);
+      } else if (StringUtils.isEmpty(path)) {
         return new ValidationInfo(
             GctBundle.message("cloud.apis.management.dialog.serviceaccount.key.path.empty.error"),
             serviceKeyPathSelector);
-      } else if (!isValidDirectory(serviceKeyPathSelector.getText().trim())) {
+      } else if (!isValidDirectory(path)) {
         return new ValidationInfo(
             GctBundle.message("cloud.apis.management.dialog.serviceaccount.key.path.invalid.error"),
             serviceKeyPathSelector);
@@ -227,6 +240,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
   }
 
   private static final class ServiceAccountRolesTable extends JBTable {
+
     ServiceAccountRolesTable(Set<Role> roles) {
       super(new ServiceAccountRolesTableModel(roles));
       setDefaultRenderer(Role.class, new RoleNameRenderer());
