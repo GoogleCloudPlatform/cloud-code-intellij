@@ -92,8 +92,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
             if (jvmFlags != null) {
               runConfiguration.appendJvmFlags(Arrays.asList(jvmFlags.trim().split(" ")));
             }
-            // We don't want to pass the jvm flags to the dev server
-            // environment
+            // We don't want to pass the jvm flags to the dev server environment
             environment.remove(JVM_FLAGS_ENVIRONMENT_KEY);
 
             runConfiguration.setEnvironment(environment);
