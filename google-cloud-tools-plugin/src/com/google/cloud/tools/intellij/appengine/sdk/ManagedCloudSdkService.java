@@ -184,8 +184,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
       return managedCloudSdk
           .newInstaller()
           .install(
-              ManagedCloudSdkServiceUiPresenter.getInstance()
-                  .createProgressListener(() -> managedSdkBackgroundJob.cancel(true)),
+              ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this),
               sdkConsoleListener);
     }
 
@@ -197,8 +196,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
       ConsoleListener appEngineConsoleListener = logger::debug;
 
       ProgressListener appEngineProgressListener =
-          ManagedCloudSdkServiceUiPresenter.getInstance()
-              .createProgressListener(() -> managedSdkBackgroundJob.cancel(true));
+          ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
       appEngineProgressListener.start("Installing App Engine Java", ProgressListener.UNKNOWN);
       managedCloudSdk
           .newComponentInstaller()

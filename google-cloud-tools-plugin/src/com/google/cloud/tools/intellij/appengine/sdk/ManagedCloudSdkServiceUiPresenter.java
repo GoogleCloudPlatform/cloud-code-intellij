@@ -67,8 +67,8 @@ public class ManagedCloudSdkServiceUiPresenter {
     showNotification(message, NotificationType.WARNING);
   }
 
-  public ProgressListener createProgressListener(Runnable cancelCallback) {
-    return new ManagedCloudSdkProgressListener(cancelCallback);
+  public ProgressListener createProgressListener(ManagedCloudSdkService managedCloudSdkService) {
+    return new ManagedCloudSdkProgressListener(managedCloudSdkService);
   }
 
   private void showNotification(String message, NotificationType notificationType) {

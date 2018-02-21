@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.managedcloudsdk.ProgressListener;
+import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.PerformInBackgroundOption;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -27,58 +28,38 @@ import com.intellij.openapi.progress.util.AbstractProgressIndicatorExBase;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Progress listener for {@link com.google.cloud.tools.managedcloudsdk.ManagedCloudSdk} installation
- * and update processes. Uses {@link BackgroundableProcessIndicator} to show progress while running
- * managed SDK jobs. UI provides cancel option, passing it to cancel callback.
+ * Progress listener for {@link ManagedCloudSdkService} installation and update processes. Uses
+ * {@link BackgroundableProcessIndicator} to show progress while running managed SDK jobs. UI
+ * provides cancel option.
+ *
+ * <p>This class is not thread-safe and must be called from single thread (managed SDK job thread).
  */
 class ManagedCloudSdkProgressListener implements ProgressListener {
 
-  private final Runnable cancelCallback;
+  private final ManagedCloudSdkService managedCloudSdkService;
+
   private BackgroundableProcessIndicator progressIndicator;
-  private double totalWork;
-  private double lastUpdatedGlobalDoneFraction;
   private Backgroundable task;
 
-  ManagedCloudSdkProgressListener(Runnable cancelCallback) {
-    this.cancelCallback = cancelCallback;
+  private double totalWork;
+  private double lastUpdatedGlobalDoneFraction;
+
+  ManagedCloudSdkProgressListener(ManagedCloudSdkService managedCloudSdkService) {
+    this.managedCloudSdkService = managedCloudSdkService;
   }
 
   @Override
   public void start(String message, long totalWork) {
     this.totalWork = totalWork;
 
-    // initialize progress indicator first in UI thread before using for updates.
-    ApplicationManager.getApplication()
-        .invokeAndWait(
-            () -> {
-              // task info for progress indicator, required to init/finish properly.
-              task =
-                  new Backgroundable(
-                      null /* not project specific task */,
-                      "" /* set in each message */,
-                      true /* cancellable */,
-                      PerformInBackgroundOption.ALWAYS_BACKGROUND) {
-                    @Override
-                    public void run(@NotNull ProgressIndicator indicator) {
-                      // will not be called in manual progress mode.
-                    }
-                  };
-              progressIndicator = new BackgroundableProcessIndicator(task);
-              progressIndicator.addStateDelegate(
-                  new AbstractProgressIndicatorExBase() {
-                    @Override
-                    public void cancel() {
-                      cancelCallback.run();
-                      done();
-                    }
-                  });
+    // initialize progress indicator first in UI thread before using it for updates.
+    this.progressIndicator = initProgressIndicator();
 
-              setProgressText(message);
+    setProgressText(message);
 
-              if (totalWork == UNKNOWN) {
-                progressIndicator.setIndeterminate(true);
-              }
-            });
+    if (totalWork == UNKNOWN) {
+      progressIndicator.setIndeterminate(true);
+    }
   }
 
   @Override
@@ -87,7 +68,7 @@ class ManagedCloudSdkProgressListener implements ProgressListener {
       progressIndicator.setIndeterminate(true);
     } else {
       progressIndicator.setIndeterminate(false);
-      lastUpdatedGlobalDoneFraction = workDone / totalWork;
+      lastUpdatedGlobalDoneFraction += workDone / totalWork;
       progressIndicator.setFraction(lastUpdatedGlobalDoneFraction);
     }
   }
@@ -112,35 +93,69 @@ class ManagedCloudSdkProgressListener implements ProgressListener {
     progressIndicator.setText(GctBundle.message("managedsdk.progress.message", message));
   }
 
+  @VisibleForTesting
+  BackgroundableProcessIndicator initProgressIndicator() {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              // task info for progress indicator, required to init/finish properly.
+              task =
+                  new Backgroundable(
+                      null /* not project specific task */,
+                      "" /* set in each message */,
+                      true /* cancellable */,
+                      PerformInBackgroundOption.ALWAYS_BACKGROUND) {
+                    @Override
+                    public void run(@NotNull ProgressIndicator indicator) {
+                      // will not be called in manual progress mode.
+                    }
+                  };
+              progressIndicator = new BackgroundableProcessIndicator(task);
+              progressIndicator.addStateDelegate(
+                  new AbstractProgressIndicatorExBase() {
+                    @Override
+                    public void cancel() {
+                      managedCloudSdkService.cancelInstallOrUpdate();
+                      done();
+                    }
+                  });
+            });
+
+    return progressIndicator;
+  }
+
   /**
    * Progress listener for child activities, updates the same progress indicator. Updates progress
-   * with proportioned chunk of global progress.
+   * indicator with proportioned chunk of global progress.
    */
   private final class ChildProgressListener implements ProgressListener {
 
-    private double childTotalWork;
-    private final double globalProgressAllocation;
+    private double childWork;
+    /* 0 < childTotalWorkAllocation <= totalWork */
+    private final double childTotalWorkAllocation;
 
-    private ChildProgressListener(double globalProgressAllocation) {
-      this.globalProgressAllocation = globalProgressAllocation;
+    private ChildProgressListener(double childTotalWorkAllocation) {
+      this.childTotalWorkAllocation = childTotalWorkAllocation;
     }
 
     @Override
-    public void start(String message, long totalWork) {
-      childTotalWork = totalWork;
+    public void start(String message, long childWork) {
+      this.childWork = childWork;
 
       setProgressText(message);
 
-      if (totalWork == UNKNOWN) {
-        progressIndicator.setIndeterminate(true);
+      if (childWork == UNKNOWN) {
+        // pass unknown state to parent listener.
+        ManagedCloudSdkProgressListener.this.update(UNKNOWN);
       }
     }
 
     @Override
-    public void update(long workDone) {
-      if (workDone != ProgressListener.UNKNOWN && childTotalWork != UNKNOWN) {
-        double globalWorkRatio = globalProgressAllocation / totalWork;
-        double childWorkFraction = workDone / childTotalWork;
+    public void update(long childWorkDone) {
+      // both could be UNKNOWN meaning undetermined total progress for the whole child task.
+      if (childWorkDone != ProgressListener.UNKNOWN && childWork != UNKNOWN) {
+        double globalWorkRatio = childTotalWorkAllocation / totalWork;
+        double childWorkFraction = childWorkDone / childWork;
         double globalWorkFraction = childWorkFraction * globalWorkRatio;
         lastUpdatedGlobalDoneFraction += globalWorkFraction;
         progressIndicator.setFraction(lastUpdatedGlobalDoneFraction);

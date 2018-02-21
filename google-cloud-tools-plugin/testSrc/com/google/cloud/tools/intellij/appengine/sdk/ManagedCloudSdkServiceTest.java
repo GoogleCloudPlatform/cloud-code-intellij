@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutorService;
 import org.junit.Before;
 import org.junit.Rule;
@@ -236,6 +237,18 @@ public class ManagedCloudSdkServiceTest {
   }
 
   @Test
+  public void cancelledInstall_showsCancelNotification() throws Exception {
+    emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
+    SdkInstaller sdkInstaller = mockManagedCloudSdk.newInstaller();
+    when(sdkInstaller.install(any(), any())).thenThrow(new CancellationException());
+    when(mockManagedCloudSdk.newInstaller()).thenReturn(sdkInstaller);
+
+    sdkService.install();
+
+    verify(mockUiPresenter).notifyManagedSdkJobCancellation(ManagedSdkJobType.INSTALL);
+  }
+
+  @Test
   public void successful_update_changesSdkStatus_inProgress() {
     makeMockSdkInstalled(MOCK_SDK_PATH);
     emulateMockSdkUpdateProcess();
@@ -275,6 +288,35 @@ public class ManagedCloudSdkServiceTest {
 
     assertThat(statusCaptor.getAllValues())
         .isEqualTo(Arrays.asList(SdkStatus.INSTALLING, SdkStatus.READY));
+  }
+
+  @Test
+  public void cancelled_update_keepsSdkStatus_available() throws Exception {
+    makeMockSdkInstalled(MOCK_SDK_PATH);
+    emulateMockSdkUpdateProcess();
+    SdkUpdater mockUpdater = mockManagedCloudSdk.newUpdater();
+    doThrow(new CancellationException()).when(mockUpdater).update(any());
+
+    sdkService.addStatusUpdateListener(mockStatusUpdateListener);
+    sdkService.update();
+
+    ArgumentCaptor<SdkStatus> statusCaptor = ArgumentCaptor.forClass(SdkStatus.class);
+    verify(mockStatusUpdateListener, times(2)).onSdkStatusChange(any(), statusCaptor.capture());
+
+    assertThat(statusCaptor.getAllValues())
+        .isEqualTo(Arrays.asList(SdkStatus.INSTALLING, SdkStatus.READY));
+  }
+
+  @Test
+  public void cancelled_update_showsNotification() throws Exception {
+    makeMockSdkInstalled(MOCK_SDK_PATH);
+    emulateMockSdkUpdateProcess();
+    SdkUpdater mockUpdater = mockManagedCloudSdk.newUpdater();
+    doThrow(new CancellationException()).when(mockUpdater).update(any());
+
+    sdkService.update();
+
+    verify(mockUiPresenter).notifyManagedSdkJobCancellation(ManagedSdkJobType.UPDATE);
   }
 
   @Test
