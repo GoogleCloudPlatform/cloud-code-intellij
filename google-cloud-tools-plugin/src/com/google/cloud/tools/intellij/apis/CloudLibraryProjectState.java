@@ -75,17 +75,17 @@ public class CloudLibraryProjectState implements ProjectComponent {
             });
   }
 
-  Set<CloudLibrary> getManagedProjectLibraries(Module module) {
+  Set<CloudLibrary> getManagedLibraries(Module module) {
     return moduleLibraryMap.get(module);
   }
 
   private void syncManagedProjectLibraries() {
     moduleLibraryMap =
         Stream.of(ModuleManager.getInstance(project).getModules())
-            .collect(Collectors.toMap(Function.identity(), this::getManagedLibraries));
+            .collect(Collectors.toMap(Function.identity(), this::loadManagedLibraries));
   }
 
-  private Set<CloudLibrary> getManagedLibraries(Module module) {
+  private Set<CloudLibrary> loadManagedLibraries(Module module) {
     List<MavenDomDependency> moduleDependencies = getModuleDependencies(module);
 
     return allLibraries
