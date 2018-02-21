@@ -360,6 +360,12 @@
     </component>
   </application-components>
 
+  <project-components>
+    <component>
+      <implementation-class>com.google.cloud.tools.intellij.apis.CloudLibraryProjectState</implementation-class>
+    </component>
+  </project-components>
+
   <extensionPoints>
     <extensionPoint name="forbiddenCodeHandler" interface="com.google.cloud.tools.intellij.appengine.inspections.AppEngineForbiddenCodeHandler"/>
   </extensionPoints>
@@ -402,6 +408,7 @@
     <applicationService serviceInterface="com.google.cloud.tools.intellij.resources.GoogleApiClientFactory"
                         serviceImplementation="com.google.cloud.tools.intellij.resources.DefaultGoogleApiClientFactory"/>
     <applicationService serviceImplementation="com.google.cloud.tools.intellij.csr.CloudRepositoryService"/>
+    <!--<applicationService serviceImplementation="com.google.cloud.tools.intellij.apis.CloudLibraryProjectState"/>-->
 
     <!-- App Engine Cloud and Deployment Sources Configuration-->
     <remoteServer.type

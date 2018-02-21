@@ -151,7 +151,8 @@ final class CloudLibraryDependencyWriter {
    * @param dependencies the list of {@link MavenDomDependency} objects that currently exist in the
    *     DOM model
    */
-  private static boolean isMavenIdInDependencyList(
+  // TODO move to MavenUtils
+  static boolean isMavenIdInDependencyList(
       MavenId mavenId, List<MavenDomDependency> dependencies) {
     return dependencies
         .stream()
@@ -169,7 +170,8 @@ final class CloudLibraryDependencyWriter {
    * @param mavenCoordinates the {@link CloudLibraryClientMavenCoordinates} to convert to a {@link
    *     MavenId}
    */
-  private static MavenId toMavenId(CloudLibraryClientMavenCoordinates mavenCoordinates) {
+  // TODO move to MavenUtils
+  static MavenId toMavenId(CloudLibraryClientMavenCoordinates mavenCoordinates) {
     return new MavenId(
         mavenCoordinates.getGroupId(),
         mavenCoordinates.getArtifactId(),
