@@ -64,6 +64,7 @@ public class CloudLibraryProjectState implements ProjectComponent {
   public void projectOpened() {
     // todo figure out how to deal with eventual maven/gradle and ensure that double synching
     // doesn't occur if multiple build systems exist
+    // todo what happens if this is not a maven project? (and later becomes one?)
     MavenProjectsManager.getInstance(project)
         .addManagerListener(
             new Listener() {
