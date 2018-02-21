@@ -35,6 +35,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -184,7 +185,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
           .newInstaller()
           .install(
               ManagedCloudSdkServiceUiPresenter.getInstance()
-                  .createProgressListener(ManagedSdkJobType.INSTALL),
+                  .createProgressListener(() -> managedSdkBackgroundJob.cancel(true)),
               sdkConsoleListener);
     }
 
@@ -197,7 +198,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
       ProgressListener appEngineProgressListener =
           ManagedCloudSdkServiceUiPresenter.getInstance()
-              .createProgressListener(ManagedSdkJobType.INSTALL);
+              .createProgressListener(() -> managedSdkBackgroundJob.cancel(true));
       appEngineProgressListener.start("Installing App Engine Java", ProgressListener.UNKNOWN);
       managedCloudSdk
           .newComponentInstaller()
@@ -274,7 +275,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
     @Override
     public void onFailure(Throwable t) {
-      if (t instanceof InterruptedException) {
+      if (t instanceof InterruptedException || t instanceof CancellationException) {
         logger.info("Managed Google Cloud SDK install/update cancelled.");
 
         ManagedCloudSdkServiceUiPresenter.getInstance().notifyManagedSdkJobCancellation(jobType);
