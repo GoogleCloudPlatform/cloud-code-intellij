@@ -85,29 +85,40 @@ public class CloudLibraryProjectState implements ProjectComponent {
   }
 
   private Set<CloudLibrary> getManagedLibraries(Module module) {
+    List<MavenDomDependency> moduleDependencies = getModuleDependencies(module);
+
+    return allLibraries
+        .stream()
+        .filter(library -> isManagedDependencyInModule(library, moduleDependencies))
+        .collect(Collectors.toSet());
+  }
+
+  private List<MavenDomDependency> getModuleDependencies(Module module) {
     MavenProject mavenProject = MavenProjectsManager.getInstance(project).findProject(module);
 
     return ApplicationManager.getApplication()
         .runReadAction(
-            (Computable<Set<CloudLibrary>>)
+            (Computable<List<MavenDomDependency>>)
                 () -> {
                   MavenDomProjectModel model =
                       MavenDomUtil.getMavenDomProjectModel(project, mavenProject.getFile());
 
-                  List<MavenDomDependency> dependencies = model.getDependencies().getDependencies();
-                  return allLibraries
-                      .stream()
-                      .filter(
-                          // todo extract to named method for readability
-                          library ->
-                              CloudLibraryUtils.getFirstJavaClientMavenCoordinates(library)
-                                  .map(
-                                      coordinates ->
-                                          CloudLibraryDependencyWriter.isMavenIdInDependencyList(
-                                              CloudLibraryDependencyWriter.toMavenId(coordinates),
-                                              dependencies))
-                                  .orElse(false))
-                      .collect(Collectors.toSet());
+                  return model.getDependencies().getDependencies();
                 });
+  }
+
+  private boolean isManagedDependencyInModule(
+      CloudLibrary library, List<MavenDomDependency> moduleDependencies) {
+    return ApplicationManager.getApplication()
+        .runReadAction(
+            (Computable<Boolean>)
+                () ->
+                    CloudLibraryUtils.getFirstJavaClientMavenCoordinates(library)
+                        .map(
+                            coordinates ->
+                                CloudLibraryDependencyWriter.isMavenIdInDependencyList(
+                                    CloudLibraryDependencyWriter.toMavenId(coordinates),
+                                    moduleDependencies))
+                        .orElse(false));
   }
 }
