@@ -65,7 +65,7 @@ class ManagedCloudSdkProgressListener implements ProgressListener {
 
   @Override
   public void update(long workDone) {
-    if (workDone == ProgressListener.UNKNOWN) {
+    if (workDone == UNKNOWN) {
       progressIndicator.setIndeterminate(true);
     } else {
       progressIndicator.setIndeterminate(false);
@@ -157,7 +157,7 @@ class ManagedCloudSdkProgressListener implements ProgressListener {
     @Override
     public void update(long childWorkDone) {
       // both could be UNKNOWN meaning undetermined total progress for the whole child task.
-      if (childWorkDone != ProgressListener.UNKNOWN && childWork != UNKNOWN) {
+      if (childWorkDone != UNKNOWN && childWork != UNKNOWN) {
         double globalWorkRatio = childTotalWorkAllocation / totalWork;
         double childWorkFraction = childWorkDone / childWork;
         double globalWorkFraction = childWorkFraction * globalWorkRatio;
