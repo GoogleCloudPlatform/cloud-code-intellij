@@ -29,7 +29,6 @@ import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary.TestCloudLi
 import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary.TestCloudLibraryClientMavenCoordinates;
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.externalSystem.ExternalSystemModulePropertyManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ModuleRootManager;
@@ -47,7 +46,6 @@ import java.nio.file.Paths;
 import org.jetbrains.idea.maven.project.MavenGeneralSettings;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
 import org.jetbrains.idea.maven.utils.MavenProgressIndicator;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -95,17 +93,6 @@ public class CloudLibraryProjectStateTest {
     initMavenModule();
   }
 
-  @After
-  public void tearDown() {
-    ApplicationManager.getApplication()
-        .runWriteAction(
-            () -> {
-              ModifiableRootModel modifiableModel =
-                  ModuleRootManager.getInstance(module).getModifiableModel();
-              modifiableModel.dispose();
-            });
-  }
-
   @Test
   public void managedLibraries_beforeSyncing_isEmptyOptional() {
     assertThat(state.getManagedLibraries(module).isPresent()).isFalse();
@@ -116,7 +103,7 @@ public class CloudLibraryProjectStateTest {
     when(librariesService.getCloudLibraries())
         .thenReturn(ImmutableList.of(LIBRARY_1.toCloudLibrary()));
 
-    state.syncManagedProjectLibraries();
+    //    state.syncManagedProjectLibraries();
   }
 
   private void initMavenModule() {
@@ -125,16 +112,12 @@ public class CloudLibraryProjectStateTest {
             () -> {
               VirtualFile pomVirtualFile = createAndAddPomToModule();
 
-              ExternalSystemModulePropertyManager.getInstance(module).setMavenized(true);
               MavenProjectsManager.getInstance(testFixture.getProject()).initForTests();
-              MavenProjectsManager.getInstance(testFixture.getProject()).fireActivatedInTests();
-              MavenProjectsManager.getInstance(testFixture.getProject())
-                  .addManagedFiles(ImmutableList.of(pomVirtualFile));
               MavenProjectsManager.getInstance(testFixture.getProject())
                   .getProjectsTreeForTests()
                   .update(
                       ImmutableList.of(pomVirtualFile),
-                      true,
+                      false,
                       new MavenGeneralSettings(),
                       new MavenProgressIndicator());
             });
