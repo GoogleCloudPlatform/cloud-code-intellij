@@ -57,6 +57,8 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
   private volatile ListenableFuture<Path> managedSdkBackgroundJob;
 
+  private ProgressListener progressListener;
+
   @Override
   public void activate() {
     // TODO track event that custom SDK is activated and used.
@@ -180,12 +182,10 @@ public class ManagedCloudSdkService implements CloudSdkService {
   private Path installSdk() throws Exception {
     if (!safeCheckSdkStatus(() -> managedCloudSdk.isInstalled())) {
       ConsoleListener sdkConsoleListener = logger::debug;
+      progressListener =
+          ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
 
-      return managedCloudSdk
-          .newInstaller()
-          .install(
-              ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this),
-              sdkConsoleListener);
+      return managedCloudSdk.newInstaller().install(progressListener, sdkConsoleListener);
     }
 
     return managedCloudSdk.getSdkHome();
@@ -195,22 +195,29 @@ public class ManagedCloudSdkService implements CloudSdkService {
     if (!safeCheckSdkStatus(() -> managedCloudSdk.hasComponent(SdkComponent.APP_ENGINE_JAVA))) {
       ConsoleListener appEngineConsoleListener = logger::debug;
 
-      ProgressListener appEngineProgressListener =
+      progressListener =
           ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
-      appEngineProgressListener.start("Installing App Engine Java", ProgressListener.UNKNOWN);
+      progressListener.start(
+          GctBundle.message("managedsdk.progress.install.app.engine"), ProgressListener.UNKNOWN);
       managedCloudSdk
           .newComponentInstaller()
           .installComponent(SdkComponent.APP_ENGINE_JAVA, appEngineConsoleListener);
 
-      appEngineProgressListener.done();
+      progressListener.done();
     }
   }
 
   private Path updateManagedSdk() throws Exception {
     if (!safeCheckSdkStatus(() -> managedCloudSdk.isUpToDate())) {
       ConsoleListener sdkUpdateListener = logger::debug;
+      progressListener =
+          ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
 
+      progressListener.start(
+          GctBundle.message("managedsdk.progress.update"), ProgressListener.UNKNOWN);
       managedCloudSdk.newUpdater().update(sdkUpdateListener);
+
+      progressListener.done();
     }
 
     return managedCloudSdk.getSdkHome();
@@ -293,6 +300,9 @@ public class ManagedCloudSdkService implements CloudSdkService {
           checkSdkStatusAfterFailedUpdate();
           break;
       }
+
+      // in case of failure progress done() is not called, call explicitly to remove UI.
+      progressListener.done();
     }
   }
 

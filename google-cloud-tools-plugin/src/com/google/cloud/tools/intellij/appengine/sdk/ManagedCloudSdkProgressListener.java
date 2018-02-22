@@ -25,6 +25,7 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task.Backgroundable;
 import com.intellij.openapi.progress.impl.BackgroundableProcessIndicator;
 import com.intellij.openapi.progress.util.AbstractProgressIndicatorExBase;
+import com.intellij.openapi.util.Disposer;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -80,8 +81,10 @@ class ManagedCloudSdkProgressListener implements ProgressListener {
 
   @Override
   public void done() {
-    progressIndicator.finish(task);
-    progressIndicator.dispose();
+    if (!progressIndicator.isFinished(task)) {
+      progressIndicator.finish(task);
+      progressIndicator.dispose();
+    }
   }
 
   @Override
@@ -102,7 +105,7 @@ class ManagedCloudSdkProgressListener implements ProgressListener {
               task =
                   new Backgroundable(
                       null /* not project specific task */,
-                      "" /* set in each message */,
+                      GctBundle.message("managedsdk.notifications.title"),
                       true /* cancellable */,
                       PerformInBackgroundOption.ALWAYS_BACKGROUND) {
                     @Override
@@ -111,6 +114,7 @@ class ManagedCloudSdkProgressListener implements ProgressListener {
                     }
                   };
               progressIndicator = new BackgroundableProcessIndicator(task);
+              Disposer.register(ApplicationManager.getApplication(), progressIndicator);
               progressIndicator.addStateDelegate(
                   new AbstractProgressIndicatorExBase() {
                     @Override

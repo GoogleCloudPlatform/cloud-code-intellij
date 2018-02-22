@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -70,6 +71,8 @@ public class ManagedCloudSdkServiceTest {
 
   @Mock private ManagedCloudSdkServiceUiPresenter mockUiPresenter;
 
+  @Mock private ProgressListener mockProgressListener;
+
   @Before
   public void setUp() throws UnsupportedOsException {
     doReturn(mockManagedCloudSdk).when(sdkService).createManagedSdk();
@@ -88,7 +91,7 @@ public class ManagedCloudSdkServiceTest {
         .invokeOnApplicationUIThread(any());
     // replace UI presenter for verifications
     ManagedCloudSdkServiceUiPresenter.setInstance(mockUiPresenter);
-    when(mockUiPresenter.createProgressListener(any())).thenReturn(mock(ProgressListener.class));
+    when(mockUiPresenter.createProgressListener(any())).thenReturn(mockProgressListener);
     // init SDK, most tests require initialized state.
     sdkService.initManagedSdk();
   }
@@ -193,6 +196,18 @@ public class ManagedCloudSdkServiceTest {
 
     verify(mockUiPresenter)
         .notifyManagedSdkJobFailure(ManagedSdkJobType.INSTALL, ioException.toString());
+  }
+
+  @Test
+  public void failed_install_removesProgressIndicator() throws Exception {
+    emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
+    SdkInstaller mockInstaller = mockManagedCloudSdk.newInstaller();
+    IOException ioException = new IOException("IO Error");
+    when(mockInstaller.install(any(), any())).thenThrow(ioException);
+
+    sdkService.install();
+
+    verify(mockProgressListener, atLeastOnce()).done();
   }
 
   @Test
