@@ -149,9 +149,8 @@ public class CloudLibraryProjectState implements ProjectComponent {
                     CloudLibraryUtils.getFirstJavaClientMavenCoordinates(library)
                         .map(
                             coordinates ->
-                                CloudLibraryDependencyWriter.isMavenIdInDependencyList(
-                                    CloudLibraryDependencyWriter.toMavenId(coordinates),
-                                    moduleDependencies))
+                                MavenUtils.isMavenIdInDependencyList(
+                                    MavenUtils.toMavenId(coordinates), moduleDependencies))
                         .orElse(false));
   }
 }
