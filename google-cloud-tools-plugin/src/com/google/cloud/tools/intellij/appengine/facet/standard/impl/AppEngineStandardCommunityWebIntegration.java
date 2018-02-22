@@ -19,12 +19,10 @@ package com.google.cloud.tools.intellij.appengine.facet.standard.impl;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardWebIntegration;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
 import com.intellij.ide.util.frameworkSupport.FrameworkRole;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.libraries.Library;
-import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.artifacts.ArtifactManager;
@@ -32,8 +30,6 @@ import com.intellij.packaging.artifacts.ArtifactType;
 import com.intellij.packaging.elements.PackagingElement;
 import com.intellij.packaging.elements.PackagingElementFactory;
 import com.intellij.packaging.impl.artifacts.PlainArtifactType;
-import com.intellij.util.ArrayUtil;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -42,23 +38,11 @@ import org.jetbrains.annotations.Nullable;
 /** @author nik. */
 public class AppEngineStandardCommunityWebIntegration extends AppEngineStandardWebIntegration {
 
-  private static final Logger LOG =
-      Logger.getInstance(AppEngineStandardCommunityWebIntegration.class);
-
   @Nullable
   @Override
   public VirtualFile suggestParentDirectoryForAppEngineWebXml(
       @NotNull Module module, @NotNull ModifiableRootModel rootModel) {
-    final VirtualFile root = ArrayUtil.getFirstElement(rootModel.getContentRoots());
-    if (root != null) {
-      try {
-        return VfsUtil.createDirectoryIfMissing(root, "WEB-INF");
-      } catch (IOException ioe) {
-        LOG.info(ioe);
-        return null;
-      }
-    }
-    return null;
+    return getDefaultDirectoryForAppEngineWebXml(rootModel);
   }
 
   @NotNull
@@ -112,6 +96,12 @@ public class AppEngineStandardCommunityWebIntegration extends AppEngineStandardW
             artifact,
             "WEB-INF",
             PackagingElementFactory.getInstance().createFileCopy(descriptor.getPath(), null));
+  }
+
+  @NotNull
+  @Override
+  public String getDefaultAppEngineWebXmlPath() {
+    return "WEB-INF";
   }
 
   @Override

@@ -73,6 +73,15 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
   @Override
   public VirtualFile suggestParentDirectoryForAppEngineWebXml(
       @NotNull Module module, @NotNull ModifiableRootModel rootModel) {
+    VirtualFile webXmlParent = getWebXmlParent(module);
+    if (webXmlParent == null) {
+      return getDefaultDirectoryForAppEngineWebXml(rootModel);
+    }
+
+    return webXmlParent;
+  }
+
+  private VirtualFile getWebXmlParent(@NotNull Module module) {
     final WebFacet webFacet = ContainerUtil.getFirstItem(WebFacet.getInstances(module));
     if (webFacet == null) {
       return null;
@@ -194,6 +203,12 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
       FrameworkSupportModel model, AppEngineStandardFacet appEngineStandardFacet) {
     JavaeeFrameworkSupportInfoCollector.getOrCreateCollector(model)
         .setFacet(AppEngineStandardFacetType.ID, appEngineStandardFacet);
+  }
+
+  @NotNull
+  @Override
+  public String getDefaultAppEngineWebXmlPath() {
+    return "web/WEB-INF";
   }
 
   @Override
