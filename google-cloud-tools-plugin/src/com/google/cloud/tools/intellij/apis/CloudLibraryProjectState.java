@@ -16,9 +16,8 @@
 
 package com.google.cloud.tools.intellij.apis;
 
-import com.google.cloud.tools.libraries.CloudLibraries;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
-import com.google.common.collect.ImmutableList;
+import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.diagnostic.Logger;
@@ -26,9 +25,9 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -53,19 +52,12 @@ public class CloudLibraryProjectState implements ProjectComponent {
   private Map<Module, Set<CloudLibrary>> moduleLibraryMap = Maps.newHashMap();
   private List<CloudLibrary> allLibraries;
 
-  /**
-   * Initializes the state of the project's managed cloud libraries and fetches the list of all
-   * available client libraries.
-   */
   private CloudLibraryProjectState(Project project) {
     this.project = project;
+  }
 
-    try {
-      allLibraries = ImmutableList.copyOf(CloudLibraries.getCloudLibraries());
-    } catch (IOException e) {
-      logger.error(e);
-      allLibraries = ImmutableList.of();
-    }
+  static CloudLibraryProjectState getInstance(Project project) {
+    return project.getComponent(CloudLibraryProjectState.class);
   }
 
   /**
@@ -89,16 +81,20 @@ public class CloudLibraryProjectState implements ProjectComponent {
             });
   }
 
-  /** Returns the set of {@link CloudLibrary} currently configured on the given {@link Module}. */
-  Set<CloudLibrary> getManagedLibraries(Module module) {
-    return moduleLibraryMap.get(module);
+  /**
+   * Returns an optional set of {@link CloudLibrary} currently configured on the given {@link
+   * Module}.
+   */
+  Optional<Set<CloudLibrary>> getManagedLibraries(Module module) {
+    return Optional.ofNullable(moduleLibraryMap.get(module));
   }
 
   /**
    * Updates the project's mapping of {@link Module} to {@link CloudLibrary} with the currently
    * configured set of managed client libraries.
    */
-  private void syncManagedProjectLibraries() {
+  @VisibleForTesting
+  void syncManagedProjectLibraries() {
     moduleLibraryMap =
         Stream.of(ModuleManager.getInstance(project).getModules())
             .collect(Collectors.toMap(Function.identity(), this::loadManagedLibraries));
@@ -112,6 +108,11 @@ public class CloudLibraryProjectState implements ProjectComponent {
    */
   private Set<CloudLibrary> loadManagedLibraries(Module module) {
     List<MavenDomDependency> moduleDependencies = getModuleDependencies(module);
+
+    // Only fetch the libraries once
+    if (allLibraries == null) {
+      allLibraries = CloudLibrariesService.getInstance().getCloudLibraries();
+    }
 
     return allLibraries
         .stream()
