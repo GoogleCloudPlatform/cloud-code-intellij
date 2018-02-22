@@ -41,6 +41,10 @@ import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
 import org.jetbrains.idea.maven.project.MavenProjectsManager.Listener;
 
+/**
+ * A {@link ProjectComponent} that maintains, in memory, the current set of {@link CloudLibrary}
+ * that are configured on the user's project.
+ */
 public class CloudLibraryProjectState implements ProjectComponent {
 
   private static final Logger logger = Logger.getInstance(AddCloudLibrariesAction.class);
@@ -49,6 +53,10 @@ public class CloudLibraryProjectState implements ProjectComponent {
   private Map<Module, Set<CloudLibrary>> moduleLibraryMap = Maps.newHashMap();
   private List<CloudLibrary> allLibraries;
 
+  /**
+   * Initializes the state of the project's managed cloud libraries and fetches the list of all
+   * available client libraries.
+   */
   private CloudLibraryProjectState(Project project) {
     this.project = project;
 
@@ -60,11 +68,17 @@ public class CloudLibraryProjectState implements ProjectComponent {
     }
   }
 
+  /**
+   * Attaches a listener to listen for changes to a module's pom.xml to request a resync of the
+   * project's managed dependencies.
+   *
+   * <p>If the project is not a maven project, then the listener simply isn't fired. If the project
+   * is not a maven project, but later becomes one, then the listener will be fired as expected and
+   * the managed libraries will be synchronized.
+   */
   @Override
   public void projectOpened() {
-    // todo figure out how to deal with eventual maven/gradle and ensure that double synching
-    // doesn't occur if multiple build systems exist
-    // todo what happens if this is not a maven project? (and later becomes one?)
+    // todo (eshaul) handle Gradle & native projects and ensure that double syncing won't occur
     MavenProjectsManager.getInstance(project)
         .addManagerListener(
             new Listener() {
@@ -75,16 +89,27 @@ public class CloudLibraryProjectState implements ProjectComponent {
             });
   }
 
+  /** Returns the set of {@link CloudLibrary} currently configured on the given {@link Module}. */
   Set<CloudLibrary> getManagedLibraries(Module module) {
     return moduleLibraryMap.get(module);
   }
 
+  /**
+   * Updates the project's mapping of {@link Module} to {@link CloudLibrary} with the currently
+   * configured set of managed client libraries.
+   */
   private void syncManagedProjectLibraries() {
     moduleLibraryMap =
         Stream.of(ModuleManager.getInstance(project).getModules())
             .collect(Collectors.toMap(Function.identity(), this::loadManagedLibraries));
   }
 
+  /**
+   * Loads the set of managed {@link CloudLibrary} configured in the current {@link Module}.
+   *
+   * <p>Does so by fetching the dependencies configured in the user's build and comparing them to
+   * the set of all available GCP client libraries and filtering out the non-managed ones.
+   */
   private Set<CloudLibrary> loadManagedLibraries(Module module) {
     List<MavenDomDependency> moduleDependencies = getModuleDependencies(module);
 
@@ -94,6 +119,9 @@ public class CloudLibraryProjectState implements ProjectComponent {
         .collect(Collectors.toSet());
   }
 
+  /**
+   * Returns a list of all {@link MavenDomDependency} currently configured in the module's pom.xml.
+   */
   private List<MavenDomDependency> getModuleDependencies(Module module) {
     MavenProject mavenProject = MavenProjectsManager.getInstance(project).findProject(module);
 
@@ -108,6 +136,10 @@ public class CloudLibraryProjectState implements ProjectComponent {
                 });
   }
 
+  /**
+   * Checks to see if the given {@link CloudLibrary} is present in the list of {@link
+   * MavenDomDependency}.
+   */
   private boolean isManagedDependencyInModule(
       CloudLibrary library, List<MavenDomDependency> moduleDependencies) {
     return ApplicationManager.getApplication()
