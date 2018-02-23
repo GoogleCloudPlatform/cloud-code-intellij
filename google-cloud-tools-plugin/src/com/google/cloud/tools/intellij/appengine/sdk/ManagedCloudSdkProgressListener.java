@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.managedcloudsdk.ChildProgressListener;
 import com.google.cloud.tools.managedcloudsdk.ProgressListener;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.application.ApplicationManager;
@@ -89,7 +90,7 @@ class ManagedCloudSdkProgressListener implements ProgressListener {
 
   @Override
   public ProgressListener newChild(long allocation) {
-    return new ChildProgressListener(allocation);
+    return new ChildProgressListener(this, allocation);
   }
 
   private void setProgressText(String message) {
@@ -108,13 +109,18 @@ class ManagedCloudSdkProgressListener implements ProgressListener {
                       GctBundle.message("managedsdk.notifications.title"),
                       true /* cancellable */,
                       PerformInBackgroundOption.ALWAYS_BACKGROUND) {
+                    /**
+                     * Task.Backgroundable is usually constructed in ProgressManager, which calls
+                     * run(). Here indicator is used purely as UI element but still needs task to
+                     * start/finish. Task has to have run() method, it's never called.
+                     */
                     @Override
-                    public void run(@NotNull ProgressIndicator indicator) {
-                      // will not be called in manual progress mode.
-                    }
+                    public void run(@NotNull ProgressIndicator indicator) {}
                   };
               progressIndicator = new BackgroundableProcessIndicator(task);
+              // required for BackgroundableProcessIndicator to avoid leak check error.
               Disposer.register(ApplicationManager.getApplication(), progressIndicator);
+              // callback for user clicked 'Cancel', used same way as in ProgressManager
               progressIndicator.addStateDelegate(
                   new AbstractProgressIndicatorExBase() {
                     @Override
@@ -126,62 +132,5 @@ class ManagedCloudSdkProgressListener implements ProgressListener {
             });
 
     return progressIndicator;
-  }
-
-  /**
-   * Progress listener for child activities, updates the same progress indicator. Updates progress
-   * indicator with proportioned chunk of global progress.
-   */
-  private final class ChildProgressListener implements ProgressListener {
-
-    private double childWork;
-    /* 0 < childTotalWorkAllocation <= totalWork */
-    private final double childTotalWorkAllocation;
-
-    private ChildProgressListener(double childTotalWorkAllocation) {
-      this.childTotalWorkAllocation = childTotalWorkAllocation;
-    }
-
-    @Override
-    public void start(String message, long childWork) {
-      this.childWork = childWork;
-
-      setProgressText(message);
-
-      if (childWork == UNKNOWN) {
-        // pass unknown state to parent listener.
-        ManagedCloudSdkProgressListener.this.update(UNKNOWN);
-      }
-    }
-
-    @Override
-    public void update(long childWorkDone) {
-      // both could be UNKNOWN meaning undetermined total progress for the whole child task.
-      if (childWorkDone != UNKNOWN && childWork != UNKNOWN) {
-        double globalWorkRatio = childTotalWorkAllocation / totalWork;
-        double childWorkFraction = childWorkDone / childWork;
-        double globalWorkFraction = childWorkFraction * globalWorkRatio;
-        lastUpdatedGlobalDoneFraction += globalWorkFraction;
-        progressIndicator.setFraction(lastUpdatedGlobalDoneFraction);
-      } else {
-        // pass unknown state to parent listener.
-        ManagedCloudSdkProgressListener.this.update(UNKNOWN);
-      }
-    }
-
-    @Override
-    public void update(String message) {
-      setProgressText(message);
-    }
-
-    @Override
-    public void done() {
-      /* don't stop main progress for child progress listeners. */
-    }
-
-    @Override
-    public ProgressListener newChild(long childAllocation) {
-      return new ChildProgressListener(childAllocation);
-    }
   }
 }
