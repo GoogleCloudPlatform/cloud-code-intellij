@@ -202,14 +202,14 @@ public class CloudLibraryProjectStateTest {
                 () -> {
                   ModifiableModuleModel model =
                       ModuleManager.getInstance(testFixture.getProject()).getModifiableModel();
-                  Module module = null;
+                  Module module;
                   try {
                     module = moduleBuilder.createModule(model);
                   } catch (IOException
                       | ModuleWithNameAlreadyExists
                       | JDOMException
                       | ConfigurationException e) {
-                    e.printStackTrace();
+                    throw new AssertionError("Error creating Mavenized module");
                   }
                   model.commit();
 
