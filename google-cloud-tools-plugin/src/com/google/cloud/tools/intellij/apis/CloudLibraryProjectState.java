@@ -81,10 +81,7 @@ public class CloudLibraryProjectState implements ProjectComponent {
             });
   }
 
-  /**
-   * Returns an optional set of {@link CloudLibrary} currently configured on the given {@link
-   * Module}.
-   */
+  /** Returns the set of {@link CloudLibrary} currently configured on the given {@link Module}. */
   Set<CloudLibrary> getManagedLibraries(Module module) {
     return moduleLibraryMap.get(module);
   }
