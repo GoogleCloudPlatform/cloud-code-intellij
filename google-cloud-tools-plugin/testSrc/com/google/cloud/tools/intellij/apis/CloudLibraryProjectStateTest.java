@@ -22,37 +22,38 @@ import static org.mockito.Mockito.when;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestDirectory;
 import com.google.cloud.tools.intellij.testing.TestFixture;
-import com.google.cloud.tools.intellij.testing.TestModule;
 import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary;
 import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary.TestCloudLibraryClient;
 import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary.TestCloudLibraryClientMavenCoordinates;
+import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.application.Result;
-import com.intellij.openapi.application.WriteAction;
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.ModifiableModuleModel;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.roots.ModifiableRootModel;
-import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
+import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.Computable;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
+import com.intellij.util.xml.DomUtil;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Set;
+import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.idea.maven.dom.MavenDomUtil;
+import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel;
 import org.jetbrains.idea.maven.model.MavenId;
-import org.jetbrains.idea.maven.project.MavenGeneralSettings;
+import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
-import org.jetbrains.idea.maven.utils.MavenProgressIndicator;
 import org.jetbrains.idea.maven.wizards.MavenModuleBuilder;
 import org.junit.Before;
 import org.junit.Rule;
@@ -66,32 +67,24 @@ public class CloudLibraryProjectStateTest {
   @TestFixture private IdeaProjectTestFixture testFixture;
 
   @Mock @TestService CloudLibrariesService librariesService;
-  @TestModule private Module module;
-  private Module testModule;
 
   @TestDirectory(name = "root")
   private File root;
 
-  private static final TestCloudLibraryClientMavenCoordinates JAVA_CLIENT_MAVEN_COORDS_1 =
-      TestCloudLibraryClientMavenCoordinates.create("java", "client-1", "1.0.0");
-  private static final TestCloudLibraryClient JAVA_CLIENT_1 =
+  private static final TestCloudLibraryClientMavenCoordinates JAVA_CLIENT_MAVEN_COORDS =
+      TestCloudLibraryClientMavenCoordinates.create("java", "client", "1.0.0");
+  private static final TestCloudLibraryClient JAVA_CLIENT =
       TestCloudLibraryClient.create(
-          "Client 1",
-          "java",
-          "API Ref 1",
-          "alpha",
-          "Source 1",
-          "Lang Level 1",
-          JAVA_CLIENT_MAVEN_COORDS_1);
-  private static final TestCloudLibrary LIBRARY_1 =
+          "Client", "java", "API Ref", "alpha", "Source", "Lang Level", JAVA_CLIENT_MAVEN_COORDS);
+  private static final TestCloudLibrary LIBRARY =
       TestCloudLibrary.create(
-          "Library 1",
-          "ID 1",
-          "service_1",
-          "Docs Link 1",
-          "Description 1",
+          "Library",
+          "ID",
+          "service",
+          "Docs Link",
+          "Description",
           "Icon Link 1",
-          ImmutableList.of(JAVA_CLIENT_1));
+          ImmutableList.of(JAVA_CLIENT));
 
   private CloudLibraryProjectState state;
   private MavenModuleBuilder moduleBuilder;
@@ -103,59 +96,126 @@ public class CloudLibraryProjectStateTest {
     moduleBuilder = new MavenModuleBuilder();
     id = new MavenId("org.foo", "module", "1.0");
 
-    try {
-      setModuleNameAndRoot("module", testFixture.getProject().getBasePath());
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
-    //    initMavenModule();
-  }
-
-  private void setModuleNameAndRoot(String name, String root) {
-    moduleBuilder.setName(name);
-    moduleBuilder.setModuleFilePath(root + "/" + name + ".iml");
-    moduleBuilder.setContentEntryPath(root);
+    setModuleNameAndRoot(testFixture.getProject().getBasePath());
   }
 
   @Test
   public void managedLibraries_withNoDependenies_isEmptyOptional() {
-    //    assertThat(state.getManagedLibraries(module).isPresent()).isFalse();
-    createNewModule(id);
-    assertThat(state.getManagedLibraries(module)).isEmpty();
-    // todo needs to be tested _before_ the maven module is created (move creation to each test)
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              Module module = createNewModule(id);
+
+              assertThat(state.getManagedLibraries(module)).isEmpty();
+            });
   }
 
   @Test
-  public void managedLibraries_whenProjectHasManagedLibraries_isPresent() {
+  public void managedLibraries_withOnlyUnmanagedDependencies_isEmptyOptional() {
     when(librariesService.getCloudLibraries())
-        .thenReturn(ImmutableList.of(LIBRARY_1.toCloudLibrary()));
+        .thenReturn(ImmutableList.of(LIBRARY.toCloudLibrary()));
 
-    //        state.syncManagedProjectLibraries();
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              Module module = createNewModule(id);
+              MavenId unmanagedDependency = new MavenId("my-group", "my-artifact", "1.0");
+              writeDependenciesToPom(module, ImmutableList.of(unmanagedDependency));
+
+              assertThat(state.getManagedLibraries(module)).isEmpty();
+            });
   }
 
-  // todo test when no maven module
-  // todo test when only maven module
-  // todo test with both maven and non-maven modules
-  // todo test with maven module with empty/no dependency section
+  @Test
+  public void managedLibraries_withUnmanagedAndManagedDependencies_isPresent() {
+    when(librariesService.getCloudLibraries())
+        .thenReturn(ImmutableList.of(LIBRARY.toCloudLibrary()));
 
-  private void createNewModule(MavenId id) {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              Module module = createNewModule(id);
+
+              TestCloudLibraryClientMavenCoordinates mavenCoordinates =
+                  LIBRARY.clients().get(0).mavenCoordinates();
+              String groupId = mavenCoordinates.groupId();
+              String artifactId = mavenCoordinates.artifactId();
+
+              MavenId managedDependency = new MavenId(groupId, artifactId, "1.0");
+              MavenId unmanagedDependency = new MavenId("my-group", "my-artifact", "1.0");
+              writeDependenciesToPom(
+                  module, ImmutableList.of(managedDependency, unmanagedDependency));
+
+              state.syncManagedProjectLibraries();
+
+              Set<CloudLibrary> libraries = state.getManagedLibraries(module);
+              assertThat_managedLibrariesContainsExactlyOne(libraries);
+            });
+  }
+
+  @Test
+  public void managedLibraries_withOnlyManagedDependencies_isPresent() {
+    when(librariesService.getCloudLibraries())
+        .thenReturn(ImmutableList.of(LIBRARY.toCloudLibrary()));
+
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              Module module = createNewModule(id);
+
+              TestCloudLibraryClientMavenCoordinates mavenCoordinates =
+                  LIBRARY.clients().get(0).mavenCoordinates();
+              String groupId = mavenCoordinates.groupId();
+              String artifactId = mavenCoordinates.artifactId();
+
+              MavenId managedDependency = new MavenId(groupId, artifactId, "1.0");
+              writeDependenciesToPom(module, ImmutableList.of(managedDependency));
+
+              state.syncManagedProjectLibraries();
+
+              Set<CloudLibrary> libraries = state.getManagedLibraries(module);
+              assertThat_managedLibrariesContainsExactlyOne(libraries);
+            });
+  }
+
+  private void assertThat_managedLibrariesContainsExactlyOne(Set<CloudLibrary> managedLibraries) {
+    assertThat(managedLibraries.size()).isEqualTo(1);
+    CloudLibrary library = managedLibraries.iterator().next();
+    assertThat(library.getName()).isEqualTo(LIBRARY.name());
+  }
+
+  private void setModuleNameAndRoot(String root) {
+    moduleBuilder.setName("module");
+    moduleBuilder.setModuleFilePath(root + "/module.iml");
+    moduleBuilder.setContentEntryPath(root);
+  }
+
+  private Module createNewModule(MavenId id) {
     moduleBuilder.setProjectId(id);
 
-    new WriteAction() {
-      protected void run(@NotNull Result result) throws Throwable {
-        ModifiableModuleModel model =
-            ModuleManager.getInstance(testFixture.getProject()).getModifiableModel();
-        moduleBuilder.createModule(model);
-        model.commit();
-      }
-    }.execute();
+    return ApplicationManager.getApplication()
+        .runWriteAction(
+            (Computable<Module>)
+                () -> {
+                  ModifiableModuleModel model =
+                      ModuleManager.getInstance(testFixture.getProject()).getModifiableModel();
+                  Module module = null;
+                  try {
+                    module = moduleBuilder.createModule(model);
+                  } catch (IOException
+                      | ModuleWithNameAlreadyExists
+                      | JDOMException
+                      | ConfigurationException e) {
+                    e.printStackTrace();
+                  }
+                  model.commit();
 
-    resolveDependenciesAndImport();
+                  resolveDependenciesAndImport();
+                  return module;
+                });
   }
 
   private void resolveDependenciesAndImport() {
-    //    UIUtil.invokeAndWaitIfNeeded((Runnable)() -> {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> {
@@ -171,48 +231,19 @@ public class CloudLibraryProjectStateTest {
             ModalityState.NON_MODAL);
   }
 
-  private void initMavenModule() {
-    ApplicationManager.getApplication()
-        .invokeAndWait(
-            () -> {
-              VirtualFile pomVirtualFile = createAndAddPomToModule();
+  private void writeDependenciesToPom(Module module, List<MavenId> dependencies) {
+    MavenProject mavenProject =
+        MavenProjectsManager.getInstance(testFixture.getProject()).findProject(module);
+    MavenDomProjectModel model =
+        MavenDomUtil.getMavenDomProjectModel(testFixture.getProject(), mavenProject.getFile());
 
-              MavenProjectsManager.getInstance(testFixture.getProject()).initForTests();
-              MavenProjectsManager.getInstance(testFixture.getProject())
-                  .getProjectsTreeForTests()
-                  .update(
-                      ImmutableList.of(pomVirtualFile),
-                      false,
-                      new MavenGeneralSettings(),
-                      new MavenProgressIndicator());
-            });
-  }
-
-  private VirtualFile createAndAddPomToModule() {
-    return ApplicationManager.getApplication()
-        .runWriteAction(
-            new Computable<VirtualFile>() {
-              @Override
-              public VirtualFile compute() {
-                ModifiableRootModel modifiableModel =
-                    ModuleRootManager.getInstance(module).getModifiableModel();
-                VirtualFile rootVirtualDir = LocalFileSystem.getInstance().findFileByIoFile(root);
-                VirtualFile pomVirtualFile = null;
-                try {
-
-                  pomVirtualFile = rootVirtualDir.createChildData(this, "pom.xml");
-
-                  // copy data from template test pom to the pom VirtualFile
-                  Path templatePom = Paths.get(getMavenTestDataPath().toString(), "pom.xml");
-                  pomVirtualFile.setBinaryContent(Files.readAllBytes(templatePom));
-                } catch (IOException e) {
-                }
-
-                modifiableModel.addContentEntry(rootVirtualDir);
-                modifiableModel.commit();
-                return pomVirtualFile;
-              }
-            });
+    new WriteCommandAction(testFixture.getProject(), DomUtil.getFile(model)) {
+      @Override
+      protected void run(@NotNull Result result) {
+        dependencies.forEach(
+            dependency -> MavenDomUtil.createDomDependency(model, null, dependency));
+      }
+    }.execute();
   }
 
   private static File getMavenTestDataPath() {

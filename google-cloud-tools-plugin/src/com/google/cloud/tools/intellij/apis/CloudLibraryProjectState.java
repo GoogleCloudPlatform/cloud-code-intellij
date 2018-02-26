@@ -32,6 +32,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.fest.util.Maps;
+import org.fest.util.VisibleForTesting;
 import org.jetbrains.idea.maven.dom.MavenDomUtil;
 import org.jetbrains.idea.maven.dom.model.MavenDomDependency;
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel;
@@ -92,7 +93,8 @@ public class CloudLibraryProjectState implements ProjectComponent {
    * Updates the project's mapping of {@link Module} to {@link CloudLibrary} with the currently
    * configured set of managed client libraries.
    */
-  private void syncManagedProjectLibraries() {
+  @VisibleForTesting
+  void syncManagedProjectLibraries() {
     moduleLibraryMap =
         Stream.of(ModuleManager.getInstance(project).getModules())
             .collect(Collectors.toMap(Function.identity(), this::loadManagedLibraries));
