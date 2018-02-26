@@ -42,9 +42,6 @@ import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import com.intellij.util.xml.DomUtil;
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
 import org.jdom.JDOMException;
@@ -244,14 +241,5 @@ public class CloudLibraryProjectStateTest {
             dependency -> MavenDomUtil.createDomDependency(model, null, dependency));
       }
     }.execute();
-  }
-
-  private static File getMavenTestDataPath() {
-    try {
-      URL resource = CloudLibraryProjectStateTest.class.getResource("/maven");
-      return Paths.get(resource.toURI()).toFile();
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
-    }
   }
 }
