@@ -29,7 +29,6 @@ import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary.TestCloudLi
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.ModifiableModuleModel;
@@ -51,7 +50,9 @@ import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel;
 import org.jetbrains.idea.maven.model.MavenId;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
+import org.jetbrains.idea.maven.server.MavenServerManager;
 import org.jetbrains.idea.maven.wizards.MavenModuleBuilder;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -94,6 +95,11 @@ public class CloudLibraryProjectStateTest {
     id = new MavenId("org.foo", "module", "1.0");
 
     setModuleNameAndRoot(testFixture.getProject().getBasePath());
+  }
+
+  @After
+  public void tearDown() {
+    MavenServerManager.getInstance().shutdown(true);
   }
 
   @Test
@@ -213,19 +219,10 @@ public class CloudLibraryProjectStateTest {
   }
 
   private void resolveDependenciesAndImport() {
-    ApplicationManager.getApplication()
-        .invokeAndWait(
-            () -> {
-              ApplicationManager.getApplication()
-                  .runWriteAction(
-                      () -> {
-                        MavenProjectsManager myProjectsManager =
-                            MavenProjectsManager.getInstance(testFixture.getProject());
-                        myProjectsManager.waitForResolvingCompletion();
-                        myProjectsManager.performScheduledImportInTests();
-                      });
-            },
-            ModalityState.NON_MODAL);
+    MavenProjectsManager myProjectsManager =
+        MavenProjectsManager.getInstance(testFixture.getProject());
+    myProjectsManager.waitForResolvingCompletion();
+    myProjectsManager.performScheduledImportInTests();
   }
 
   private void writeDependenciesToPom(Module module, List<MavenId> dependencies) {
