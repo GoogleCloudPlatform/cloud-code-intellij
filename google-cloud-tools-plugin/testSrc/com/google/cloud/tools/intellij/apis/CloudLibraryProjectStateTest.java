@@ -29,7 +29,12 @@ import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary.TestCloudLi
 import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary.TestCloudLibraryClientMavenCoordinates;
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.application.Result;
+import com.intellij.openapi.application.WriteAction;
+import com.intellij.openapi.module.ModifiableModuleModel;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.Computable;
@@ -43,9 +48,12 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.idea.maven.model.MavenId;
 import org.jetbrains.idea.maven.project.MavenGeneralSettings;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
 import org.jetbrains.idea.maven.utils.MavenProgressIndicator;
+import org.jetbrains.idea.maven.wizards.MavenModuleBuilder;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,6 +67,7 @@ public class CloudLibraryProjectStateTest {
 
   @Mock @TestService CloudLibrariesService librariesService;
   @TestModule private Module module;
+  private Module testModule;
 
   @TestDirectory(name = "root")
   private File root;
@@ -85,17 +94,36 @@ public class CloudLibraryProjectStateTest {
           ImmutableList.of(JAVA_CLIENT_1));
 
   private CloudLibraryProjectState state;
+  private MavenModuleBuilder moduleBuilder;
+  private MavenId id;
 
   @Before
   public void setUp() {
     state = CloudLibraryProjectState.getInstance(testFixture.getProject());
+    moduleBuilder = new MavenModuleBuilder();
+    id = new MavenId("org.foo", "module", "1.0");
 
-    initMavenModule();
+    try {
+      setModuleNameAndRoot("module", testFixture.getProject().getBasePath());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    //    initMavenModule();
+  }
+
+  private void setModuleNameAndRoot(String name, String root) {
+    moduleBuilder.setName(name);
+    moduleBuilder.setModuleFilePath(root + "/" + name + ".iml");
+    moduleBuilder.setContentEntryPath(root);
   }
 
   @Test
-  public void managedLibraries_beforeSyncing_isEmptyOptional() {
-    assertThat(state.getManagedLibraries(module).isPresent()).isFalse();
+  public void managedLibraries_withNoDependenies_isEmptyOptional() {
+    //    assertThat(state.getManagedLibraries(module).isPresent()).isFalse();
+    createNewModule(id);
+    assertThat(state.getManagedLibraries(module)).isEmpty();
+    // todo needs to be tested _before_ the maven module is created (move creation to each test)
   }
 
   @Test
@@ -103,7 +131,44 @@ public class CloudLibraryProjectStateTest {
     when(librariesService.getCloudLibraries())
         .thenReturn(ImmutableList.of(LIBRARY_1.toCloudLibrary()));
 
-    //    state.syncManagedProjectLibraries();
+    //        state.syncManagedProjectLibraries();
+  }
+
+  // todo test when no maven module
+  // todo test when only maven module
+  // todo test with both maven and non-maven modules
+  // todo test with maven module with empty/no dependency section
+
+  private void createNewModule(MavenId id) {
+    moduleBuilder.setProjectId(id);
+
+    new WriteAction() {
+      protected void run(@NotNull Result result) throws Throwable {
+        ModifiableModuleModel model =
+            ModuleManager.getInstance(testFixture.getProject()).getModifiableModel();
+        moduleBuilder.createModule(model);
+        model.commit();
+      }
+    }.execute();
+
+    resolveDependenciesAndImport();
+  }
+
+  private void resolveDependenciesAndImport() {
+    //    UIUtil.invokeAndWaitIfNeeded((Runnable)() -> {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              ApplicationManager.getApplication()
+                  .runWriteAction(
+                      () -> {
+                        MavenProjectsManager myProjectsManager =
+                            MavenProjectsManager.getInstance(testFixture.getProject());
+                        myProjectsManager.waitForResolvingCompletion();
+                        myProjectsManager.performScheduledImportInTests();
+                      });
+            },
+            ModalityState.NON_MODAL);
   }
 
   private void initMavenModule() {

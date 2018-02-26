@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.apis;
 
 import com.google.cloud.tools.libraries.json.CloudLibrary;
-import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableSet;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.diagnostic.Logger;
@@ -27,7 +27,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -85,16 +84,15 @@ public class CloudLibraryProjectState implements ProjectComponent {
    * Returns an optional set of {@link CloudLibrary} currently configured on the given {@link
    * Module}.
    */
-  Optional<Set<CloudLibrary>> getManagedLibraries(Module module) {
-    return Optional.ofNullable(moduleLibraryMap.get(module));
+  Set<CloudLibrary> getManagedLibraries(Module module) {
+    return moduleLibraryMap.get(module);
   }
 
   /**
    * Updates the project's mapping of {@link Module} to {@link CloudLibrary} with the currently
    * configured set of managed client libraries.
    */
-  @VisibleForTesting
-  void syncManagedProjectLibraries() {
+  private void syncManagedProjectLibraries() {
     moduleLibraryMap =
         Stream.of(ModuleManager.getInstance(project).getModules())
             .collect(Collectors.toMap(Function.identity(), this::loadManagedLibraries));
@@ -108,6 +106,10 @@ public class CloudLibraryProjectState implements ProjectComponent {
    */
   private Set<CloudLibrary> loadManagedLibraries(Module module) {
     List<MavenDomDependency> moduleDependencies = getModuleDependencies(module);
+
+    if (moduleDependencies == null || moduleDependencies.isEmpty()) {
+      return ImmutableSet.of();
+    }
 
     // Only fetch the libraries once
     if (allLibraries == null) {
@@ -125,6 +127,9 @@ public class CloudLibraryProjectState implements ProjectComponent {
    */
   private List<MavenDomDependency> getModuleDependencies(Module module) {
     MavenProject mavenProject = MavenProjectsManager.getInstance(project).findProject(module);
+    if (mavenProject == null) {
+      return null;
+    }
 
     return ApplicationManager.getApplication()
         .runReadAction(
