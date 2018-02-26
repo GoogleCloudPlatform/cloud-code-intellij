@@ -16,8 +16,8 @@
 
 package com.google.cloud.tools.intellij.debugger.ui;
 
+import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
-import com.google.cloud.tools.intellij.core.analytics.GctTracking;
 import com.google.cloud.tools.intellij.debugger.CloudDebugProcessState;
 import com.google.cloud.tools.intellij.debugger.ProjectRepositoryState;
 import com.google.cloud.tools.intellij.debugger.ProjectRepositoryValidator;

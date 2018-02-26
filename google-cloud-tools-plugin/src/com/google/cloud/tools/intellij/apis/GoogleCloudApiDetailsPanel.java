@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.apis;
 
-import com.google.cloud.tools.intellij.core.GoogleCloudCoreIcons;
+import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.ThreadUtil;

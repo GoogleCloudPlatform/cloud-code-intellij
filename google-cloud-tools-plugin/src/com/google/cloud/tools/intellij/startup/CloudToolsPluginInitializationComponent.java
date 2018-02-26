@@ -16,8 +16,17 @@
 
 package com.google.cloud.tools.intellij.startup;
 
-import com.google.cloud.tools.intellij.CloudToolsPluginConfigurationService;
-import com.google.cloud.tools.intellij.CloudToolsPluginInfoService;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerManager;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerNotification;
+import com.google.cloud.tools.intellij.login.Services;
+import com.google.cloud.tools.intellij.login.util.TrackerMessageBundle;
+import com.google.cloud.tools.intellij.service.PluginConfigurationService;
+import com.google.cloud.tools.intellij.service.PluginInfoService;
+import com.google.common.annotations.VisibleForTesting;
+import com.intellij.notification.NotificationDisplayType;
+import com.intellij.notification.NotificationsConfiguration;
+import com.intellij.notification.NotificationsManager;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.components.ServiceManager;
 import org.jetbrains.annotations.NotNull;
@@ -38,10 +47,14 @@ public class CloudToolsPluginInitializationComponent implements ApplicationCompo
 
   @Override
   public void initComponent() {
-    CloudToolsPluginConfigurationService pluginConfigurationService =
-        ServiceManager.getService(CloudToolsPluginConfigurationService.class);
-    CloudToolsPluginInfoService pluginInfoService =
-        ServiceManager.getService(CloudToolsPluginInfoService.class);
+
+    if (!ApplicationManager.getApplication().isUnitTestMode()) {
+      configureUsageTracking();
+    }
+    Services.getLoginService().loadPersistedCredentials();
+    PluginConfigurationService pluginConfigurationService =
+        ServiceManager.getService(PluginConfigurationService.class);
+    PluginInfoService pluginInfoService = ServiceManager.getService(PluginInfoService.class);
 
     if (pluginInfoService.shouldEnableErrorFeedbackReporting()) {
       initErrorReporting(pluginConfigurationService, pluginInfoService);
@@ -51,9 +64,28 @@ public class CloudToolsPluginInitializationComponent implements ApplicationCompo
     new GoogleAccountPluginUninstaller().uninstallIfPresent();
   }
 
+  /**
+   * For Google Usage Tracker Ensure that the notification manager (also an application component)
+   * is registered first; otherwise this component's initComponent() call will fire a notification
+   * event bus to show the opt-in dialog, but the notification component may not yet have been
+   * initialized and is therefore not subscribed and listening.
+   */
+  @VisibleForTesting
+  void configureUsageTracking() {
+    UsageTrackerManager usageTrackerManager = UsageTrackerManager.getInstance();
+    if (usageTrackerManager.isUsageTrackingAvailable()
+        && !usageTrackerManager.hasUserRecordedTrackingPreference()) {
+      NotificationsManager.getNotificationsManager();
+      NotificationsConfiguration.getNotificationsConfiguration()
+          .register(
+              TrackerMessageBundle.message("notification.group.display.id"),
+              NotificationDisplayType.STICKY_BALLOON);
+      UsageTrackerNotification.getInstance().showNotification();
+    }
+  }
+
   private void initErrorReporting(
-      CloudToolsPluginConfigurationService pluginConfigurationService,
-      CloudToolsPluginInfoService pluginInfoService) {
+      PluginConfigurationService pluginConfigurationService, PluginInfoService pluginInfoService) {
     pluginConfigurationService.enabledGoogleFeedbackErrorReporting(pluginInfoService.getPluginId());
   }
 }

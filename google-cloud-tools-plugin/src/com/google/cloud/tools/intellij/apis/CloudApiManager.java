@@ -30,8 +30,8 @@ import com.google.api.services.iam.v1.model.ServiceAccount;
 import com.google.api.services.iam.v1.model.ServiceAccountKey;
 import com.google.api.services.servicemanagement.ServiceManagement;
 import com.google.api.services.servicemanagement.model.EnableServiceRequest;
+import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
-import com.google.cloud.tools.intellij.core.analytics.GctTracking;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
@@ -63,6 +63,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.fest.util.Lists;
 
@@ -86,6 +87,10 @@ class CloudApiManager {
   private static final String SERVICE_ACCOUNT_CREATE_REQUEST_PROJECT_FORMAT = "projects/%s";
   private static final String SERVICE_ACCOUNT_ROLE_REQUEST_PREFIX = "serviceAccount:";
   private static final String SERVICE_ACCOUNT_KEY_FILE_NAME_FORMAT = "%s-%s.json";
+
+  private static final int SERVICE_ACCOUNT_ID_MAX_LEN = 30;
+  static final int SERVICE_ACCOUNT_NAME_MAX_LEN = 100;
+  static final Pattern SERVICE_ACCOUNT_ID_PATTERN = Pattern.compile("[a-z][a-z\\d\\-]*[a-z\\d].");
 
   private CloudApiManager() {}
 
@@ -373,20 +378,20 @@ class CloudApiManager {
   }
 
   /**
-   * Creates the unique ID of the service account.
+   * Creates the unique ID for the service account in the form: [name]-[timestamp].
    *
-   * <p>Must be less than 30 characters.
+   * <p>Trims the id if necessary to be less than the max allowed characters.
    *
-   * @param prefix the name chosen by the user for the service account
-   * @return an ID that is a combination of the prefix and a timestamp
+   * @param name the name chosen by the user for the service account
+   * @return an usable ID for GCP that is a combination of a prefix, the filtered name, and a
+   *     timestamp
    */
-  private static String createServiceAccountId(String prefix) {
-    int maxLen = 30;
-    String timestamp = getTimestamp();
-    int maxPrefixLen = maxLen - timestamp.length() - 1;
-    String trimmedPrefix =
-        prefix.length() <= maxPrefixLen ? prefix : prefix.substring(0, maxPrefixLen);
-    return String.format("%s-%s", trimmedPrefix, timestamp);
+  private static String createServiceAccountId(String name) {
+    String id = String.format("%s-%s", name, getTimestamp());
+
+    return id.length() <= SERVICE_ACCOUNT_ID_MAX_LEN
+        ? id
+        : id.substring(0, SERVICE_ACCOUNT_ID_MAX_LEN);
   }
 
   private static String getTimestamp() {

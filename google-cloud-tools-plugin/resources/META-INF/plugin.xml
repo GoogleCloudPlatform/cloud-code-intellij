@@ -369,8 +369,8 @@
 
     <implicitUsageProvider implementation="com.google.cloud.tools.intellij.appengine.validation.EndpointImplicitUsageProvider"/>
 
-    <checkoutProvider implementation="com.google.cloud.tools.intellij.vcs.GcpCheckoutProvider"/>
-    <vcsPopupProvider implementation="com.google.cloud.tools.intellij.vcs.GcpQuickListContentProvider"/>
+    <checkoutProvider implementation="com.google.cloud.tools.intellij.csr.GcpCheckoutProvider"/>
+    <vcsPopupProvider implementation="com.google.cloud.tools.intellij.csr.GcpQuickListContentProvider"/>
 
     <dom.fileDescription
             implementation="com.google.cloud.tools.intellij.appengine.descriptor.dom.AppEngineStandardWebFileDescriptor"/>
@@ -381,12 +381,8 @@
     <xdebugger.breakpointType implementation="com.google.cloud.tools.intellij.debugger.CloudLineBreakpointType"/>
     <projectService serviceImplementation="com.google.cloud.tools.intellij.debugger.CloudDebugProcessStateSerializer"/>
 
-    <applicationService serviceInterface="com.google.cloud.tools.intellij.ApplicationPluginInfoService"
-                        serviceImplementation="com.google.cloud.tools.intellij.DefaultApplicationPluginInfoService"/>
-    <applicationService serviceInterface="com.google.cloud.tools.intellij.CloudToolsPluginInfoService"
-                        serviceImplementation="com.google.cloud.tools.intellij.IdeaCloudToolsPluginInfoService"/>
-    <applicationService serviceInterface="com.google.cloud.tools.intellij.CloudToolsPluginConfigurationService"
-                        serviceImplementation="com.google.cloud.tools.intellij.DefaultCloudToolsPluginConfigurationService"/>
+    <applicationService serviceInterface="com.google.cloud.tools.intellij.service.ApplicationPluginInfoService"
+                        serviceImplementation="com.google.cloud.tools.intellij.service.DefaultApplicationPluginInfoService"/>
 
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService"
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.DefaultCloudSdkService"/>
@@ -405,7 +401,7 @@
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.application.GoogleApiClientAppEngineAdminService"/>
     <applicationService serviceInterface="com.google.cloud.tools.intellij.resources.GoogleApiClientFactory"
                         serviceImplementation="com.google.cloud.tools.intellij.resources.DefaultGoogleApiClientFactory"/>
-    <applicationService serviceImplementation="com.google.cloud.tools.intellij.vcs.CloudRepositoryService"/>
+    <applicationService serviceImplementation="com.google.cloud.tools.intellij.csr.CloudRepositoryService"/>
 
     <!-- App Engine Cloud and Deployment Sources Configuration-->
     <remoteServer.type
@@ -493,7 +489,7 @@
   </extensions>
 
   <extensions defaultExtensionNs="Git4Idea">
-    <GitHttpAuthDataProvider implementation="com.google.cloud.tools.intellij.vcs.GcpHttpAuthDataProvider" />
+    <GitHttpAuthDataProvider implementation="com.google.cloud.tools.intellij.csr.GcpHttpAuthDataProvider" />
   </extensions>
 
   <extensions defaultExtensionNs="com.google.gct.core">
@@ -519,7 +515,7 @@
     <action id="AddSnapshotLocation" class="com.google.cloud.tools.intellij.debugger.actions.ToggleSnapshotLocationAction"/>
 
     <action id="GoogleCloudTools.UploadSourceToGCP"
-            class="com.google.cloud.tools.intellij.vcs.SetupCloudRepositoryAction">
+            class="com.google.cloud.tools.intellij.csr.SetupCloudRepositoryAction">
       <add-to-group group-id="Vcs.Import"/>
     </action>
 

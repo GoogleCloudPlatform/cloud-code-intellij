@@ -18,8 +18,8 @@ package com.google.cloud.tools.intellij.debugger.ui;
 
 import com.google.api.services.clouddebugger.v2.model.Breakpoint;
 import com.google.api.services.clouddebugger.v2.model.StatusMessage;
+import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
-import com.google.cloud.tools.intellij.core.analytics.GctTracking;
 import com.google.cloud.tools.intellij.debugger.BreakpointUtil;
 import com.google.cloud.tools.intellij.debugger.CloudBreakpointListener;
 import com.google.cloud.tools.intellij.debugger.CloudDebugProcess;

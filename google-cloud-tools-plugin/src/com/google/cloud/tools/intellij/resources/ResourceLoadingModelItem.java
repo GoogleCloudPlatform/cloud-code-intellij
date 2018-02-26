@@ -17,38 +17,6 @@
 package com.google.cloud.tools.intellij.resources;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import org.jetbrains.annotations.NotNull;
 
 /** This model item is shown when a resource manager call is outstanding. */
-class ResourceLoadingModelItem extends DefaultMutableTreeNode {}
-
-/** This model item is shown when a resource manager call returns an empty result. */
-class ResourceEmptyModelItem extends DefaultMutableTreeNode {
-
-  private String message;
-
-  public ResourceEmptyModelItem(@NotNull String message) {
-    this.message = message;
-  }
-
-  public String getMessage() {
-    return message;
-  }
-}
-
-/**
- * This model item represents a node shown when an error occurs attempting to query a resource
- * manager.
- */
-class ResourceErrorModelItem extends DefaultMutableTreeNode {
-
-  private String errorMessage;
-
-  public ResourceErrorModelItem(@NotNull String errorMessage) {
-    this.errorMessage = errorMessage;
-  }
-
-  public String getErrorMessage() {
-    return errorMessage;
-  }
-}
+public class ResourceLoadingModelItem extends DefaultMutableTreeNode {}

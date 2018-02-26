@@ -47,6 +47,7 @@ public class CloudApiManagementConfirmationDialogTest {
   private File testDir;
 
   private static final CloudProject cloudProject = CloudProject.create("name", "id", "user");
+  private static final String VALID_SERVICE_ACCOUNT_NAME = "my-name";
 
   @Test
   public void enablementUiState_whenAllApisAreEnabled() {
@@ -174,66 +175,37 @@ public class CloudApiManagementConfirmationDialogTest {
 
   @Test
   public void serviceAccount_whenFieldsCorrectlyPopulated_showsNoValidationError() {
-    ApplicationManager.getApplication()
-        .invokeAndWait(
-            () -> {
-              CloudApiManagementConfirmationDialog dialog =
-                  new CloudApiManagementConfirmationDialog(
-                      module,
-                      cloudProject,
-                      ImmutableSet.of(),
-                      ImmutableSet.of(),
-                      ImmutableSet.of());
-
-              dialog.getServiceAccountNameTextField().setText("my-name");
-              dialog.getServiceKeyPathSelector().setText(testDir.getPath());
-
-              assertThat(dialog.doValidate()).isNull();
-            });
+    verifyServiceAccount_doesNotShowValidationError_withFields(
+        VALID_SERVICE_ACCOUNT_NAME, testDir.getPath());
   }
 
   @Test
   public void serviceAccount_whenServiceAccountNameEmpty_showsValidationError() {
-    ApplicationManager.getApplication()
-        .invokeAndWait(
-            () -> {
-              CloudApiManagementConfirmationDialog dialog =
-                  new CloudApiManagementConfirmationDialog(
-                      module,
-                      cloudProject,
-                      ImmutableSet.of(),
-                      ImmutableSet.of(),
-                      ImmutableSet.of());
+    verifyServiceAccount_showsValidationError_withFields("", testDir.getPath());
+  }
 
-              dialog.getServiceAccountNameTextField().setText("");
-              dialog.getServiceKeyPathSelector().setText("/some/path");
+  @Test
+  public void serviceAccount_serviceAccountNameLength_isValidated() {
+    verifyServiceAccount_doesNotShowValidationError_withFields(
+        createServiceAccountName_ofLength(99), testDir.getPath());
+    verifyServiceAccount_doesNotShowValidationError_withFields(
+        createServiceAccountName_ofLength(100), testDir.getPath());
+    verifyServiceAccount_showsValidationError_withFields(
+        createServiceAccountName_ofLength(101), testDir.getPath());
+  }
 
-              assertThat(dialog.doValidate()).isNotNull();
-              assertThat(dialog.doValidate().component)
-                  .isEqualTo(dialog.getServiceAccountNameTextField());
-            });
+  @Test
+  public void serviceAccount_serviceAccountNamePattern_isValidated() {
+    verifyServiceAccount_showsValidationError_withFields("9my-name", testDir.getPath());
+    verifyServiceAccount_showsValidationError_withFields("my$name", testDir.getPath());
+    verifyServiceAccount_doesNotShowValidationError_withFields("my-name", testDir.getPath());
+    verifyServiceAccount_doesNotShowValidationError_withFields("my-name99", testDir.getPath());
+    verifyServiceAccount_doesNotShowValidationError_withFields("MY-NAME", testDir.getPath());
   }
 
   @Test
   public void serviceAccount_whenServiceKeyPathEmpty_showsValidationError() {
-    ApplicationManager.getApplication()
-        .invokeAndWait(
-            () -> {
-              CloudApiManagementConfirmationDialog dialog =
-                  new CloudApiManagementConfirmationDialog(
-                      module,
-                      cloudProject,
-                      ImmutableSet.of(),
-                      ImmutableSet.of(),
-                      ImmutableSet.of());
-
-              dialog.getServiceKeyPathSelector().setText("");
-              dialog.getServiceAccountNameTextField().setText("my-name");
-
-              assertThat(dialog.doValidate()).isNotNull();
-              assertThat(dialog.doValidate().component)
-                  .isEqualTo(dialog.getServiceKeyPathSelector());
-            });
+    verifyServiceAccount_showsValidationError_withFields(VALID_SERVICE_ACCOUNT_NAME, "");
   }
 
   @Test
@@ -250,7 +222,7 @@ public class CloudApiManagementConfirmationDialogTest {
                       ImmutableSet.of(),
                       ImmutableSet.of());
 
-              dialog.getNewServiceAccountCheckbox().setSelected(false);
+              dialog.getCreateNewServiceAccountCheckbox().setSelected(false);
 
               dialog.getServiceKeyPathSelector().setText("");
               dialog.getServiceAccountNameTextField().setText("");
@@ -261,6 +233,11 @@ public class CloudApiManagementConfirmationDialogTest {
 
   @Test
   public void serviceAccount_whenKeyDownloadPathInvalid_showsValidationError() {
+    verifyServiceAccount_showsValidationError_withFields(
+        VALID_SERVICE_ACCOUNT_NAME, "/some/invalid/path");
+  }
+
+  private void verifyServiceAccount_showsValidationError_withFields(String name, String path) {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> {
@@ -272,10 +249,38 @@ public class CloudApiManagementConfirmationDialogTest {
                       ImmutableSet.of(),
                       ImmutableSet.of());
 
-              dialog.getServiceKeyPathSelector().setText("/some/invalid/path");
-              dialog.getServiceAccountNameTextField().setText("my-name");
+              dialog.getServiceAccountNameTextField().setText(name);
+              dialog.getServiceKeyPathSelector().setText(path);
 
               assertThat(dialog.doValidate()).isNotNull();
             });
+  }
+
+  private void verifyServiceAccount_doesNotShowValidationError_withFields(
+      String name, String path) {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              CloudApiManagementConfirmationDialog dialog =
+                  new CloudApiManagementConfirmationDialog(
+                      module,
+                      cloudProject,
+                      ImmutableSet.of(),
+                      ImmutableSet.of(),
+                      ImmutableSet.of());
+
+              dialog.getServiceAccountNameTextField().setText(name);
+              dialog.getServiceKeyPathSelector().setText(path);
+
+              assertThat(dialog.doValidate()).isNull();
+            });
+  }
+
+  private static String createServiceAccountName_ofLength(int len) {
+    StringBuilder longString = new StringBuilder();
+    for (int i = 0; i < len; i++) {
+      longString.append("a");
+    }
+    return longString.toString();
   }
 }

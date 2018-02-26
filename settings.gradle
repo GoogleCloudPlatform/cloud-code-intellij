@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 include 'google-cloud-tools-plugin'
-include 'common-lib'
 include 'common-test-lib'
 include 'google-cloud-tools-plugin:ultimate'
 include 'google-cloud-tools-plugin:google-cloud-core'

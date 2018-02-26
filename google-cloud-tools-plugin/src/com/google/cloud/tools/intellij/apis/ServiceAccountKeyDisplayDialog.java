@@ -24,6 +24,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextPane;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -36,6 +37,7 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
   private JPanel panel;
   private JLabel credentialEnvVarLabel;
   private JButton copyToClipboardButton;
+  private JTextPane envVarInfoText;
   private static final String CREDENTIAL_ENV_VAR_KEY = "GOOGLE_APPLICATION_CREDENTIALS";
   private static final String ENV_VAR_DISPLAY_FORMAT = "%s=%s";
 
@@ -45,6 +47,8 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
 
     setTitle(GctBundle.message("cloud.apis.service.account.key.downloaded.title"));
     downloadPathLabel.setText(downloadPath);
+
+    envVarInfoText.setBackground(panel.getBackground());
 
     String credentialEnvVar =
         String.format(ENV_VAR_DISPLAY_FORMAT, CREDENTIAL_ENV_VAR_KEY, downloadPath);
