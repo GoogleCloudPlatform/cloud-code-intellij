@@ -20,7 +20,6 @@ import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.collect.ImmutableSet;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ProjectComponent;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
@@ -45,8 +44,6 @@ import org.jetbrains.idea.maven.project.MavenProjectsManager.Listener;
  * that are configured on the user's project.
  */
 public class CloudLibraryProjectState implements ProjectComponent {
-
-  private static final Logger logger = Logger.getInstance(AddCloudLibrariesAction.class);
 
   private final Project project;
   private Map<Module, Set<CloudLibrary>> moduleLibraryMap = Maps.newHashMap();
