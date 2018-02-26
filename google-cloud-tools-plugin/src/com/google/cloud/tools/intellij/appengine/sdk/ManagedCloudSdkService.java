@@ -18,10 +18,11 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
+import com.google.cloud.tools.managedcloudsdk.ConsoleListener;
 import com.google.cloud.tools.managedcloudsdk.ManagedCloudSdk;
 import com.google.cloud.tools.managedcloudsdk.ManagedSdkVerificationException;
 import com.google.cloud.tools.managedcloudsdk.ManagedSdkVersionMismatchException;
-import com.google.cloud.tools.managedcloudsdk.MessageListener;
+import com.google.cloud.tools.managedcloudsdk.ProgressListener;
 import com.google.cloud.tools.managedcloudsdk.UnsupportedOsException;
 import com.google.cloud.tools.managedcloudsdk.components.SdkComponent;
 import com.google.common.annotations.VisibleForTesting;
@@ -34,6 +35,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -54,6 +56,8 @@ public class ManagedCloudSdkService implements CloudSdkService {
   private final Collection<SdkStatusUpdateListener> statusUpdateListeners = Lists.newArrayList();
 
   private volatile ListenableFuture<Path> managedSdkBackgroundJob;
+
+  private ProgressListener progressListener;
 
   @Override
   public void activate() {
@@ -177,9 +181,11 @@ public class ManagedCloudSdkService implements CloudSdkService {
   /** Installs core managed SDK if needed and returns its path if successful. */
   private Path installSdk() throws Exception {
     if (!safeCheckSdkStatus(() -> managedCloudSdk.isInstalled())) {
-      MessageListener sdkInstallListener = logger::debug;
+      ConsoleListener sdkConsoleListener = logger::debug;
+      progressListener =
+          ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
 
-      return managedCloudSdk.newInstaller().install(sdkInstallListener);
+      return managedCloudSdk.newInstaller().install(progressListener, sdkConsoleListener);
     }
 
     return managedCloudSdk.getSdkHome();
@@ -187,19 +193,31 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
   private void installAppEngineJavaComponent() throws Exception {
     if (!safeCheckSdkStatus(() -> managedCloudSdk.hasComponent(SdkComponent.APP_ENGINE_JAVA))) {
-      MessageListener appEngineInstallListener = logger::debug;
+      ConsoleListener appEngineConsoleListener = logger::debug;
 
+      progressListener =
+          ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
+      progressListener.start(
+          GctBundle.message("managedsdk.progress.install.app.engine"), ProgressListener.UNKNOWN);
       managedCloudSdk
           .newComponentInstaller()
-          .installComponent(SdkComponent.APP_ENGINE_JAVA, appEngineInstallListener);
+          .installComponent(SdkComponent.APP_ENGINE_JAVA, appEngineConsoleListener);
+
+      progressListener.done();
     }
   }
 
   private Path updateManagedSdk() throws Exception {
     if (!safeCheckSdkStatus(() -> managedCloudSdk.isUpToDate())) {
-      MessageListener sdkUpdateListener = logger::debug;
+      ConsoleListener sdkUpdateListener = logger::debug;
+      progressListener =
+          ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
 
+      progressListener.start(
+          GctBundle.message("managedsdk.progress.update"), ProgressListener.UNKNOWN);
       managedCloudSdk.newUpdater().update(sdkUpdateListener);
+
+      progressListener.done();
     }
 
     return managedCloudSdk.getSdkHome();
@@ -262,7 +280,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
     @Override
     public void onFailure(Throwable t) {
-      if (t instanceof InterruptedException) {
+      if (t instanceof InterruptedException || t instanceof CancellationException) {
         logger.info("Managed Google Cloud SDK install/update cancelled.");
 
         ManagedCloudSdkServiceUiPresenter.getInstance().notifyManagedSdkJobCancellation(jobType);
@@ -282,6 +300,9 @@ public class ManagedCloudSdkService implements CloudSdkService {
           checkSdkStatusAfterFailedUpdate();
           break;
       }
+
+      // in case of failure progress done() is not called, call explicitly to remove UI.
+      progressListener.done();
     }
   }
 

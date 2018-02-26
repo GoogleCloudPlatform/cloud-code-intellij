@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -33,6 +34,7 @@ import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.log.TestInMemoryLogger;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.managedcloudsdk.ManagedCloudSdk;
+import com.google.cloud.tools.managedcloudsdk.ProgressListener;
 import com.google.cloud.tools.managedcloudsdk.UnsupportedOsException;
 import com.google.cloud.tools.managedcloudsdk.command.CommandExecutionException;
 import com.google.cloud.tools.managedcloudsdk.command.CommandExitException;
@@ -45,6 +47,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutorService;
 import org.junit.Before;
 import org.junit.Rule;
@@ -68,6 +71,8 @@ public class ManagedCloudSdkServiceTest {
 
   @Mock private ManagedCloudSdkServiceUiPresenter mockUiPresenter;
 
+  @Mock private ProgressListener mockProgressListener;
+
   @Before
   public void setUp() throws UnsupportedOsException {
     doReturn(mockManagedCloudSdk).when(sdkService).createManagedSdk();
@@ -86,6 +91,7 @@ public class ManagedCloudSdkServiceTest {
         .invokeOnApplicationUIThread(any());
     // replace UI presenter for verifications
     ManagedCloudSdkServiceUiPresenter.setInstance(mockUiPresenter);
+    when(mockUiPresenter.createProgressListener(any())).thenReturn(mockProgressListener);
     // init SDK, most tests require initialized state.
     sdkService.initManagedSdk();
   }
@@ -169,7 +175,7 @@ public class ManagedCloudSdkServiceTest {
     sdkService.addStatusUpdateListener(mockStatusUpdateListener);
     emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
     SdkInstaller mockInstaller = mockManagedCloudSdk.newInstaller();
-    when(mockInstaller.install(any())).thenThrow(new IOException("IO Error"));
+    when(mockInstaller.install(any(), any())).thenThrow(new IOException("IO Error"));
     sdkService.install();
 
     ArgumentCaptor<SdkStatus> statusCaptor = ArgumentCaptor.forClass(SdkStatus.class);
@@ -184,12 +190,24 @@ public class ManagedCloudSdkServiceTest {
     emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
     SdkInstaller mockInstaller = mockManagedCloudSdk.newInstaller();
     IOException ioException = new IOException("IO Error");
-    when(mockInstaller.install(any())).thenThrow(ioException);
+    when(mockInstaller.install(any(), any())).thenThrow(ioException);
 
     sdkService.install();
 
     verify(mockUiPresenter)
         .notifyManagedSdkJobFailure(ManagedSdkJobType.INSTALL, ioException.toString());
+  }
+
+  @Test
+  public void failed_install_removesProgressIndicator() throws Exception {
+    emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
+    SdkInstaller mockInstaller = mockManagedCloudSdk.newInstaller();
+    IOException ioException = new IOException("IO Error");
+    when(mockInstaller.install(any(), any())).thenThrow(ioException);
+
+    sdkService.install();
+
+    verify(mockProgressListener, atLeastOnce()).done();
   }
 
   @Test
@@ -213,7 +231,7 @@ public class ManagedCloudSdkServiceTest {
   public void interruptedInstall_status_notAvailable() throws Exception {
     emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
     SdkInstaller sdkInstaller = mockManagedCloudSdk.newInstaller();
-    when(sdkInstaller.install(any())).thenThrow(new InterruptedException());
+    when(sdkInstaller.install(any(), any())).thenThrow(new InterruptedException());
     when(mockManagedCloudSdk.newInstaller()).thenReturn(sdkInstaller);
 
     sdkService.install();
@@ -225,7 +243,19 @@ public class ManagedCloudSdkServiceTest {
   public void interruptedInstall_showsCancelNotification() throws Exception {
     emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
     SdkInstaller sdkInstaller = mockManagedCloudSdk.newInstaller();
-    when(sdkInstaller.install(any())).thenThrow(new InterruptedException());
+    when(sdkInstaller.install(any(), any())).thenThrow(new InterruptedException());
+    when(mockManagedCloudSdk.newInstaller()).thenReturn(sdkInstaller);
+
+    sdkService.install();
+
+    verify(mockUiPresenter).notifyManagedSdkJobCancellation(ManagedSdkJobType.INSTALL);
+  }
+
+  @Test
+  public void cancelledInstall_showsCancelNotification() throws Exception {
+    emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
+    SdkInstaller sdkInstaller = mockManagedCloudSdk.newInstaller();
+    when(sdkInstaller.install(any(), any())).thenThrow(new CancellationException());
     when(mockManagedCloudSdk.newInstaller()).thenReturn(sdkInstaller);
 
     sdkService.install();
@@ -273,6 +303,35 @@ public class ManagedCloudSdkServiceTest {
 
     assertThat(statusCaptor.getAllValues())
         .isEqualTo(Arrays.asList(SdkStatus.INSTALLING, SdkStatus.READY));
+  }
+
+  @Test
+  public void cancelled_update_keepsSdkStatus_available() throws Exception {
+    makeMockSdkInstalled(MOCK_SDK_PATH);
+    emulateMockSdkUpdateProcess();
+    SdkUpdater mockUpdater = mockManagedCloudSdk.newUpdater();
+    doThrow(new CancellationException()).when(mockUpdater).update(any());
+
+    sdkService.addStatusUpdateListener(mockStatusUpdateListener);
+    sdkService.update();
+
+    ArgumentCaptor<SdkStatus> statusCaptor = ArgumentCaptor.forClass(SdkStatus.class);
+    verify(mockStatusUpdateListener, times(2)).onSdkStatusChange(any(), statusCaptor.capture());
+
+    assertThat(statusCaptor.getAllValues())
+        .isEqualTo(Arrays.asList(SdkStatus.INSTALLING, SdkStatus.READY));
+  }
+
+  @Test
+  public void cancelled_update_showsNotification() throws Exception {
+    makeMockSdkInstalled(MOCK_SDK_PATH);
+    emulateMockSdkUpdateProcess();
+    SdkUpdater mockUpdater = mockManagedCloudSdk.newUpdater();
+    doThrow(new CancellationException()).when(mockUpdater).update(any());
+
+    sdkService.update();
+
+    verify(mockUiPresenter).notifyManagedSdkJobCancellation(ManagedSdkJobType.UPDATE);
   }
 
   @Test
@@ -329,7 +388,7 @@ public class ManagedCloudSdkServiceTest {
       when(mockManagedCloudSdk.isInstalled()).thenReturn(false);
       SdkInstaller mockInstaller = mock(SdkInstaller.class);
       when(mockManagedCloudSdk.newInstaller()).thenReturn(mockInstaller);
-      when(mockInstaller.install(any())).thenReturn(mockSdkPath);
+      when(mockInstaller.install(any(), any())).thenReturn(mockSdkPath);
 
       when(mockManagedCloudSdk.hasComponent(SdkComponent.APP_ENGINE_JAVA)).thenReturn(false);
       SdkComponentInstaller mockComponentInstaller = mock(SdkComponentInstaller.class);
