@@ -151,7 +151,7 @@ public class CloudLibraryProjectStateTest {
               state.syncManagedProjectLibraries();
 
               Set<CloudLibrary> libraries = state.getCloudLibraries(module);
-              assertThat_managedLibrariesContainsExactlyOne(libraries);
+              assertThat_cloudLibrariesContainsExactlyOne(libraries);
             });
   }
 
@@ -176,13 +176,13 @@ public class CloudLibraryProjectStateTest {
               state.syncManagedProjectLibraries();
 
               Set<CloudLibrary> libraries = state.getCloudLibraries(module);
-              assertThat_managedLibrariesContainsExactlyOne(libraries);
+              assertThat_cloudLibrariesContainsExactlyOne(libraries);
             });
   }
 
-  private void assertThat_managedLibrariesContainsExactlyOne(Set<CloudLibrary> managedLibraries) {
-    assertThat(managedLibraries.size()).isEqualTo(1);
-    CloudLibrary library = managedLibraries.iterator().next();
+  private void assertThat_cloudLibrariesContainsExactlyOne(Set<CloudLibrary> cloudLibraries) {
+    assertThat(cloudLibraries.size()).isEqualTo(1);
+    CloudLibrary library = cloudLibraries.iterator().next();
     assertThat(library.getName()).isEqualTo(LIBRARY.name());
   }
 
