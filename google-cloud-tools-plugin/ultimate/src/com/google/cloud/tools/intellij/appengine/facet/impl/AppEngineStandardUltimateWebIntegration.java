@@ -75,7 +75,7 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
       @NotNull Module module, @NotNull ModifiableRootModel rootModel) {
     VirtualFile webXmlParent = getWebXmlParent(module);
     if (webXmlParent == null) {
-      return getDefaultDirectoryForAppEngineWebXml(rootModel);
+      return super.suggestParentDirectoryForAppEngineWebXml(module, rootModel);
     }
 
     return webXmlParent;

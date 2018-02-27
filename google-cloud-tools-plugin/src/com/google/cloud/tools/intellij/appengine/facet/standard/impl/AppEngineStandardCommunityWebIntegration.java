@@ -38,13 +38,6 @@ import org.jetbrains.annotations.Nullable;
 /** @author nik. */
 public class AppEngineStandardCommunityWebIntegration extends AppEngineStandardWebIntegration {
 
-  @Nullable
-  @Override
-  public VirtualFile suggestParentDirectoryForAppEngineWebXml(
-      @NotNull Module module, @NotNull ModifiableRootModel rootModel) {
-    return getDefaultDirectoryForAppEngineWebXml(rootModel);
-  }
-
   @NotNull
   @Override
   public ArtifactType getAppEngineWebArtifactType() {

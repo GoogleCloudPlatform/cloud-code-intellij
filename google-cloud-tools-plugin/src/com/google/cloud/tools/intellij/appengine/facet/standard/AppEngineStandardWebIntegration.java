@@ -60,8 +60,19 @@ public abstract class AppEngineStandardWebIntegration {
   }
 
   @Nullable
-  public abstract VirtualFile suggestParentDirectoryForAppEngineWebXml(
-      @NotNull Module module, @NotNull ModifiableRootModel rootModel);
+  public VirtualFile suggestParentDirectoryForAppEngineWebXml(
+      @NotNull Module module, @NotNull ModifiableRootModel rootModel) {
+    final VirtualFile root = ArrayUtil.getFirstElement(rootModel.getContentRoots());
+    if (root != null) {
+      try {
+        return VfsUtil.createDirectoryIfMissing(root, getDefaultAppEngineWebXmlPath());
+      } catch (IOException ioe) {
+        LOG.info(ioe);
+        return null;
+      }
+    }
+    return null;
+  }
 
   @NotNull
   public abstract ArtifactType getAppEngineWebArtifactType();
@@ -103,20 +114,6 @@ public abstract class AppEngineStandardWebIntegration {
 
   @NotNull
   public abstract String getDefaultAppEngineWebXmlPath();
-
-  @Nullable
-  public VirtualFile getDefaultDirectoryForAppEngineWebXml(@NotNull ModifiableRootModel rootModel) {
-    final VirtualFile root = ArrayUtil.getFirstElement(rootModel.getContentRoots());
-    if (root != null) {
-      try {
-        return VfsUtil.createDirectoryIfMissing(root, getDefaultAppEngineWebXmlPath());
-      } catch (IOException ioe) {
-        LOG.info(ioe);
-        return null;
-      }
-    }
-    return null;
-  }
 
   private void setupDeployRunConfiguration(@NotNull Module module) {
     RunManager runManager = RunManager.getInstance(module.getProject());
