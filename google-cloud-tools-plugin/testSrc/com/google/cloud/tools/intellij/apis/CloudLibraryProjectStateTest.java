@@ -130,7 +130,7 @@ public class CloudLibraryProjectStateTest {
   }
 
   @Test
-  public void getCloudLibraries_withCloudAndNonCloudDependencies_containsCloudLibrary() {
+  public void getCloudLibraries_withCloudAndNonCloudDependencies_returnsValidCloudLibrary() {
     when(librariesService.getCloudLibraries())
         .thenReturn(ImmutableList.of(LIBRARY.toCloudLibrary()));
 
@@ -156,7 +156,7 @@ public class CloudLibraryProjectStateTest {
   }
 
   @Test
-  public void getCloudLibraries_withOnlyCloudDependencies_containsCloudLibrary() {
+  public void getCloudLibraries_withOnlyCloudDependencies_returnsValidCloudLibrary() {
     when(librariesService.getCloudLibraries())
         .thenReturn(ImmutableList.of(LIBRARY.toCloudLibrary()));
 
