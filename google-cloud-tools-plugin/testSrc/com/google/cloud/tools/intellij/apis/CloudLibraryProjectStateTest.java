@@ -103,18 +103,18 @@ public class CloudLibraryProjectStateTest {
   }
 
   @Test
-  public void managedLibraries_withNoDependenies_isEmptyOptional() {
+  public void getCloudLibraries_withNoDependencies_isEmpty() {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> {
               Module module = createNewModule(id);
 
-              assertThat(state.getManagedLibraries(module)).isEmpty();
+              assertThat(state.getCloudLibraries(module)).isEmpty();
             });
   }
 
   @Test
-  public void managedLibraries_withOnlyUnmanagedDependencies_isEmptyOptional() {
+  public void getCloudLibraries_withOnlyNonCloudDependencies_isEmpty() {
     when(librariesService.getCloudLibraries())
         .thenReturn(ImmutableList.of(LIBRARY.toCloudLibrary()));
 
@@ -122,15 +122,15 @@ public class CloudLibraryProjectStateTest {
         .invokeAndWait(
             () -> {
               Module module = createNewModule(id);
-              MavenId unmanagedDependency = new MavenId("my-group", "my-artifact", "1.0");
-              writeDependenciesToPom(module, ImmutableList.of(unmanagedDependency));
+              MavenId nonCloudDependency = new MavenId("my-group", "my-artifact", "1.0");
+              writeDependenciesToPom(module, ImmutableList.of(nonCloudDependency));
 
-              assertThat(state.getManagedLibraries(module)).isEmpty();
+              assertThat(state.getCloudLibraries(module)).isEmpty();
             });
   }
 
   @Test
-  public void managedLibraries_withUnmanagedAndManagedDependencies_isPresent() {
+  public void getCloudLibraries_withCloudAndNonCloudDependencies_containsCloudLibrary() {
     when(librariesService.getCloudLibraries())
         .thenReturn(ImmutableList.of(LIBRARY.toCloudLibrary()));
 
@@ -144,20 +144,19 @@ public class CloudLibraryProjectStateTest {
               String groupId = mavenCoordinates.groupId();
               String artifactId = mavenCoordinates.artifactId();
 
-              MavenId managedDependency = new MavenId(groupId, artifactId, "1.0");
-              MavenId unmanagedDependency = new MavenId("my-group", "my-artifact", "1.0");
-              writeDependenciesToPom(
-                  module, ImmutableList.of(managedDependency, unmanagedDependency));
+              MavenId cloudDependency = new MavenId(groupId, artifactId, "1.0");
+              MavenId nonCloudDependency = new MavenId("my-group", "my-artifact", "1.0");
+              writeDependenciesToPom(module, ImmutableList.of(cloudDependency, nonCloudDependency));
 
               state.syncManagedProjectLibraries();
 
-              Set<CloudLibrary> libraries = state.getManagedLibraries(module);
+              Set<CloudLibrary> libraries = state.getCloudLibraries(module);
               assertThat_managedLibrariesContainsExactlyOne(libraries);
             });
   }
 
   @Test
-  public void managedLibraries_withOnlyManagedDependencies_isPresent() {
+  public void getCloudLibraries_withOnlyCloudDependencies_containsCloudLibrary() {
     when(librariesService.getCloudLibraries())
         .thenReturn(ImmutableList.of(LIBRARY.toCloudLibrary()));
 
@@ -176,7 +175,7 @@ public class CloudLibraryProjectStateTest {
 
               state.syncManagedProjectLibraries();
 
-              Set<CloudLibrary> libraries = state.getManagedLibraries(module);
+              Set<CloudLibrary> libraries = state.getCloudLibraries(module);
               assertThat_managedLibrariesContainsExactlyOne(libraries);
             });
   }
