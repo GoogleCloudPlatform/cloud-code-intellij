@@ -73,10 +73,10 @@
               <text resource-bundle="messages/CloudToolsBundle" key="cloudsdk.automatic.updates.checkbox"/>
             </properties>
           </component>
-          <component id="932b5" class="com.intellij.ui.HyperlinkLabel" binding="automaticUpdateHyperlink">
+          <component id="932b5" class="com.intellij.ui.HyperlinkLabel" binding="checkForUpdatesHyperlink" custom-create="true">
             <constraints/>
             <properties>
-              <text resource-bundle="messages/CloudToolsBundle" key="cloudsdk.check.for.updates.action"/>
+              <text value=""/>
             </properties>
           </component>
         </children>
