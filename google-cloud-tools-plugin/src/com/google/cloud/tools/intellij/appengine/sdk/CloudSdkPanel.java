@@ -237,6 +237,8 @@ public class CloudSdkPanel {
       managedSdkComponentsPanel.setVisible(false);
       managedRadioButton.setVisible(false);
       customRadioButton.setSelected(true);
+      // more specific title for this case as this panel will be re-used in multiple places.
+      customRadioButton.setText(GctBundle.getString("cloudsdk.customsdk.without.managedsdk.feature"));
     }
   }
 
