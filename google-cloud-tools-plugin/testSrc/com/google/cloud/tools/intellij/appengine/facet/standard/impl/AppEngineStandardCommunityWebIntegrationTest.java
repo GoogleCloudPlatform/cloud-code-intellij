@@ -45,19 +45,20 @@ public class AppEngineStandardCommunityWebIntegrationTest extends PlatformTestCa
   public void testSuggestParentDirectoryForAppEngineWebXml() {
     Project project = getProject();
     VirtualFile baseDir = project.getBaseDir();
-    when(mockModifiableRootModel.getContentRoots()).thenReturn(new VirtualFile[]{baseDir});
+    when(mockModifiableRootModel.getContentRoots()).thenReturn(new VirtualFile[] {baseDir});
 
-    Object resultObject = new WriteAction() {
-      @Override
-      protected void run(@NotNull Result result) throws Throwable {
-        result.setResult(webIntegration.suggestParentDirectoryForAppEngineWebXml(
-            mockModule,
-            mockModifiableRootModel));
-      }
-    }.execute().getResultObject();
+    Object resultObject =
+        new WriteAction() {
+          @Override
+          protected void run(@NotNull Result result) throws Throwable {
+            result.setResult(
+                webIntegration.suggestParentDirectoryForAppEngineWebXml(
+                    mockModule, mockModifiableRootModel));
+          }
+        }.execute().getResultObject();
 
     assertTrue(resultObject instanceof VirtualFile);
-    VirtualFile virtualFile = (VirtualFile)resultObject;
+    VirtualFile virtualFile = (VirtualFile) resultObject;
     assertTrue(virtualFile.exists());
     assertEquals(virtualFile.getPath(), project.getBasePath() + "/WEB-INF");
   }

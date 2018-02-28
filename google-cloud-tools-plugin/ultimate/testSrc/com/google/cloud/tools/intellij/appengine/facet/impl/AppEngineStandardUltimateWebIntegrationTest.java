@@ -64,14 +64,15 @@ public class AppEngineStandardUltimateWebIntegrationTest extends PlatformTestCas
     when(mockFacetManager.getFacetsByType(WebFacet.ID)).thenReturn(Arrays.asList(mockWebFacet));
     when(mockModule.getComponent(FacetManager.class)).thenReturn(mockFacetManager);
 
-    Object resultObject = new WriteAction() {
-      @Override
-      protected void run(@NotNull Result result) throws Throwable {
-        result.setResult(webIntegration.suggestParentDirectoryForAppEngineWebXml(
-            mockModule,
-            mockModifiableRootModel));
-      }
-    }.execute().getResultObject();
+    Object resultObject =
+        new WriteAction() {
+          @Override
+          protected void run(@NotNull Result result) throws Throwable {
+            result.setResult(
+                webIntegration.suggestParentDirectoryForAppEngineWebXml(
+                    mockModule, mockModifiableRootModel));
+          }
+        }.execute().getResultObject();
 
     assertEquals(resultObject, mockWebXmlDir);
   }
@@ -79,23 +80,24 @@ public class AppEngineStandardUltimateWebIntegrationTest extends PlatformTestCas
   public void testSuggestParentDirectoryForAppEngineWebXml_noWebXml() throws IOException {
     Project project = getProject();
     VirtualFile baseDir = project.getBaseDir();
-    when(mockModifiableRootModel.getContentRoots()).thenReturn(new VirtualFile[]{baseDir});
+    when(mockModifiableRootModel.getContentRoots()).thenReturn(new VirtualFile[] {baseDir});
     when(mockWebFacet.getWebXmlDescriptor()).thenReturn(null);
     when(mockFacetManager.getFacetsByType(WebFacet.ID)).thenReturn(Arrays.asList(mockWebFacet));
     when(mockModule.getComponent(FacetManager.class)).thenReturn(mockFacetManager);
 
-    Object resultObject = new WriteAction() {
-      @Override
-      protected void run(@NotNull Result result) throws Throwable {
-        result.setResult(webIntegration.suggestParentDirectoryForAppEngineWebXml(
-            mockModule,
-            mockModifiableRootModel));
-      }
-    }.execute().getResultObject();
+    Object resultObject =
+        new WriteAction() {
+          @Override
+          protected void run(@NotNull Result result) throws Throwable {
+            result.setResult(
+                webIntegration.suggestParentDirectoryForAppEngineWebXml(
+                    mockModule, mockModifiableRootModel));
+          }
+        }.execute().getResultObject();
 
     assertTrue(resultObject instanceof VirtualFile);
-    VirtualFile virtualFile = (VirtualFile)resultObject;
+    VirtualFile virtualFile = (VirtualFile) resultObject;
     assertTrue(virtualFile.exists());
-    assertEquals(virtualFile.getPath(), project.getBasePath() + "web/WEB-INF");
+    assertEquals(virtualFile.getPath(), project.getBasePath() + "/web/WEB-INF");
   }
 }
