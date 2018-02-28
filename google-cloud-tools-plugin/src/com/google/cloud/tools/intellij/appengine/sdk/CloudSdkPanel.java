@@ -49,6 +49,7 @@ import org.jetbrains.annotations.NotNull;
 /** Reusable panel for configuring the path to the Cloud SDK from various contexts. */
 @SuppressWarnings("FutureReturnValueIgnored")
 public class CloudSdkPanel {
+  public static final boolean MANAGED_SDK_AUTOMATIC_UPDATES_DEFAULT = true;
 
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
   private JTextPane warningMessage;
@@ -70,6 +71,8 @@ public class CloudSdkPanel {
     warningMessage.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
     warningIcon.setVisible(false);
     warningIcon.setIcon(RunConfigurations.ConfigurationWarning);
+
+    enableAutomaticUpdatesCheckbox.setSelected(MANAGED_SDK_AUTOMATIC_UPDATES_DEFAULT);
 
     checkManagedSdkFeatureStatus();
 
