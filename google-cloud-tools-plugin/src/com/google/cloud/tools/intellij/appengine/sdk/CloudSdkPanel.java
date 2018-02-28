@@ -16,35 +16,50 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
+import com.google.cloud.tools.intellij.GctFeature;
+import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.icons.AllIcons.RunConfigurations;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.DocumentAdapter;
+import com.intellij.ui.HyperlinkAdapter;
+import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.JBColor;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextPane;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.HyperlinkEvent;
 import org.jetbrains.annotations.NotNull;
 
 /** Reusable panel for configuring the path to the Cloud SDK from various contexts. */
 @SuppressWarnings("FutureReturnValueIgnored")
 public class CloudSdkPanel {
+  public static final boolean MANAGED_SDK_AUTOMATIC_UPDATES_DEFAULT = true;
 
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
   private JTextPane warningMessage;
   private JPanel cloudSdkPanel;
   private JLabel warningIcon;
+  private JRadioButton managedRadioButton;
+  private JRadioButton customRadioButton;
+  private JCheckBox enableAutomaticUpdatesCheckbox;
+  private HyperlinkLabel checkForUpdatesHyperlink;
+  private JPanel managedSdkComponentsPanel;
 
   private static final String CLOUD_SDK_DOWNLOAD_LINK =
       "https://cloud.google.com/sdk/docs/"
@@ -57,26 +72,11 @@ public class CloudSdkPanel {
     warningIcon.setVisible(false);
     warningIcon.setIcon(RunConfigurations.ConfigurationWarning);
 
-    cloudSdkDirectoryField.addBrowseFolderListener(
-        GctBundle.message("appengine.cloudsdk.location.browse.window.title"),
-        null
-        /** description */
-        ,
-        null
-        /** project */
-        ,
-        FileChooserDescriptorFactory.createSingleFolderDescriptor());
+    enableAutomaticUpdatesCheckbox.setSelected(MANAGED_SDK_AUTOMATIC_UPDATES_DEFAULT);
 
-    cloudSdkDirectoryField
-        .getTextField()
-        .getDocument()
-        .addDocumentListener(
-            new DocumentAdapter() {
-              @Override
-              protected void textChanged(DocumentEvent event) {
-                checkSdkInBackground();
-              }
-            });
+    checkManagedSdkFeatureStatus();
+
+    initEvents();
   }
 
   @SuppressWarnings("FutureReturnValueIgnored")
@@ -98,7 +98,7 @@ public class CloudSdkPanel {
 
   public String buildSdkMessage(String path, boolean htmlEnabled) {
     if (StringUtil.isEmpty(path)) {
-      String missingMessage = GctBundle.message("appengine.cloudsdk.location.missing.message");
+      String missingMessage = GctBundle.message("cloudsdk.location.missing.message");
 
       return htmlEnabled ? missingMessage + " " + getCloudSdkDownloadMessage() : missingMessage;
     }
@@ -232,7 +232,76 @@ public class CloudSdkPanel {
 
   private String getCloudSdkDownloadMessage() {
     String openTag = "<a href='" + CLOUD_SDK_DOWNLOAD_LINK + "'>";
-    return GctBundle.message("appengine.cloudsdk.download.message", openTag, "</a>");
+    return GctBundle.message("cloudsdk.download.message", openTag, "</a>");
+  }
+
+  private void checkManagedSdkFeatureStatus() {
+    if (!ServiceManager.getService(PluginInfoService.class).shouldEnable(GctFeature.MANAGED_SDK)) {
+      managedSdkComponentsPanel.setVisible(false);
+      managedRadioButton.setVisible(false);
+      customRadioButton.setSelected(true);
+      // more specific title for this case as this panel will be re-used in multiple places.
+      customRadioButton.setText(
+          GctBundle.getString("cloudsdk.customsdk.without.managedsdk.feature"));
+    }
+  }
+
+  private void createUIComponents() {
+    checkForUpdatesHyperlink = new HyperlinkLabel();
+    checkForUpdatesHyperlink.setHyperlinkText(
+        GctBundle.getString("cloudsdk.check.for.updates.action"));
+  }
+
+  private void initEvents() {
+    ButtonGroup sdkChoiceGroup = new ButtonGroup();
+    sdkChoiceGroup.add(managedRadioButton);
+    sdkChoiceGroup.add(customRadioButton);
+
+    managedRadioButton.addActionListener(
+        (e) -> {
+          setManagedSdkUiAvailable(true);
+          setCustomSdkUiAvailable(false);
+        });
+
+    customRadioButton.addActionListener(
+        (e) -> {
+          setCustomSdkUiAvailable(true);
+          setManagedSdkUiAvailable(false);
+        });
+
+    checkForUpdatesHyperlink.addHyperlinkListener(
+        new HyperlinkAdapter() {
+          @Override
+          protected void hyperlinkActivated(HyperlinkEvent e) {}
+        });
+
+    cloudSdkDirectoryField.addBrowseFolderListener(
+        GctBundle.message("cloudsdk.location.browse.window.title"),
+        null, /* description */
+        null, /* project */
+        FileChooserDescriptorFactory.createSingleFolderDescriptor());
+
+    cloudSdkDirectoryField
+        .getTextField()
+        .getDocument()
+        .addDocumentListener(
+            new DocumentAdapter() {
+              @Override
+              protected void textChanged(DocumentEvent event) {
+                checkSdkInBackground();
+              }
+            });
+  }
+
+  private void setManagedSdkUiAvailable(boolean available) {
+    if (ServiceManager.getService(PluginInfoService.class).shouldEnable(GctFeature.MANAGED_SDK)) {
+      enableAutomaticUpdatesCheckbox.setEnabled(available);
+      checkForUpdatesHyperlink.setVisible(available);
+    }
+  }
+
+  private void setCustomSdkUiAvailable(boolean available) {
+    cloudSdkDirectoryField.setEnabled(available);
   }
 
   private class CloudSdkCheckerRunnable implements Runnable {
