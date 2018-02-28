@@ -70,50 +70,6 @@ public class CloudSdkPanel {
     initEvents();
   }
 
-  private void initEvents() {
-    ButtonGroup sdkChoiceGroup = new ButtonGroup();
-    sdkChoiceGroup.add(managedRadioButton);
-    sdkChoiceGroup.add(customRadioButton);
-
-    managedRadioButton.addActionListener(
-        (e) -> {
-          setManagedSdkUiAvailable(true);
-          setCustomSdkUiAvailable(false);
-        });
-
-    customRadioButton.addActionListener(
-        (e) -> {
-          setCustomSdkUiAvailable(true);
-          setManagedSdkUiAvailable(false);
-        });
-
-    cloudSdkDirectoryField.addBrowseFolderListener(
-        GctBundle.message("cloudsdk.location.browse.window.title"),
-        null, /* description */
-        null, /* project */
-        FileChooserDescriptorFactory.createSingleFolderDescriptor());
-
-    cloudSdkDirectoryField
-        .getTextField()
-        .getDocument()
-        .addDocumentListener(
-            new DocumentAdapter() {
-              @Override
-              protected void textChanged(DocumentEvent event) {
-                checkSdkInBackground();
-              }
-            });
-  }
-
-  private void setManagedSdkUiAvailable(boolean available) {
-    enableAutomaticUpdatesCheckbox.setEnabled(available);
-    checkForUpdatesHyperlink.setEnabled(available);
-  }
-
-  private void setCustomSdkUiAvailable(boolean available) {
-    cloudSdkDirectoryField.setEnabled(available);
-  }
-
   @SuppressWarnings("FutureReturnValueIgnored")
   private void checkSdkInBackground() {
     final String path = cloudSdkDirectoryField.getText();
@@ -274,6 +230,25 @@ public class CloudSdkPanel {
     checkForUpdatesHyperlink = new HyperlinkLabel();
     checkForUpdatesHyperlink.setHyperlinkText(
         GctBundle.getString("cloudsdk.check.for.updates.action"));
+  }
+
+  private void initEvents() {
+    ButtonGroup sdkChoiceGroup = new ButtonGroup();
+    sdkChoiceGroup.add(managedRadioButton);
+    sdkChoiceGroup.add(customRadioButton);
+
+    managedRadioButton.addActionListener(
+        (e) -> {
+          setManagedSdkUiAvailable(true);
+          setCustomSdkUiAvailable(false);
+        });
+
+    customRadioButton.addActionListener(
+        (e) -> {
+          setCustomSdkUiAvailable(true);
+          setManagedSdkUiAvailable(false);
+        });
+
     checkForUpdatesHyperlink.addHyperlinkListener(
         new HyperlinkAdapter() {
           @Override
@@ -281,6 +256,32 @@ public class CloudSdkPanel {
             System.out.println("UPDATE NOW!");
           }
         });
+
+    cloudSdkDirectoryField.addBrowseFolderListener(
+        GctBundle.message("cloudsdk.location.browse.window.title"),
+        null, /* description */
+        null, /* project */
+        FileChooserDescriptorFactory.createSingleFolderDescriptor());
+
+    cloudSdkDirectoryField
+        .getTextField()
+        .getDocument()
+        .addDocumentListener(
+            new DocumentAdapter() {
+              @Override
+              protected void textChanged(DocumentEvent event) {
+                checkSdkInBackground();
+              }
+            });
+  }
+
+  private void setManagedSdkUiAvailable(boolean available) {
+    enableAutomaticUpdatesCheckbox.setEnabled(available);
+    checkForUpdatesHyperlink.setVisible(available);
+  }
+
+  private void setCustomSdkUiAvailable(boolean available) {
+    cloudSdkDirectoryField.setEnabled(available);
   }
 
   private class CloudSdkCheckerRunnable implements Runnable {
