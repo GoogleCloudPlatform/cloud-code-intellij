@@ -16,12 +16,15 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
+import com.google.cloud.tools.intellij.GctFeature;
+import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.icons.AllIcons.RunConfigurations;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
@@ -55,6 +58,7 @@ public class CloudSdkPanel {
   private JRadioButton customRadioButton;
   private JCheckBox enableAutomaticUpdatesCheckbox;
   private HyperlinkLabel checkForUpdatesHyperlink;
+  private JPanel managedSdkComponentsPanel;
 
   private static final String CLOUD_SDK_DOWNLOAD_LINK =
       "https://cloud.google.com/sdk/docs/"
@@ -66,6 +70,8 @@ public class CloudSdkPanel {
     warningMessage.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
     warningIcon.setVisible(false);
     warningIcon.setIcon(RunConfigurations.ConfigurationWarning);
+
+    checkManagedSdkFeatureStatus();
 
     initEvents();
   }
@@ -226,6 +232,14 @@ public class CloudSdkPanel {
     return GctBundle.message("cloudsdk.download.message", openTag, "</a>");
   }
 
+  private void checkManagedSdkFeatureStatus() {
+    if (!ServiceManager.getService(PluginInfoService.class).shouldEnable(GctFeature.MANAGED_SDK)) {
+      managedSdkComponentsPanel.setVisible(false);
+      managedRadioButton.setVisible(false);
+      customRadioButton.setSelected(true);
+    }
+  }
+
   private void createUIComponents() {
     checkForUpdatesHyperlink = new HyperlinkLabel();
     checkForUpdatesHyperlink.setHyperlinkText(
@@ -276,8 +290,10 @@ public class CloudSdkPanel {
   }
 
   private void setManagedSdkUiAvailable(boolean available) {
-    enableAutomaticUpdatesCheckbox.setEnabled(available);
-    checkForUpdatesHyperlink.setVisible(available);
+    if (ServiceManager.getService(PluginInfoService.class).shouldEnable(GctFeature.MANAGED_SDK)) {
+      enableAutomaticUpdatesCheckbox.setEnabled(available);
+      checkForUpdatesHyperlink.setVisible(available);
+    }
   }
 
   private void setCustomSdkUiAvailable(boolean available) {
