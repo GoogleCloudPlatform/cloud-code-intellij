@@ -16,8 +16,11 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
+import com.google.cloud.tools.intellij.GctFeature;
+import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.common.base.Strings;
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.openapi.components.ServiceManager;
 import com.sun.istack.NotNull;
 
 /** Stores user settings for {@link CloudSdkService}, including choice of implementation. */
@@ -45,6 +48,11 @@ class CloudSdkServiceUserSettings {
       sdkType = CloudSdkServiceType.valueOf(Strings.nullToEmpty(sdkTypeName));
     } catch (Exception ex) {
       sdkType = DEFAULT_SDK_TYPE;
+    }
+
+    // override result based on feature status until feature is done.
+    if (!ServiceManager.getService(PluginInfoService.class).shouldEnable(GctFeature.MANAGED_SDK)) {
+      sdkType = CloudSdkServiceType.CUSTOM_SDK;
     }
 
     return sdkType;

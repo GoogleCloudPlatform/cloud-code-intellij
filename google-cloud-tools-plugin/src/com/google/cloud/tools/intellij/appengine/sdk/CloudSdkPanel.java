@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.cloud.tools.intellij.GctFeature;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceUserSettings.CloudSdkServiceType;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -64,6 +65,8 @@ public class CloudSdkPanel {
   private static final String CLOUD_SDK_DOWNLOAD_LINK =
       "https://cloud.google.com/sdk/docs/"
           + "#install_the_latest_cloud_tools_version_cloudsdk_current_version";
+
+  private CloudSdkServiceUserSettings.CloudSdkServiceType selectedCloudSdkServiceType;
 
   public CloudSdkPanel() {
     warningMessage.setVisible(false);
@@ -193,14 +196,19 @@ public class CloudSdkPanel {
   }
 
   public void apply() throws ConfigurationException {
-    if (CloudSdkValidator.getInstance()
-        .validateCloudSdk(getCloudSdkDirectoryText())
-        .contains(CloudSdkValidationResult.MALFORMED_PATH)) {
-      throw new ConfigurationException(
-          GctBundle.message("appengine.cloudsdk.location.badchars.message"));
+    if (customRadioButton.isSelected()) {
+      if (CloudSdkValidator.getInstance()
+          .validateCloudSdk(getCloudSdkDirectoryText())
+          .contains(CloudSdkValidationResult.MALFORMED_PATH)) {
+        throw new ConfigurationException(
+            GctBundle.message("appengine.cloudsdk.location.badchars.message"));
+      }
+
+      CloudSdkService.getInstance().setSdkHomePath(getCloudSdkDirectoryText());
     }
 
-    CloudSdkService.getInstance().setSdkHomePath(getCloudSdkDirectoryText());
+    CloudSdkServiceUserSettings.getInstance()
+        .setUserSelectedSdkServiceType(selectedCloudSdkServiceType);
   }
 
   public void reset() {
@@ -262,12 +270,16 @@ public class CloudSdkPanel {
         (e) -> {
           setManagedSdkUiAvailable(true);
           setCustomSdkUiAvailable(false);
+
+          selectedCloudSdkServiceType = CloudSdkServiceType.MANAGED_SDK;
         });
 
     customRadioButton.addActionListener(
         (e) -> {
           setCustomSdkUiAvailable(true);
           setManagedSdkUiAvailable(false);
+
+          selectedCloudSdkServiceType = CloudSdkServiceType.CUSTOM_SDK;
         });
 
     checkForUpdatesHyperlink.addHyperlinkListener(
