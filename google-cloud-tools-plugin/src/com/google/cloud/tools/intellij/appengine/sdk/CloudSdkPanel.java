@@ -77,6 +77,7 @@ public class CloudSdkPanel {
     checkManagedSdkFeatureStatus();
 
     initEvents();
+    initUiState();
   }
 
   @SuppressWarnings("FutureReturnValueIgnored")
@@ -291,6 +292,19 @@ public class CloudSdkPanel {
                 checkSdkInBackground();
               }
             });
+  }
+
+  private void initUiState() {
+    CloudSdkServiceUserSettings.CloudSdkServiceType selectedSdkServiceType =
+        CloudSdkServiceUserSettings.getInstance().getUserSelectedSdkServiceType();
+    switch (selectedSdkServiceType) {
+      case MANAGED_SDK:
+        managedRadioButton.doClick();
+        break;
+      case CUSTOM_SDK:
+        customRadioButton.doClick();
+        break;
+    }
   }
 
   private void setManagedSdkUiAvailable(boolean available) {
