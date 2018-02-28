@@ -66,6 +66,8 @@ public class CloudSdkPanel {
       "https://cloud.google.com/sdk/docs/"
           + "#install_the_latest_cloud_tools_version_cloudsdk_current_version";
 
+  private boolean settingsModified;
+
   private CloudSdkServiceUserSettings.CloudSdkServiceType selectedCloudSdkServiceType;
 
   public CloudSdkPanel() {
@@ -80,7 +82,6 @@ public class CloudSdkPanel {
     checkManagedSdkFeatureStatus();
 
     initEvents();
-    initUiState();
   }
 
   @SuppressWarnings("FutureReturnValueIgnored")
@@ -186,13 +187,7 @@ public class CloudSdkPanel {
   }
 
   public boolean isModified() {
-    CloudSdkService sdkService = CloudSdkService.getInstance();
-
-    String cloudSdkDirectoryFieldValue =
-        getCloudSdkDirectoryText() != null ? getCloudSdkDirectoryText() : "";
-    String currentCloudSdkDirectory =
-        sdkService.getSdkHomePath() != null ? sdkService.getSdkHomePath().toString() : "";
-    return !cloudSdkDirectoryFieldValue.equals(currentCloudSdkDirectory);
+    return settingsModified;
   }
 
   public void apply() throws ConfigurationException {
@@ -209,15 +204,31 @@ public class CloudSdkPanel {
 
     CloudSdkServiceUserSettings.getInstance()
         .setUserSelectedSdkServiceType(selectedCloudSdkServiceType);
+
+    // settings are applied and saved, clear modification status
+    settingsModified = false;
   }
 
   public void reset() {
-    CloudSdkService sdkService = CloudSdkService.getInstance();
+    CloudSdkServiceUserSettings sdkServiceUserSettings = CloudSdkServiceUserSettings.getInstance();
 
-    // TODO(joaomartins): Suggest Cloud SDK location (by resorting to PathResolver) if the path is
-    // empty? Or create a suggest button?
+    CloudSdkServiceUserSettings.CloudSdkServiceType selectedSdkServiceType =
+        sdkServiceUserSettings.getUserSelectedSdkServiceType();
+    switch (selectedSdkServiceType) {
+      case MANAGED_SDK:
+        managedRadioButton.doClick();
+        break;
+      case CUSTOM_SDK:
+        customRadioButton.doClick();
+        break;
+    }
+
+    CloudSdkService sdkService = CloudSdkService.getInstance();
     setCloudSdkDirectoryText(
         sdkService.getSdkHomePath() != null ? sdkService.getSdkHomePath().toString() : "");
+
+    // reset modified flag too so user won't see this as changed state.
+    settingsModified = false;
   }
 
   public String getCloudSdkDirectoryText() {
@@ -272,6 +283,8 @@ public class CloudSdkPanel {
           setCustomSdkUiAvailable(false);
 
           selectedCloudSdkServiceType = CloudSdkServiceType.MANAGED_SDK;
+
+          settingsModified = true;
         });
 
     customRadioButton.addActionListener(
@@ -280,7 +293,11 @@ public class CloudSdkPanel {
           setManagedSdkUiAvailable(false);
 
           selectedCloudSdkServiceType = CloudSdkServiceType.CUSTOM_SDK;
+
+          settingsModified = true;
         });
+
+    enableAutomaticUpdatesCheckbox.addActionListener((e) -> settingsModified = true);
 
     checkForUpdatesHyperlink.addHyperlinkListener(
         new HyperlinkAdapter() {
@@ -301,22 +318,11 @@ public class CloudSdkPanel {
             new DocumentAdapter() {
               @Override
               protected void textChanged(DocumentEvent event) {
+                settingsModified = true;
+
                 checkSdkInBackground();
               }
             });
-  }
-
-  private void initUiState() {
-    CloudSdkServiceUserSettings.CloudSdkServiceType selectedSdkServiceType =
-        CloudSdkServiceUserSettings.getInstance().getUserSelectedSdkServiceType();
-    switch (selectedSdkServiceType) {
-      case MANAGED_SDK:
-        managedRadioButton.doClick();
-        break;
-      case CUSTOM_SDK:
-        customRadioButton.doClick();
-        break;
-    }
   }
 
   private void setManagedSdkUiAvailable(boolean available) {
