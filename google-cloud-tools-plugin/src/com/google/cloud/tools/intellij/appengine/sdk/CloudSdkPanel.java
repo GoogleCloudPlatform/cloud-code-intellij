@@ -27,12 +27,15 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.DocumentAdapter;
+import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.JBColor;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextPane;
 import javax.swing.event.DocumentEvent;
 import org.jetbrains.annotations.NotNull;
@@ -45,6 +48,11 @@ public class CloudSdkPanel {
   private JTextPane warningMessage;
   private JPanel cloudSdkPanel;
   private JLabel warningIcon;
+  private JRadioButton managedRadioButton;
+  private JRadioButton customRadioButton;
+  private JCheckBox checkBox1;
+  private HyperlinkLabel automaticUpdateHyperlink;
+  private JCheckBox enableAutomaticUpdatesCheckbox;
 
   private static final String CLOUD_SDK_DOWNLOAD_LINK =
       "https://cloud.google.com/sdk/docs/"
@@ -58,7 +66,7 @@ public class CloudSdkPanel {
     warningIcon.setIcon(RunConfigurations.ConfigurationWarning);
 
     cloudSdkDirectoryField.addBrowseFolderListener(
-        GctBundle.message("appengine.cloudsdk.location.browse.window.title"),
+        GctBundle.message("cloudsdk.location.browse.window.title"),
         null
         /** description */
         ,
@@ -98,7 +106,7 @@ public class CloudSdkPanel {
 
   public String buildSdkMessage(String path, boolean htmlEnabled) {
     if (StringUtil.isEmpty(path)) {
-      String missingMessage = GctBundle.message("appengine.cloudsdk.location.missing.message");
+      String missingMessage = GctBundle.message("cloudsdk.location.missing.message");
 
       return htmlEnabled ? missingMessage + " " + getCloudSdkDownloadMessage() : missingMessage;
     }
@@ -232,7 +240,7 @@ public class CloudSdkPanel {
 
   private String getCloudSdkDownloadMessage() {
     String openTag = "<a href='" + CLOUD_SDK_DOWNLOAD_LINK + "'>";
-    return GctBundle.message("appengine.cloudsdk.download.message", openTag, "</a>");
+    return GctBundle.message("cloudsdk.download.message", openTag, "</a>");
   }
 
   private class CloudSdkCheckerRunnable implements Runnable {
