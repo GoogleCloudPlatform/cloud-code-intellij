@@ -266,9 +266,7 @@ public class CloudSdkPanel {
     checkForUpdatesHyperlink.addHyperlinkListener(
         new HyperlinkAdapter() {
           @Override
-          protected void hyperlinkActivated(HyperlinkEvent e) {
-            System.out.println("UPDATE NOW!");
-          }
+          protected void hyperlinkActivated(HyperlinkEvent e) {}
         });
 
     cloudSdkDirectoryField.addBrowseFolderListener(
