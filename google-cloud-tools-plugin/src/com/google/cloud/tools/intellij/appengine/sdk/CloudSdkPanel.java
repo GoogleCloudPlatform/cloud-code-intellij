@@ -22,6 +22,7 @@ import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 import com.intellij.icons.AllIcons.RunConfigurations;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
@@ -232,9 +233,7 @@ public class CloudSdkPanel {
         break;
     }
 
-    CloudSdkService sdkService = CloudSdkService.getInstance();
-    setCloudSdkDirectoryText(
-        sdkService.getSdkHomePath() != null ? sdkService.getSdkHomePath().toString() : "");
+    setCloudSdkDirectoryText(Strings.nullToEmpty(sdkServiceUserSettings.getCustomSdkPath()));
 
     enableAutomaticUpdatesCheckbox.setSelected(sdkServiceUserSettings.getEnableAutomaticUpdates());
 

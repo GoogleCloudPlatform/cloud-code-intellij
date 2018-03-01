@@ -29,6 +29,7 @@ import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceUserSettings
 import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
+import com.google.common.base.Strings;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.ConfigurationException;
 import java.util.Collections;
@@ -153,6 +154,36 @@ public class CloudSdkPanelTest {
   }
 
   @Test
+  public void defaultSdkSettings_reset_validUiState() {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              // use non-spy panel as spy messes up with UI event thread field updates.
+              CloudSdkPanel sdkPanel = new CloudSdkPanel();
+              // use built-in defaults.
+              sdkPanel.reset();
+
+              verifySdkPanelStateForCurrentSettings(sdkPanel);
+            });
+  }
+
+  @Test
+  public void customSdkSettings_reset_validUiState() {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              // use non-spy panel as spy messes up with UI event thread field updates.
+              CloudSdkPanel sdkPanel = new CloudSdkPanel();
+              CloudSdkServiceUserSettings userSettings = CloudSdkServiceUserSettings.getInstance();
+              userSettings.setUserSelectedSdkServiceType(CloudSdkServiceType.CUSTOM_SDK);
+              userSettings.setCustomSdkPath("/home/gcloud");
+              sdkPanel.reset();
+
+              verifySdkPanelStateForCurrentSettings(sdkPanel);
+            });
+  }
+
+  @Test
   public void managedSdk_choice_apply_validSettings() {
     ApplicationManager.getApplication()
         .invokeAndWait(
@@ -238,5 +269,30 @@ public class CloudSdkPanelTest {
     assertThat(cloudSdkServiceType).isEqualTo(userSettings.getUserSelectedSdkServiceType());
     assertThat(enableAutomaticUpdates).isEqualTo(userSettings.getEnableAutomaticUpdates());
     assertThat(customSdkPath).isEqualTo(userSettings.getCustomSdkPath());
+  }
+
+  private void verifySdkPanelStateForCurrentSettings(CloudSdkPanel sdkPanel) {
+    CloudSdkServiceUserSettings userSettings = CloudSdkServiceUserSettings.getInstance();
+    switch (userSettings.getUserSelectedSdkServiceType()) {
+      case CUSTOM_SDK:
+        assertThat(sdkPanel.getCustomRadioButton().isSelected()).isTrue();
+
+        assertThat(sdkPanel.getManagedRadioButton().isSelected()).isFalse();
+        assertThat(sdkPanel.getEnableAutomaticUpdatesCheckbox().isEnabled()).isFalse();
+        break;
+      case MANAGED_SDK:
+        assertThat(sdkPanel.getManagedRadioButton().isSelected()).isTrue();
+        assertThat(sdkPanel.getEnableAutomaticUpdatesCheckbox().isEnabled()).isTrue();
+
+        assertThat(sdkPanel.getCustomRadioButton().isSelected()).isFalse();
+        assertThat(sdkPanel.getCloudSdkDirectoryField().isEnabled()).isFalse();
+        break;
+    }
+
+    assertThat(sdkPanel.getEnableAutomaticUpdatesCheckbox().isSelected())
+        .isEqualTo(userSettings.getEnableAutomaticUpdates());
+
+    assertThat(sdkPanel.getCloudSdkDirectoryText())
+        .isEqualTo(Strings.nullToEmpty(userSettings.getCustomSdkPath()));
   }
 }
