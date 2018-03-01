@@ -50,7 +50,6 @@ import org.jetbrains.annotations.NotNull;
 /** Reusable panel for configuring the path to the Cloud SDK from various contexts. */
 @SuppressWarnings("FutureReturnValueIgnored")
 public class CloudSdkPanel {
-  public static final boolean MANAGED_SDK_AUTOMATIC_UPDATES_DEFAULT = true;
 
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
   private JTextPane warningMessage;
@@ -76,8 +75,6 @@ public class CloudSdkPanel {
     warningMessage.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
     warningIcon.setVisible(false);
     warningIcon.setIcon(RunConfigurations.ConfigurationWarning);
-
-    enableAutomaticUpdatesCheckbox.setSelected(MANAGED_SDK_AUTOMATIC_UPDATES_DEFAULT);
 
     checkManagedSdkFeatureStatus();
 
@@ -202,8 +199,10 @@ public class CloudSdkPanel {
       CloudSdkService.getInstance().setSdkHomePath(getCloudSdkDirectoryText());
     }
 
-    CloudSdkServiceUserSettings.getInstance()
-        .setUserSelectedSdkServiceType(selectedCloudSdkServiceType);
+    CloudSdkServiceUserSettings sdkServiceUserSettings = CloudSdkServiceUserSettings.getInstance();
+    sdkServiceUserSettings.setUserSelectedSdkServiceType(selectedCloudSdkServiceType);
+
+    sdkServiceUserSettings.setEnableAutomaticUpdates(enableAutomaticUpdatesCheckbox.isSelected());
 
     // settings are applied and saved, clear modification status
     settingsModified = false;
@@ -226,6 +225,8 @@ public class CloudSdkPanel {
     CloudSdkService sdkService = CloudSdkService.getInstance();
     setCloudSdkDirectoryText(
         sdkService.getSdkHomePath() != null ? sdkService.getSdkHomePath().toString() : "");
+
+    enableAutomaticUpdatesCheckbox.setSelected(sdkServiceUserSettings.getEnableAutomaticUpdates());
 
     // reset modified flag too so user won't see this as changed state.
     settingsModified = false;

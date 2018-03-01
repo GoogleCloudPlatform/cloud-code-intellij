@@ -18,29 +18,34 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
+import com.google.cloud.tools.intellij.GctFeature;
+import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Spy;
 
 /** Tests for {@link CloudSdkPanel}. */
 public class CloudSdkPanelTest {
 
   @Rule public CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
 
-  @Spy private CloudSdkPanel panel;
+  @Mock @TestService private PluginInfoService pluginInfoService;
 
   @Mock @TestService private CloudSdkService cloudSdkService;
   @Mock @TestService private CloudSdkValidator cloudSdkValidator;
+
+  private CloudSdkPanel panel;
 
   private static final String CLOUD_SDK_DOWNLOAD_LINK =
       "<a href='https://cloud.google.com/sdk/docs/"
@@ -50,6 +55,14 @@ public class CloudSdkPanelTest {
       "Cloud SDK home directory is not specified. " + CLOUD_SDK_DOWNLOAD_LINK;
   private static final String INVALID_SDK_DIR_WARNING =
       "No Cloud SDK was found in the specified directory. " + CLOUD_SDK_DOWNLOAD_LINK;
+
+  @Before
+  public void setUp() {
+    // enable managed SDK UI - remove when feature is rolled out.
+    when(pluginInfoService.shouldEnable(GctFeature.MANAGED_SDK)).thenReturn(true);
+    // now safe to create panel spy.
+    panel = spy(new CloudSdkPanel());
+  }
 
   @Test
   public void testCheckSdk_nullSdk() {
@@ -115,6 +128,8 @@ public class CloudSdkPanelTest {
 
   @Test
   public void testApplyWith_invalidSdk() throws Exception {
+    // apply() calls should be preceded with reset()
+    panel.reset();
     setValidateCloudSdkResponse(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
     panel.getCloudSdkDirectoryField().setText("/non/empty/path");
 
