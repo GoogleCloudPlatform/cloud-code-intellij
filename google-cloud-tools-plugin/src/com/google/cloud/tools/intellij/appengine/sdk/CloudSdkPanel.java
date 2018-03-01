@@ -159,13 +159,10 @@ public class CloudSdkPanel {
   @VisibleForTesting
   protected void hideWarning() {
     invokePanelValidationUpdate(
-        new Runnable() {
-          @Override
-          public void run() {
-            cloudSdkDirectoryField.getTextField().setForeground(JBColor.black);
-            warningIcon.setVisible(false);
-            warningMessage.setVisible(false);
-          }
+        () -> {
+          cloudSdkDirectoryField.getTextField().setForeground(JBColor.black);
+          warningIcon.setVisible(false);
+          warningMessage.setVisible(false);
         });
   }
 
@@ -174,13 +171,23 @@ public class CloudSdkPanel {
   }
 
   @VisibleForTesting
-  public TextFieldWithBrowseButton getCloudSdkDirectoryField() {
+  TextFieldWithBrowseButton getCloudSdkDirectoryField() {
     return cloudSdkDirectoryField;
   }
 
   @VisibleForTesting
-  JTextPane getWarningMessage() {
-    return warningMessage;
+  JRadioButton getManagedRadioButton() {
+    return managedRadioButton;
+  }
+
+  @VisibleForTesting
+  JCheckBox getEnableAutomaticUpdatesCheckbox() {
+    return enableAutomaticUpdatesCheckbox;
+  }
+
+  @VisibleForTesting
+  JRadioButton getCustomRadioButton() {
+    return customRadioButton;
   }
 
   public boolean isModified() {
@@ -188,18 +195,21 @@ public class CloudSdkPanel {
   }
 
   public void apply() throws ConfigurationException {
+    CloudSdkServiceUserSettings sdkServiceUserSettings = CloudSdkServiceUserSettings.getInstance();
+
     if (customRadioButton.isSelected()) {
+      String customSdkPathText = getCloudSdkDirectoryText();
       if (CloudSdkValidator.getInstance()
-          .validateCloudSdk(getCloudSdkDirectoryText())
+          .validateCloudSdk(customSdkPathText)
           .contains(CloudSdkValidationResult.MALFORMED_PATH)) {
         throw new ConfigurationException(
             GctBundle.message("appengine.cloudsdk.location.badchars.message"));
       }
 
-      CloudSdkService.getInstance().setSdkHomePath(getCloudSdkDirectoryText());
+      sdkServiceUserSettings.setCustomSdkPath(customSdkPathText);
+      CloudSdkService.getInstance().setSdkHomePath(customSdkPathText);
     }
 
-    CloudSdkServiceUserSettings sdkServiceUserSettings = CloudSdkServiceUserSettings.getInstance();
     sdkServiceUserSettings.setUserSelectedSdkServiceType(selectedCloudSdkServiceType);
 
     sdkServiceUserSettings.setEnableAutomaticUpdates(enableAutomaticUpdatesCheckbox.isSelected());

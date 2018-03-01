@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.cloud.tools.intellij.GctFeature;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.components.ServiceManager;
@@ -28,12 +29,12 @@ class CloudSdkServiceUserSettings {
   private static CloudSdkServiceUserSettings instance;
 
   private static final CloudSdkServiceType DEFAULT_SDK_TYPE = CloudSdkServiceType.MANAGED_SDK;
-  private static final boolean DEFAULT_MANAGED_SDK_AUTOMATIC_UPDATES = true;
+  static final boolean DEFAULT_MANAGED_SDK_AUTOMATIC_UPDATES = true;
 
-  private static final String SDK_TYPE_PROPERTY_NAME = "SDK_TYPE_PROPERTY_NAME";
-  private static final String CLOUD_SDK_PROPERTY_KEY = "GCT_CLOUD_SDK_HOME_PATH";
+  private static final String SDK_TYPE_PROPERTY_NAME = "GCT_CLOUD_SDK_TYPE";
+  private static final String CUSTOM_CLOUD_SDK_PATH_PROPERTY_NAME = "GCT_CLOUD_SDK_HOME_PATH";
   private static final String SDK_AUTOMATIC_UPDATES_PROPERTY_NAME =
-      "SDK_AUTOMATIC_UPDATES_PROPERTY_NAME";
+      "GCT_CLOUD_SDK_AUTOMATIC_UPDATES";
 
   private PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
 
@@ -42,6 +43,13 @@ class CloudSdkServiceUserSettings {
       instance = new CloudSdkServiceUserSettings();
     }
     return instance;
+  }
+
+  @VisibleForTesting
+  static void reset() {
+    getInstance().propertiesComponent.unsetValue(SDK_TYPE_PROPERTY_NAME);
+    getInstance().propertiesComponent.unsetValue(CUSTOM_CLOUD_SDK_PATH_PROPERTY_NAME);
+    getInstance().propertiesComponent.unsetValue(SDK_AUTOMATIC_UPDATES_PROPERTY_NAME);
   }
 
   @NotNull
@@ -72,15 +80,19 @@ class CloudSdkServiceUserSettings {
   }
 
   void setEnableAutomaticUpdates(boolean enableAutomaticUpdates) {
-    propertiesComponent.setValue(SDK_AUTOMATIC_UPDATES_PROPERTY_NAME, enableAutomaticUpdates);
+    propertiesComponent.setValue(
+        SDK_AUTOMATIC_UPDATES_PROPERTY_NAME,
+        enableAutomaticUpdates,
+        DEFAULT_MANAGED_SDK_AUTOMATIC_UPDATES /* need to specify default to avoid removal */);
   }
 
   String getCustomSdkPath() {
-    return propertiesComponent.getValue(CLOUD_SDK_PROPERTY_KEY);
+    return propertiesComponent.getValue(CUSTOM_CLOUD_SDK_PATH_PROPERTY_NAME);
   }
 
   void setCustomSdkPath(String path) {
-    propertiesComponent.setValue(CLOUD_SDK_PROPERTY_KEY, path);
+    propertiesComponent.setValue(
+        CUSTOM_CLOUD_SDK_PATH_PROPERTY_NAME, path, null /* default for path */);
   }
 
   enum CloudSdkServiceType {

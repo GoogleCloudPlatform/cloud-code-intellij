@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.spy;
@@ -24,9 +25,12 @@ import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 import com.google.cloud.tools.intellij.GctFeature;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceUserSettings.CloudSdkServiceType;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.options.ConfigurationException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -62,6 +66,8 @@ public class CloudSdkPanelTest {
     when(pluginInfoService.shouldEnable(GctFeature.MANAGED_SDK)).thenReturn(true);
     // now safe to create panel spy.
     panel = spy(new CloudSdkPanel());
+    // reset SDK settings on each run to clean previous settings.
+    CloudSdkServiceUserSettings.reset();
   }
 
   @Test
@@ -127,19 +133,110 @@ public class CloudSdkPanelTest {
   }
 
   @Test
-  public void testApplyWith_invalidSdk() throws Exception {
-    // apply() calls should be preceded with reset()
-    panel.reset();
-    setValidateCloudSdkResponse(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
-    panel.getCloudSdkDirectoryField().setText("/non/empty/path");
+  public void testApplyWith_invalidSdk() {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              // use non-spy panel as spy messes up with UI event thread field updates.
+              CloudSdkPanel sdkPanel = new CloudSdkPanel();
+              sdkPanel.reset();
+              setValidateCloudSdkResponse(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
+              sdkPanel.getCloudSdkDirectoryField().setText("/non/empty/path");
 
-    // No exception should be thrown on invalid sdk entry from this panel
-    panel.apply();
+              // No exception should be thrown on invalid sdk entry from this panel
+              try {
+                sdkPanel.apply();
+              } catch (ConfigurationException e) {
+                throw new AssertionError(e);
+              }
+            });
+  }
+
+  @Test
+  public void managedSdk_choice_apply_validSettings() {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              // use non-spy panel as spy messes up with UI event thread field updates.
+              CloudSdkPanel sdkPanel = new CloudSdkPanel();
+              sdkPanel.reset();
+              sdkPanel.getManagedRadioButton().doClick();
+
+              try {
+                sdkPanel.apply();
+              } catch (ConfigurationException e) {
+                throw new AssertionError(e);
+              }
+
+              verifyCloudSdkSettings(
+                  CloudSdkServiceType.MANAGED_SDK,
+                  CloudSdkServiceUserSettings.DEFAULT_MANAGED_SDK_AUTOMATIC_UPDATES,
+                  null /* no custom path */);
+            });
+  }
+
+  @Test
+  public void managedSdk_choice_disableAutomaticUpdates_apply_validSettings() {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              // use non-spy panel as spy messes up with UI event thread field updates.
+              CloudSdkPanel sdkPanel = new CloudSdkPanel();
+              sdkPanel.reset();
+              sdkPanel.getManagedRadioButton().doClick();
+              sdkPanel.getEnableAutomaticUpdatesCheckbox().setSelected(false);
+
+              try {
+                sdkPanel.apply();
+              } catch (ConfigurationException e) {
+                throw new AssertionError(e);
+              }
+
+              verifyCloudSdkSettings(
+                  CloudSdkServiceType.MANAGED_SDK,
+                  false, /* no auto-updates */
+                  null /* no custom path */);
+            });
+  }
+
+  @Test
+  public void customSdk_choice_apply_validSettings() {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              // use non-spy panel as spy messes up with UI event thread field updates.
+              CloudSdkPanel sdkPanel = new CloudSdkPanel();
+              sdkPanel.reset();
+              sdkPanel.getCustomRadioButton().doClick();
+              String customSdkPath = "/home/gcloud";
+              sdkPanel.getCloudSdkDirectoryField().setText(customSdkPath);
+
+              try {
+                sdkPanel.apply();
+              } catch (ConfigurationException e) {
+                throw new AssertionError(e);
+              }
+
+              verifyCloudSdkSettings(
+                  CloudSdkServiceType.CUSTOM_SDK,
+                  CloudSdkServiceUserSettings.DEFAULT_MANAGED_SDK_AUTOMATIC_UPDATES,
+                  customSdkPath);
+            });
   }
 
   private void setValidateCloudSdkResponse(CloudSdkValidationResult... results) {
     Set<CloudSdkValidationResult> validationResults = new HashSet<>();
     Collections.addAll(validationResults, results);
     when(cloudSdkValidator.validateCloudSdk(any(String.class))).thenReturn(validationResults);
+  }
+
+  private void verifyCloudSdkSettings(
+      CloudSdkServiceUserSettings.CloudSdkServiceType cloudSdkServiceType,
+      boolean enableAutomaticUpdates,
+      String customSdkPath) {
+    CloudSdkServiceUserSettings userSettings = CloudSdkServiceUserSettings.getInstance();
+    assertThat(cloudSdkServiceType).isEqualTo(userSettings.getUserSelectedSdkServiceType());
+    assertThat(enableAutomaticUpdates).isEqualTo(userSettings.getEnableAutomaticUpdates());
+    assertThat(customSdkPath).isEqualTo(userSettings.getCustomSdkPath());
   }
 }
