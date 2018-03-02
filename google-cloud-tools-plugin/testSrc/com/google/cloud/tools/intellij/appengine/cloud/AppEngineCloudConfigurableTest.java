@@ -71,6 +71,7 @@ public final class AppEngineCloudConfigurableTest {
   @Test
   public void apply_withValidSdkPath_doesSetSdkPath() throws ConfigurationException {
     String sdkPath = "/some/sdk/path";
+    appEngineCloudConfigurable.reset();
     appEngineCloudConfigurable.getCloudSdkPanel().setCloudSdkDirectoryText(sdkPath);
 
     appEngineCloudConfigurable.apply();
@@ -81,6 +82,7 @@ public final class AppEngineCloudConfigurableTest {
   @Test
   public void apply_withInvalidSdkPath_doesSetSdkPath() throws ConfigurationException {
     String sdkPath = "/some/sdk/path";
+    appEngineCloudConfigurable.reset();
     appEngineCloudConfigurable.getCloudSdkPanel().setCloudSdkDirectoryText(sdkPath);
     when(mockCloudSdkValidator.validateCloudSdk(any()))
         .thenReturn(ImmutableSet.of(CLOUD_SDK_NOT_FOUND));

@@ -17,10 +17,12 @@
 package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.cloud.tools.intellij.GctFeature;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceUserSettings.CloudSdkServiceType;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 import com.intellij.icons.AllIcons.RunConfigurations;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
@@ -33,6 +35,7 @@ import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.HyperlinkAdapter;
 import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.UserActivityWatcher;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
@@ -49,7 +52,6 @@ import org.jetbrains.annotations.NotNull;
 /** Reusable panel for configuring the path to the Cloud SDK from various contexts. */
 @SuppressWarnings("FutureReturnValueIgnored")
 public class CloudSdkPanel {
-  public static final boolean MANAGED_SDK_AUTOMATIC_UPDATES_DEFAULT = true;
 
   private TextFieldWithBrowseButton cloudSdkDirectoryField;
   private JTextPane warningMessage;
@@ -65,14 +67,16 @@ public class CloudSdkPanel {
       "https://cloud.google.com/sdk/docs/"
           + "#install_the_latest_cloud_tools_version_cloudsdk_current_version";
 
+  private boolean settingsModified;
+
+  private CloudSdkServiceUserSettings.CloudSdkServiceType selectedCloudSdkServiceType;
+
   public CloudSdkPanel() {
     warningMessage.setVisible(false);
     warningMessage.setBackground(cloudSdkPanel.getBackground());
     warningMessage.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
     warningIcon.setVisible(false);
     warningIcon.setIcon(RunConfigurations.ConfigurationWarning);
-
-    enableAutomaticUpdatesCheckbox.setSelected(MANAGED_SDK_AUTOMATIC_UPDATES_DEFAULT);
 
     checkManagedSdkFeatureStatus();
 
@@ -157,13 +161,10 @@ public class CloudSdkPanel {
   @VisibleForTesting
   protected void hideWarning() {
     invokePanelValidationUpdate(
-        new Runnable() {
-          @Override
-          public void run() {
-            cloudSdkDirectoryField.getTextField().setForeground(JBColor.black);
-            warningIcon.setVisible(false);
-            warningMessage.setVisible(false);
-          }
+        () -> {
+          cloudSdkDirectoryField.getTextField().setForeground(JBColor.black);
+          warningIcon.setVisible(false);
+          warningMessage.setVisible(false);
         });
   }
 
@@ -172,43 +173,73 @@ public class CloudSdkPanel {
   }
 
   @VisibleForTesting
-  public TextFieldWithBrowseButton getCloudSdkDirectoryField() {
+  TextFieldWithBrowseButton getCloudSdkDirectoryField() {
     return cloudSdkDirectoryField;
   }
 
   @VisibleForTesting
-  JTextPane getWarningMessage() {
-    return warningMessage;
+  JRadioButton getManagedRadioButton() {
+    return managedRadioButton;
+  }
+
+  @VisibleForTesting
+  JCheckBox getEnableAutomaticUpdatesCheckbox() {
+    return enableAutomaticUpdatesCheckbox;
+  }
+
+  @VisibleForTesting
+  JRadioButton getCustomRadioButton() {
+    return customRadioButton;
   }
 
   public boolean isModified() {
-    CloudSdkService sdkService = CloudSdkService.getInstance();
-
-    String cloudSdkDirectoryFieldValue =
-        getCloudSdkDirectoryText() != null ? getCloudSdkDirectoryText() : "";
-    String currentCloudSdkDirectory =
-        sdkService.getSdkHomePath() != null ? sdkService.getSdkHomePath().toString() : "";
-    return !cloudSdkDirectoryFieldValue.equals(currentCloudSdkDirectory);
+    return settingsModified;
   }
 
   public void apply() throws ConfigurationException {
-    if (CloudSdkValidator.getInstance()
-        .validateCloudSdk(getCloudSdkDirectoryText())
-        .contains(CloudSdkValidationResult.MALFORMED_PATH)) {
-      throw new ConfigurationException(
-          GctBundle.message("appengine.cloudsdk.location.badchars.message"));
+    CloudSdkServiceUserSettings sdkServiceUserSettings = CloudSdkServiceUserSettings.getInstance();
+
+    if (customRadioButton.isSelected()) {
+      String customSdkPathText = getCloudSdkDirectoryText();
+      if (CloudSdkValidator.getInstance()
+          .validateCloudSdk(customSdkPathText)
+          .contains(CloudSdkValidationResult.MALFORMED_PATH)) {
+        throw new ConfigurationException(
+            GctBundle.message("appengine.cloudsdk.location.badchars.message"));
+      }
+
+      sdkServiceUserSettings.setCustomSdkPath(customSdkPathText);
+      CloudSdkService.getInstance().setSdkHomePath(customSdkPathText);
     }
 
-    CloudSdkService.getInstance().setSdkHomePath(getCloudSdkDirectoryText());
+    sdkServiceUserSettings.setUserSelectedSdkServiceType(selectedCloudSdkServiceType);
+
+    sdkServiceUserSettings.setEnableAutomaticUpdates(enableAutomaticUpdatesCheckbox.isSelected());
+
+    // settings are applied and saved, clear modification status
+    settingsModified = false;
   }
 
   public void reset() {
-    CloudSdkService sdkService = CloudSdkService.getInstance();
+    CloudSdkServiceUserSettings sdkServiceUserSettings = CloudSdkServiceUserSettings.getInstance();
 
-    // TODO(joaomartins): Suggest Cloud SDK location (by resorting to PathResolver) if the path is
-    // empty? Or create a suggest button?
-    setCloudSdkDirectoryText(
-        sdkService.getSdkHomePath() != null ? sdkService.getSdkHomePath().toString() : "");
+    CloudSdkServiceUserSettings.CloudSdkServiceType selectedSdkServiceType =
+        sdkServiceUserSettings.getUserSelectedSdkServiceType();
+    switch (selectedSdkServiceType) {
+      case MANAGED_SDK:
+        managedRadioButton.doClick();
+        break;
+      case CUSTOM_SDK:
+        customRadioButton.doClick();
+        break;
+    }
+
+    setCloudSdkDirectoryText(Strings.nullToEmpty(sdkServiceUserSettings.getCustomSdkPath()));
+
+    enableAutomaticUpdatesCheckbox.setSelected(sdkServiceUserSettings.getEnableAutomaticUpdates());
+
+    // reset modified flag too so user won't see this as changed state.
+    settingsModified = false;
   }
 
   public String getCloudSdkDirectoryText() {
@@ -253,6 +284,11 @@ public class CloudSdkPanel {
   }
 
   private void initEvents() {
+    // track all changes in UI to report settings changes.
+    UserActivityWatcher activityWatcher = new UserActivityWatcher();
+    activityWatcher.register(cloudSdkPanel);
+    activityWatcher.addUserActivityListener(() -> settingsModified = true);
+
     ButtonGroup sdkChoiceGroup = new ButtonGroup();
     sdkChoiceGroup.add(managedRadioButton);
     sdkChoiceGroup.add(customRadioButton);
@@ -261,18 +297,24 @@ public class CloudSdkPanel {
         (e) -> {
           setManagedSdkUiAvailable(true);
           setCustomSdkUiAvailable(false);
+
+          selectedCloudSdkServiceType = CloudSdkServiceType.MANAGED_SDK;
         });
 
     customRadioButton.addActionListener(
         (e) -> {
           setCustomSdkUiAvailable(true);
           setManagedSdkUiAvailable(false);
+
+          selectedCloudSdkServiceType = CloudSdkServiceType.CUSTOM_SDK;
         });
 
     checkForUpdatesHyperlink.addHyperlinkListener(
         new HyperlinkAdapter() {
           @Override
-          protected void hyperlinkActivated(HyperlinkEvent e) {}
+          protected void hyperlinkActivated(HyperlinkEvent e) {
+            // TODO(ivanporty) will call ManagedSdk#update if it's installed and active.
+          }
         });
 
     cloudSdkDirectoryField.addBrowseFolderListener(
