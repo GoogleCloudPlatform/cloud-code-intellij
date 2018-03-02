@@ -35,6 +35,7 @@ import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.HyperlinkAdapter;
 import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.UserActivityWatcher;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
@@ -283,6 +284,11 @@ public class CloudSdkPanel {
   }
 
   private void initEvents() {
+    // track all changes in UI to report settings changes.
+    UserActivityWatcher activityWatcher = new UserActivityWatcher();
+    activityWatcher.register(cloudSdkPanel);
+    activityWatcher.addUserActivityListener(() -> settingsModified = true);
+
     ButtonGroup sdkChoiceGroup = new ButtonGroup();
     sdkChoiceGroup.add(managedRadioButton);
     sdkChoiceGroup.add(customRadioButton);
@@ -293,8 +299,6 @@ public class CloudSdkPanel {
           setCustomSdkUiAvailable(false);
 
           selectedCloudSdkServiceType = CloudSdkServiceType.MANAGED_SDK;
-
-          settingsModified = true;
         });
 
     customRadioButton.addActionListener(
@@ -303,16 +307,14 @@ public class CloudSdkPanel {
           setManagedSdkUiAvailable(false);
 
           selectedCloudSdkServiceType = CloudSdkServiceType.CUSTOM_SDK;
-
-          settingsModified = true;
         });
-
-    enableAutomaticUpdatesCheckbox.addActionListener((e) -> settingsModified = true);
 
     checkForUpdatesHyperlink.addHyperlinkListener(
         new HyperlinkAdapter() {
           @Override
-          protected void hyperlinkActivated(HyperlinkEvent e) {}
+          protected void hyperlinkActivated(HyperlinkEvent e) {
+            // TODO(ivanporty) will call ManagedSdk#update if it's installed and active.
+          }
         });
 
     cloudSdkDirectoryField.addBrowseFolderListener(
@@ -328,8 +330,6 @@ public class CloudSdkPanel {
             new DocumentAdapter() {
               @Override
               protected void textChanged(DocumentEvent event) {
-                settingsModified = true;
-
                 checkSdkInBackground();
               }
             });
