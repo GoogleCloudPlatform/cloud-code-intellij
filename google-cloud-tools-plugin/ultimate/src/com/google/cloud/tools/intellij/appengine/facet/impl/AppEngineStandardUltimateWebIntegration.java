@@ -38,21 +38,25 @@ import com.intellij.javaee.oss.server.JavaeePersistentData;
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.javaee.run.configuration.J2EEConfigurationFactory;
 import com.intellij.javaee.serverInstances.ApplicationServersManager;
+import com.intellij.javaee.web.WebRoot;
 import com.intellij.javaee.web.artifact.WebArtifactUtil;
 import com.intellij.javaee.web.facet.WebFacet;
 import com.intellij.jpa.facet.JpaFacet;
 import com.intellij.jpa.facet.JpaFacetType;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.DependencyScope;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.libraries.Library;
+import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.artifacts.ArtifactType;
 import com.intellij.packaging.impl.run.BuildArtifactsBeforeRunTaskProvider;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.descriptors.ConfigFile;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -61,6 +65,7 @@ import org.jetbrains.annotations.Nullable;
 /** @author nik */
 public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWebIntegration {
 
+  private static final Logger LOG = Logger.getInstance(AppEngineStandardUltimateWebIntegration.class);
   private static final FrameworkRole JAVA_PROJECT_ROLE = new FrameworkRole("JAVA_MODULE");
   private static final FrameworkRole JAVA_EE_PROJECT_ROLE = JavaeeProjectCategory.ROLE;
 
@@ -73,20 +78,45 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
   @Override
   public VirtualFile suggestParentDirectoryForAppEngineWebXml(
       @NotNull Module module, @NotNull ModifiableRootModel rootModel) {
-    VirtualFile webXmlParent = getWebXmlParent(module);
-    if (webXmlParent == null) {
-      return super.suggestParentDirectoryForAppEngineWebXml(module, rootModel);
+    final WebFacet webFacet = ContainerUtil.getFirstItem(WebFacet.getInstances(module));
+    if (webFacet != null) {
+      VirtualFile webXmlParent = getWebXmlParent(webFacet);
+      if (webXmlParent != null) {
+        return webXmlParent;
+      }
+
+      VirtualFile webInfPath = getWebInfPath(webFacet);
+      if (webInfPath != null) {
+        return webInfPath;
+      }
     }
 
-    return webXmlParent;
+    return super.suggestParentDirectoryForAppEngineWebXml(module, rootModel);
   }
 
-  private VirtualFile getWebXmlParent(@NotNull Module module) {
-    final WebFacet webFacet = ContainerUtil.getFirstItem(WebFacet.getInstances(module));
-    if (webFacet == null) {
+  private VirtualFile getWebInfPath(@NotNull WebFacet webFacet) {
+    List<WebRoot> webRoots = webFacet.getWebRoots();
+    if (webRoots.isEmpty()) {
       return null;
     }
 
+    for (WebRoot webRoot : webRoots) {
+      VirtualFile webInfFolder = webRoot.getFile().findChild("WEB-INF");
+      if (webInfFolder != null) {
+        return webInfFolder;
+      }
+    }
+
+    try {
+      return VfsUtil.createDirectoryIfMissing(webRoots.get(0).getFile(), "WEB-INF");
+    } catch (IOException ioe) {
+      LOG.info(ioe);
+      return null;
+    }
+  }
+
+
+  private VirtualFile getWebXmlParent(@NotNull WebFacet webFacet) {
     ConfigFile configFile = webFacet.getWebXmlDescriptor();
     if (configFile == null) {
       return null;
