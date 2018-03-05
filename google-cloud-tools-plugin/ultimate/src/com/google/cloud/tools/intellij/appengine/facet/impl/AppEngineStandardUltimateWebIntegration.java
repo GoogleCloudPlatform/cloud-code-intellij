@@ -59,13 +59,15 @@ import com.intellij.util.descriptors.ConfigFile;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** @author nik */
 public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWebIntegration {
 
-  private static final Logger LOG = Logger.getInstance(AppEngineStandardUltimateWebIntegration.class);
+  private static final Logger LOG =
+      Logger.getInstance(AppEngineStandardUltimateWebIntegration.class);
   private static final FrameworkRole JAVA_PROJECT_ROLE = new FrameworkRole("JAVA_MODULE");
   private static final FrameworkRole JAVA_EE_PROJECT_ROLE = JavaeeProjectCategory.ROLE;
 
@@ -99,12 +101,18 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
     if (webRoots.isEmpty()) {
       return null;
     }
+    
+    Optional<WebRoot> result =
+        webRoots
+            .stream()
+            .filter(
+                webRoot ->
+                    webRoot.getFile().getPath().endsWith("/WEB-INF")
+                        || webRoot.getFile().findChild("WEB-INF") != null)
+            .findFirst();
 
-    for (WebRoot webRoot : webRoots) {
-      VirtualFile webInfFolder = webRoot.getFile().findChild("WEB-INF");
-      if (webInfFolder != null) {
-        return webInfFolder;
-      }
+    if (result.isPresent()) {
+      return result.get().getFile();
     }
 
     try {
@@ -114,7 +122,6 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
       return null;
     }
   }
-
 
   private VirtualFile getWebXmlParent(@NotNull WebFacet webFacet) {
     ConfigFile configFile = webFacet.getWebXmlDescriptor();
