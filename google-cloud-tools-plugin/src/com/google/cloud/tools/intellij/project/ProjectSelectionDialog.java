@@ -205,8 +205,12 @@ public class ProjectSelectionDialog {
               SwingUtilities.invokeLater(
                   () -> {
                     runningProjectLoaderJobs.remove(user);
+                    // validation message should not be null, use exception name if needed.
+                    String errorMessage =
+                        Optional.ofNullable(throwable.getMessage())
+                            .orElse(throwable.getClass().getName());
                     dialogWrapper.setErrorInfoAll(
-                        Collections.singletonList(new ValidationInfo(throwable.getMessage())));
+                        Collections.singletonList(new ValidationInfo(errorMessage)));
                     refreshProjectListUi(user);
                   });
             }
