@@ -59,7 +59,6 @@ import com.intellij.util.descriptors.ConfigFile;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -102,17 +101,16 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
       return null;
     }
 
-    Optional<WebRoot> result =
-        webRoots
-            .stream()
-            .filter(
-                webRoot ->
-                    webRoot.getFile().getPath().endsWith("/WEB-INF")
-                        || webRoot.getFile().findChild("WEB-INF") != null)
-            .findFirst();
+    for (WebRoot webRoot : webRoots) {
+      VirtualFile parent = webRoot.getFile();
+      if (parent.getPath().endsWith("/WEB-INF")) {
+        return parent;
+      }
 
-    if (result.isPresent()) {
-      return result.get().getFile();
+      VirtualFile child = parent.findChild("WEB-INF");
+      if (child != null) {
+        return child;
+      }
     }
 
     try {
@@ -245,7 +243,7 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
   @NotNull
   @Override
   public String getDefaultAppEngineWebXmlPath() {
-    return "web/WEB-INF";
+    return "src/main/webapp/WEB-INF";
   }
 
   @Override
