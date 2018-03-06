@@ -30,9 +30,8 @@ public class CloudSdkServiceManager {
   }
 
   public CloudSdkService getCloudSdkService() {
-    CloudSdkServiceType currentSdkServiceType =
-        CloudSdkServiceUserSettings.getInstance().getUserSelectedSdkServiceType();
-    return supportedCloudSdkServices.get(currentSdkServiceType);
+    return supportedCloudSdkServices.get(
+        CloudSdkServiceUserSettings.getInstance().getUserSelectedSdkServiceType());
   }
 
   /** Callback when a user selected and applied a new cloud sdk type. */
