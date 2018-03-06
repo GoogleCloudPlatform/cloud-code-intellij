@@ -78,11 +78,6 @@ public class ManagedCloudSdkService implements CloudSdkService {
   }
 
   @Override
-  public void setSdkHomePath(String path) {
-    /* unsupported, to be removed. */
-  }
-
-  @Override
   public SdkStatus getStatus() {
     return sdkStatus;
   }

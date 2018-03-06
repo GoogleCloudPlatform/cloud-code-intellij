@@ -208,7 +208,6 @@ public class CloudSdkPanel {
       }
 
       sdkServiceUserSettings.setCustomSdkPath(customSdkPathText);
-      CloudSdkService.getInstance().setSdkHomePath(customSdkPathText);
     }
 
     CloudSdkServiceType previousSdkType = sdkServiceUserSettings.getUserSelectedSdkServiceType();

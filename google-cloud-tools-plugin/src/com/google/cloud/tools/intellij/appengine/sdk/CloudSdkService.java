@@ -34,10 +34,6 @@ public interface CloudSdkService {
   @Nullable
   Path getSdkHomePath();
 
-  /* TODO(ivanporty) to be removed from common interface, only applies for custom sdk service.*/
-  @Deprecated
-  void setSdkHomePath(String path);
-
   SdkStatus getStatus();
 
   /**

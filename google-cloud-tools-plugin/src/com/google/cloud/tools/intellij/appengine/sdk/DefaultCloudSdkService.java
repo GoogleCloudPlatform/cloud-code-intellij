@@ -60,11 +60,6 @@ public class DefaultCloudSdkService implements CloudSdkService {
   }
 
   @Override
-  public void setSdkHomePath(String cloudSdkHomePath) {
-    CloudSdkServiceUserSettings.getInstance().setCustomSdkPath(cloudSdkHomePath);
-  }
-
-  @Override
   public SdkStatus getStatus() {
     String sdkPath = CloudSdkServiceUserSettings.getInstance().getCustomSdkPath();
     if (Strings.isNullOrEmpty(sdkPath)) {

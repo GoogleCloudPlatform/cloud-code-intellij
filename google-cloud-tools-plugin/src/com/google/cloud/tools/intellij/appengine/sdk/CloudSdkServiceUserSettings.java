@@ -25,7 +25,7 @@ import com.intellij.openapi.components.ServiceManager;
 import com.sun.istack.NotNull;
 
 /** Stores user settings for {@link CloudSdkService}, including choice of implementation. */
-class CloudSdkServiceUserSettings {
+public class CloudSdkServiceUserSettings {
   private static CloudSdkServiceUserSettings instance;
 
   private static final CloudSdkServiceType DEFAULT_SDK_TYPE = CloudSdkServiceType.MANAGED_SDK;
@@ -38,7 +38,7 @@ class CloudSdkServiceUserSettings {
 
   private PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
 
-  static CloudSdkServiceUserSettings getInstance() {
+  public static CloudSdkServiceUserSettings getInstance() {
     if (instance == null) {
       instance = new CloudSdkServiceUserSettings();
     }
@@ -86,11 +86,12 @@ class CloudSdkServiceUserSettings {
         DEFAULT_MANAGED_SDK_AUTOMATIC_UPDATES /* need to specify default to avoid removal */);
   }
 
-  String getCustomSdkPath() {
+  @VisibleForTesting
+  public String getCustomSdkPath() {
     return propertiesComponent.getValue(CUSTOM_CLOUD_SDK_PATH_PROPERTY_NAME);
   }
 
-  void setCustomSdkPath(String path) {
+  public void setCustomSdkPath(String path) {
     propertiesComponent.setValue(
         CUSTOM_CLOUD_SDK_PATH_PROPERTY_NAME, path, null /* default for path */);
   }

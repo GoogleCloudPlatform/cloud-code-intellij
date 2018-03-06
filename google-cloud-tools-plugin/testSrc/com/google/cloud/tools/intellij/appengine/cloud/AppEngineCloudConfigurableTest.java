@@ -19,10 +19,11 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 import static com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND;
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceUserSettings;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
@@ -43,6 +44,7 @@ public final class AppEngineCloudConfigurableTest {
 
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
 
+  @Mock @TestService private CloudSdkServiceManager mockCloudSdkServiceManager;
   @Mock @TestService private CloudSdkService mockCloudSdkService;
 
   @Mock @TestService private CloudSdkValidator mockCloudSdkValidator;
@@ -56,6 +58,8 @@ public final class AppEngineCloudConfigurableTest {
 
   @Test
   public void reset_withSdkPath_doesSetFieldText() {
+    when(mockCloudSdkServiceManager.getCloudSdkService()).thenReturn(mockCloudSdkService);
+
     Path sdkPath = Paths.get("/some/sdk/path");
     when(mockCloudSdkService.getSdkHomePath()).thenReturn(sdkPath);
 
@@ -76,7 +80,7 @@ public final class AppEngineCloudConfigurableTest {
 
     appEngineCloudConfigurable.apply();
 
-    verify(mockCloudSdkService).setSdkHomePath(sdkPath);
+    assertThat(CloudSdkServiceUserSettings.getInstance().getCustomSdkPath()).isEqualTo(sdkPath);
   }
 
   @Test
@@ -89,6 +93,6 @@ public final class AppEngineCloudConfigurableTest {
 
     appEngineCloudConfigurable.apply();
 
-    verify(mockCloudSdkService).setSdkHomePath(sdkPath);
+    assertThat(CloudSdkServiceUserSettings.getInstance().getCustomSdkPath()).isEqualTo(sdkPath);
   }
 }
