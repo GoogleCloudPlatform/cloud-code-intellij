@@ -101,7 +101,7 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
     if (webRoots.isEmpty()) {
       return null;
     }
-    
+
     Optional<WebRoot> result =
         webRoots
             .stream()
