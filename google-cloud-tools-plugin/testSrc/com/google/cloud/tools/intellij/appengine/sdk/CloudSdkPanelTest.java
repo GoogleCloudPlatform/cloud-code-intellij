@@ -46,7 +46,8 @@ public class CloudSdkPanelTest {
 
   @Mock @TestService private PluginInfoService pluginInfoService;
 
-  @Mock @TestService private CloudSdkService cloudSdkService;
+  @Mock private CloudSdkService mockCloudSdkService;
+  @Mock @TestService private CloudSdkServiceManager mockCloudSdkServiceManager;
   @Mock @TestService private CloudSdkValidator cloudSdkValidator;
 
   private CloudSdkPanel panel;
@@ -62,6 +63,7 @@ public class CloudSdkPanelTest {
 
   @Before
   public void setUp() {
+    when(mockCloudSdkServiceManager.getCloudSdkService()).thenReturn(mockCloudSdkService);
     // enable managed SDK UI - remove when feature is rolled out.
     when(pluginInfoService.shouldEnable(GctFeature.MANAGED_SDK)).thenReturn(true);
     // now safe to create panel spy.

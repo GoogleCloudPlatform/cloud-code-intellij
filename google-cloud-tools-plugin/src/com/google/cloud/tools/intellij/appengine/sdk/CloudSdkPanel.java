@@ -211,6 +211,12 @@ public class CloudSdkPanel {
       CloudSdkService.getInstance().setSdkHomePath(customSdkPathText);
     }
 
+    CloudSdkServiceType previousSdkType = sdkServiceUserSettings.getUserSelectedSdkServiceType();
+    if (previousSdkType != selectedCloudSdkServiceType) {
+      // notify SDK manager about changed selection
+      ServiceManager.getService(CloudSdkServiceManager.class)
+          .onNewCloudSdkServiceTypeSelected(selectedCloudSdkServiceType);
+    }
     sdkServiceUserSettings.setUserSelectedSdkServiceType(selectedCloudSdkServiceType);
 
     sdkServiceUserSettings.setEnableAutomaticUpdates(enableAutomaticUpdatesCheckbox.isSelected());
