@@ -256,6 +256,31 @@ public class CloudSdkPanelTest {
             });
   }
 
+  @Test
+  public void changeSdkType_apply_callsChangedSdkTypeCallback() {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              // use non-spy panel as spy messes up with UI event thread field updates.
+              CloudSdkPanel sdkPanel = new CloudSdkPanel();
+              CloudSdkServiceUserSettings.getInstance()
+                  .setUserSelectedSdkServiceType(CloudSdkServiceType.MANAGED_SDK);
+              sdkPanel.reset();
+              sdkPanel.getCustomRadioButton().doClick();
+              String customSdkPath = "/home/gcloud";
+              sdkPanel.getCloudSdkDirectoryField().setText(customSdkPath);
+
+              try {
+                sdkPanel.apply();
+              } catch (ConfigurationException e) {
+                throw new AssertionError(e);
+              }
+
+              verify(mockCloudSdkServiceManager)
+                  .onNewCloudSdkServiceTypeSelected(CloudSdkServiceType.CUSTOM_SDK);
+            });
+  }
+
   private void setValidateCloudSdkResponse(CloudSdkValidationResult... results) {
     Set<CloudSdkValidationResult> validationResults = new HashSet<>();
     Collections.addAll(validationResults, results);
