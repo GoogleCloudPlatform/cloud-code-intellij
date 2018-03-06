@@ -94,9 +94,4 @@ class CloudSdkServiceUserSettings {
     propertiesComponent.setValue(
         CUSTOM_CLOUD_SDK_PATH_PROPERTY_NAME, path, null /* default for path */);
   }
-
-  enum CloudSdkServiceType {
-    MANAGED_SDK,
-    CUSTOM_SDK
-  }
 }

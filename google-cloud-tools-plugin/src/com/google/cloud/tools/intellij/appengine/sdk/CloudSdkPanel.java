@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.cloud.tools.intellij.GctFeature;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceUserSettings.CloudSdkServiceType;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -69,7 +68,7 @@ public class CloudSdkPanel {
 
   private boolean settingsModified;
 
-  private CloudSdkServiceUserSettings.CloudSdkServiceType selectedCloudSdkServiceType;
+  private CloudSdkServiceType selectedCloudSdkServiceType;
 
   public CloudSdkPanel() {
     warningMessage.setVisible(false);
@@ -223,7 +222,7 @@ public class CloudSdkPanel {
   public void reset() {
     CloudSdkServiceUserSettings sdkServiceUserSettings = CloudSdkServiceUserSettings.getInstance();
 
-    CloudSdkServiceUserSettings.CloudSdkServiceType selectedSdkServiceType =
+    CloudSdkServiceType selectedSdkServiceType =
         sdkServiceUserSettings.getUserSelectedSdkServiceType();
     switch (selectedSdkServiceType) {
       case MANAGED_SDK:

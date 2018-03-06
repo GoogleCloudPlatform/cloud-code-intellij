@@ -25,7 +25,6 @@ import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 import com.google.cloud.tools.intellij.GctFeature;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceUserSettings.CloudSdkServiceType;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
@@ -262,7 +261,7 @@ public class CloudSdkPanelTest {
   }
 
   private void verifyCloudSdkSettings(
-      CloudSdkServiceUserSettings.CloudSdkServiceType cloudSdkServiceType,
+      CloudSdkServiceType cloudSdkServiceType,
       boolean enableAutomaticUpdates,
       String customSdkPath) {
     CloudSdkServiceUserSettings userSettings = CloudSdkServiceUserSettings.getInstance();
