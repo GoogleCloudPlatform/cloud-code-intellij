@@ -36,6 +36,16 @@ public class CloudSdkServiceManager {
 
   /** Callback when a user selected and applied a new cloud sdk type. */
   public void onNewCloudSdkServiceTypeSelected(CloudSdkServiceType newServiceType) {
-    supportedCloudSdkServices.get(newServiceType).activate();
+    if (supportedCloudSdkServices.containsKey(newServiceType)) {
+      supportedCloudSdkServices.get(newServiceType).activate();
+    } else {
+      throw new UnsupportedCloudSdkTypeException(newServiceType.name());
+    }
+  }
+
+  private static class UnsupportedCloudSdkTypeException extends RuntimeException {
+    private UnsupportedCloudSdkTypeException(String message) {
+      super(message);
+    }
   }
 }
