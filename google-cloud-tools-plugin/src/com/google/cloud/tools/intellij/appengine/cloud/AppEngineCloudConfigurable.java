@@ -16,12 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
-import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.options.Configurable;
-import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.remoteServer.RemoteServerConfigurable;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -39,7 +36,6 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
   private String displayName = GctBundle.message("appengine.name");
   private JPanel mainPanel;
   private JTextPane appEngineMoreInfoLabel;
-  private CloudSdkPanel cloudSdkPanel;
 
   /** Initialize the UI. */
   public AppEngineCloudConfigurable() {
@@ -69,18 +65,14 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
 
   @Override
   public boolean isModified() {
-    return cloudSdkPanel.isModified();
+    return false;
   }
 
   @Override
-  public void apply() throws ConfigurationException {
-    cloudSdkPanel.apply();
-  }
+  public void apply() {}
 
   @Override
-  public void reset() {
-    cloudSdkPanel.reset();
-  }
+  public void reset() {}
 
   /**
    * We don't need to test the connection if we know the cloud SDK, user, and project ID are valid.
@@ -88,14 +80,5 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
   @Override
   public boolean canCheckConnection() {
     return false;
-  }
-
-  @VisibleForTesting
-  CloudSdkPanel getCloudSdkPanel() {
-    return cloudSdkPanel;
-  }
-
-  private void createUIComponents() {
-    cloudSdkPanel = new CloudSdkPanel();
   }
 }
