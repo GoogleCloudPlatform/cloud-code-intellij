@@ -34,14 +34,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import org.jetbrains.annotations.NotNull;
 
+/** Tests for {@link AppEngineStandardUltimateWebIntegration}. */
 public class AppEngineStandardUltimateWebIntegrationTest extends PlatformTestCase {
   private AppEngineStandardUltimateWebIntegration webIntegration;
   private Module mockModule;
   private ModifiableRootModel mockModifiableRootModel;
   private WebFacet mockWebFacet;
   private ConfigFile mockConfigFile;
-  private VirtualFile mockWebXmlDir;
-  private VirtualFile mockWebXml;
   private FacetManager mockFacetManager;
   private WebRoot mockWebRoot;
   private VirtualFile mockVirtualFile1;
@@ -56,8 +55,6 @@ public class AppEngineStandardUltimateWebIntegrationTest extends PlatformTestCas
     mockModifiableRootModel = mock(ModifiableRootModel.class);
     mockWebFacet = mock(WebFacet.class);
     mockConfigFile = mock(ConfigFile.class);
-    mockWebXmlDir = mock(VirtualFile.class);
-    mockWebXml = mock(VirtualFile.class);
     mockFacetManager = mock(FacetManager.class);
     mockWebRoot = mock(WebRoot.class);
     mockVirtualFile1 = mock(VirtualFile.class);
@@ -69,15 +66,15 @@ public class AppEngineStandardUltimateWebIntegrationTest extends PlatformTestCas
   }
 
   public void testSuggestParentDirectoryForAppEngineWebXml_withWebXml() throws IOException {
-    when(mockWebXml.getParent()).thenReturn(mockWebXmlDir);
-    when(mockConfigFile.getVirtualFile()).thenReturn(mockWebXml);
+    when(mockVirtualFile2.getParent()).thenReturn(mockVirtualFile1);
+    when(mockConfigFile.getVirtualFile()).thenReturn(mockVirtualFile2);
     when(mockWebFacet.getWebXmlDescriptor()).thenReturn(mockConfigFile);
     when(mockFacetManager.getFacetsByType(WebFacet.ID))
         .thenReturn(Collections.singletonList(mockWebFacet));
     when(mockModule.getComponent(FacetManager.class)).thenReturn(mockFacetManager);
 
     VirtualFile suggestedDirectory = runSuggestParentDirectoryForAppEngineWebXml();
-    assertEquals(mockWebXmlDir, suggestedDirectory);
+    assertEquals(mockVirtualFile1, suggestedDirectory);
   }
 
   public void testSuggestParentDirectoryForAppEngineWebXml_noWebXml_noWebInfFolder()

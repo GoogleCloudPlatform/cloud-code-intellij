@@ -28,6 +28,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.PlatformTestCase;
 import org.jetbrains.annotations.NotNull;
 
+/** Tests for {@link AppEngineStandardCommunityWebIntegration}. */
 public class AppEngineStandardCommunityWebIntegrationTest extends PlatformTestCase {
   private AppEngineStandardCommunityWebIntegration webIntegration;
   private Module mockModule;
@@ -40,6 +41,10 @@ public class AppEngineStandardCommunityWebIntegrationTest extends PlatformTestCa
     webIntegration = new AppEngineStandardCommunityWebIntegration();
     mockModule = mock(Module.class);
     mockModifiableRootModel = mock(ModifiableRootModel.class);
+  }
+
+  public void testGetDefaultAppEngineWebXmlPath() {
+    assertEquals(webIntegration.getDefaultAppEngineWebXmlPath(), "WEB-INF");
   }
 
   public void testSuggestParentDirectoryForAppEngineWebXml() {
