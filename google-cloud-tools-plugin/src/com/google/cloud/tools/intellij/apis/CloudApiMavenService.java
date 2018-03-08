@@ -43,8 +43,8 @@ public class CloudApiMavenService {
   /**
    * Returns the available Google Cloud Java client library BOM versions from Maven Central.
    *
-   * @param limit the n latest BOM versions to return
-   * @return returns the {@link Version versions} of the BOMs.
+   * @param limit the number of results to the n latest BOM versions
+   * @return returns the {@link Version versions} of the BOMs
    */
   List<Version> getBomVersions(int limit) {
     List<RemoteRepository> remoteRepositories =
