@@ -250,7 +250,7 @@ public final class GoogleCloudApiSelectorPanelTest {
   }
 
   @Test
-  public void getPanel_withAvailableBomVersions_populatesBomVersions() {
+  public void getPanel_withAvailableBomVersions_populatesBomVersionsInReverseOrder() {
     // TODO (eshaul): remove once feature is released
     when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
 
@@ -267,9 +267,9 @@ public final class GoogleCloudApiSelectorPanelTest {
     assertThat(panel.getBomComboBox().isVisible()).isTrue();
     assertThat(bomComboBox.getItemCount()).isEqualTo(3);
 
-    assertThat(bomComboBox.getItemAt(0).toString()).isEqualTo("v0");
+    assertThat(bomComboBox.getItemAt(0).toString()).isEqualTo("v2");
     assertThat(bomComboBox.getItemAt(1).toString()).isEqualTo("v1");
-    assertThat(bomComboBox.getItemAt(2).toString()).isEqualTo("v2");
+    assertThat(bomComboBox.getItemAt(2).toString()).isEqualTo("v0");
   }
 
   @Test
@@ -650,13 +650,13 @@ public final class GoogleCloudApiSelectorPanelTest {
   private static class TestVersion implements Version {
     private final String name;
 
-    public TestVersion(String name) {
+    TestVersion(String name) {
       this.name = name;
     }
 
     @Override
-    public int compareTo(@NotNull Version o) {
-      return 0;
+    public int compareTo(@NotNull Version that) {
+      return this.toString().compareTo(that.toString());
     }
 
     @Override
