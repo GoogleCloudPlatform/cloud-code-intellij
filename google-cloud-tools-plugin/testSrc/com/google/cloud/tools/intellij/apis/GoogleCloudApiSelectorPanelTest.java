@@ -265,9 +265,9 @@ public final class GoogleCloudApiSelectorPanelTest {
     assertThat(panel.getBomComboBox().isVisible()).isTrue();
     assertThat(bomComboBox.getItemCount()).isEqualTo(3);
 
-    for (int i = 0; i < bomComboBox.getItemCount(); i++) {
-      assertThat(bomComboBox.getItemAt(i).toString()).isEqualTo("v" + i);
-    }
+    assertThat(bomComboBox.getItemAt(0).toString()).isEqualTo("v0");
+    assertThat(bomComboBox.getItemAt(1).toString()).isEqualTo("v1");
+    assertThat(bomComboBox.getItemAt(2).toString()).isEqualTo("v2");
   }
 
   @Test
