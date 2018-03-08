@@ -24,6 +24,7 @@ import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.intellij.application.options.ModulesComboBox;
 import com.intellij.openapi.application.ApplicationManager;
@@ -252,15 +253,24 @@ final class GoogleCloudApiSelectorPanel {
   /**
    * Populates the BOM {@link JComboBox} with the fetched versions. If there are no versions
    * returned, then the BOM UX is hidden.
+   *
+   * <p>Sorts the displayable versions in reverse order, and limits the number shown to some value
+   * N.
    */
   // TODO (eshaul): make async with loader icons
   private void populateBomVersions() {
     List<Version> bomVersions =
-        CloudApiMavenService.getInstance().getBomVersions(NUM_BOM_VERSIONS_TO_SHOW);
+        Lists.newArrayList(CloudApiMavenService.getInstance().getBomVersions());
 
     if (bomVersions.isEmpty()) {
       hideBomUI();
     } else {
+      bomVersions.sort(Comparator.reverseOrder());
+
+      if (bomVersions.size() > NUM_BOM_VERSIONS_TO_SHOW) {
+        bomVersions = bomVersions.subList(0, NUM_BOM_VERSIONS_TO_SHOW);
+      }
+
       bomVersions.forEach(bomComboBox::addItem);
     }
   }

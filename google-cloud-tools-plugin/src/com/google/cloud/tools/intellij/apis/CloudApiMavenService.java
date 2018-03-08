@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableList;
 import com.intellij.jarRepository.JarRepositoryManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
-import java.util.Comparator;
 import java.util.List;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.version.Version;
@@ -43,10 +42,9 @@ public class CloudApiMavenService {
   /**
    * Returns the available Google Cloud Java client library BOM versions from Maven Central.
    *
-   * @param limit the number of results to the n latest BOM versions
    * @return returns the {@link Version versions} of the BOMs
    */
-  List<Version> getBomVersions(int limit) {
+  List<Version> getBomVersions() {
     List<RemoteRepository> remoteRepositories =
         ImmutableList.of(ArtifactRepositoryManager.MAVEN_CENTRAL_REPOSITORY);
     ArtifactRepositoryManager repositoryManager =
@@ -56,16 +54,11 @@ public class CloudApiMavenService {
             ProgressConsumer.DEAF);
 
     try {
-      List<Version> availableVersions =
-          repositoryManager.getAvailableVersions(
-              GOOGLE_CLOUD_JAVA_BOM_GROUP_NAME,
-              GOOGLE_CLOUD_JAVA_BOM_ARTIFACT_NAME,
-              GOOGLE_CLOUD_JAVA_BOM_VERSION_CONSTRAINT,
-              ArtifactKind.ARTIFACT);
-
-      availableVersions.sort(Comparator.reverseOrder());
-
-      return availableVersions.subList(0, limit);
+      return repositoryManager.getAvailableVersions(
+          GOOGLE_CLOUD_JAVA_BOM_GROUP_NAME,
+          GOOGLE_CLOUD_JAVA_BOM_ARTIFACT_NAME,
+          GOOGLE_CLOUD_JAVA_BOM_VERSION_CONSTRAINT,
+          ArtifactKind.ARTIFACT);
     } catch (Exception e) {
       logger.warn("Error fetching available BOM versions from Maven Central", e);
       return ImmutableList.of();

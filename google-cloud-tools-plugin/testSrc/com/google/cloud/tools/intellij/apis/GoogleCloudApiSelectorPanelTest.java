@@ -41,6 +41,7 @@ import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -51,6 +52,7 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
 import org.eclipse.aether.version.Version;
+import org.fest.util.Lists;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Rule;
 import org.junit.Test;
@@ -252,7 +254,7 @@ public final class GoogleCloudApiSelectorPanelTest {
     // TODO (eshaul): remove once feature is released
     when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
 
-    when(mavenService.getBomVersions(anyInt()))
+    when(mavenService.getBomVersions())
         .thenReturn(
             ImmutableList.of(newTestVersion("v0"), newTestVersion("v1"), newTestVersion("v2")));
 
@@ -271,11 +273,29 @@ public final class GoogleCloudApiSelectorPanelTest {
   }
 
   @Test
+  public void getPanel_withManyAvailableBomVersions_limitsNumBomVersions() {
+    // TODO (eshaul): remove once feature is released
+    when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
+
+    List<Version> versions = Lists.newArrayList();
+    for (int i = 0; i < 20; i++) {
+      versions.add(newTestVersion("v" + i));
+    }
+
+    when(mavenService.getBomVersions()).thenReturn(versions);
+
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
+
+    assertThat(panel.getBomComboBox().getItemCount()).isEqualTo(5);
+  }
+
+  @Test
   public void getPanel_withNoAvailableBomVersions_hidesBomUi() {
     // TODO (eshaul): remove once feature is released
     when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
 
-    when(mavenService.getBomVersions(anyInt())).thenReturn(ImmutableList.of());
+    when(mavenService.getBomVersions()).thenReturn(ImmutableList.of());
 
     GoogleCloudApiSelectorPanel panel =
         new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
