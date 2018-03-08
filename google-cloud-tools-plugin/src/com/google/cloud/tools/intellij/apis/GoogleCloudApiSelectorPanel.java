@@ -112,7 +112,6 @@ final class GoogleCloudApiSelectorPanel {
     if (!ServiceManager.getService(PluginInfoService.class).shouldEnable(GctFeature.BOM)) {
       hideBomUI();
     } else {
-      // populate it
       populateBomVersions();
     }
   }
