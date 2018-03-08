@@ -23,8 +23,9 @@ import org.jetbrains.annotations.Nullable;
 /** IntelliJ configured service for providing the path to the Cloud SDK. */
 public interface CloudSdkService {
 
+  /** Shortcut for getting currently active implementation of {@link CloudSdkService}. */
   static CloudSdkService getInstance() {
-    return ServiceManager.getService(CloudSdkService.class);
+    return ServiceManager.getService(CloudSdkServiceManager.class).getCloudSdkService();
   }
 
   /** Called when this service becomes primary choice for serving Cloud SDK. */
@@ -32,10 +33,6 @@ public interface CloudSdkService {
 
   @Nullable
   Path getSdkHomePath();
-
-  /* TODO(ivanporty) to be removed from common interface, only applies for custom sdk service.*/
-  @Deprecated
-  void setSdkHomePath(String path);
 
   SdkStatus getStatus();
 

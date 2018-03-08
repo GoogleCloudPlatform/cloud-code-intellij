@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
@@ -66,6 +67,8 @@ public class CloudSdkAppEngineHelperTest {
   @Mock private GoogleLoginState loginState;
   @Mock private LoggingHandler loggingHandler;
   @Mock private DeploymentOperationCallback callback;
+
+  @TestService @Mock private CloudSdkServiceManager mockCloudSdkServiceManager;
   @TestService @Mock private CloudSdkService sdkService;
   @TestService @Mock private CloudSdkValidator cloudSdkValidator;
   @Mock private DeploymentSource undeployableDeploymentSource;
@@ -73,6 +76,8 @@ public class CloudSdkAppEngineHelperTest {
   @Before
   public void initialize() {
     helper = new CloudSdkAppEngineHelper(testFixture.getProject());
+
+    when(mockCloudSdkServiceManager.getCloudSdkService()).thenReturn(sdkService);
   }
 
   @Test

@@ -25,7 +25,6 @@ import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 import com.google.cloud.tools.intellij.GctFeature;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceUserSettings.CloudSdkServiceType;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
@@ -47,7 +46,8 @@ public class CloudSdkPanelTest {
 
   @Mock @TestService private PluginInfoService pluginInfoService;
 
-  @Mock @TestService private CloudSdkService cloudSdkService;
+  @Mock private CloudSdkService mockCloudSdkService;
+  @Mock @TestService private CloudSdkServiceManager mockCloudSdkServiceManager;
   @Mock @TestService private CloudSdkValidator cloudSdkValidator;
 
   private CloudSdkPanel panel;
@@ -63,6 +63,7 @@ public class CloudSdkPanelTest {
 
   @Before
   public void setUp() {
+    when(mockCloudSdkServiceManager.getCloudSdkService()).thenReturn(mockCloudSdkService);
     // enable managed SDK UI - remove when feature is rolled out.
     when(pluginInfoService.shouldEnable(GctFeature.MANAGED_SDK)).thenReturn(true);
     // now safe to create panel spy.
@@ -255,6 +256,31 @@ public class CloudSdkPanelTest {
             });
   }
 
+  @Test
+  public void changeSdkType_apply_callsChangedSdkTypeCallback() {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              // use non-spy panel as spy messes up with UI event thread field updates.
+              CloudSdkPanel sdkPanel = new CloudSdkPanel();
+              CloudSdkServiceUserSettings.getInstance()
+                  .setUserSelectedSdkServiceType(CloudSdkServiceType.MANAGED_SDK);
+              sdkPanel.reset();
+              sdkPanel.getCustomRadioButton().doClick();
+              String customSdkPath = "/home/gcloud";
+              sdkPanel.getCloudSdkDirectoryField().setText(customSdkPath);
+
+              try {
+                sdkPanel.apply();
+              } catch (ConfigurationException e) {
+                throw new AssertionError(e);
+              }
+
+              verify(mockCloudSdkServiceManager)
+                  .onNewCloudSdkServiceTypeSelected(CloudSdkServiceType.CUSTOM_SDK);
+            });
+  }
+
   private void setValidateCloudSdkResponse(CloudSdkValidationResult... results) {
     Set<CloudSdkValidationResult> validationResults = new HashSet<>();
     Collections.addAll(validationResults, results);
@@ -262,7 +288,7 @@ public class CloudSdkPanelTest {
   }
 
   private void verifyCloudSdkSettings(
-      CloudSdkServiceUserSettings.CloudSdkServiceType cloudSdkServiceType,
+      CloudSdkServiceType cloudSdkServiceType,
       boolean enableAutomaticUpdates,
       String customSdkPath) {
     CloudSdkServiceUserSettings userSettings = CloudSdkServiceUserSettings.getInstance();

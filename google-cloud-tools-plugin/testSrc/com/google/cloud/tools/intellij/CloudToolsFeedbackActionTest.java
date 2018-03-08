@@ -22,6 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestFile;
 import com.google.cloud.tools.intellij.testing.TestService;
@@ -41,6 +42,7 @@ public final class CloudToolsFeedbackActionTest {
 
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
 
+  @Mock @TestService private CloudSdkServiceManager mockCloudSdkServiceManager;
   @Mock @TestService private CloudSdkService sdkService;
   @Mock @TestService private BrowserLauncher browserLauncher;
 
@@ -50,7 +52,8 @@ public final class CloudToolsFeedbackActionTest {
   private CloudToolsFeedbackAction feedbackAction;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
+    when(mockCloudSdkServiceManager.getCloudSdkService()).thenReturn(sdkService);
     feedbackAction = new CloudToolsFeedbackAction();
   }
 
