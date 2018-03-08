@@ -20,8 +20,10 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.GctFeature;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
+import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.google.cloud.tools.intellij.testing.TestModule;
@@ -109,6 +111,7 @@ public final class GoogleCloudApiSelectorPanelTest {
 
   @TestFixture private IdeaProjectTestFixture testFixture;
 
+  @Mock @TestService private PluginInfoService pluginInfoService;
   @Mock @TestService CloudApiMavenService mavenService;
 
   @Test
@@ -246,6 +249,9 @@ public final class GoogleCloudApiSelectorPanelTest {
 
   @Test
   public void getPanel_withAvailableBomVersions_populatesBomVersions() {
+    // TODO (eshaul): remove once feature is released
+    when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
+
     when(mavenService.getBomVersions(anyInt()))
         .thenReturn(
             ImmutableList.of(newTestVersion("v0"), newTestVersion("v1"), newTestVersion("v2")));
@@ -266,6 +272,9 @@ public final class GoogleCloudApiSelectorPanelTest {
 
   @Test
   public void getPanel_withNoAvailableBomVersions_hidesBomUi() {
+    // TODO (eshaul): remove once feature is released
+    when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
+
     when(mavenService.getBomVersions(anyInt())).thenReturn(ImmutableList.of());
 
     GoogleCloudApiSelectorPanel panel =
