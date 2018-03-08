@@ -109,10 +109,10 @@ final class GoogleCloudApiSelectorPanel {
 
     projectSelector.loadActiveCloudProject();
 
-    if (!ServiceManager.getService(PluginInfoService.class).shouldEnable(GctFeature.BOM)) {
-      hideBomUI();
-    } else {
+    if (ServiceManager.getService(PluginInfoService.class).shouldEnable(GctFeature.BOM)) {
       populateBomVersions();
+    } else {
+      hideBomUI();
     }
   }
 
