@@ -21,7 +21,6 @@ import com.intellij.javaee.appServerIntegrations.ApplicationServerHelper;
 import com.intellij.javaee.appServerIntegrations.ApplicationServerInfo;
 import com.intellij.javaee.appServerIntegrations.ApplicationServerPersistentData;
 import com.intellij.javaee.appServerIntegrations.ApplicationServerPersistentDataEditor;
-import com.intellij.javaee.appServerIntegrations.CantFindApplicationServerJarsException;
 import com.intellij.javaee.oss.server.JavaeePersistentData;
 import java.io.File;
 import javax.swing.JComponent;
@@ -33,8 +32,7 @@ public class AppEngineServerHelper implements ApplicationServerHelper {
 
   @Override
   public ApplicationServerInfo getApplicationServerInfo(
-      ApplicationServerPersistentData persistentData)
-      throws CantFindApplicationServerJarsException {
+      ApplicationServerPersistentData persistentData) {
     return new ApplicationServerInfo(
         new File[] {}, GctBundle.getString("appengine.run.server.name"));
   }

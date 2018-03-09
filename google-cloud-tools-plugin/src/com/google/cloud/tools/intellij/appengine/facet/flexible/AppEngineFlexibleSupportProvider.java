@@ -24,11 +24,6 @@ import com.google.cloud.tools.intellij.appengine.cloud.AppEngineServerConfigurat
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceUserSettings;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
@@ -169,7 +164,6 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
   static class AppEngineFlexibleSupportConfigurable extends FrameworkSupportInModuleConfigurable {
 
     private JPanel mainPanel;
-    private CloudSdkPanel cloudSdkPanel;
     private JCheckBox generateConfigurationFilesCheckBox;
 
     @Nullable
@@ -196,15 +190,6 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       } else {
         addAppEngineFlexibleSupport(rootModel, facet);
       }
-
-      CloudSdkService sdkService = CloudSdkService.getInstance();
-      CloudSdkValidator sdkValidator = CloudSdkValidator.getInstance();
-      if (!sdkValidator
-          .validateCloudSdk(cloudSdkPanel.getCloudSdkDirectoryText())
-          .contains(CloudSdkValidationResult.MALFORMED_PATH)) {
-        CloudSdkServiceUserSettings.getInstance()
-            .setCustomSdkPath(cloudSdkPanel.getCloudSdkDirectoryText());
-      }
     }
 
     @VisibleForTesting
@@ -212,11 +197,6 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
         @NotNull ModifiableRootModel rootModel, AppEngineFlexibleFacet facet) {
       AppEngineFlexibleSupportProvider.addSupport(
           facet, rootModel, generateConfigurationFilesCheckBox.isSelected());
-    }
-
-    private void createUIComponents() {
-      cloudSdkPanel = new CloudSdkPanel();
-      cloudSdkPanel.reset();
     }
   }
 }
