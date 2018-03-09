@@ -23,9 +23,6 @@ import com.intellij.javaee.appServerIntegrations.ApplicationServerPersistentData
 import com.intellij.javaee.appServerIntegrations.ApplicationServerPersistentDataEditor;
 import com.intellij.javaee.oss.server.JavaeePersistentData;
 import java.io.File;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import org.jetbrains.annotations.NotNull;
 
 /** @author nik */
 public class AppEngineServerHelper implements ApplicationServerHelper {
@@ -44,18 +41,6 @@ public class AppEngineServerHelper implements ApplicationServerHelper {
 
   @Override
   public ApplicationServerPersistentDataEditor createConfigurable() {
-    return new ApplicationServerPersistentDataEditor<ApplicationServerPersistentData>() {
-      @Override
-      protected void resetEditorFrom(ApplicationServerPersistentData data) {}
-
-      @Override
-      protected void applyEditorTo(ApplicationServerPersistentData data) {}
-
-      @NotNull
-      @Override
-      protected JComponent createEditor() {
-        return new JPanel();
-      }
-    };
+    return null;
   }
 }
