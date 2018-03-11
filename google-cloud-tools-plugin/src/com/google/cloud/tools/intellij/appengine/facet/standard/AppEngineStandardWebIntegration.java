@@ -63,7 +63,7 @@ public abstract class AppEngineStandardWebIntegration {
 
   @NotNull
   public abstract List<FrameworkSupportInModuleProvider.FrameworkDependency>
-  getAppEngineFrameworkDependencies();
+      getAppEngineFrameworkDependencies();
 
   @Nullable
   public abstract String getUnderlyingFrameworkTypeId();

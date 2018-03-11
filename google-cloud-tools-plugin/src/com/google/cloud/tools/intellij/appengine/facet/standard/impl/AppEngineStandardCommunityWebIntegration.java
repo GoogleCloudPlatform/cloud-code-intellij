@@ -96,8 +96,8 @@ public class AppEngineStandardCommunityWebIntegration extends AppEngineStandardW
         PackagingElementFactory.getInstance().createLibraryElements(library)) {
       final String dir =
           element
-              .getFilesKind(artifactManager.getResolvingContext())
-              .containsDirectoriesWithClasses()
+                  .getFilesKind(artifactManager.getResolvingContext())
+                  .containsDirectoriesWithClasses()
               ? "classes"
               : "lib";
       artifactManager.addElementsToDirectory(artifact, "WEB-INF/" + dir, element);
@@ -117,7 +117,7 @@ public class AppEngineStandardCommunityWebIntegration extends AppEngineStandardW
   @Override
   @NotNull
   public List<FrameworkSupportInModuleProvider.FrameworkDependency>
-  getAppEngineFrameworkDependencies() {
+      getAppEngineFrameworkDependencies() {
     return Collections.emptyList();
   }
 }
