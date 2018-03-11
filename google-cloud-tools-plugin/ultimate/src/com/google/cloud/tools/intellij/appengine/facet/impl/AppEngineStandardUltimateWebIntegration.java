@@ -86,13 +86,10 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
         return webXmlParent;
       }
 
-      VirtualFile webInfPath = getWebInfPath(webFacet);
-      if (webInfPath != null) {
-        return webInfPath;
-      }
+      return getWebInfPath(webFacet);
     }
 
-    return super.suggestParentDirectoryForAppEngineWebXml(module, rootModel);
+    return null;
   }
 
   private VirtualFile getWebInfPath(@NotNull WebFacet webFacet) {
@@ -238,12 +235,6 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
       FrameworkSupportModel model, AppEngineStandardFacet appEngineStandardFacet) {
     JavaeeFrameworkSupportInfoCollector.getOrCreateCollector(model)
         .setFacet(AppEngineStandardFacetType.ID, appEngineStandardFacet);
-  }
-
-  @NotNull
-  @Override
-  public String getDefaultAppEngineWebXmlPath() {
-    return "src/main/webapp/WEB-INF";
   }
 
   @Override

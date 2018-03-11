@@ -29,12 +29,10 @@ import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
 import com.intellij.ide.util.frameworkSupport.FrameworkRole;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel;
 import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.libraries.Library;
-import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.artifacts.ArtifactType;
@@ -44,42 +42,28 @@ import com.intellij.remoteServer.configuration.RemoteServersManager;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerConfigurationType;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerConfigurationTypesRegistrar;
 import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerRunConfiguration;
-import com.intellij.util.ArrayUtil;
 import com.intellij.util.containers.ContainerUtil;
-import java.io.IOException;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** @author nik */
 public abstract class AppEngineStandardWebIntegration {
-  private static final Logger LOG = Logger.getInstance(AppEngineStandardWebIntegration.class);
 
   public static AppEngineStandardWebIntegration getInstance() {
     return ServiceManager.getService(AppEngineStandardWebIntegration.class);
   }
 
   @Nullable
-  public VirtualFile suggestParentDirectoryForAppEngineWebXml(
-      @NotNull Module module, @NotNull ModifiableRootModel rootModel) {
-    final VirtualFile root = ArrayUtil.getFirstElement(rootModel.getContentRoots());
-    if (root != null) {
-      try {
-        return VfsUtil.createDirectoryIfMissing(root, getDefaultAppEngineWebXmlPath());
-      } catch (IOException ioe) {
-        LOG.info(ioe);
-        return null;
-      }
-    }
-    return null;
-  }
+  public abstract VirtualFile suggestParentDirectoryForAppEngineWebXml(
+      @NotNull Module module, @NotNull ModifiableRootModel rootModel);
 
   @NotNull
   public abstract ArtifactType getAppEngineWebArtifactType();
 
   @NotNull
   public abstract List<FrameworkSupportInModuleProvider.FrameworkDependency>
-      getAppEngineFrameworkDependencies();
+  getAppEngineFrameworkDependencies();
 
   @Nullable
   public abstract String getUnderlyingFrameworkTypeId();
@@ -111,9 +95,6 @@ public abstract class AppEngineStandardWebIntegration {
 
   public void registerFrameworkInModel(
       FrameworkSupportModel model, AppEngineStandardFacet appEngineStandardFacet) {}
-
-  @NotNull
-  public abstract String getDefaultAppEngineWebXmlPath();
 
   private void setupDeployRunConfiguration(@NotNull Module module) {
     RunManager runManager = RunManager.getInstance(module.getProject());
