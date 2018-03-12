@@ -43,10 +43,6 @@ public class AppEngineStandardCommunityWebIntegrationTest extends PlatformTestCa
     mockModifiableRootModel = mock(ModifiableRootModel.class);
   }
 
-  public void testGetDefaultAppEngineWebXmlPath() {
-    assertEquals(webIntegration.getDefaultAppEngineWebXmlPath(), "WEB-INF");
-  }
-
   public void testSuggestParentDirectoryForAppEngineWebXml() {
     Project project = getProject();
     VirtualFile baseDir = project.getBaseDir();
