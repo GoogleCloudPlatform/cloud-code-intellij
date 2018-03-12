@@ -55,7 +55,6 @@ import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.artifacts.ArtifactType;
 import com.intellij.packaging.impl.run.BuildArtifactsBeforeRunTaskProvider;
 import com.intellij.util.containers.ContainerUtil;
-import com.intellij.util.descriptors.ConfigFile;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -69,6 +68,7 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
       Logger.getInstance(AppEngineStandardUltimateWebIntegration.class);
   private static final FrameworkRole JAVA_PROJECT_ROLE = new FrameworkRole("JAVA_MODULE");
   private static final FrameworkRole JAVA_EE_PROJECT_ROLE = JavaeeProjectCategory.ROLE;
+  private static final String WEB_INF = "WEB-INF";
 
   @NotNull
   @Override
@@ -76,23 +76,20 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
     return WebArtifactUtil.getInstance().getExplodedWarArtifactType();
   }
 
+  /**
+   * Returns the first WEB-INF folder determined in this order or null if none can be found. 1. If a
+   * WEB-INF folder exists as one of {@code module}'s web resource directories, returns the first
+   * one 2. If a WEB-INF folder is a child of one or more of the web resource directories, returns
+   * the first one 3. Creates a WEB-INF folder in the first web resource directory
+   */
   @Override
   public VirtualFile suggestParentDirectoryForAppEngineWebXml(
       @NotNull Module module, @NotNull ModifiableRootModel rootModel) {
     final WebFacet webFacet = ContainerUtil.getFirstItem(WebFacet.getInstances(module));
-    if (webFacet != null) {
-      VirtualFile webXmlParent = getWebXmlParent(webFacet);
-      if (webXmlParent != null) {
-        return webXmlParent;
-      }
-
-      return getWebInfPath(webFacet);
+    if (webFacet == null) {
+      return null;
     }
 
-    return null;
-  }
-
-  private VirtualFile getWebInfPath(@NotNull WebFacet webFacet) {
     List<WebRoot> webRoots = webFacet.getWebRoots();
     if (webRoots.isEmpty()) {
       return null;
@@ -100,36 +97,22 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
 
     for (WebRoot webRoot : webRoots) {
       VirtualFile parent = webRoot.getFile();
-      if (parent.getPath().endsWith("/WEB-INF")) {
+      if (parent.getName().equals(WEB_INF)) {
         return parent;
       }
 
-      VirtualFile child = parent.findChild("WEB-INF");
+      VirtualFile child = parent.findChild(WEB_INF);
       if (child != null) {
         return child;
       }
     }
 
     try {
-      return VfsUtil.createDirectoryIfMissing(webRoots.get(0).getFile(), "WEB-INF");
+      return VfsUtil.createDirectoryIfMissing(webRoots.get(0).getFile(), WEB_INF);
     } catch (IOException ioe) {
       LOG.info(ioe);
       return null;
     }
-  }
-
-  private VirtualFile getWebXmlParent(@NotNull WebFacet webFacet) {
-    ConfigFile configFile = webFacet.getWebXmlDescriptor();
-    if (configFile == null) {
-      return null;
-    }
-
-    final VirtualFile webXml = configFile.getVirtualFile();
-    if (webXml == null) {
-      return null;
-    }
-
-    return webXml.getParent();
   }
 
   @Override
