@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
+import com.google.cloud.tools.intellij.ui.FontUtils;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.options.Configurable;
@@ -47,6 +48,7 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
         GctBundle.message("appengine.more.info", MORE_INFO_URI_OPEN_TAG, MORE_INFO_URI_CLOSE_TAG));
     appEngineMoreInfoLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
     appEngineMoreInfoLabel.setBackground(mainPanel.getBackground());
+    FontUtils.convertStyledDocumentFontToDefault(appEngineMoreInfoLabel.getStyledDocument());
   }
 
   @Nls
