@@ -21,6 +21,7 @@ import com.intellij.jarRepository.JarRepositoryManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import java.util.List;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.version.Version;
 import org.jetbrains.idea.maven.aether.ArtifactKind;
 import org.jetbrains.idea.maven.aether.ArtifactRepositoryManager;
@@ -34,6 +35,9 @@ public class CloudApiMavenService {
   private static final String GOOGLE_CLOUD_JAVA_BOM_ARTIFACT_NAME = "google-cloud-bom";
   private static final String GOOGLE_CLOUD_JAVA_BOM_VERSION_CONSTRAINT = "[0,)";
 
+  private static final RemoteRepository MAVEN_CENTRAL_REPOSITORY =
+      ArtifactRepositoryManager.createRemoteRepository("central", "http://repo1.maven.org/maven2/");
+
   static CloudApiMavenService getInstance() {
     return ServiceManager.getService(CloudApiMavenService.class);
   }
@@ -46,7 +50,9 @@ public class CloudApiMavenService {
   List<Version> getBomVersions() {
     ArtifactRepositoryManager repositoryManager =
         new ArtifactRepositoryManager(
-            JarRepositoryManager.getLocalRepositoryPath(), ProgressConsumer.DEAF);
+            JarRepositoryManager.getLocalRepositoryPath(),
+            ImmutableList.of(MAVEN_CENTRAL_REPOSITORY),
+            ProgressConsumer.DEAF);
 
     try {
       return repositoryManager.getAvailableVersions(
