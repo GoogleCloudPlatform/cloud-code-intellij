@@ -34,14 +34,15 @@ public class FontUtils {
    * @param styledDocument {@link StyledDocument} to update, see {@link javax.swing.JTextPane}
    */
   public static void convertStyledDocumentFontToDefault(StyledDocument styledDocument) {
-    for (int ch = 0; ch < styledDocument.getLength(); ch++) {
-      AttributeSet defaultStyle = styledDocument.getCharacterElement(ch).getAttributes();
+    for (int i = 0; i < styledDocument.getLength(); i++) {
+      AttributeSet defaultStyle = styledDocument.getCharacterElement(i).getAttributes();
       MutableAttributeSet updatedFontAttrbutes = new SimpleAttributeSet(defaultStyle);
       Font defaultFont = UIManager.getFont("Label.font");
       StyleConstants.setFontFamily(updatedFontAttrbutes, defaultFont.getFamily());
       StyleConstants.setFontSize(updatedFontAttrbutes, defaultFont.getSize());
 
-      styledDocument.setCharacterAttributes(ch, 1, updatedFontAttrbutes, true);
+      styledDocument.setCharacterAttributes(
+          i, 1 /* apply for 1 char only */, updatedFontAttrbutes, true /*replace old style.*/);
     }
   }
 }
