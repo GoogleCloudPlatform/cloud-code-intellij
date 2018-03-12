@@ -21,7 +21,6 @@ import com.intellij.jarRepository.JarRepositoryManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import java.util.List;
-import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.version.Version;
 import org.jetbrains.idea.maven.aether.ArtifactKind;
 import org.jetbrains.idea.maven.aether.ArtifactRepositoryManager;
@@ -45,13 +44,9 @@ public class CloudApiMavenService {
    * @return returns the {@link Version versions} of the BOMs
    */
   List<Version> getBomVersions() {
-    List<RemoteRepository> remoteRepositories =
-        ImmutableList.of(ArtifactRepositoryManager.MAVEN_CENTRAL_REPOSITORY);
     ArtifactRepositoryManager repositoryManager =
         new ArtifactRepositoryManager(
-            JarRepositoryManager.getLocalRepositoryPath(),
-            remoteRepositories,
-            ProgressConsumer.DEAF);
+            JarRepositoryManager.getLocalRepositoryPath(), ProgressConsumer.DEAF);
 
     try {
       return repositoryManager.getAvailableVersions(
