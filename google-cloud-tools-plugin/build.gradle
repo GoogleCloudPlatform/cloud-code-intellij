@@ -23,9 +23,8 @@ sourceSets.test.resources.srcDirs = ['testResources', 'testData']
 apply plugin: 'org.jetbrains.intellij'
 
 intellij {
-
     pluginName = 'google-cloud-tools'
-    plugins 'Groovy', 'gradle', 'git4idea', 'properties', 'junit', 'maven', 'yaml'
+    plugins 'gradle', 'git4idea', 'properties', 'junit', 'maven', 'yaml'
 }
 
 publishPlugin {
