@@ -25,18 +25,13 @@ import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.intellij.facet.FacetManager;
 import com.intellij.javaee.web.WebRoot;
 import com.intellij.javaee.web.facet.WebFacet;
-import com.intellij.openapi.application.Result;
-import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.util.descriptors.ConfigFile;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,29 +45,16 @@ public class AppEngineStandardUltimateWebIntegrationTest {
   @Mock private Module mockModule;
   @Mock private ModifiableRootModel mockModifiableRootModel;
   @Mock private WebFacet mockWebFacet;
-  @Mock private ConfigFile mockConfigFile;
   @Mock private FacetManager mockFacetManager;
   @Mock private WebRoot mockWebRoot;
   @Mock private VirtualFile mockVirtualFile1;
   @Mock private VirtualFile mockVirtualFile2;
   @Mock private VirtualFile mockVirtualFile3;
   private List<WebRoot> webRoots = new ArrayList<>();
-  private String virtualFile1Name = "someName";
 
   @Before
   public void setUp() throws Exception {
-    /**
     webIntegration = new AppEngineStandardUltimateWebIntegration();
-    mockModule = mock(Module.class);
-    mockModifiableRootModel = mock(ModifiableRootModel.class);
-    mockWebFacet = mock(WebFacet.class);
-    mockConfigFile = mock(ConfigFile.class);
-    mockFacetManager = mock(FacetManager.class);
-    mockWebRoot = mock(WebRoot.class);
-    mockVirtualFile1 = mock(VirtualFile.class);
-    mockVirtualFile2 = mock(VirtualFile.class);
-    mockVirtualFile3 = mock(VirtualFile.class);**/
-
     webRoots.add(mockWebRoot);
 
     when(mockVirtualFile1.createChildDirectory(
@@ -80,7 +62,7 @@ public class AppEngineStandardUltimateWebIntegrationTest {
         .thenReturn(mockVirtualFile3);
     when(mockVirtualFile1.findChild(AppEngineStandardUltimateWebIntegration.WEB_INF))
         .thenReturn(mockVirtualFile2);
-    when(mockVirtualFile1.getName()).thenReturn(virtualFile1Name);
+    when(mockVirtualFile1.getName()).thenReturn("someName");
     when(mockWebRoot.getFile()).thenReturn(mockVirtualFile1);
     when(mockWebFacet.getWebRoots()).thenReturn(webRoots);
     when(mockFacetManager.getFacetsByType(WebFacet.ID))
@@ -89,62 +71,41 @@ public class AppEngineStandardUltimateWebIntegrationTest {
   }
 
   @Test
-  public void testSuggestParentDirectoryForAppEngineWebXml_noWebResourceDir() throws IOException {
+  public void testSuggestParentDirectoryForAppEngineWebXml_noWebResourceDir() {
     webRoots.clear();
 
-    assertNull(runSuggestParentDirectoryForAppEngineWebXml());
+    VirtualFile suggestedDirectory =
+        webIntegration.suggestParentDirectoryForAppEngineWebXml(
+            mockModule, mockModifiableRootModel);
+    assertNull(suggestedDirectory);
   }
 
   @Test
-  public void testSuggestParentDirectoryForAppEngineWebXml_noWebInfInResourceDir()
-      throws IOException {
-    mockVirtualFile2 = null;
+  public void testSuggestParentDirectoryForAppEngineWebXml_noWebInfFolderInResourceDir() {
+    when(mockVirtualFile1.findChild(AppEngineStandardUltimateWebIntegration.WEB_INF))
+        .thenReturn(null);
 
-    VirtualFile suggestedDirectory = runSuggestParentDirectoryForAppEngineWebXml();
+    VirtualFile suggestedDirectory =
+        webIntegration.suggestParentDirectoryForAppEngineWebXml(
+            mockModule, mockModifiableRootModel);
     assertEquals(mockVirtualFile3, suggestedDirectory);
   }
 
-  public void xtestSuggestParentDirectoryForAppEngineWebXml_withWebInfFolderAsResourceDir()
-      throws IOException {
-    //String webInfPath = getProject().getBasePath() + "/a/b/c/WEB-INF";
-    //when(mockVirtualFile1.getPath()).thenReturn(webInfPath);
-    when(mockWebRoot.getFile()).thenReturn(mockVirtualFile1);
-    when(mockWebFacet.getWebRoots()).thenReturn(Collections.singletonList(mockWebRoot));
-    when(mockWebFacet.getWebXmlDescriptor()).thenReturn(null);
-    when(mockFacetManager.getFacetsByType(WebFacet.ID))
-        .thenReturn(Collections.singletonList(mockWebFacet));
-    when(mockModule.getComponent(FacetManager.class)).thenReturn(mockFacetManager);
-
-    VirtualFile suggestedDirectory = runSuggestParentDirectoryForAppEngineWebXml();
-    //assertEquals(webInfPath, suggestedDirectory.getPath());
-  }
-
-  public void xtestSuggestParentDirectoryForAppEngineWebXml_withWebInfFolderInResourceDir()
-      throws IOException {
-    final String baseDir = "";//getProject().getBaseDir().getPath();
-    when(mockVirtualFile1.findChild("WEB-INF")).thenReturn(mockVirtualFile2);
-    when(mockVirtualFile1.getPath()).thenReturn(baseDir + "/a/b/c");
-    when(mockWebRoot.getFile()).thenReturn(mockVirtualFile1);
-    when(mockWebFacet.getWebRoots()).thenReturn(Collections.singletonList(mockWebRoot));
-    when(mockWebFacet.getWebXmlDescriptor()).thenReturn(null);
-    when(mockFacetManager.getFacetsByType(WebFacet.ID))
-        .thenReturn(Collections.singletonList(mockWebFacet));
-    when(mockModule.getComponent(FacetManager.class)).thenReturn(mockFacetManager);
-
-    VirtualFile suggestedDirectory = runSuggestParentDirectoryForAppEngineWebXml();
+  @Test
+  public void testSuggestParentDirectoryForAppEngineWebXml_withWebInfFolderInResourceDir() {
+    VirtualFile suggestedDirectory =
+        webIntegration.suggestParentDirectoryForAppEngineWebXml(
+            mockModule, mockModifiableRootModel);
     assertEquals(mockVirtualFile2, suggestedDirectory);
   }
 
-  private VirtualFile runSuggestParentDirectoryForAppEngineWebXml() {
-    Object resultObject =
-        new WriteAction() {
-          @Override
-          protected void run(@NotNull Result result) throws Throwable {
-            result.setResult(
-                webIntegration.suggestParentDirectoryForAppEngineWebXml(
-                    mockModule, mockModifiableRootModel));
-          }
-        }.execute().getResultObject();
-    return (VirtualFile) resultObject;
+  @Test
+  public void testSuggestParentDirectoryForAppEngineWebXml_withWebInfFolderAsResourceDir() {
+    when(mockVirtualFile1.getName()).thenReturn(AppEngineStandardUltimateWebIntegration.WEB_INF);
+
+    VirtualFile suggestedDirectory =
+        webIntegration.suggestParentDirectoryForAppEngineWebXml(
+            mockModule, mockModifiableRootModel);
+    assertEquals(mockVirtualFile1, suggestedDirectory);
   }
 }
