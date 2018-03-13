@@ -21,6 +21,7 @@ import com.google.api.services.appengine.v1.model.Location;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
+import com.google.cloud.tools.intellij.ui.FontUtils;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
@@ -51,8 +52,8 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
       "https://cloud.google.com/appengine/docs/flexible";
   private static final String STANDARD_DOCUMENTATION_URL =
       "https://cloud.google.com/appengine/docs/about-the-standard-environment";
-  private static final String HTML_OPEN_TAG = "<html><font face='sans' size='-1'>";
-  private static final String HTML_CLOSE_TAG = "</font></html>";
+  private static final String HTML_OPEN_TAG = "<html>";
+  private static final String HTML_CLOSE_TAG = "</html>";
 
   private JPanel panel;
   private JTextPane instructionsTextPane;
@@ -102,6 +103,8 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
                 "</a>")
             + "</p>"
             + HTML_CLOSE_TAG);
+
+    FontUtils.convertStyledDocumentFontToDefault(instructionsTextPane.getStyledDocument());
   }
 
   @Override
@@ -252,6 +255,8 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
 
     displayText += "</ul>" + HTML_CLOSE_TAG;
     regionDetailPane.setText(displayText);
+
+    FontUtils.convertStyledDocumentFontToDefault(regionDetailPane.getStyledDocument());
   }
 
   @Nullable

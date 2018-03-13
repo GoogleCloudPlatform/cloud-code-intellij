@@ -20,6 +20,7 @@ import com.google.cloud.tools.intellij.GctFeature;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkConfigurable;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
+import com.google.cloud.tools.intellij.ui.FontUtils;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.options.Configurable;
@@ -74,6 +75,7 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
           }
         });
     appEngineMoreInfoLabel.setBackground(mainPanel.getBackground());
+    FontUtils.convertStyledDocumentFontToDefault(appEngineMoreInfoLabel.getStyledDocument());
   }
 
   @Nls

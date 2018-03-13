@@ -410,6 +410,7 @@
                         serviceImplementation="com.google.cloud.tools.intellij.resources.DefaultGoogleApiClientFactory"/>
     <applicationService serviceImplementation="com.google.cloud.tools.intellij.csr.CloudRepositoryService"/>
     <applicationService serviceImplementation="com.google.cloud.tools.intellij.apis.CloudLibrariesService"/>
+    <applicationService serviceImplementation="com.google.cloud.tools.intellij.apis.CloudApiMavenService"/>
 
     <!-- App Engine Cloud and Deployment Sources Configuration-->
     <remoteServer.type
