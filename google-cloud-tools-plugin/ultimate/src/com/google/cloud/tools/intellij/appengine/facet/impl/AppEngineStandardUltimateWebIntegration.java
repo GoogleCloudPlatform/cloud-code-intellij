@@ -63,12 +63,12 @@ import org.jetbrains.annotations.Nullable;
 
 /** @author nik */
 public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWebIntegration {
+  public static final String WEB_INF = "WEB-INF";
 
   private static final Logger LOG =
       Logger.getInstance(AppEngineStandardUltimateWebIntegration.class);
   private static final FrameworkRole JAVA_PROJECT_ROLE = new FrameworkRole("JAVA_MODULE");
   private static final FrameworkRole JAVA_EE_PROJECT_ROLE = JavaeeProjectCategory.ROLE;
-  private static final String WEB_INF = "WEB-INF";
 
   @NotNull
   @Override
