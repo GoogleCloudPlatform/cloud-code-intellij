@@ -18,6 +18,8 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.GctFeature;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkConfigurable;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceUserSettings;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.ui.FontUtils;
@@ -26,6 +28,7 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.remoteServer.RemoteServerConfigurable;
+import com.intellij.ui.components.JBLabel;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
@@ -45,6 +48,7 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
   private String displayName = GctBundle.message("appengine.name");
   private JPanel mainPanel;
   private JTextPane appEngineMoreInfoLabel;
+  private JBLabel sdkValidationErrorLabel;
 
   /** Initialize the UI. */
   AppEngineCloudConfigurable() {
@@ -69,6 +73,7 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
             if (event.getEventType() == EventType.ACTIVATED
                 && event.getURL().toString().contains(PSEUDO_GOOGLE_SDK_LINK)) {
               ShowSettingsUtil.getInstance().showSettingsDialog(null, CloudSdkConfigurable.class);
+              updateSdkValidationLabel();
             } else {
               super.hyperlinkUpdate(event);
             }
@@ -76,6 +81,8 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
         });
     appEngineMoreInfoLabel.setBackground(mainPanel.getBackground());
     FontUtils.convertStyledDocumentFontToDefault(appEngineMoreInfoLabel.getStyledDocument());
+
+    updateSdkValidationLabel();
   }
 
   @Nls
@@ -113,5 +120,25 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
   @Override
   public boolean canCheckConnection() {
     return false;
+  }
+
+  /**
+   * Checks for custom SDK validation errors and shows error label if they exist. To be removed once
+   * managed SDk feature is rolled out.
+   */
+  private void updateSdkValidationLabel() {
+    if (!ServiceManager.getService(PluginInfoService.class).shouldEnable(GctFeature.MANAGED_SDK)) {
+      String sdkValidationMessage =
+          CloudSdkPanel.buildSdkMessage(
+              CloudSdkServiceUserSettings.getInstance().getCustomSdkPath(), false);
+      if (sdkValidationMessage != null) {
+        sdkValidationErrorLabel.setText(sdkValidationMessage);
+        sdkValidationErrorLabel.setVisible(true);
+      } else {
+        sdkValidationErrorLabel.setVisible(false);
+      }
+    } else {
+      sdkValidationErrorLabel.setVisible(false);
+    }
   }
 }
