@@ -234,9 +234,9 @@ public class ProjectSelector extends JPanel {
     Optional<CredentialedUser> loggedInUser =
         loginService.getLoggedInUser(selection.googleUsername());
 
-    if (!loginService.isLoggedIn()) {
+    if (!loggedInUser.isPresent()) {
       accountInfoLabel.setHyperlinkText(
-          GoogleCloudCoreMessageBundle.message("cloud.project.selector.not.signed.in"));
+          GoogleCloudCoreMessageBundle.message("cloud.project.selector.not.signed.in", selection.googleUsername()));
     } else if (loggedInUser.isPresent()) {
       accountInfoLabel.setHyperlinkText(
           String.format(
