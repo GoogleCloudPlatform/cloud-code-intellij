@@ -20,6 +20,7 @@ import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploymentConfiguration;
+import com.google.cloud.tools.intellij.appengine.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineServerConfiguration;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
@@ -157,8 +158,11 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
         .map(runConfig -> ((DeployToServerRunConfiguration) runConfig).getDeploymentConfiguration())
         .filter(deployConfig -> deployConfig instanceof AppEngineDeploymentConfiguration)
         .anyMatch(
-            deployConfig ->
-                ((AppEngineDeploymentConfiguration) deployConfig).getEnvironment().isFlexible());
+            deployConfig -> {
+              AppEngineEnvironment environment =
+                  ((AppEngineDeploymentConfiguration) deployConfig).getEnvironment();
+              return environment != null && environment.isFlexible();
+            });
   }
 
   static class AppEngineFlexibleSupportConfigurable extends FrameworkSupportInModuleConfigurable {

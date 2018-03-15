@@ -43,6 +43,7 @@ dependencies {
     testCompile 'org.yaml:snakeyaml:1.18'
     testCompile project(path: ':google-cloud-tools-plugin', configuration: 'tests')
     testCompile project(':google-cloud-tools-plugin:google-cloud-core')
+    testCompile(project(':common-test-lib'))
     testRuntime files(project(':google-cloud-tools-plugin').sourceSets.test.resources.srcDirs)
 }
 

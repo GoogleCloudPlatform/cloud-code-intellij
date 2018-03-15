@@ -44,7 +44,7 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
   private final GoogleCloudApiSelectorPanel cloudApiSelectorPanel;
 
   AddCloudLibrariesDialog(Project project) {
-    super(false);
+    super(project);
 
     List<CloudLibrary> libraries = CloudLibrariesService.getInstance().getCloudLibraries();
 

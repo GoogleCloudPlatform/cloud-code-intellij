@@ -18,17 +18,20 @@ package com.google.cloud.tools.intellij.project;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.GoogleCloudCoreMessageBundle;
+import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import java.awt.Component;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -197,7 +200,9 @@ public class ProjectSelectorTest {
     projectSelector.setSelectedProject(TEST_PROJECT);
 
     assertThat(projectSelector.getAccountInfoLabel().getText())
-        .isEqualTo(GoogleCloudCoreMessageBundle.message("cloud.project.selector.not.signed.in"));
+        .isEqualTo(
+            GoogleCloudCoreMessageBundle.message(
+                "cloud.project.selector.not.signed.in", TEST_PROJECT.googleUsername()));
     assertThat(projectSelector.getAccountInfoLabel().getIcon()).isNull();
   }
 
@@ -206,7 +211,7 @@ public class ProjectSelectorTest {
     when(mockLoginService.isLoggedIn()).thenReturn(false);
     projectSelector.setSelectedProject(TEST_PROJECT);
     // log in now, fire event
-    when(mockLoginService.isLoggedIn()).thenReturn(true);
+    mockUserLoggedIn(TEST_PROJECT.googleUsername());
     projectSelector.googleLoginListener.statusChanged();
     // drain UI events.
     ApplicationManager.getApplication().invokeAndWait(() -> {});
@@ -224,7 +229,9 @@ public class ProjectSelectorTest {
     ApplicationManager.getApplication().invokeAndWait(() -> {});
 
     assertThat(projectSelector.getAccountInfoLabel().getText())
-        .isEqualTo(GoogleCloudCoreMessageBundle.message("cloud.project.selector.not.signed.in"));
+        .isEqualTo(
+            GoogleCloudCoreMessageBundle.message(
+                "cloud.project.selector.not.signed.in", TEST_PROJECT.googleUsername()));
     assertThat(projectSelector.getAccountInfoLabel().getIcon()).isNull();
   }
 
@@ -242,8 +249,16 @@ public class ProjectSelectorTest {
           .isEqualTo(project.projectName());
       assertThat(projectSelector.getProjectAccountSeparatorLabel().isVisible()).isTrue();
       assertThat(projectSelector.getAccountInfoLabel().getHyperlinkText())
-          .isEqualTo(project.googleUsername());
+          .contains(project.googleUsername());
       assertThat(projectSelector.getAccountInfoLabel().getIcon()).isNotNull();
     }
+  }
+
+  private void mockUserLoggedIn(String username) {
+    when(mockLoginService.isLoggedIn()).thenReturn(true);
+    CredentialedUser mockUser = mock(CredentialedUser.class);
+    when(mockLoginService.getLoggedInUser(TEST_PROJECT.googleUsername()))
+        .thenReturn(Optional.of(mockUser));
+    when(mockUser.getEmail()).thenReturn(username);
   }
 }
