@@ -261,6 +261,7 @@ final class GoogleCloudApiSelectorPanel {
   private void populateBomVersions() {
     List<Version> bomVersions =
         Lists.newArrayList(CloudApiMavenService.getInstance().getBomVersions());
+    CloudApiMavenService.getInstance().getBomManagedDependencies();
 
     if (bomVersions.isEmpty()) {
       hideBomUI();
