@@ -24,6 +24,7 @@ import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.ui.FontUtils;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ShowSettingsUtil;
@@ -58,7 +59,6 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
     if (!ServiceManager.getService(PluginInfoService.class).shouldEnable(GctFeature.MANAGED_SDK)) {
       messageBuilder.append(
           GctBundle.message("appengine.cloud.sdk.settings", PSEUDO_GOOGLE_SDK_LINK));
-      System.out.println(messageBuilder.toString());
       messageBuilder.append("<p/>");
     }
     messageBuilder.append(
@@ -120,6 +120,16 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
   @Override
   public boolean canCheckConnection() {
     return false;
+  }
+
+  @VisibleForTesting
+  JTextPane getAppEngineMoreInfoLabel() {
+    return appEngineMoreInfoLabel;
+  }
+
+  @VisibleForTesting
+  JBLabel getSdkValidationErrorLabel() {
+    return sdkValidationErrorLabel;
   }
 
   /**
