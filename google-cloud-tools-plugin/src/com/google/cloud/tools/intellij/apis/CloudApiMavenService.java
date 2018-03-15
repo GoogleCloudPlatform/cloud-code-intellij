@@ -45,7 +45,7 @@ import org.eclipse.aether.version.Version;
 import org.jetbrains.idea.maven.aether.ArtifactKind;
 import org.jetbrains.idea.maven.aether.ArtifactRepositoryManager;
 
-/** An application service providing Cloud API Maven functionality. */
+/** Aether-based application service providing Cloud API Maven functionality. */
 public class CloudApiMavenService {
   private static final Logger logger = Logger.getInstance(CloudApiManager.class);
 
@@ -87,9 +87,6 @@ public class CloudApiMavenService {
   }
 
   void getBomManagedDependencies() {
-    RepositorySystem system = newRepositorySystem();
-    RepositorySystemSession session = newRepositorySystemSession(system);
-
     Artifact artifact = new DefaultArtifact(toBomCoordinates("0.39-alpha"));
 
     ArtifactDescriptorRequest request = new ArtifactDescriptorRequest();
@@ -97,7 +94,7 @@ public class CloudApiMavenService {
     request.addRepository(MAVEN_CENTRAL_REPOSITORY);
 
     try {
-      ArtifactDescriptorResult result = system.readArtifactDescriptor(session, request);
+      ArtifactDescriptorResult result = SYSTEM.readArtifactDescriptor(SESSION, request);
       System.out.println("Dependencies: " + result.getManagedDependencies());
     } catch (ArtifactDescriptorException e) {
       e.printStackTrace();
