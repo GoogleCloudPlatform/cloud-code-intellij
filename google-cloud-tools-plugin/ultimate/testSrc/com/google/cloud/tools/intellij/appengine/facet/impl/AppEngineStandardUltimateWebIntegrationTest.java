@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.impl;
 
-import static org.hamcrest.core.IsInstanceOf.any;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
@@ -58,7 +57,7 @@ public class AppEngineStandardUltimateWebIntegrationTest {
     webRoots.add(mockWebRoot);
 
     when(mockVirtualFile1.createChildDirectory(
-            any(LocalFileSystem.class), AppEngineStandardUltimateWebIntegration.WEB_INF))
+            LocalFileSystem.getInstance(), AppEngineStandardUltimateWebIntegration.WEB_INF))
         .thenReturn(mockVirtualFile3);
     when(mockVirtualFile1.findChild(AppEngineStandardUltimateWebIntegration.WEB_INF))
         .thenReturn(mockVirtualFile2);
