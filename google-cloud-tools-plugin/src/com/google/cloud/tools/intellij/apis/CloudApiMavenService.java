@@ -69,7 +69,6 @@ public class CloudApiMavenService {
    * @return returns the {@link Version versions} of the BOMs
    */
   List<Version> getBomVersions() {
-
     Artifact artifact =
         new DefaultArtifact(toBomCoordinates(GOOGLE_CLOUD_JAVA_BOM_ALL_VERSIONS_CONSTRAINT));
 
@@ -121,6 +120,7 @@ public class CloudApiMavenService {
     locator.addService(TransporterFactory.class, HttpTransporterFactory.class);
     locator.setErrorHandler(
         new DefaultServiceLocator.ErrorHandler() {
+          @Override
           public void serviceCreationFailed(Class<?> type, Class<?> impl, Throwable exception) {
             if (exception != null) {
               throw new RuntimeException(exception);
