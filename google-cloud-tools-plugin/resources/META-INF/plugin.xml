@@ -50,7 +50,7 @@
 
       <h3>Added</h3>
       <ul>
-        <li>.Added ability to create service accounts and download service account keys from the IDE client library workflow. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1808">#1808</a>)</li>
+        <li>Added ability to create service accounts and download service account keys from the IDE client library workflow. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1808">#1808</a>)</li>
       </ul>
 
       <h3>Fixed</h3>
