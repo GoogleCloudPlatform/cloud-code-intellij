@@ -26,7 +26,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.FixedSizeButton;
 import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.components.JBLabel;
@@ -35,9 +34,6 @@ import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
@@ -73,7 +69,7 @@ public class ProjectSelector extends JPanel {
   private Project ideProject;
 
   @VisibleForTesting GoogleLoginListener googleLoginListener;
-  private Set<MessageBusConnection> messageBusConnections;
+  private MessageBusConnection messageBusConnection;
 
   /** @param ideProject IDE {@link Project} to be used to update active cloud project settings. */
   public ProjectSelector(@Nullable Project ideProject) {
@@ -91,14 +87,9 @@ public class ProjectSelector extends JPanel {
                     });
           }
         };
-    messageBusConnections =
-        Stream.of(ProjectManager.getInstance().getOpenProjects())
-            .map(p -> p.getMessageBus().connect())
-            .collect(Collectors.toSet());
-    messageBusConnections.forEach(
-        connection ->
-            connection.subscribe(
-                GoogleLoginListener.GOOGLE_LOGIN_LISTENER_TOPIC, googleLoginListener));
+    messageBusConnection = ApplicationManager.getApplication().getMessageBus().connect();
+    messageBusConnection.subscribe(
+        GoogleLoginListener.GOOGLE_LOGIN_LISTENER_TOPIC, googleLoginListener);
   }
 
   /** Returns project selection or null if no project is selected. */
@@ -167,8 +158,7 @@ public class ProjectSelector extends JPanel {
   @Override
   public void removeNotify() {
     super.removeNotify();
-    messageBusConnections.forEach(MessageBusConnection::disconnect);
-    messageBusConnections.clear();
+    messageBusConnection.disconnect();
   }
 
   private void createUIComponents() {
@@ -244,9 +234,10 @@ public class ProjectSelector extends JPanel {
     Optional<CredentialedUser> loggedInUser =
         loginService.getLoggedInUser(selection.googleUsername());
 
-    if (!loginService.isLoggedIn()) {
+    if (!loggedInUser.isPresent()) {
       accountInfoLabel.setHyperlinkText(
-          GoogleCloudCoreMessageBundle.message("cloud.project.selector.not.signed.in"));
+          GoogleCloudCoreMessageBundle.message(
+              "cloud.project.selector.not.signed.in", selection.googleUsername()));
     } else if (loggedInUser.isPresent()) {
       accountInfoLabel.setHyperlinkText(
           String.format(

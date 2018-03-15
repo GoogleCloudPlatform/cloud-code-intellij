@@ -32,9 +32,6 @@ import org.jetbrains.annotations.Nullable;
  */
 public class DefaultCloudSdkService implements CloudSdkService {
 
-  private PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
-  private static final String CLOUD_SDK_PROPERTY_KEY = "GCT_CLOUD_SDK_HOME_PATH";
-
   @Override
   public void activate() {
     // TODO track event that custom SDK is activated and used.
@@ -43,7 +40,7 @@ public class DefaultCloudSdkService implements CloudSdkService {
   @Nullable
   @Override
   public Path getSdkHomePath() {
-    String sdkPath = propertiesComponent.getValue(CLOUD_SDK_PROPERTY_KEY);
+    String sdkPath = CloudSdkServiceUserSettings.getInstance().getCustomSdkPath();
     if (sdkPath != null) {
       // To let Windows users that persisted the old malformed path save a new one.
       // TODO(joaomartins): Delete this after a while so gets are faster.
@@ -63,13 +60,8 @@ public class DefaultCloudSdkService implements CloudSdkService {
   }
 
   @Override
-  public void setSdkHomePath(String cloudSdkHomePath) {
-    propertiesComponent.setValue(CLOUD_SDK_PROPERTY_KEY, cloudSdkHomePath);
-  }
-
-  @Override
   public SdkStatus getStatus() {
-    String sdkPath = propertiesComponent.getValue(CLOUD_SDK_PROPERTY_KEY);
+    String sdkPath = CloudSdkServiceUserSettings.getInstance().getCustomSdkPath();
     if (Strings.isNullOrEmpty(sdkPath)) {
       return SdkStatus.NOT_AVAILABLE;
     }

@@ -21,6 +21,7 @@ import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceUserSettings;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
@@ -292,7 +293,8 @@ public class AppEngineStandardSupportProvider extends FrameworkSupportInModulePr
       if (!sdkValidator
           .validateCloudSdk(cloudSdkPanel.getCloudSdkDirectoryText())
           .contains(CloudSdkValidationResult.MALFORMED_PATH)) {
-        sdkService.setSdkHomePath(cloudSdkPanel.getCloudSdkDirectoryText());
+        CloudSdkServiceUserSettings.getInstance()
+            .setCustomSdkPath(cloudSdkPanel.getCloudSdkDirectoryText());
       }
 
       AppEngineStandardSupportProvider.this.addSupport(

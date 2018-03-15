@@ -19,9 +19,7 @@ package com.google.cloud.tools.intellij.apis;
 import com.google.api.services.iam.v1.model.Role;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.util.GctBundle;
-import com.google.cloud.tools.libraries.CloudLibraries;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
@@ -29,7 +27,6 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import git4idea.DialogManager;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
@@ -47,15 +44,9 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
   private final GoogleCloudApiSelectorPanel cloudApiSelectorPanel;
 
   AddCloudLibrariesDialog(Project project) {
-    super(false);
+    super(project);
 
-    List<CloudLibrary> libraries;
-    try {
-      libraries = CloudLibraries.getCloudLibraries();
-    } catch (IOException e) {
-      logger.error(e);
-      libraries = ImmutableList.of();
-    }
+    List<CloudLibrary> libraries = CloudLibrariesService.getInstance().getCloudLibraries();
 
     this.project = project;
 

@@ -17,12 +17,16 @@
 package com.google.cloud.tools.intellij.apis;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.GctFeature;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
+import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.google.cloud.tools.intellij.testing.TestModule;
+import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary;
 import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary.TestCloudLibraryClient;
 import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary.TestCloudLibraryClientMavenCoordinates;
@@ -36,18 +40,24 @@ import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
+import org.eclipse.aether.version.Version;
+import org.fest.util.Lists;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.mockito.Mock;
 
 /** Unit tests for {@link GoogleCloudApiSelectorPanel}. */
 @RunWith(JUnit4.class)
@@ -101,6 +111,9 @@ public final class GoogleCloudApiSelectorPanelTest {
   @TestModule private Module module2;
 
   @TestFixture private IdeaProjectTestFixture testFixture;
+
+  @Mock @TestService private PluginInfoService pluginInfoService;
+  @Mock @TestService CloudApiMavenService mavenService;
 
   @Test
   public void getPanel_withOneLibrary_noSelection_hasCheckboxAndEmptyDetails() {
@@ -236,6 +249,61 @@ public final class GoogleCloudApiSelectorPanelTest {
   }
 
   @Test
+  public void getPanel_withAvailableBomVersions_populatesBomVersionsInReverseOrder() {
+    // TODO (eshaul): remove once feature is released
+    when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
+
+    when(mavenService.getBomVersions())
+        .thenReturn(
+            ImmutableList.of(newTestVersion("v0"), newTestVersion("v1"), newTestVersion("v2")));
+
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
+
+    JComboBox<Version> bomComboBox = panel.getBomComboBox();
+
+    assertThat(panel.getBomSelectorLabel().isVisible()).isTrue();
+    assertThat(panel.getBomComboBox().isVisible()).isTrue();
+    assertThat(bomComboBox.getItemCount()).isEqualTo(3);
+
+    assertThat(bomComboBox.getItemAt(0).toString()).isEqualTo("v2");
+    assertThat(bomComboBox.getItemAt(1).toString()).isEqualTo("v1");
+    assertThat(bomComboBox.getItemAt(2).toString()).isEqualTo("v0");
+  }
+
+  @Test
+  public void getPanel_withManyAvailableBomVersions_limitsNumBomVersions() {
+    // TODO (eshaul): remove once feature is released
+    when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
+
+    List<Version> versions = Lists.newArrayList();
+    for (int i = 0; i < 20; i++) {
+      versions.add(newTestVersion("v" + i));
+    }
+
+    when(mavenService.getBomVersions()).thenReturn(versions);
+
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
+
+    assertThat(panel.getBomComboBox().getItemCount()).isEqualTo(5);
+  }
+
+  @Test
+  public void getPanel_withNoAvailableBomVersions_hidesBomUi() {
+    // TODO (eshaul): remove once feature is released
+    when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
+
+    when(mavenService.getBomVersions()).thenReturn(ImmutableList.of());
+
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
+
+    assertThat(panel.getBomSelectorLabel().isVisible()).isFalse();
+    assertThat(panel.getBomComboBox().isVisible()).isFalse();
+  }
+
+  @Test
   public void getSelectedModule_withNoneSelected_returnsDefaultModule() {
     GoogleCloudApiSelectorPanel panel =
         new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
@@ -345,7 +413,6 @@ public final class GoogleCloudApiSelectorPanelTest {
   }
 
   @Test
-  // todo broken
   public void
       getApisToEnable_withAllLibrariesChecked_AndNoShouldEnableChecked_returnsNoneEnabled() {
     CloudLibrary library1 = LIBRARY_1.toCloudLibrary();
@@ -573,5 +640,27 @@ public final class GoogleCloudApiSelectorPanelTest {
       mapBuilder.put(matcher.group(2), matcher.group(1));
     }
     return mapBuilder.build();
+  }
+
+  private static TestVersion newTestVersion(String name) {
+    return new TestVersion(name);
+  }
+
+  private static class TestVersion implements Version {
+    private final String name;
+
+    TestVersion(String name) {
+      this.name = name;
+    }
+
+    @Override
+    public int compareTo(@NotNull Version that) {
+      return this.toString().compareTo(that.toString());
+    }
+
+    @Override
+    public String toString() {
+      return name;
+    }
   }
 }

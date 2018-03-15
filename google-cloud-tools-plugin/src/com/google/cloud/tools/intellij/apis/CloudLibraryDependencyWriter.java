@@ -22,7 +22,6 @@ import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
-import com.google.cloud.tools.libraries.json.CloudLibraryClientMavenCoordinates;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
@@ -108,10 +107,10 @@ final class CloudLibraryDependencyWriter {
                 .map(CloudLibraryUtils::getFirstJavaClientMavenCoordinates)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .map(CloudLibraryDependencyWriter::toMavenId)
+                .map(MavenUtils::toMavenId)
                 .collect(
                     Collectors.partitioningBy(
-                        mavenId -> isMavenIdInDependencyList(mavenId, dependencies)));
+                        mavenId -> MavenUtils.isMavenIdInDependencyList(mavenId, dependencies)));
 
         // The MavenIds in the "true" list are already in the pom.xml, so we don't duplicate them
         // and warn the user that they weren't added.
@@ -137,43 +136,6 @@ final class CloudLibraryDependencyWriter {
         }
       }
     }.execute();
-  }
-
-  /**
-   * Returns {@code true} if the given {@link MavenId} is in the given list of {@link
-   * MavenDomDependency dependencies}.
-   *
-   * <p>Note that equality is tested via matching group IDs and artifact IDs. Equality of versions
-   * is not required. This prevents adding duplicate dependencies for the same artifact, but with a
-   * different version.
-   *
-   * @param mavenId the {@link MavenId} to check for existence in the given list of dependencies
-   * @param dependencies the list of {@link MavenDomDependency} objects that currently exist in the
-   *     DOM model
-   */
-  private static boolean isMavenIdInDependencyList(
-      MavenId mavenId, List<MavenDomDependency> dependencies) {
-    return dependencies
-        .stream()
-        .anyMatch(
-            dependency ->
-                mavenId.equals(
-                    dependency.getGroupId().getStringValue(),
-                    dependency.getArtifactId().getStringValue()));
-  }
-
-  /**
-   * Returns a new {@link MavenId} whose values are based on the given {@link
-   * CloudLibraryClientMavenCoordinates}.
-   *
-   * @param mavenCoordinates the {@link CloudLibraryClientMavenCoordinates} to convert to a {@link
-   *     MavenId}
-   */
-  private static MavenId toMavenId(CloudLibraryClientMavenCoordinates mavenCoordinates) {
-    return new MavenId(
-        mavenCoordinates.getGroupId(),
-        mavenCoordinates.getArtifactId(),
-        mavenCoordinates.getVersion());
   }
 
   /**

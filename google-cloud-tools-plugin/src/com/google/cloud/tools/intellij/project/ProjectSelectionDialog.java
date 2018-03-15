@@ -29,7 +29,7 @@ import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
@@ -50,7 +50,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
@@ -122,17 +121,12 @@ public class ProjectSelectionDialog {
       installTableSpeedSearch(projectListTable);
       installProgressBar(dialogWrapper);
 
-      Stream.of(ProjectManager.getInstance().getOpenProjects())
-          .forEach(
-              project ->
-                  project
-                      .getMessageBus()
-                      .connect(dialogWrapper.getDisposable() /* disconnect once dialog is gone. */)
-                      .subscribe(
-                          GoogleLoginListener.GOOGLE_LOGIN_LISTENER_TOPIC,
-                          () -> {
-                            refreshDialog(Services.getLoginService().getActiveUser());
-                          }));
+      ApplicationManager.getApplication()
+          .getMessageBus()
+          .connect(dialogWrapper.getDisposable())
+          .subscribe(
+              GoogleLoginListener.GOOGLE_LOGIN_LISTENER_TOPIC,
+              () -> refreshDialog(Services.getLoginService().getActiveUser()));
     }
 
     loadAllProjects();
@@ -211,8 +205,12 @@ public class ProjectSelectionDialog {
               SwingUtilities.invokeLater(
                   () -> {
                     runningProjectLoaderJobs.remove(user);
+                    // validation message should not be null, use exception name if needed.
+                    String errorMessage =
+                        Optional.ofNullable(throwable.getMessage())
+                            .orElse(throwable.getClass().getName());
                     dialogWrapper.setErrorInfoAll(
-                        Collections.singletonList(new ValidationInfo(throwable.getMessage())));
+                        Collections.singletonList(new ValidationInfo(errorMessage)));
                     refreshProjectListUi(user);
                   });
             }

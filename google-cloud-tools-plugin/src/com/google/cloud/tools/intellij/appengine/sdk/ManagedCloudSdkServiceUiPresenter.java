@@ -20,6 +20,7 @@ import com.google.cloud.tools.intellij.appengine.sdk.ManagedCloudSdkService.Mana
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.managedcloudsdk.ProgressListener;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
@@ -64,6 +65,10 @@ public class ManagedCloudSdkServiceUiPresenter {
   public void notifyManagedSdkJobCancellation(ManagedSdkJobType jobType) {
     String message = GctBundle.message("managedsdk.cancel." + jobType.name().toLowerCase());
     showNotification(message, NotificationType.WARNING);
+  }
+
+  public ProgressListener createProgressListener(ManagedCloudSdkService managedCloudSdkService) {
+    return new ManagedCloudSdkProgressListener(managedCloudSdkService);
   }
 
   private void showNotification(String message, NotificationType notificationType) {

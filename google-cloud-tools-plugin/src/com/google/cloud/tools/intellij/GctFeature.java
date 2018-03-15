@@ -34,7 +34,10 @@ public enum GctFeature implements Feature {
    * to see the {@code GctFeature} history of flags in this enum.
    */
   @Deprecated
-  APPENGINE_FLEX(null, "feature.appengine.flex", "ct4ij.feature.appengine.flex");
+  APPENGINE_FLEX(null, "feature.appengine.flex", "ct4ij.feature.appengine.flex"),
+
+  MANAGED_SDK(null, "feature.managed.sdk", "ct4ij.feature.managed.sdk"),
+  BOM(null, "feature.bom", "ct4ij.feature.bom");
 
   private final ImmutableSet<IntelliJPlatform> supportedPlatforms;
   private final String resourceFlagName;
