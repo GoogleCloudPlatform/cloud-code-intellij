@@ -16,35 +16,41 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.standard.impl;
 
-import static org.mockito.Mockito.mock;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.testFramework.PlatformTestCase;
+import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import org.jetbrains.annotations.NotNull;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.mockito.Mock;
 
 /** Tests for {@link AppEngineStandardCommunityWebIntegration}. */
-public class AppEngineStandardCommunityWebIntegrationTest extends PlatformTestCase {
+public class AppEngineStandardCommunityWebIntegrationTest {
+  @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
+  @TestFixture private IdeaProjectTestFixture testFixture;
+  @Mock private Module mockModule;
+  @Mock private ModifiableRootModel mockModifiableRootModel;
   private AppEngineStandardCommunityWebIntegration webIntegration;
-  private Module mockModule;
-  private ModifiableRootModel mockModifiableRootModel;
 
-  @Override
+  @Before
   public void setUp() throws Exception {
-    super.setUp();
-
     webIntegration = new AppEngineStandardCommunityWebIntegration();
-    mockModule = mock(Module.class);
-    mockModifiableRootModel = mock(ModifiableRootModel.class);
   }
 
+  @Test
   public void testSuggestParentDirectoryForAppEngineWebXml() {
-    Project project = getProject();
+    Project project = testFixture.getProject();
     VirtualFile baseDir = project.getBaseDir();
     when(mockModifiableRootModel.getContentRoots()).thenReturn(new VirtualFile[] {baseDir});
 
