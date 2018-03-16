@@ -323,8 +323,7 @@ public final class GoogleCloudApiSelectorPanelTest {
 
     panel
         .getDetailsPanel()
-        .setCloudLibrary(
-            cloudLibrary, BOM_VERSION, panel.getApiManagementMap().get(cloudLibrary));
+        .setCloudLibrary(cloudLibrary, BOM_VERSION, panel.getApiManagementMap().get(cloudLibrary));
 
     assertThat(panel.getDetailsPanel().getVersionLabel().getText())
         .isEqualTo("Version: " + libVersion);
@@ -475,14 +474,10 @@ public final class GoogleCloudApiSelectorPanelTest {
 
     Map<CloudLibrary, CloudApiManagementSpec> apiManagementMap = panel.getApiManagementMap();
 
-    panel
-        .getDetailsPanel()
-        .setCloudLibrary(library1, BOM_VERSION, apiManagementMap.get(library1));
+    panel.getDetailsPanel().setCloudLibrary(library1, BOM_VERSION, apiManagementMap.get(library1));
     checkEnableCheckbox(panel.getDetailsPanel().getEnableApiCheckbox(), false);
 
-    panel
-        .getDetailsPanel()
-        .setCloudLibrary(library2, BOM_VERSION, apiManagementMap.get(library2));
+    panel.getDetailsPanel().setCloudLibrary(library2, BOM_VERSION, apiManagementMap.get(library2));
     checkEnableCheckbox(panel.getDetailsPanel().getEnableApiCheckbox(), false);
 
     assertThat(panel.getApisToEnable()).isEmpty();
@@ -504,14 +499,10 @@ public final class GoogleCloudApiSelectorPanelTest {
 
     Map<CloudLibrary, CloudApiManagementSpec> apiManagementMap = panel.getApiManagementMap();
 
-    panel
-        .getDetailsPanel()
-        .setCloudLibrary(library1, BOM_VERSION, apiManagementMap.get(library1));
+    panel.getDetailsPanel().setCloudLibrary(library1, BOM_VERSION, apiManagementMap.get(library1));
     checkEnableCheckbox(panel.getDetailsPanel().getEnableApiCheckbox(), false);
 
-    panel
-        .getDetailsPanel()
-        .setCloudLibrary(library2, BOM_VERSION, apiManagementMap.get(library2));
+    panel.getDetailsPanel().setCloudLibrary(library2, BOM_VERSION, apiManagementMap.get(library2));
     checkEnableCheckbox(panel.getDetailsPanel().getEnableApiCheckbox(), true);
 
     assertThat(panel.getApisToEnable()).containsExactly(library2);
@@ -529,14 +520,10 @@ public final class GoogleCloudApiSelectorPanelTest {
 
     Map<CloudLibrary, CloudApiManagementSpec> apiManagementMap = panel.getApiManagementMap();
 
-    panel
-        .getDetailsPanel()
-        .setCloudLibrary(library1, BOM_VERSION, apiManagementMap.get(library1));
+    panel.getDetailsPanel().setCloudLibrary(library1, BOM_VERSION, apiManagementMap.get(library1));
     checkEnableCheckbox(panel.getDetailsPanel().getEnableApiCheckbox(), true);
 
-    panel
-        .getDetailsPanel()
-        .setCloudLibrary(library2, BOM_VERSION, apiManagementMap.get(library2));
+    panel.getDetailsPanel().setCloudLibrary(library2, BOM_VERSION, apiManagementMap.get(library2));
     checkEnableCheckbox(panel.getDetailsPanel().getEnableApiCheckbox(), true);
 
     assertThat(panel.getApisToEnable()).isEmpty();
@@ -551,8 +538,7 @@ public final class GoogleCloudApiSelectorPanelTest {
 
     panel
         .getDetailsPanel()
-        .setCloudLibrary(
-            library, BOM_VERSION, panel.getApiManagementMap().get(library));
+        .setCloudLibrary(library, BOM_VERSION, panel.getApiManagementMap().get(library));
 
     assertThat(panel.getDetailsPanel().getEnableApiCheckbox().isEnabled()).isFalse();
     assertThat(panel.getDetailsPanel().getManagementInfoPanel().isVisible()).isTrue();
@@ -569,8 +555,7 @@ public final class GoogleCloudApiSelectorPanelTest {
     checkAddLibraryCheckbox(table, 0);
     panel
         .getDetailsPanel()
-        .setCloudLibrary(
-            library, BOM_VERSION, panel.getApiManagementMap().get(library));
+        .setCloudLibrary(library, BOM_VERSION, panel.getApiManagementMap().get(library));
 
     CloudProject cloudProject = CloudProject.create("name", "id", "user");
     ProjectSelector projectSelector = panel.getProjectSelector();
@@ -591,9 +576,7 @@ public final class GoogleCloudApiSelectorPanelTest {
         new GoogleCloudApiSelectorPanel(ImmutableList.of(library), testFixture.getProject());
 
     Map<CloudLibrary, CloudApiManagementSpec> apiManagementMap = panel.getApiManagementMap();
-    panel
-        .getDetailsPanel()
-        .setCloudLibrary(library, BOM_VERSION, apiManagementMap.get(library));
+    panel.getDetailsPanel().setCloudLibrary(library, BOM_VERSION, apiManagementMap.get(library));
 
     assertThat(panel.getDetailsPanel().getEnableApiCheckbox().isSelected()).isFalse();
   }
