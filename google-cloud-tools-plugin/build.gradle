@@ -25,7 +25,7 @@ apply plugin: 'org.jetbrains.intellij'
 intellij {
 
     pluginName = 'google-cloud-tools'
-    plugins 'Groovy', 'gradle', 'git4idea', 'properties', 'junit', 'maven', 'yaml'
+    plugins 'Groovy', 'git4idea', 'gradle', 'properties', 'junit', 'maven', 'yaml'
 }
 
 publishPlugin {

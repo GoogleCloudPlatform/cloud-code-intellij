@@ -20,6 +20,10 @@ sourceSets.main.resources.srcDirs = ['resources']
 sourceSets.test.java.srcDirs = ['testSrc']
 sourceSets.test.resources.srcDirs = ['testResources']
 
+intellij {
+    plugins 'git4idea'
+}
+
 dependencies {
     compile files('lib/google.gdt.eclipse.login.common.jar')
     compile files('lib/google-gct-login-context-ij-pg.jar')
@@ -45,6 +49,9 @@ dependencies {
 
     compile 'com.google.apis:google-api-services-oauth2:v2-rev98-1.20.0'
     compile 'javax.servlet:javax.servlet-api:3.0.1'
+
+    compileOnly 'com.google.auto.value:auto-value:1.4.1'
+    apt         'com.google.auto.value:auto-value:1.4.1'
 
     testCompile 'xalan:serializer:2.7.1'
     testCompile files("${System.properties['java.home']}/../lib/tools.jar")
