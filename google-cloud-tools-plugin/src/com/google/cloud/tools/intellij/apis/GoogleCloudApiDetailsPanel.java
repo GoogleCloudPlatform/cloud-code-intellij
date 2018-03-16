@@ -206,20 +206,7 @@ public final class GoogleCloudApiDetailsPanel {
       CloudLibraryUtils.getFirstJavaClient(currentCloudLibrary)
           .ifPresent(
               client -> {
-                CloudLibraryClientMavenCoordinates coordinates = client.getMavenCoordinates();
-                if (coordinates != null) {
-                  versionLabel.setIcon(GoogleCloudCoreIcons.LOADING);
-                  loadVersionFromBomAsync(
-                      coordinates,
-                      currentBomVersion,
-                      versionOptional -> {
-                        versionLabel.setIcon(null);
-                        versionOptional.ifPresent(
-                            version ->
-                                versionLabel.setText(
-                                    GctBundle.message("cloud.libraries.version.label", version)));
-                      });
-                }
+                loadAndDisplayVersionFromBom();
 
                 statusLabel.setText(
                     GctBundle.message("cloud.libraries.status.label", client.getLaunchStage()));
@@ -240,6 +227,32 @@ public final class GoogleCloudApiDetailsPanel {
     }
 
     managementWarningTextPane.setText(GctBundle.message("cloud.apis.management.section.info.text"));
+  }
+
+  // todo problem: BOM version isn't updated since its only passed in when selected
+  void loadAndDisplayVersionFromBom() {
+    if (currentCloudLibrary.getClients() != null) {
+      CloudLibraryUtils.getFirstJavaClient(currentCloudLibrary)
+          .ifPresent(
+              client -> {
+                CloudLibraryClientMavenCoordinates coordinates = client.getMavenCoordinates();
+
+                if (coordinates != null) {
+                  versionLabel.setIcon(GoogleCloudCoreIcons.LOADING);
+
+                  loadVersionFromBomAsync(
+                      coordinates,
+                      currentBomVersion,
+                      versionOptional -> {
+                        versionLabel.setIcon(null);
+                        versionOptional.ifPresent(
+                            version ->
+                                versionLabel.setText(
+                                    GctBundle.message("cloud.libraries.version.label", version)));
+                      });
+                }
+              });
+    }
   }
 
   /**
