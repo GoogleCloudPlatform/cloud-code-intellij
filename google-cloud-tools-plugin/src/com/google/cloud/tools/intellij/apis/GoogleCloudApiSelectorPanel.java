@@ -116,7 +116,8 @@ final class GoogleCloudApiSelectorPanel {
       bomComboBox.addActionListener(
           event -> {
             if (cloudLibrariesTable.getSelectedRow() != -1) {
-              detailsPanel.updateManagedLibraryVersionFromBom(bomComboBox.getSelectedItem().toString());
+              detailsPanel.updateManagedLibraryVersionFromBom(
+                  bomComboBox.getSelectedItem().toString());
             }
           });
     } else {
