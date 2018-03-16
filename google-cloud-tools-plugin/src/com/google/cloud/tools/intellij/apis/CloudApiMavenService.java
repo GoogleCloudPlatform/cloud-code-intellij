@@ -52,8 +52,8 @@ import org.jetbrains.idea.maven.aether.ArtifactRepositoryManager;
 public class CloudApiMavenService {
   private static final Logger logger = Logger.getInstance(CloudApiManager.class);
 
-  private static final RepositorySystem SYSTEM = newRepositorySystem();
-  private static final RepositorySystemSession SESSION = newRepositorySystemSession(SYSTEM);
+  private static RepositorySystem SYSTEM;
+  private static RepositorySystemSession SESSION;
 
   private static final String GOOGLE_CLOUD_JAVA_BOM_GROUP_NAME = "com.google.cloud";
   private static final String GOOGLE_CLOUD_JAVA_BOM_ARTIFACT_NAME = "google-cloud-bom";
@@ -64,6 +64,11 @@ public class CloudApiMavenService {
 
   static CloudApiMavenService getInstance() {
     return ServiceManager.getService(CloudApiMavenService.class);
+  }
+
+  private CloudApiMavenService() {
+    SYSTEM = newRepositorySystem();
+    SESSION = newRepositorySystemSession(SYSTEM);
   }
 
   /**
