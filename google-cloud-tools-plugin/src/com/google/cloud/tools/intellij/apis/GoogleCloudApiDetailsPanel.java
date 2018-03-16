@@ -61,7 +61,7 @@ public final class GoogleCloudApiDetailsPanel {
   private JTextPane managementWarningTextPane;
 
   private CloudLibrary currentCloudLibrary;
-  private String currentBomVersion;
+  private Optional<String> currentBomVersion;
   private CloudApiManagementSpec currentCloudApiManagementSpec;
 
   /** Returns the {@link JPanel} that holds the UI elements in this panel. */
@@ -78,7 +78,9 @@ public final class GoogleCloudApiDetailsPanel {
    * @param library the {@link CloudLibrary} to display
    */
   void setCloudLibrary(
-      CloudLibrary library, String bomVersion, CloudApiManagementSpec cloudApiManagementSpec) {
+      CloudLibrary library,
+      Optional<String> bomVersion,
+      CloudApiManagementSpec cloudApiManagementSpec) {
     if (cloudLibrariesEqual(currentCloudLibrary, library)) {
       return;
     }
@@ -206,7 +208,16 @@ public final class GoogleCloudApiDetailsPanel {
       CloudLibraryUtils.getFirstJavaClient(currentCloudLibrary)
           .ifPresent(
               client -> {
-                updateManagedLibraryVersion(currentBomVersion);
+                if (currentBomVersion.isPresent()) {
+                  updateManagedLibraryVersionFromBom(currentBomVersion.get());
+                } else {
+                  if (client.getMavenCoordinates() != null) {
+                    versionLabel.setText(
+                        GctBundle.message(
+                            "cloud.libraries.version.label",
+                            client.getMavenCoordinates().getVersion()));
+                  }
+                }
 
                 statusLabel.setText(
                     GctBundle.message("cloud.libraries.status.label", client.getLaunchStage()));
@@ -239,7 +250,8 @@ public final class GoogleCloudApiDetailsPanel {
   // TODO (eshaul) this unoptimized implementation fetches all managed BOM versions each time the
   // BOM is updated and library is selected. The bomVersion -> managedLibraryVersions results can be
   // cached on disk to reduce network calls.
-  void updateManagedLibraryVersion(String bomVersion) {
+  @SuppressWarnings("FutureReturnValueIgnored")
+  void updateManagedLibraryVersionFromBom(String bomVersion) {
     if (currentCloudLibrary.getClients() != null) {
       CloudLibraryUtils.getFirstJavaClient(currentCloudLibrary)
           .ifPresent(
