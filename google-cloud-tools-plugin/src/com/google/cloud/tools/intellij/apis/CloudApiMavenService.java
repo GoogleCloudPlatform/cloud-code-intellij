@@ -95,8 +95,8 @@ public class CloudApiMavenService {
   }
 
   /**
-   * Finds the version of the passed in {@link CloudLibrary} maven coordinates that is managed by
-   * the given BOM version.
+   * Finds the version of the passed in {@link CloudLibraryClientMavenCoordinates} that is managed
+   * by the given BOM version.
    *
    * @param libraryMavenCoordinates the maven coordinates of the {@link CloudLibrary} for which we
    *     are finding the version
