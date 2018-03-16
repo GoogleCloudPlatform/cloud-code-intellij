@@ -42,7 +42,6 @@ import com.intellij.util.ui.UIUtil;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -113,10 +112,12 @@ final class GoogleCloudApiSelectorPanel {
 
     if (ServiceManager.getService(PluginInfoService.class).shouldEnable(GctFeature.BOM)) {
       populateBomVersions();
-      bomComboBox.addActionListener(event -> {
-        // todo only do this if a library is selected (not just checked)
-        detailsPanel.loadAndDisplayVersionFromBom();
-      });
+      bomComboBox.addActionListener(
+          event -> {
+            if (cloudLibrariesTable.getSelectedRow() != -1) {
+              detailsPanel.updateManagedLibraryVersion(bomComboBox.getSelectedItem().toString());
+            }
+          });
     } else {
       hideBomUI();
     }
@@ -237,7 +238,9 @@ final class GoogleCloudApiSelectorPanel {
                     (CloudLibrary)
                         cloudLibrariesTable.getModel().getValueAt(selectedIndex, CLOUD_LIBRARY_COL);
                 detailsPanel.setCloudLibrary(
-                    library, bomComboBox.getSelectedItem().toString(), apiManagementMap.get(library));
+                    library,
+                    bomComboBox.getSelectedItem().toString(),
+                    apiManagementMap.get(library));
                 updateManagementUI();
               }
             });

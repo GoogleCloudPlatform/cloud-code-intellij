@@ -206,7 +206,7 @@ public final class GoogleCloudApiDetailsPanel {
       CloudLibraryUtils.getFirstJavaClient(currentCloudLibrary)
           .ifPresent(
               client -> {
-                loadAndDisplayVersionFromBom();
+                updateManagedLibraryVersion(currentBomVersion);
 
                 statusLabel.setText(
                     GctBundle.message("cloud.libraries.status.label", client.getLaunchStage()));
@@ -229,8 +229,17 @@ public final class GoogleCloudApiDetailsPanel {
     managementWarningTextPane.setText(GctBundle.message("cloud.apis.management.section.info.text"));
   }
 
-  // todo problem: BOM version isn't updated since its only passed in when selected
-  void loadAndDisplayVersionFromBom() {
+  /**
+   * Asynchronously fetches and displays the version of the client library that is managed by the
+   * given BOM version.
+   *
+   * @param bomVersion the version of the BOM from which to load the version of the current client
+   *     library
+   */
+  // TODO (eshaul) this unoptimized implementation fetches all managed BOM versions each time the
+  // BOM is updated and library is selected. The bomVersion -> managedLibraryVersions results can be
+  // cached on disk to reduce network calls.
+  void updateManagedLibraryVersion(String bomVersion) {
     if (currentCloudLibrary.getClients() != null) {
       CloudLibraryUtils.getFirstJavaClient(currentCloudLibrary)
           .ifPresent(
@@ -239,17 +248,27 @@ public final class GoogleCloudApiDetailsPanel {
 
                 if (coordinates != null) {
                   versionLabel.setIcon(GoogleCloudCoreIcons.LOADING);
+                  versionLabel.setText("");
 
-                  loadVersionFromBomAsync(
-                      coordinates,
-                      currentBomVersion,
-                      versionOptional -> {
-                        versionLabel.setIcon(null);
-                        versionOptional.ifPresent(
-                            version ->
-                                versionLabel.setText(
-                                    GctBundle.message("cloud.libraries.version.label", version)));
-                      });
+                  ThreadUtil.getInstance()
+                      .executeInBackground(
+                          () -> {
+                            Optional<String> versionOptional =
+                                CloudApiMavenService.getInstance()
+                                    .getManagedDependencyVersion(coordinates, bomVersion);
+
+                            versionOptional.ifPresent(
+                                version ->
+                                    ApplicationManager.getApplication()
+                                        .invokeAndWait(
+                                            () -> {
+                                              versionLabel.setIcon(null);
+                                              versionLabel.setText(
+                                                  GctBundle.message(
+                                                      "cloud.libraries.version.label", version));
+                                            },
+                                            ModalityState.any()));
+                          });
                 }
               });
     }
@@ -291,21 +310,6 @@ public final class GoogleCloudApiDetailsPanel {
               ImageIcon finalImageIcon = imageIcon;
               ApplicationManager.getApplication()
                   .invokeAndWait(() -> imageConsumer.accept(finalImageIcon), ModalityState.any());
-            });
-  }
-
-  private static void loadVersionFromBomAsync(
-      CloudLibraryClientMavenCoordinates mavenCoordinates,
-      String bomVersion,
-      Consumer<Optional<String>> versionConsumer) {
-    ThreadUtil.getInstance()
-        .executeInBackground(
-            () -> {
-              Optional<String> version =
-                  CloudApiMavenService.getInstance()
-                      .getManagedDependencyVersion(mavenCoordinates, bomVersion);
-              ApplicationManager.getApplication()
-                  .invokeAndWait(() -> versionConsumer.accept(version), ModalityState.any());
             });
   }
 
