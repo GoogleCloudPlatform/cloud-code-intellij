@@ -17,6 +17,8 @@
 package com.google.cloud.tools.intellij.apis;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.GctFeature;
@@ -65,7 +67,6 @@ import org.mockito.Mock;
 public final class GoogleCloudApiSelectorPanelTest {
 
   private static final String BOM_VERSION = "1.2.3-alpha";
-  private static final String LIB_VERSION = "1.0.0";
   private static final TestCloudLibraryClientMavenCoordinates JAVA_CLIENT_MAVEN_COORDS_1 =
       TestCloudLibraryClientMavenCoordinates.create("java", "client-1", "1.0.0");
   private static final TestCloudLibraryClientMavenCoordinates JAVA_CLIENT_MAVEN_COORDS_2 =
@@ -306,19 +307,48 @@ public final class GoogleCloudApiSelectorPanelTest {
     assertThat(panel.getBomComboBox().isVisible()).isFalse();
   }
 
-  //  @Test
-  //  public void getPanel_withVersionReturnedFromBomQuery_displaysVersion() {
-  //    String libVersion = "9.9-alpha";
-  //
-  //    when(mavenService.getManagedDependencyVersion(any(),
-  // anyString())).thenReturn(Optional.of(libVersion));
-  //    GoogleCloudApiSelectorPanel panel =
-  //        new GoogleCloudApiSelectorPanel(
-  //            ImmutableList.of(LIBRARY_1.toCloudLibrary()), testFixture.getProject());
-  //
-  //    asserThat(panel.)
-  //
-  //  }
+  @Test
+  public void getPanel_withVersionReturnedFromBomQuery_displaysVersionFromBom() {
+    // TODO (eshaul): remove once feature is released
+    when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
+
+    String libVersion = "9.9-alpha";
+    when(mavenService.getManagedDependencyVersion(any(), anyString()))
+        .thenReturn(Optional.of(libVersion));
+    when(mavenService.getBomVersions()).thenReturn(ImmutableList.of(newTestVersion(BOM_VERSION)));
+
+    CloudLibrary cloudLibrary = LIBRARY_1.toCloudLibrary();
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(cloudLibrary), testFixture.getProject());
+
+    panel
+        .getDetailsPanel()
+        .setCloudLibrary(
+            cloudLibrary, Optional.of(BOM_VERSION), panel.getApiManagementMap().get(cloudLibrary));
+
+    assertThat(panel.getDetailsPanel().getVersionLabel().getText())
+        .isEqualTo("Version: " + libVersion);
+  }
+
+  @Test
+  public void getPanel_withNoVersionReturnedFromBomQuery_fallsBackToAndDisplaysStaticVersion() {
+    // TODO (eshaul): remove once feature is released
+    when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
+
+    when(mavenService.getBomVersions()).thenReturn(ImmutableList.of(newTestVersion(BOM_VERSION)));
+
+    CloudLibrary cloudLibrary = LIBRARY_1.toCloudLibrary();
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(cloudLibrary), testFixture.getProject());
+
+    panel
+        .getDetailsPanel()
+        .setCloudLibrary(
+            cloudLibrary, Optional.empty(), panel.getApiManagementMap().get(cloudLibrary));
+
+    assertThat(panel.getDetailsPanel().getVersionLabel().getText())
+        .isEqualTo("Version: " + JAVA_CLIENT_MAVEN_COORDS_1.version());
+  }
 
   @Test
   public void getSelectedModule_withNoneSelected_returnsDefaultModule() {
