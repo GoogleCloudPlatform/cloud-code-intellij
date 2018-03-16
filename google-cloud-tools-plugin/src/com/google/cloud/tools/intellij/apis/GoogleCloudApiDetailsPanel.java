@@ -61,7 +61,7 @@ public final class GoogleCloudApiDetailsPanel {
   private JTextPane managementWarningTextPane;
 
   private CloudLibrary currentCloudLibrary;
-  private Optional<String> currentBomVersion;
+  private String currentBomVersion;
   private CloudApiManagementSpec currentCloudApiManagementSpec;
 
   /** Returns the {@link JPanel} that holds the UI elements in this panel. */
@@ -79,7 +79,7 @@ public final class GoogleCloudApiDetailsPanel {
    */
   void setCloudLibrary(
       CloudLibrary library,
-      Optional<String> bomVersion,
+      String bomVersion,
       CloudApiManagementSpec cloudApiManagementSpec) {
     if (cloudLibrariesEqual(currentCloudLibrary, library)) {
       return;
@@ -208,8 +208,8 @@ public final class GoogleCloudApiDetailsPanel {
       CloudLibraryUtils.getFirstJavaClient(currentCloudLibrary)
           .ifPresent(
               client -> {
-                if (currentBomVersion.isPresent()) {
-                  updateManagedLibraryVersionFromBom(currentBomVersion.get());
+                if (currentBomVersion != null) {
+                  updateManagedLibraryVersionFromBom(currentBomVersion);
                 } else {
                   if (client.getMavenCoordinates() != null) {
                     versionLabel.setText(

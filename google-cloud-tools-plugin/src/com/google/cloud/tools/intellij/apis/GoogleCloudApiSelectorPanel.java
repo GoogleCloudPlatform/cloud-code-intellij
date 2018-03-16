@@ -241,7 +241,9 @@ final class GoogleCloudApiSelectorPanel {
                         cloudLibrariesTable.getModel().getValueAt(selectedIndex, CLOUD_LIBRARY_COL);
                 detailsPanel.setCloudLibrary(
                     library,
-                    Optional.ofNullable(bomComboBox.getSelectedItem()).map(Object::toString),
+                    bomComboBox.getSelectedItem() != null
+                        ? bomComboBox.getSelectedItem().toString()
+                        : null,
                     apiManagementMap.get(library));
                 updateManagementUI();
               }
