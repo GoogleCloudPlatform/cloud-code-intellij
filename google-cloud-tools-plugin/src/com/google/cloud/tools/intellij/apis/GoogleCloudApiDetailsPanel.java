@@ -78,9 +78,7 @@ public final class GoogleCloudApiDetailsPanel {
    * @param library the {@link CloudLibrary} to display
    */
   void setCloudLibrary(
-      CloudLibrary library,
-      String bomVersion,
-      CloudApiManagementSpec cloudApiManagementSpec) {
+      CloudLibrary library, String bomVersion, CloudApiManagementSpec cloudApiManagementSpec) {
     if (cloudLibrariesEqual(currentCloudLibrary, library)) {
       return;
     }
