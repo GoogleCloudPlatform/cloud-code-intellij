@@ -40,8 +40,8 @@ import com.google.cloud.tools.managedcloudsdk.command.CommandExecutionException;
 import com.google.cloud.tools.managedcloudsdk.command.CommandExitException;
 import com.google.cloud.tools.managedcloudsdk.components.SdkComponent;
 import com.google.cloud.tools.managedcloudsdk.components.SdkComponentInstaller;
+import com.google.cloud.tools.managedcloudsdk.components.SdkUpdater;
 import com.google.cloud.tools.managedcloudsdk.install.SdkInstaller;
-import com.google.cloud.tools.managedcloudsdk.update.SdkUpdater;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -217,7 +217,7 @@ public class ManagedCloudSdkServiceTest {
     SdkComponentInstaller mockComponentInstaller = mockManagedCloudSdk.newComponentInstaller();
     doThrow(new CommandExecutionException(new UnsupportedOperationException()))
         .when(mockComponentInstaller)
-        .installComponent(any(), any());
+        .installComponent(any(), any(), any());
     sdkService.install();
 
     ArgumentCaptor<SdkStatus> statusCaptor = ArgumentCaptor.forClass(SdkStatus.class);
@@ -293,7 +293,7 @@ public class ManagedCloudSdkServiceTest {
     makeMockSdkInstalled(MOCK_SDK_PATH);
     emulateMockSdkUpdateProcess();
     SdkUpdater mockUpdater = mockManagedCloudSdk.newUpdater();
-    doThrow(new InterruptedException()).when(mockUpdater).update(any());
+    doThrow(new InterruptedException()).when(mockUpdater).update(any(), any());
 
     sdkService.addStatusUpdateListener(mockStatusUpdateListener);
     sdkService.update();
@@ -310,7 +310,7 @@ public class ManagedCloudSdkServiceTest {
     makeMockSdkInstalled(MOCK_SDK_PATH);
     emulateMockSdkUpdateProcess();
     SdkUpdater mockUpdater = mockManagedCloudSdk.newUpdater();
-    doThrow(new CancellationException()).when(mockUpdater).update(any());
+    doThrow(new CancellationException()).when(mockUpdater).update(any(), any());
 
     sdkService.addStatusUpdateListener(mockStatusUpdateListener);
     sdkService.update();
@@ -327,7 +327,7 @@ public class ManagedCloudSdkServiceTest {
     makeMockSdkInstalled(MOCK_SDK_PATH);
     emulateMockSdkUpdateProcess();
     SdkUpdater mockUpdater = mockManagedCloudSdk.newUpdater();
-    doThrow(new CancellationException()).when(mockUpdater).update(any());
+    doThrow(new CancellationException()).when(mockUpdater).update(any(), any());
 
     sdkService.update();
 
@@ -339,7 +339,7 @@ public class ManagedCloudSdkServiceTest {
     makeMockSdkInstalled(MOCK_SDK_PATH);
     emulateMockSdkUpdateProcess();
     SdkUpdater mockUpdater = mockManagedCloudSdk.newUpdater();
-    doThrow(new CommandExitException(-1, "")).when(mockUpdater).update(any());
+    doThrow(new CommandExitException(-1, "")).when(mockUpdater).update(any(), any());
 
     sdkService.addStatusUpdateListener(mockStatusUpdateListener);
     sdkService.update();
@@ -356,7 +356,7 @@ public class ManagedCloudSdkServiceTest {
     makeMockSdkInstalled(MOCK_SDK_PATH);
     emulateMockSdkUpdateProcess();
     SdkUpdater mockUpdater = mockManagedCloudSdk.newUpdater();
-    doThrow(new CommandExitException(-1, "")).when(mockUpdater).update(any());
+    doThrow(new CommandExitException(-1, "")).when(mockUpdater).update(any(), any());
     // update breaks SDK
     when(mockManagedCloudSdk.isInstalled()).thenReturn(false);
 

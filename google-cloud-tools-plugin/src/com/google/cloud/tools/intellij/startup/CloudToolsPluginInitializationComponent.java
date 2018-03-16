@@ -64,7 +64,9 @@ public class CloudToolsPluginInitializationComponent implements ApplicationCompo
     new ConflictingAppEnginePluginCheck().notifyIfConflicting();
     new GoogleAccountPluginUninstaller().uninstallIfPresent();
 
-    ServiceManager.getService(CloudSdkServiceManager.class).getCloudSdkService().activate();
+    if (!ApplicationManager.getApplication().isUnitTestMode()) {
+      ServiceManager.getService(CloudSdkServiceManager.class).getCloudSdkService().activate();
+    }
   }
 
   /**

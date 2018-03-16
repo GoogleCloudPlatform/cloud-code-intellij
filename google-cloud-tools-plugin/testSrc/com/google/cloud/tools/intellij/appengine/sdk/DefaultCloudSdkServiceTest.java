@@ -47,11 +47,14 @@ public class DefaultCloudSdkServiceTest {
 
   @Spy @TestService private CloudSdkValidator sdkValidator;
 
+  @Mock @TestService private CloudSdkServiceManager cloudSdkServiceManager;
+
   @Mock private CloudSdk mockSdk;
 
   @Before
   public void setUp() throws Exception {
     when(service.getSdkHomePath()).thenReturn(Paths.get("/home/path"));
+    when(cloudSdkServiceManager.getCloudSdkService()).thenReturn(service);
     doReturn(mockSdk).when(sdkValidator).buildCloudSdkWithPath(any(Path.class));
   }
 
