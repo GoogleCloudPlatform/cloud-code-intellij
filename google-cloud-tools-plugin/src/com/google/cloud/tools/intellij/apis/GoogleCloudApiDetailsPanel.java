@@ -21,6 +21,7 @@ import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
+import com.google.cloud.tools.libraries.json.CloudLibraryClientMavenCoordinates;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.application.ApplicationManager;
@@ -60,6 +61,7 @@ public final class GoogleCloudApiDetailsPanel {
   private JTextPane managementWarningTextPane;
 
   private CloudLibrary currentCloudLibrary;
+  private String currentBomVersion;
   private CloudApiManagementSpec currentCloudApiManagementSpec;
 
   /** Returns the {@link JPanel} that holds the UI elements in this panel. */
@@ -75,12 +77,14 @@ public final class GoogleCloudApiDetailsPanel {
    *
    * @param library the {@link CloudLibrary} to display
    */
-  void setCloudLibrary(CloudLibrary library, CloudApiManagementSpec cloudApiManagementSpec) {
+  void setCloudLibrary(
+      CloudLibrary library, String bomVersion, CloudApiManagementSpec cloudApiManagementSpec) {
     if (cloudLibrariesEqual(currentCloudLibrary, library)) {
       return;
     }
 
     currentCloudLibrary = library;
+    currentBomVersion = bomVersion;
     currentCloudApiManagementSpec = cloudApiManagementSpec;
     updateUI();
   }
@@ -202,12 +206,21 @@ public final class GoogleCloudApiDetailsPanel {
       CloudLibraryUtils.getFirstJavaClient(currentCloudLibrary)
           .ifPresent(
               client -> {
-                if (client.getMavenCoordinates() != null) {
-                  versionLabel.setText(
-                      GctBundle.message(
-                          "cloud.libraries.version.label",
-                          client.getMavenCoordinates().getVersion()));
+                CloudLibraryClientMavenCoordinates coordinates = client.getMavenCoordinates();
+                if (coordinates != null) {
+                  versionLabel.setIcon(GoogleCloudCoreIcons.LOADING);
+                  loadVersionFromBomAsync(
+                      coordinates,
+                      currentBomVersion,
+                      versionOptional -> {
+                        versionLabel.setIcon(null);
+                        versionOptional.ifPresent(
+                            version ->
+                                versionLabel.setText(
+                                    GctBundle.message("cloud.libraries.version.label", version)));
+                      });
                 }
+
                 statusLabel.setText(
                     GctBundle.message("cloud.libraries.status.label", client.getLaunchStage()));
 
@@ -265,6 +278,21 @@ public final class GoogleCloudApiDetailsPanel {
               ImageIcon finalImageIcon = imageIcon;
               ApplicationManager.getApplication()
                   .invokeAndWait(() -> imageConsumer.accept(finalImageIcon), ModalityState.any());
+            });
+  }
+
+  private static void loadVersionFromBomAsync(
+      CloudLibraryClientMavenCoordinates mavenCoordinates,
+      String bomVersion,
+      Consumer<Optional<String>> versionConsumer) {
+    ThreadUtil.getInstance()
+        .executeInBackground(
+            () -> {
+              Optional<String> version =
+                  CloudApiMavenService.getInstance()
+                      .getManagedDependencyVersion(mavenCoordinates, bomVersion);
+              ApplicationManager.getApplication()
+                  .invokeAndWait(() -> versionConsumer.accept(version), ModalityState.any());
             });
   }
 

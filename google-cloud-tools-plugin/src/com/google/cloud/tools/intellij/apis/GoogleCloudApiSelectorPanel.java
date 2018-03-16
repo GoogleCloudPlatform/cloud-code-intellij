@@ -231,7 +231,8 @@ final class GoogleCloudApiSelectorPanel {
                 CloudLibrary library =
                     (CloudLibrary)
                         cloudLibrariesTable.getModel().getValueAt(selectedIndex, CLOUD_LIBRARY_COL);
-                detailsPanel.setCloudLibrary(library, apiManagementMap.get(library));
+                detailsPanel.setCloudLibrary(
+                    library, bomComboBox.getSelectedItem().toString(), apiManagementMap.get(library));
                 updateManagementUI();
               }
             });
@@ -261,7 +262,6 @@ final class GoogleCloudApiSelectorPanel {
   private void populateBomVersions() {
     List<Version> bomVersions =
         Lists.newArrayList(CloudApiMavenService.getInstance().getBomVersions());
-    CloudApiMavenService.getInstance().getBomManagedDependencies();
 
     if (bomVersions.isEmpty()) {
       hideBomUI();

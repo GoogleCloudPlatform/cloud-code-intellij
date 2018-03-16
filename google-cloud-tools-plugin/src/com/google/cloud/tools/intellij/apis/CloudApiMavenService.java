@@ -16,11 +16,14 @@
 
 package com.google.cloud.tools.intellij.apis;
 
+import com.google.cloud.tools.libraries.json.CloudLibrary;
+import com.google.cloud.tools.libraries.json.CloudLibraryClientMavenCoordinates;
 import com.google.common.collect.ImmutableList;
 import com.intellij.jarRepository.JarRepositoryManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import java.util.List;
+import java.util.Optional;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -86,19 +89,50 @@ public class CloudApiMavenService {
     }
   }
 
-  void getBomManagedDependencies() {
-    Artifact artifact = new DefaultArtifact(toBomCoordinates("0.39-alpha"));
+  /**
+   * Finds the version of the passed in {@link CloudLibrary} maven coordinates that is managed by
+   * the given BOM version.
+   *
+   * @param libraryMavenCoordinates the maven coordinates of the {@link CloudLibrary} for which we
+   *     are finding the version
+   * @param bomVersion the version of the BOM from which to fetch the library version
+   * @return the optional version of the library found in the given BOM
+   */
+  Optional<String> getManagedDependencyVersion(
+      CloudLibraryClientMavenCoordinates libraryMavenCoordinates, String bomVersion) {
+    Artifact bomArtifact = new DefaultArtifact(toBomCoordinates(bomVersion));
 
     ArtifactDescriptorRequest request = new ArtifactDescriptorRequest();
-    request.setArtifact(artifact);
+    request.setArtifact(bomArtifact);
     request.addRepository(MAVEN_CENTRAL_REPOSITORY);
 
     try {
       ArtifactDescriptorResult result = SYSTEM.readArtifactDescriptor(SESSION, request);
-      System.out.println("Dependencies: " + result.getManagedDependencies());
+      return result
+          .getManagedDependencies()
+          .stream()
+          .filter(
+              dependency -> {
+                Artifact artifact = dependency.getArtifact();
+                String coordinatesFromBom =
+                    toFormattedMavenCoordinates(
+                        libraryMavenCoordinates.getGroupId(),
+                        libraryMavenCoordinates.getArtifactId());
+                String libraryCoordinates =
+                    toFormattedMavenCoordinates(artifact.getGroupId(), artifact.getArtifactId());
+
+                return coordinatesFromBom.equalsIgnoreCase(libraryCoordinates);
+              })
+          .findFirst()
+          .map(dependency -> dependency.getArtifact().getVersion());
     } catch (ArtifactDescriptorException e) {
-      e.printStackTrace();
+      logger.warn("Error fetching version of client library from bom version " + bomVersion);
+      return Optional.empty();
     }
+  }
+
+  private static String toFormattedMavenCoordinates(String groupName, String artifactName) {
+    return groupName + ":" + artifactName;
   }
 
   private static String toBomCoordinates(String versionConstraint) {
