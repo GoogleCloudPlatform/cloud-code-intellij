@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij;
 
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 
@@ -28,6 +27,6 @@ public class CloudToolsMenuGroupAction extends DefaultActionGroup {
 
   public CloudToolsMenuGroupAction() {
     getTemplatePresentation().setText(GctBundle.message("cloud.tools.group.menu.text"));
-    getTemplatePresentation().setIcon(GoogleCloudToolsIcons.CLOUD);
+    getTemplatePresentation().setIcon(GoogleCloudCoreIcons.CLOUD);
   }
 }

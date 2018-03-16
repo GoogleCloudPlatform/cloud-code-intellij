@@ -23,7 +23,6 @@ import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.resources.ResourceLoadingModelItem;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBox;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBoxPopup;
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.application.ApplicationManager;
@@ -232,8 +231,8 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
       repositoryTree.expandRow(0);
 
       RepositorySelectorRenderer renderer = new RepositorySelectorRenderer();
-      renderer.setOpenIcon(GoogleCloudToolsIcons.CLOUD);
-      renderer.setClosedIcon(GoogleCloudToolsIcons.CLOUD);
+      renderer.setOpenIcon(GoogleCloudCoreIcons.CLOUD);
+      renderer.setClosedIcon(GoogleCloudCoreIcons.CLOUD);
       renderer.setLeafIcon(null);
       repositoryTree.setCellRenderer(renderer);
 

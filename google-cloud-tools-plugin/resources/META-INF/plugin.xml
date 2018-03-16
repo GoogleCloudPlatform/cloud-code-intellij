@@ -418,8 +418,6 @@
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.DefaultCloudSdkVersionNotifier"/>
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.application.AppEngineAdminService"
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.application.GoogleApiClientAppEngineAdminService"/>
-    <applicationService serviceInterface="com.google.cloud.tools.intellij.resources.GoogleApiClientFactory"
-                        serviceImplementation="com.google.cloud.tools.intellij.resources.DefaultGoogleApiClientFactory"/>
     <applicationService serviceImplementation="com.google.cloud.tools.intellij.csr.CloudRepositoryService"/>
     <applicationService serviceImplementation="com.google.cloud.tools.intellij.apis.CloudLibrariesService"/>
     <applicationService serviceImplementation="com.google.cloud.tools.intellij.apis.CloudApiMavenService"/>

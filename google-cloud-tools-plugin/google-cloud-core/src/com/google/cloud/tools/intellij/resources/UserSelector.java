@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.resources;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
+import com.google.cloud.tools.intellij.GoogleCloudCoreMessageBundle;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.IGoogleLoginCompletedCallback;
 import com.google.cloud.tools.intellij.login.IntegratedIntellijGoogleLoginService;
@@ -24,7 +25,6 @@ import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.login.ui.GoogleLoginEmptyPanel;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBox;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBoxPopup;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -62,7 +62,9 @@ public class UserSelector extends CustomizableComboBox implements CustomizableCo
 
   public UserSelector() {
     getTextField().setCursor(Cursor.getDefaultCursor());
-    getTextField().getEmptyText().setText(GctBundle.message("select.user.emptytext"));
+    getTextField()
+        .getEmptyText()
+        .setText(GoogleCloudCoreMessageBundle.message("select.user.emptytext"));
   }
 
   /**

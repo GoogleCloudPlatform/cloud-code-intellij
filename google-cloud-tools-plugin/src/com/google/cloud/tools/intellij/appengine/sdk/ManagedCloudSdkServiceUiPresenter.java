@@ -16,9 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
+import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
 import com.google.cloud.tools.intellij.appengine.sdk.ManagedCloudSdkService.ManagedSdkJobType;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.managedcloudsdk.ProgressListener;
 import com.google.common.annotations.VisibleForTesting;
@@ -40,7 +40,7 @@ public class ManagedCloudSdkServiceUiPresenter {
           NotificationDisplayType.BALLOON,
           true,
           null,
-          GoogleCloudToolsIcons.CLOUD);
+          GoogleCloudCoreIcons.CLOUD);
 
   static ManagedCloudSdkServiceUiPresenter getInstance() {
     return instance;
