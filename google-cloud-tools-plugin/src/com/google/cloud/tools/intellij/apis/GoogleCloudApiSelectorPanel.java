@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -115,7 +116,7 @@ final class GoogleCloudApiSelectorPanel {
       bomComboBox.addActionListener(
           event -> {
             if (cloudLibrariesTable.getSelectedRow() != -1) {
-              detailsPanel.updateManagedLibraryVersion(bomComboBox.getSelectedItem().toString());
+              detailsPanel.updateManagedLibraryVersionFromBom(bomComboBox.getSelectedItem().toString());
             }
           });
     } else {
@@ -239,7 +240,7 @@ final class GoogleCloudApiSelectorPanel {
                         cloudLibrariesTable.getModel().getValueAt(selectedIndex, CLOUD_LIBRARY_COL);
                 detailsPanel.setCloudLibrary(
                     library,
-                    bomComboBox.getSelectedItem().toString(),
+                    Optional.ofNullable(bomComboBox.getSelectedItem()).map(Object::toString),
                     apiManagementMap.get(library));
                 updateManagementUI();
               }
