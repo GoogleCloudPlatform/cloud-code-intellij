@@ -18,9 +18,9 @@ package com.google.cloud.tools.intellij.debugger.actions;
 
 import static com.intellij.openapi.actionSystem.CommonDataKeys.EDITOR;
 
+import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
 import com.google.cloud.tools.intellij.debugger.CloudDebugRunConfiguration;
 import com.google.cloud.tools.intellij.debugger.CloudLineBreakpointType;
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.impl.RunManagerImpl;
@@ -48,7 +48,7 @@ public class ToggleSnapshotLocationAction extends AnAction {
     super(
         GctBundle.getString("clouddebug.snapshot.location"),
         GctBundle.getString("clouddebug.adds.snapshot.location"),
-        GoogleCloudToolsIcons.CLOUD);
+        GoogleCloudCoreIcons.CLOUD);
   }
 
   @SuppressWarnings("ConstantConditions")
