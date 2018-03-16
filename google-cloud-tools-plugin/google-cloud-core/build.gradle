@@ -25,7 +25,20 @@ dependencies {
     compile files('lib/google-gct-login-context-ij-pg.jar')
     compile files('lib/GoogleFeedback.jar')
     compile files('third_party/repackaged/google-api-java-client-min-repackaged-1.20.0.jar')
-
+    compile 'com.google.apis:google-api-services-clouddebugger:v2-rev7-1.21.0'
+    compile 'com.google.apis:google-api-services-cloudresourcemanager:v1beta1-rev12-1.21.0'
+    compile 'com.google.apis:google-api-services-iam:v1-rev225-1.22.0'
+    compile 'com.google.apis:google-api-services-appengine:v1-rev8-1.22.0'
+    compile ('com.google.cloud:google-cloud-storage:1.2.0') {
+        exclude group: 'com.google.http-client', module: 'google-http-client'
+        exclude group: 'com.google.http-client', module: 'google-http-client-jackson'
+        exclude group: 'com.google.code.findbugs', module: 'jsr305'
+        exclude group: 'com.google.guava', module: 'guava'
+        exclude group: 'com.google.oauth-client', module: 'google-oauth-client'
+        exclude group: 'com.google.protobuf', module: 'protobuf-java'
+        exclude group: 'com.google.protobuf', module: 'protobuf-java-util'
+    }
+    compile 'com.google.apis:google-api-services-servicemanagement:v1-rev374-1.22.0'
     // TODO : see #350
     compile 'com.google.http-client:google-http-client-jackson:1.20.0'
     compile 'org.codehaus.jackson:jackson-core-asl:1.9.11'

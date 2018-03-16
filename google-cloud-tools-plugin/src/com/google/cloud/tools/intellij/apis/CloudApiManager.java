@@ -30,6 +30,7 @@ import com.google.api.services.iam.v1.model.ServiceAccount;
 import com.google.api.services.iam.v1.model.ServiceAccountKey;
 import com.google.api.services.servicemanagement.ServiceManagement;
 import com.google.api.services.servicemanagement.model.EnableServiceRequest;
+import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
@@ -37,7 +38,6 @@ import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.collect.ImmutableList;
@@ -78,7 +78,7 @@ class CloudApiManager {
           NotificationDisplayType.BALLOON,
           true,
           null,
-          GoogleCloudToolsIcons.CLOUD);
+          GoogleCloudCoreIcons.CLOUD);
 
   private static final DateTimeFormatter SERVICE_ACCOUNT_TIMESTAMP_FORMAT =
       DateTimeFormatter.ofPattern("yyMMddHHmmss");

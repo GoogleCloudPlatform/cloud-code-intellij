@@ -46,6 +46,18 @@
       </p>
       <br/>
 
+      <h2>[18.3.1]</h2>
+
+      <h3>Added</h3>
+      <ul>
+        <li>Added ability to create service accounts and download service account keys from the IDE client library workflow. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1808">#1808</a>)</li>
+      </ul>
+
+      <h3>Fixed</h3>
+      <ul>
+        <li>Fixed cases where appengine-web.xml wasn't being generated due to missing web.xml. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1903">#1903</a>)</li>
+      </ul>
+
       <h2>[18.2.1]</h2>
 
       <h3>Added</h3>
@@ -406,8 +418,6 @@
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.DefaultCloudSdkVersionNotifier"/>
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.application.AppEngineAdminService"
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.application.GoogleApiClientAppEngineAdminService"/>
-    <applicationService serviceInterface="com.google.cloud.tools.intellij.resources.GoogleApiClientFactory"
-                        serviceImplementation="com.google.cloud.tools.intellij.resources.DefaultGoogleApiClientFactory"/>
     <applicationService serviceImplementation="com.google.cloud.tools.intellij.csr.CloudRepositoryService"/>
     <applicationService serviceImplementation="com.google.cloud.tools.intellij.apis.CloudLibrariesService"/>
     <applicationService serviceImplementation="com.google.cloud.tools.intellij.apis.CloudApiMavenService"/>

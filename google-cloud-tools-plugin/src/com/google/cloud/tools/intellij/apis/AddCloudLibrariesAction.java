@@ -16,10 +16,10 @@
 
 package com.google.cloud.tools.intellij.apis;
 
+import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -42,7 +42,7 @@ public final class AddCloudLibrariesAction extends DumbAwareAction {
     super(
         GctBundle.message("cloud.libraries.menu.action.text"),
         GctBundle.message("cloud.libraries.menu.action.description"),
-        GoogleCloudToolsIcons.CLOUD);
+        GoogleCloudCoreIcons.CLOUD);
   }
 
   @Override

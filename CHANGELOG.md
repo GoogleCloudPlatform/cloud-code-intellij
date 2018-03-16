@@ -1,6 +1,14 @@
 # Release notes
 This page documents production updates to Cloud Tools for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## 18.3.1
+
+### Added
+  - Added ability to create service accounts and download service account keys from the IDE client library workflow. [1808](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1808)
+  
+### Fixed
+  - Fixed cases where appengine-web.xml wasn't being generated due to missing web.xml. [1903](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1903)
+
 ## 18.2.1
 
 ### Added
