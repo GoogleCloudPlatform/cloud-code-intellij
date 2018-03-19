@@ -347,6 +347,25 @@ public final class GoogleCloudApiSelectorPanelTest {
   }
 
   @Test
+  public void getPanel_withBomAndNoDependencyVersion_displaysEmptyVersion() {
+    // TODO (eshaul): remove once feature is released
+    when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
+
+    when(mavenService.getManagedDependencyVersion(any(), anyString())).thenReturn(Optional.empty());
+
+    CloudLibrary cloudLibrary = LIBRARY_1.toCloudLibrary();
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(cloudLibrary), testFixture.getProject());
+
+    panel
+        .getDetailsPanel()
+        .setCloudLibrary(cloudLibrary, BOM_VERSION, panel.getApiManagementMap().get(cloudLibrary));
+
+    assertThat(panel.getDetailsPanel().getVersionLabel().getText()).isEqualTo("");
+    assertThat(panel.getDetailsPanel().getVersionLabel().getIcon()).isNull();
+  }
+
+  @Test
   public void getSelectedModule_withNoneSelected_returnsDefaultModule() {
     GoogleCloudApiSelectorPanel panel =
         new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());

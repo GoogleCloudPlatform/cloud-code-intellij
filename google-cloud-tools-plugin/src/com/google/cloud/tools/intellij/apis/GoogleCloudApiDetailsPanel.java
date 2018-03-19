@@ -267,17 +267,21 @@ public final class GoogleCloudApiDetailsPanel {
                                 CloudApiMavenService.getInstance()
                                     .getManagedDependencyVersion(coordinates, bomVersion);
 
-                            versionOptional.ifPresent(
-                                version ->
-                                    ApplicationManager.getApplication()
-                                        .invokeAndWait(
-                                            () -> {
-                                              versionLabel.setIcon(null);
-                                              versionLabel.setText(
-                                                  GctBundle.message(
-                                                      "cloud.libraries.version.label", version));
-                                            },
-                                            ModalityState.any()));
+
+                            if (versionOptional.isPresent()) {
+                              ApplicationManager.getApplication()
+                                  .invokeAndWait(
+                                      () -> {
+                                        versionLabel.setIcon(null);
+                                        versionLabel.setText(
+                                            GctBundle.message(
+                                                "cloud.libraries.version.label",
+                                                versionOptional.get()));
+                                      },
+                                      ModalityState.any());
+                            } else {
+                              versionLabel.setIcon(null);
+                            }
                           });
                 }
               });
