@@ -61,6 +61,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -230,27 +231,26 @@ final class GoogleCloudApiSelectorPanel {
     cloudLibrariesTable.setTableHeader(null);
     cloudLibrariesTable
         .getSelectionModel()
-        .addListSelectionListener(
-            e -> {
-              ListSelectionModel model = (ListSelectionModel) e.getSource();
-              if (!model.isSelectionEmpty()) {
-                int selectedIndex = model.getMinSelectionIndex();
-                CloudLibrary library =
-                    (CloudLibrary)
-                        cloudLibrariesTable.getModel().getValueAt(selectedIndex, CLOUD_LIBRARY_COL);
-                detailsPanel.setCloudLibrary(
-                    library,
-                    bomComboBox.getSelectedItem() != null
-                        ? bomComboBox.getSelectedItem().toString()
-                        : null,
-                    apiManagementMap.get(library));
-                updateManagementUI();
-              }
-            });
+        .addListSelectionListener(this::onClientLibrarySelection);
     addTableModelListener(e -> updateManagementUI());
 
     projectSelector = new ProjectSelector(project);
     projectSelector.addProjectSelectionListener(cloudProject -> updateManagementUI());
+  }
+
+  private void onClientLibrarySelection(ListSelectionEvent event) {
+    ListSelectionModel model = (ListSelectionModel) event.getSource();
+    if (!model.isSelectionEmpty()) {
+      int selectedIndex = model.getMinSelectionIndex();
+      CloudLibrary library =
+          (CloudLibrary)
+              cloudLibrariesTable.getModel().getValueAt(selectedIndex, CLOUD_LIBRARY_COL);
+      detailsPanel.setCloudLibrary(
+          library,
+          bomComboBox.getSelectedItem() != null ? bomComboBox.getSelectedItem().toString() : null,
+          apiManagementMap.get(library));
+      updateManagementUI();
+    }
   }
 
   private void updateManagementUI() {
