@@ -40,7 +40,7 @@ public final class AddCloudLibrariesAction extends DumbAwareAction {
 
   public AddCloudLibrariesAction() {
     super(
-        GctBundle.message("cloud.libraries.menu.action.text"),
+        GctBundle.message("cloud.libraries.menu.action.active.text"),
         GctBundle.message("cloud.libraries.menu.action.description"),
         GoogleCloudCoreIcons.CLOUD);
   }
@@ -64,12 +64,16 @@ public final class AddCloudLibrariesAction extends DumbAwareAction {
               e.getPresentation()
                   .setDescription(
                       GctBundle.message("cloud.libraries.menu.action.maven.required.description"));
+              e.getPresentation()
+                  .setText(GctBundle.message("cloud.libraries.menu.action.disabled.maven.text"));
               break;
             case APPENGINE_JAVA8_REQUIRED:
               e.getPresentation()
                   .setDescription(
                       GctBundle.message(
                           "cloud.libraries.menu.action.gae.java8.required.description"));
+              e.getPresentation()
+                  .setText(GctBundle.message("cloud.libraries.menu.action.disabled.java8.text"));
               break;
           }
         }
@@ -77,6 +81,7 @@ public final class AddCloudLibrariesAction extends DumbAwareAction {
         // standard message for a supported module action.
         e.getPresentation()
             .setDescription(GctBundle.message("cloud.libraries.menu.action.description"));
+        e.getPresentation().setText(GctBundle.message("cloud.libraries.menu.action.active.text"));
       }
     }
 
