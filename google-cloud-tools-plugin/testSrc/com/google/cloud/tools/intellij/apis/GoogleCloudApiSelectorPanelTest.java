@@ -315,7 +315,6 @@ public final class GoogleCloudApiSelectorPanelTest {
     String libVersion = "9.9-alpha";
     when(mavenService.getManagedDependencyVersion(any(), anyString()))
         .thenReturn(Optional.of(libVersion));
-    when(mavenService.getBomVersions()).thenReturn(ImmutableList.of(newTestVersion(BOM_VERSION)));
 
     CloudLibrary cloudLibrary = LIBRARY_1.toCloudLibrary();
     GoogleCloudApiSelectorPanel panel =
@@ -333,8 +332,6 @@ public final class GoogleCloudApiSelectorPanelTest {
   public void getPanel_withNoVersionReturnedFromBomQuery_fallsBackToAndDisplaysStaticVersion() {
     // TODO (eshaul): remove once feature is released
     when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
-
-    when(mavenService.getBomVersions()).thenReturn(ImmutableList.of(newTestVersion(BOM_VERSION)));
 
     CloudLibrary cloudLibrary = LIBRARY_1.toCloudLibrary();
     GoogleCloudApiSelectorPanel panel =
