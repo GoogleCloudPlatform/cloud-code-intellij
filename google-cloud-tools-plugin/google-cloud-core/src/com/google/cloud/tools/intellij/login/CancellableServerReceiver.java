@@ -158,12 +158,9 @@ class CancellableServerReceiver implements VerificationCodeReceiver {
   }
 
   private static int getUnusedPort() throws IOException {
-    Socket socket = new Socket();
-    socket.bind(null);
-    try {
+    try (Socket socket = new Socket()) {
+      socket.bind(null);
       return socket.getLocalPort();
-    } finally {
-      socket.close();
     }
   }
 

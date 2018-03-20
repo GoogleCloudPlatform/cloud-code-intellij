@@ -94,10 +94,11 @@ public class AppEngineFlexibleFrameworkDetector
               // inside.
               boolean nameMatch = APP_ENGINE_FLEX_CONFIG_FILES.contains(fileContent.getFileName());
               if (nameMatch) {
-                Scanner scanner = new Scanner(fileContent.getContentAsText().toString());
-                while (scanner.hasNextLine()) {
-                  if (scanner.nextLine().startsWith(APP_ENGINE_FLEX_REQUIRED_YAML_CONTENT)) {
-                    return true;
+                try (Scanner scanner = new Scanner(fileContent.getContentAsText().toString())) {
+                  while (scanner.hasNextLine()) {
+                    if (scanner.nextLine().startsWith(APP_ENGINE_FLEX_REQUIRED_YAML_CONTENT)) {
+                      return true;
+                    }
                   }
                 }
               }
