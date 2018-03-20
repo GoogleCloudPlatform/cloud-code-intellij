@@ -16,7 +16,11 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.UserSpecifiedPathDeploymentSource;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.collect.ArrayListMultimap;
@@ -34,6 +38,7 @@ import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.runtime.deployment.DeploymentLogManager;
 import com.intellij.remoteServer.runtime.deployment.DeploymentTask;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance;
+import java.util.concurrent.CountDownLatch;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 
@@ -67,6 +72,79 @@ public class AppEngineRuntimeInstance
     if (!Services.getLoginService().isLoggedIn()) {
       callback.errorOccurred(GctBundle.message("appengine.deployment.error.not.logged.in"));
       return;
+    }
+
+    CloudSdkService cloudSdkService = CloudSdkService.getInstance();
+    System.out.println("SDK Status: " + cloudSdkService.getStatus());
+    SdkStatus sdkStatus = cloudSdkService.getStatus();
+    boolean supportsInPlaceInstall = false;
+    if (sdkStatus == SdkStatus.NOT_AVAILABLE) {
+      supportsInPlaceInstall = cloudSdkService.install();
+    }
+    boolean installingInProgress = supportsInPlaceInstall || sdkStatus == SdkStatus.INSTALLING;
+    if (installingInProgress) {
+      // wait until install / update is done. use latch to notify UI blocking thread.
+      CountDownLatch installationCompletionLatch = new CountDownLatch(1);
+      final CloudSdkService.SdkStatusUpdateListener sdkStatusUpdateListener =
+          (sdkService, status) -> {
+            System.out.println("SDk status change to: " + status);
+            switch (status) {
+              case READY:
+              case INVALID:
+              case NOT_AVAILABLE:
+                System.out.println("latch triggered.");
+                installationCompletionLatch.countDown();
+                break;
+              case INSTALLING:
+                // continue waiting for completion.
+                break;
+            }
+          };
+      cloudSdkService.addStatusUpdateListener(sdkStatusUpdateListener);
+
+      ProgressManager.getInstance()
+          .runProcessWithProgressSynchronously(
+              () -> {
+                ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
+
+                try {
+                  while (installationCompletionLatch.getCount() > 0) {
+                    // wait interruptibility to check for user cancel each second.
+                    installationCompletionLatch.await(1, SECONDS);
+                    if (ProgressManager.getInstance().getProgressIndicator().isCanceled()) {
+                      return;
+                    }
+                  }
+                } catch (InterruptedException e) {
+                  /* valid cancellation exception, no handlind needed. */
+                }
+              },
+              "Waiting for Google Cloud SDK Installation to Complete...",
+              true,
+              task.getProject());
+
+      cloudSdkService.removeStatusUpdateListener(sdkStatusUpdateListener);
+    }
+
+    // check the status of SDK after install.
+    sdkStatus = cloudSdkService.getStatus();
+    System.out.println("SDK Status post-install check: " + cloudSdkService.getStatus());
+    switch (sdkStatus) {
+      case INSTALLING:
+        callback.errorOccurred(
+            "Google Cloud SDK with App Engine Java needs to be completely installed to perform this action.");
+        return;
+      case NOT_AVAILABLE:
+        callback.errorOccurred(
+            "Google Cloud SDK is not available. Please check Settings -> Google -> Cloud SDK.");
+        return;
+      case INVALID:
+        callback.errorOccurred(
+            "Google Cloud SDK is invalid. Please check Settings -> Google -> Cloud SDK.");
+        return;
+      case READY:
+        // can continue to deployment.
+        break;
     }
 
     AppEngineDeploymentConfiguration deploymentConfig = task.getConfiguration();

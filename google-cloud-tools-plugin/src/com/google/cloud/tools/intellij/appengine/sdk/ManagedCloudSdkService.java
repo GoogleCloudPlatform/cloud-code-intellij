@@ -192,13 +192,10 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
       progressListener =
           ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
-      progressListener.start(
-          GctBundle.message("managedsdk.progress.install.app.engine"), ProgressListener.UNKNOWN);
       managedCloudSdk
           .newComponentInstaller()
-          .installComponent(SdkComponent.APP_ENGINE_JAVA, appEngineConsoleListener);
-
-      progressListener.done();
+          .installComponent(
+              SdkComponent.APP_ENGINE_JAVA, progressListener, appEngineConsoleListener);
     }
   }
 
@@ -208,11 +205,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
       progressListener =
           ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
 
-      progressListener.start(
-          GctBundle.message("managedsdk.progress.update"), ProgressListener.UNKNOWN);
-      managedCloudSdk.newUpdater().update(sdkUpdateListener);
-
-      progressListener.done();
+      managedCloudSdk.newUpdater().update(progressListener, sdkUpdateListener);
     }
 
     return managedCloudSdk.getSdkHome();

@@ -24,6 +24,8 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager;
 import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
 import com.google.cloud.tools.intellij.service.ApplicationPluginInfoService;
 import com.google.cloud.tools.intellij.service.PluginConfigurationService;
@@ -37,7 +39,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /** Tests to validate initialization on supported platforms */
 @RunWith(MockitoJUnitRunner.class)
@@ -49,6 +51,7 @@ public class CloudToolsPluginInitializationComponentTest extends BasePluginTestC
   @Mock ActionManager actionManager;
   @Mock ApplicationPluginInfoService applicationInfoService;
   @Mock IntegratedGoogleLoginService googleLoginService;
+  @Mock CloudSdkServiceManager cloudSdkServiceManager;
 
   CloudToolsPluginInitializationComponent testComponent;
 
@@ -59,6 +62,8 @@ public class CloudToolsPluginInitializationComponentTest extends BasePluginTestC
     registerService(ActionManager.class, actionManager);
     registerService(ApplicationPluginInfoService.class, applicationInfoService);
     registerService(IntegratedGoogleLoginService.class, googleLoginService);
+    registerService(CloudSdkServiceManager.class, cloudSdkServiceManager);
+    when(cloudSdkServiceManager.getCloudSdkService()).thenReturn(mock(CloudSdkService.class));
 
     testComponent = new CloudToolsPluginInitializationComponent();
   }
