@@ -16,14 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator;
-import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.RemoteServerConfigurable;
 import com.intellij.remoteServer.ServerType;
@@ -97,7 +92,8 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
         return;
       }
 
-      if (!CloudSdkValidator.getInstance().isValidCloudSdk()) {
+      // TODO(ivanporty) need to show this in a better place once, based on an installation status.
+      /*if (!CloudSdkValidator.getInstance().isValidCloudSdk()) {
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.invalid.cloudsdk"));
         Notification invalidSdkWarning =
             new Notification(
@@ -107,7 +103,7 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
                 NotificationType.ERROR);
         Notifications.Bus.notify(invalidSdkWarning);
         // TODO Consider auto opening configuration panel
-      }
+      }*/
 
       callback.connected(new AppEngineRuntimeInstance());
     }
