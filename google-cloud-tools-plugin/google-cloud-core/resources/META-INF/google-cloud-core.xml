@@ -48,6 +48,8 @@
     <applicationService
             serviceInterface="com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService"
             serviceImplementation="com.google.cloud.tools.intellij.login.IntegratedIntellijGoogleLoginService"/>
+    <applicationService serviceInterface="com.google.cloud.tools.intellij.resources.GoogleApiClientFactory"
+                        serviceImplementation="com.google.cloud.tools.intellij.resources.DefaultGoogleApiClientFactory"/>
   </extensions>
 
   <extensions defaultExtensionNs="com.google.gct.core">

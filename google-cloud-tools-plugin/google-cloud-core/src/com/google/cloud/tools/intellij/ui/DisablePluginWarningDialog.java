@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package com.google.cloud.tools.intellij.ui;
 
+import com.google.cloud.tools.intellij.GoogleCloudCoreMessageBundle;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.ide.plugins.PluginManagerCore;
@@ -53,15 +53,17 @@ public class DisablePluginWarningDialog extends DialogWrapper {
     this.pluginId = pluginId;
     IdeaPluginDescriptor plugin = PluginManager.getPlugin(pluginId);
     isRestartCapable = ApplicationManager.getApplication().isRestartCapable();
-    promptLabel.setText(GctBundle.message("error.dialog.disable.plugin.prompt", plugin.getName()));
+    promptLabel.setText(
+        GoogleCloudCoreMessageBundle.message(
+            "error.dialog.disable.plugin.prompt", plugin.getName()));
     restartLabel.setText(
-        GctBundle.message(
+        GoogleCloudCoreMessageBundle.message(
             isRestartCapable
                 ? "error.dialog.disable.plugin.restart"
                 : "error.dialog.disable.plugin.norestart",
             ApplicationNamesInfo.getInstance().getFullProductName()));
 
-    setTitle(GctBundle.message("error.dialog.disable.plugin.title"));
+    setTitle(GoogleCloudCoreMessageBundle.message("error.dialog.disable.plugin.title"));
     init();
   }
 
@@ -106,7 +108,7 @@ public class DisablePluginWarningDialog extends DialogWrapper {
 
   private class DisableAction extends DialogWrapperAction {
     protected DisableAction() {
-      super(GctBundle.message("error.dialog.disable.plugin.action.disable"));
+      super(GoogleCloudCoreMessageBundle.message("error.dialog.disable.plugin.action.disable"));
     }
 
     @Override
@@ -117,7 +119,9 @@ public class DisablePluginWarningDialog extends DialogWrapper {
 
   private class DisableAndRestartAction extends DialogWrapperAction {
     protected DisableAndRestartAction() {
-      super(GctBundle.message("error.dialog.disable.plugin.action.disableAndRestart"));
+      super(
+          GoogleCloudCoreMessageBundle.message(
+              "error.dialog.disable.plugin.action.disableAndRestart"));
     }
 
     @Override

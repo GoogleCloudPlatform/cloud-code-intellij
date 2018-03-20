@@ -34,6 +34,7 @@ public class GoogleCloudCoreIcons {
   private static final int STEPS_COUNT = 12;
   public static final ImmutableList<Icon> STEP_ICONS = findStepIcons("/icons/step_");
   public static final Icon LOADING = loadGif("/icons/loading.gif");
+  public static final Icon CLOUD = load("/icons/cloudPlatform.png");
 
   private GoogleCloudCoreIcons() {
     // Not for instantiation.
