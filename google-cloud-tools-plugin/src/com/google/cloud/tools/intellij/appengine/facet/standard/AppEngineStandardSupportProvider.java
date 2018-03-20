@@ -19,11 +19,6 @@ package com.google.cloud.tools.intellij.appengine.facet.standard;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceUserSettings;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator;
 import com.google.cloud.tools.intellij.appengine.util.AppEngineUtil;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.facet.FacetManager;
@@ -69,7 +64,6 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.TestOnly;
 
 /** @author nik */
 public class AppEngineStandardSupportProvider extends FrameworkSupportInModuleProvider {
@@ -248,18 +242,12 @@ public class AppEngineStandardSupportProvider extends FrameworkSupportInModulePr
     return new AppEngineSupportConfigurable(model);
   }
 
-  @TestOnly
-  public static void setSdkPath(FrameworkSupportInModuleConfigurable configurable, String path) {
-    ((AppEngineSupportConfigurable) configurable).cloudSdkPanel.setCloudSdkDirectoryText(path);
-  }
-
   @VisibleForTesting
   public class AppEngineSupportConfigurable extends FrameworkSupportInModuleConfigurable
       implements FrameworkSupportModelListener {
 
     private final FrameworkSupportModel frameworkSupportModel;
     private JPanel mainPanel;
-    private CloudSdkPanel cloudSdkPanel;
     private AppEngineStandardLibraryPanel appEngineStandardLibraryPanel;
 
     private AppEngineSupportConfigurable(FrameworkSupportModel model) {
@@ -277,26 +265,13 @@ public class AppEngineStandardSupportProvider extends FrameworkSupportInModulePr
     public void wizardStepUpdated() {}
 
     @Override
-    public void onFrameworkSelectionChanged(boolean selected) {
-      if (selected) {
-        cloudSdkPanel.reset();
-      }
-    }
+    public void onFrameworkSelectionChanged(boolean selected) {}
 
     @Override
     public void addSupport(
         @NotNull Module module,
         @NotNull ModifiableRootModel rootModel,
         @NotNull ModifiableModelsProvider modifiableModelsProvider) {
-      CloudSdkService sdkService = CloudSdkService.getInstance();
-      CloudSdkValidator sdkValidator = CloudSdkValidator.getInstance();
-      if (!sdkValidator
-          .validateCloudSdk(cloudSdkPanel.getCloudSdkDirectoryText())
-          .contains(CloudSdkValidationResult.MALFORMED_PATH)) {
-        CloudSdkServiceUserSettings.getInstance()
-            .setCustomSdkPath(cloudSdkPanel.getCloudSdkDirectoryText());
-      }
-
       AppEngineStandardSupportProvider.this.addSupport(
           module,
           rootModel,
@@ -331,7 +306,6 @@ public class AppEngineStandardSupportProvider extends FrameworkSupportInModulePr
     }
 
     private void createUIComponents() {
-      cloudSdkPanel = new CloudSdkPanel();
       appEngineStandardLibraryPanel = new AppEngineStandardLibraryPanel(true /*enabled*/);
     }
   }

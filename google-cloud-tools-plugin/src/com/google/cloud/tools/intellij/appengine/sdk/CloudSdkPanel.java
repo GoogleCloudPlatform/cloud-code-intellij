@@ -99,7 +99,7 @@ public class CloudSdkPanel {
     }
   }
 
-  public String buildSdkMessage(String path, boolean htmlEnabled) {
+  public static String buildSdkMessage(String path, boolean htmlEnabled) {
     if (StringUtil.isEmpty(path)) {
       String missingMessage = GctBundle.message("cloudsdk.location.missing.message");
 
@@ -265,7 +265,7 @@ public class CloudSdkPanel {
     return cloudSdkPanel;
   }
 
-  private String getCloudSdkDownloadMessage() {
+  private static String getCloudSdkDownloadMessage() {
     String openTag = "<a href='" + CLOUD_SDK_DOWNLOAD_LINK + "'>";
     return GctBundle.message("cloudsdk.download.message", openTag, "</a>");
   }

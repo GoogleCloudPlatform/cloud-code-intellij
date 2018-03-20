@@ -24,11 +24,12 @@ import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandar
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFrameworkType;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardLibraryPanel;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardMavenLibrary;
-import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardSupportProvider;
 import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardSupportProvider.AppEngineSupportConfigurable;
 import com.google.cloud.tools.intellij.appengine.facet.standard.MavenRepositoryLibraryDownloader;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkInternals;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceUserSettings;
 import com.google.cloud.tools.intellij.appengine.server.run.AppEngineServerConfigurationType;
 import com.google.cloud.tools.intellij.compiler.artifacts.ArtifactsTestUtil;
 import com.google.cloud.tools.intellij.javaee.supportProvider.JavaeeFrameworkSupportProviderTestCase;
@@ -124,6 +125,8 @@ public class AppEngineStandardSupportProviderTest extends JavaeeFrameworkSupport
 
   private void setupAppEngine(AppEngineStandardLibraryPanel libraryPanel, Library library) {
     CloudSdkService sdkService = mock(CloudSdkService.class);
+    CloudSdkServiceManager sdkServiceManager = mock(CloudSdkServiceManager.class);
+    when(sdkServiceManager.getCloudSdkService()).thenReturn(sdkService);
     CloudSdkInternals mockSdkInternals = mock(CloudSdkInternals.class);
     when(mockSdkInternals.getLibraries()).thenReturn(new File[] {});
     CloudSdkInternals.setInstance(mockSdkInternals);
@@ -147,8 +150,8 @@ public class AppEngineStandardSupportProviderTest extends JavaeeFrameworkSupport
     if (libraryPanel != null && configurable instanceof AppEngineSupportConfigurable) {
       ((AppEngineSupportConfigurable) configurable).setAppEngineStandardLibraryPanel(libraryPanel);
     }
-    AppEngineStandardSupportProvider.setSdkPath(
-        configurable, AppEngineCodeInsightTestCase.getSdkPath());
+    CloudSdkServiceUserSettings.getInstance()
+        .setCustomSdkPath(AppEngineCodeInsightTestCase.getSdkPath());
   }
 
   @NotNull

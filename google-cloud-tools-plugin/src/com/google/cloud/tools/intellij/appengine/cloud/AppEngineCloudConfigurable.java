@@ -16,17 +16,25 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
+import com.google.cloud.tools.intellij.GctFeature;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkConfigurable;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPanel;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceUserSettings;
+import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.ui.FontUtils;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.options.Configurable;
-import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.remoteServer.RemoteServerConfigurable;
+import com.intellij.ui.components.JBLabel;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkEvent.EventType;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,19 +44,45 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
   private static final String MORE_INFO_URI_OPEN_TAG =
       "<a href='https://cloud.google.com/appengine/'>";
   private static final String MORE_INFO_URI_CLOSE_TAG = "</a>";
+  private static final String PSEUDO_GOOGLE_SDK_LINK = "http://google-sdk/";
 
   private String displayName = GctBundle.message("appengine.name");
   private JPanel mainPanel;
   private JTextPane appEngineMoreInfoLabel;
-  private CloudSdkPanel cloudSdkPanel;
+  private JBLabel sdkValidationErrorLabel;
 
   /** Initialize the UI. */
-  public AppEngineCloudConfigurable() {
-    appEngineMoreInfoLabel.setText(
+  AppEngineCloudConfigurable() {
+    // in case managed SDK is not available yet, provide direct link to SDK settings to allow
+    // familiar SDK setup via App Engine Server panel.
+    StringBuilder messageBuilder = new StringBuilder();
+    if (!ServiceManager.getService(PluginInfoService.class).shouldEnable(GctFeature.MANAGED_SDK)) {
+      messageBuilder.append(
+          GctBundle.message("appengine.cloud.sdk.settings", PSEUDO_GOOGLE_SDK_LINK));
+      messageBuilder.append("<p/>");
+    }
+    messageBuilder.append(
         GctBundle.message("appengine.more.info", MORE_INFO_URI_OPEN_TAG, MORE_INFO_URI_CLOSE_TAG));
-    appEngineMoreInfoLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
+
+    appEngineMoreInfoLabel.setText(messageBuilder.toString());
+    appEngineMoreInfoLabel.addHyperlinkListener(
+        new BrowserOpeningHyperLinkListener() {
+          @Override
+          public void hyperlinkUpdate(HyperlinkEvent event) {
+            // check for specific settings pseudo-URL.
+            if (event.getEventType() == EventType.ACTIVATED
+                && event.getURL().toString().contains(PSEUDO_GOOGLE_SDK_LINK)) {
+              ShowSettingsUtil.getInstance().showSettingsDialog(null, CloudSdkConfigurable.class);
+              updateSdkValidationLabel();
+            } else {
+              super.hyperlinkUpdate(event);
+            }
+          }
+        });
     appEngineMoreInfoLabel.setBackground(mainPanel.getBackground());
     FontUtils.convertStyledDocumentFontToDefault(appEngineMoreInfoLabel.getStyledDocument());
+
+    updateSdkValidationLabel();
   }
 
   @Nls
@@ -71,18 +105,14 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
 
   @Override
   public boolean isModified() {
-    return cloudSdkPanel.isModified();
+    return false;
   }
 
   @Override
-  public void apply() throws ConfigurationException {
-    cloudSdkPanel.apply();
-  }
+  public void apply() {}
 
   @Override
-  public void reset() {
-    cloudSdkPanel.reset();
-  }
+  public void reset() {}
 
   /**
    * We don't need to test the connection if we know the cloud SDK, user, and project ID are valid.
@@ -93,11 +123,32 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
   }
 
   @VisibleForTesting
-  CloudSdkPanel getCloudSdkPanel() {
-    return cloudSdkPanel;
+  JTextPane getAppEngineMoreInfoLabel() {
+    return appEngineMoreInfoLabel;
   }
 
-  private void createUIComponents() {
-    cloudSdkPanel = new CloudSdkPanel();
+  @VisibleForTesting
+  JBLabel getSdkValidationErrorLabel() {
+    return sdkValidationErrorLabel;
+  }
+
+  /**
+   * Checks for custom SDK validation errors and shows error label if they exist. To be removed once
+   * managed SDk feature is rolled out.
+   */
+  private void updateSdkValidationLabel() {
+    if (!ServiceManager.getService(PluginInfoService.class).shouldEnable(GctFeature.MANAGED_SDK)) {
+      String sdkValidationMessage =
+          CloudSdkPanel.buildSdkMessage(
+              CloudSdkServiceUserSettings.getInstance().getCustomSdkPath(), false);
+      if (sdkValidationMessage != null) {
+        sdkValidationErrorLabel.setText(sdkValidationMessage);
+        sdkValidationErrorLabel.setVisible(true);
+      } else {
+        sdkValidationErrorLabel.setVisible(false);
+      }
+    } else {
+      sdkValidationErrorLabel.setVisible(false);
+    }
   }
 }
