@@ -16,9 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.UserSpecifiedPathDeploymentSource;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkInstallSupport;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.login.Services;
@@ -38,7 +37,6 @@ import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.runtime.deployment.DeploymentLogManager;
 import com.intellij.remoteServer.runtime.deployment.DeploymentTask;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance;
-import java.util.concurrent.CountDownLatch;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 
@@ -75,59 +73,10 @@ public class AppEngineRuntimeInstance
     }
 
     CloudSdkService cloudSdkService = CloudSdkService.getInstance();
-    System.out.println("SDK Status: " + cloudSdkService.getStatus());
-    SdkStatus sdkStatus = cloudSdkService.getStatus();
-    boolean supportsInPlaceInstall = false;
-    if (sdkStatus == SdkStatus.NOT_AVAILABLE) {
-      supportsInPlaceInstall = cloudSdkService.install();
-    }
-    boolean installingInProgress = supportsInPlaceInstall || sdkStatus == SdkStatus.INSTALLING;
-    if (installingInProgress) {
-      // wait until install / update is done. use latch to notify UI blocking thread.
-      CountDownLatch installationCompletionLatch = new CountDownLatch(1);
-      final CloudSdkService.SdkStatusUpdateListener sdkStatusUpdateListener =
-          (sdkService, status) -> {
-            System.out.println("SDk status change to: " + status);
-            switch (status) {
-              case READY:
-              case INVALID:
-              case NOT_AVAILABLE:
-                System.out.println("latch triggered.");
-                installationCompletionLatch.countDown();
-                break;
-              case INSTALLING:
-                // continue waiting for completion.
-                break;
-            }
-          };
-      cloudSdkService.addStatusUpdateListener(sdkStatusUpdateListener);
-
-      ProgressManager.getInstance()
-          .runProcessWithProgressSynchronously(
-              () -> {
-                ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
-
-                try {
-                  while (installationCompletionLatch.getCount() > 0) {
-                    // wait interruptibility to check for user cancel each second.
-                    installationCompletionLatch.await(1, SECONDS);
-                    if (ProgressManager.getInstance().getProgressIndicator().isCanceled()) {
-                      return;
-                    }
-                  }
-                } catch (InterruptedException e) {
-                  /* valid cancellation exception, no handlind needed. */
-                }
-              },
-              "Waiting for Google Cloud SDK Installation to Complete...",
-              true,
-              task.getProject());
-
-      cloudSdkService.removeStatusUpdateListener(sdkStatusUpdateListener);
-    }
 
     // check the status of SDK after install.
-    sdkStatus = cloudSdkService.getStatus();
+    SdkStatus sdkStatus =
+        CloudSdkInstallSupport.getInstance().waitUntilCloudSdkInstalled(task.getProject());
     System.out.println("SDK Status post-install check: " + cloudSdkService.getStatus());
     switch (sdkStatus) {
       case INSTALLING:
