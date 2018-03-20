@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.idea.maven.dom.MavenDomUtil;
+import org.jetbrains.idea.maven.dom.model.MavenDomDependencies;
 import org.jetbrains.idea.maven.dom.model.MavenDomDependency;
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel;
 import org.jetbrains.idea.maven.model.MavenId;
@@ -144,11 +145,29 @@ final class CloudLibraryDependencyWriter {
 
           bomVersion.ifPresent(
               bv -> {
-                MavenDomDependency mavenDomDependency =
-                    model.getDependencyManagement().getDependencies().addDependency();
-                mavenDomDependency.getGroupId().setStringValue("com.google.cloud");
-                mavenDomDependency.getArtifactId().setStringValue("google-cloud-bom");
-                mavenDomDependency.getVersion().setStringValue(bomVersion.get());
+                MavenDomDependencies mavenDomDependencies =
+                    model.getDependencyManagement().getDependencies();
+                Optional<MavenDomDependency> bomDependencyOptional =
+                    mavenDomDependencies
+                        .getDependencies()
+                        .stream()
+                        .filter(
+                            mdd -> "google-cloud-bom".equals(mdd.getArtifactId().getStringValue()))
+                        .findFirst();
+
+                if (!bomDependencyOptional.isPresent()) {
+                  // write the new dependency
+                  MavenDomDependency mavenDomDependency =
+                      model.getDependencyManagement().getDependencies().addDependency();
+                  mavenDomDependency.getGroupId().setStringValue("com.google.cloud");
+                  mavenDomDependency.getArtifactId().setStringValue("google-cloud-bom");
+                  mavenDomDependency.getVersion().setStringValue(bomVersion.get());
+                  mavenDomDependency.getType().setStringValue("pom");
+                  mavenDomDependency.getScope().setStringValue("import");
+                } else {
+                  // update the version
+                  bomDependencyOptional.get().getVersion().setStringValue(bomVersion.get());
+                }
               });
 
           notifyAddedDependencies(newMavenIds, project);
