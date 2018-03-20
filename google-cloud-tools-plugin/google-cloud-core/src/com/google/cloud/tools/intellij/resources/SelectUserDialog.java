@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 package com.google.cloud.tools.intellij.resources;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
+import com.google.cloud.tools.intellij.GoogleCloudCoreMessageBundle;
 import com.google.cloud.tools.intellij.login.IntegratedIntellijGoogleLoginService;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -56,8 +56,8 @@ public class SelectUserDialog extends DialogWrapper {
                 setOKActionEnabled(login.getSelectedUser() != null);
               }
             });
-    setOKButtonText(GctBundle.message("select.user.continue"));
-    setCancelButtonText(GctBundle.message("select.user.manuallogin"));
+    setOKButtonText(GoogleCloudCoreMessageBundle.message("select.user.continue"));
+    setCancelButtonText(GoogleCloudCoreMessageBundle.message("select.user.manuallogin"));
     setOKActionEnabled(false);
     Window window = getWindow();
     if (window != null) {

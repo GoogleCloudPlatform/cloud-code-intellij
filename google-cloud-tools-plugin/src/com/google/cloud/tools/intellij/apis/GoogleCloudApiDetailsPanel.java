@@ -21,6 +21,7 @@ import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
+import com.google.cloud.tools.libraries.json.CloudLibraryClientMavenCoordinates;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.application.ApplicationManager;
@@ -60,6 +61,7 @@ public final class GoogleCloudApiDetailsPanel {
   private JTextPane managementWarningTextPane;
 
   private CloudLibrary currentCloudLibrary;
+  private String currentBomVersion;
   private CloudApiManagementSpec currentCloudApiManagementSpec;
 
   /** Returns the {@link JPanel} that holds the UI elements in this panel. */
@@ -75,12 +77,14 @@ public final class GoogleCloudApiDetailsPanel {
    *
    * @param library the {@link CloudLibrary} to display
    */
-  void setCloudLibrary(CloudLibrary library, CloudApiManagementSpec cloudApiManagementSpec) {
+  void setCloudLibrary(
+      CloudLibrary library, String bomVersion, CloudApiManagementSpec cloudApiManagementSpec) {
     if (cloudLibrariesEqual(currentCloudLibrary, library)) {
       return;
     }
 
     currentCloudLibrary = library;
+    currentBomVersion = bomVersion;
     currentCloudApiManagementSpec = cloudApiManagementSpec;
     updateUI();
   }
@@ -202,12 +206,17 @@ public final class GoogleCloudApiDetailsPanel {
       CloudLibraryUtils.getFirstJavaClient(currentCloudLibrary)
           .ifPresent(
               client -> {
-                if (client.getMavenCoordinates() != null) {
-                  versionLabel.setText(
-                      GctBundle.message(
-                          "cloud.libraries.version.label",
-                          client.getMavenCoordinates().getVersion()));
+                if (currentBomVersion != null) {
+                  updateManagedLibraryVersionFromBom(currentBomVersion);
+                } else {
+                  if (client.getMavenCoordinates() != null) {
+                    versionLabel.setText(
+                        GctBundle.message(
+                            "cloud.libraries.version.label",
+                            client.getMavenCoordinates().getVersion()));
+                  }
                 }
+
                 statusLabel.setText(
                     GctBundle.message("cloud.libraries.status.label", client.getLaunchStage()));
 
@@ -227,6 +236,55 @@ public final class GoogleCloudApiDetailsPanel {
     }
 
     managementWarningTextPane.setText(GctBundle.message("cloud.apis.management.section.info.text"));
+  }
+
+  /**
+   * Asynchronously fetches and displays the version of the client library that is managed by the
+   * given BOM version.
+   *
+   * @param bomVersion the version of the BOM from which to load the version of the current client
+   *     library
+   */
+  // TODO (eshaul) this unoptimized implementation fetches all managed BOM versions each time the
+  // BOM is updated and library is selected. The bomVersion -> managedLibraryVersions results can be
+  // cached on disk to reduce network calls.
+  @SuppressWarnings("FutureReturnValueIgnored")
+  void updateManagedLibraryVersionFromBom(String bomVersion) {
+    if (currentCloudLibrary.getClients() != null) {
+      CloudLibraryUtils.getFirstJavaClient(currentCloudLibrary)
+          .ifPresent(
+              client -> {
+                CloudLibraryClientMavenCoordinates coordinates = client.getMavenCoordinates();
+
+                if (coordinates != null) {
+                  versionLabel.setIcon(GoogleCloudCoreIcons.LOADING);
+                  versionLabel.setText("");
+
+                  ThreadUtil.getInstance()
+                      .executeInBackground(
+                          () -> {
+                            Optional<String> versionOptional =
+                                CloudApiMavenService.getInstance()
+                                    .getManagedDependencyVersion(coordinates, bomVersion);
+
+                            if (versionOptional.isPresent()) {
+                              ApplicationManager.getApplication()
+                                  .invokeAndWait(
+                                      () -> {
+                                        versionLabel.setIcon(null);
+                                        versionLabel.setText(
+                                            GctBundle.message(
+                                                "cloud.libraries.version.label",
+                                                versionOptional.get()));
+                                      },
+                                      ModalityState.any());
+                            } else {
+                              versionLabel.setIcon(null);
+                            }
+                          });
+                }
+              });
+    }
   }
 
   /**

@@ -16,10 +16,10 @@
 
 package com.google.cloud.tools.intellij.apis;
 
+import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.intellij.notification.Notification;
@@ -53,7 +53,7 @@ final class CloudLibraryDependencyWriter {
           NotificationDisplayType.BALLOON,
           true,
           null,
-          GoogleCloudToolsIcons.CLOUD);
+          GoogleCloudCoreIcons.CLOUD);
 
   /** Prevents instantiation. */
   private CloudLibraryDependencyWriter() {}

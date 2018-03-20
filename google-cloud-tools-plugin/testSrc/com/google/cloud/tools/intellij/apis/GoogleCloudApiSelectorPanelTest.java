@@ -17,6 +17,8 @@
 package com.google.cloud.tools.intellij.apis;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.GctFeature;
@@ -42,6 +44,7 @@ import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -63,6 +66,7 @@ import org.mockito.Mock;
 @RunWith(JUnit4.class)
 public final class GoogleCloudApiSelectorPanelTest {
 
+  private static final String BOM_VERSION = "1.2.3-alpha";
   private static final TestCloudLibraryClientMavenCoordinates JAVA_CLIENT_MAVEN_COORDS_1 =
       TestCloudLibraryClientMavenCoordinates.create("java", "client-1", "1.0.0");
   private static final TestCloudLibraryClientMavenCoordinates JAVA_CLIENT_MAVEN_COORDS_2 =
@@ -304,6 +308,64 @@ public final class GoogleCloudApiSelectorPanelTest {
   }
 
   @Test
+  public void getPanel_withVersionReturnedFromBomQuery_displaysVersionFromBom() {
+    // TODO (eshaul): remove once feature is released
+    when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
+
+    String libVersion = "9.9-alpha";
+    when(mavenService.getManagedDependencyVersion(any(), anyString()))
+        .thenReturn(Optional.of(libVersion));
+
+    CloudLibrary cloudLibrary = LIBRARY_1.toCloudLibrary();
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(cloudLibrary), testFixture.getProject());
+
+    panel
+        .getDetailsPanel()
+        .setCloudLibrary(cloudLibrary, BOM_VERSION, panel.getApiManagementMap().get(cloudLibrary));
+
+    assertThat(panel.getDetailsPanel().getVersionLabel().getText())
+        .isEqualTo("Version: " + libVersion);
+  }
+
+  @Test
+  public void getPanel_withNoVersionReturnedFromBomQuery_fallsBackToAndDisplaysStaticVersion() {
+    // TODO (eshaul): remove once feature is released
+    when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
+
+    CloudLibrary cloudLibrary = LIBRARY_1.toCloudLibrary();
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(cloudLibrary), testFixture.getProject());
+
+    panel
+        .getDetailsPanel()
+        .setCloudLibrary(
+            cloudLibrary, null /*bomVersion*/, panel.getApiManagementMap().get(cloudLibrary));
+
+    assertThat(panel.getDetailsPanel().getVersionLabel().getText())
+        .isEqualTo("Version: " + JAVA_CLIENT_MAVEN_COORDS_1.version());
+  }
+
+  @Test
+  public void getPanel_withBomAndNoDependencyVersion_displaysEmptyVersion() {
+    // TODO (eshaul): remove once feature is released
+    when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
+
+    when(mavenService.getManagedDependencyVersion(any(), anyString())).thenReturn(Optional.empty());
+
+    CloudLibrary cloudLibrary = LIBRARY_1.toCloudLibrary();
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(cloudLibrary), testFixture.getProject());
+
+    panel
+        .getDetailsPanel()
+        .setCloudLibrary(cloudLibrary, BOM_VERSION, panel.getApiManagementMap().get(cloudLibrary));
+
+    assertThat(panel.getDetailsPanel().getVersionLabel().getText()).isEqualTo("");
+    assertThat(panel.getDetailsPanel().getVersionLabel().getIcon()).isNull();
+  }
+
+  @Test
   public void getSelectedModule_withNoneSelected_returnsDefaultModule() {
     GoogleCloudApiSelectorPanel panel =
         new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
@@ -428,10 +490,10 @@ public final class GoogleCloudApiSelectorPanelTest {
 
     Map<CloudLibrary, CloudApiManagementSpec> apiManagementMap = panel.getApiManagementMap();
 
-    panel.getDetailsPanel().setCloudLibrary(library1, apiManagementMap.get(library1));
+    panel.getDetailsPanel().setCloudLibrary(library1, BOM_VERSION, apiManagementMap.get(library1));
     checkEnableCheckbox(panel.getDetailsPanel().getEnableApiCheckbox(), false);
 
-    panel.getDetailsPanel().setCloudLibrary(library2, apiManagementMap.get(library2));
+    panel.getDetailsPanel().setCloudLibrary(library2, BOM_VERSION, apiManagementMap.get(library2));
     checkEnableCheckbox(panel.getDetailsPanel().getEnableApiCheckbox(), false);
 
     assertThat(panel.getApisToEnable()).isEmpty();
@@ -453,10 +515,10 @@ public final class GoogleCloudApiSelectorPanelTest {
 
     Map<CloudLibrary, CloudApiManagementSpec> apiManagementMap = panel.getApiManagementMap();
 
-    panel.getDetailsPanel().setCloudLibrary(library1, apiManagementMap.get(library1));
+    panel.getDetailsPanel().setCloudLibrary(library1, BOM_VERSION, apiManagementMap.get(library1));
     checkEnableCheckbox(panel.getDetailsPanel().getEnableApiCheckbox(), false);
 
-    panel.getDetailsPanel().setCloudLibrary(library2, apiManagementMap.get(library2));
+    panel.getDetailsPanel().setCloudLibrary(library2, BOM_VERSION, apiManagementMap.get(library2));
     checkEnableCheckbox(panel.getDetailsPanel().getEnableApiCheckbox(), true);
 
     assertThat(panel.getApisToEnable()).containsExactly(library2);
@@ -474,10 +536,10 @@ public final class GoogleCloudApiSelectorPanelTest {
 
     Map<CloudLibrary, CloudApiManagementSpec> apiManagementMap = panel.getApiManagementMap();
 
-    panel.getDetailsPanel().setCloudLibrary(library1, apiManagementMap.get(library1));
+    panel.getDetailsPanel().setCloudLibrary(library1, BOM_VERSION, apiManagementMap.get(library1));
     checkEnableCheckbox(panel.getDetailsPanel().getEnableApiCheckbox(), true);
 
-    panel.getDetailsPanel().setCloudLibrary(library2, apiManagementMap.get(library2));
+    panel.getDetailsPanel().setCloudLibrary(library2, BOM_VERSION, apiManagementMap.get(library2));
     checkEnableCheckbox(panel.getDetailsPanel().getEnableApiCheckbox(), true);
 
     assertThat(panel.getApisToEnable()).isEmpty();
@@ -490,7 +552,9 @@ public final class GoogleCloudApiSelectorPanelTest {
     GoogleCloudApiSelectorPanel panel =
         new GoogleCloudApiSelectorPanel(ImmutableList.of(library), testFixture.getProject());
 
-    panel.getDetailsPanel().setCloudLibrary(library, panel.getApiManagementMap().get(library));
+    panel
+        .getDetailsPanel()
+        .setCloudLibrary(library, BOM_VERSION, panel.getApiManagementMap().get(library));
 
     assertThat(panel.getDetailsPanel().getEnableApiCheckbox().isEnabled()).isFalse();
     assertThat(panel.getDetailsPanel().getManagementInfoPanel().isVisible()).isTrue();
@@ -505,7 +569,9 @@ public final class GoogleCloudApiSelectorPanelTest {
     JTable table = panel.getCloudLibrariesTable();
 
     checkAddLibraryCheckbox(table, 0);
-    panel.getDetailsPanel().setCloudLibrary(library, panel.getApiManagementMap().get(library));
+    panel
+        .getDetailsPanel()
+        .setCloudLibrary(library, BOM_VERSION, panel.getApiManagementMap().get(library));
 
     CloudProject cloudProject = CloudProject.create("name", "id", "user");
     ProjectSelector projectSelector = panel.getProjectSelector();
@@ -526,7 +592,7 @@ public final class GoogleCloudApiSelectorPanelTest {
         new GoogleCloudApiSelectorPanel(ImmutableList.of(library), testFixture.getProject());
 
     Map<CloudLibrary, CloudApiManagementSpec> apiManagementMap = panel.getApiManagementMap();
-    panel.getDetailsPanel().setCloudLibrary(library, apiManagementMap.get(library));
+    panel.getDetailsPanel().setCloudLibrary(library, BOM_VERSION, apiManagementMap.get(library));
 
     assertThat(panel.getDetailsPanel().getEnableApiCheckbox().isSelected()).isFalse();
   }
