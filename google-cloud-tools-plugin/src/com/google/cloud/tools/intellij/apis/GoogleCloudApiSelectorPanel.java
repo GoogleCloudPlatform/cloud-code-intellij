@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -148,6 +149,11 @@ final class GoogleCloudApiSelectorPanel {
   /** Returns the set of selected {@link CloudLibrary CloudLibraries}. */
   Set<CloudLibrary> getSelectedLibraries() {
     return ((CloudLibraryTableModel) cloudLibrariesTable.getModel()).getSelectedLibraries();
+  }
+
+  /** Returns, optionally, the selected BOM version. */
+  Optional<String> getSelectedBomVersion() {
+    return Optional.ofNullable(bomComboBox.getSelectedItem()).map(Object::toString);
   }
 
   CloudProject getCloudProject() {

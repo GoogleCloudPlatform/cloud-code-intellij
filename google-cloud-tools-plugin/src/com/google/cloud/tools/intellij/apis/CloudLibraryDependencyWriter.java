@@ -68,14 +68,15 @@ final class CloudLibraryDependencyWriter {
    * @param libraries the set of {@link CloudLibrary CloudLibraries} to add
    * @param module the {@link Module} to add the libraries to
    */
-  static void addLibraries(@NotNull Set<CloudLibrary> libraries, @NotNull Module module) {
+  static void addLibraries(
+      @NotNull Set<CloudLibrary> libraries, @NotNull Module module, Optional<String> bomVersion) {
     if (libraries.isEmpty()) {
       return;
     }
 
     Project project = module.getProject();
     if (MavenProjectsManager.getInstance(project).isMavenizedModule(module)) {
-      addLibrariesToMavenModule(libraries, module);
+      addLibrariesToMavenModule(libraries, module, bomVersion);
     } else {
       // TODO(nkibler): Handle non-Maven projects.
     }
@@ -90,8 +91,9 @@ final class CloudLibraryDependencyWriter {
    * @param libraries the set of {@link CloudLibrary CloudLibraries} to add
    * @param module the Maven {@link Module} to add the libraries to
    */
+  // todo clean this method up
   private static void addLibrariesToMavenModule(
-      @NotNull Set<CloudLibrary> libraries, @NotNull Module module) {
+      @NotNull Set<CloudLibrary> libraries, @NotNull Module module, Optional<String> bomVersion) {
     Project project = module.getProject();
     MavenProject mavenProject = MavenProjectsManager.getInstance(project).findProject(module);
     MavenDomProjectModel model =
@@ -99,7 +101,7 @@ final class CloudLibraryDependencyWriter {
 
     new WriteCommandAction(project, DomUtil.getFile(model)) {
       @Override
-      protected void run(@NotNull Result result) throws Throwable {
+      protected void run(@NotNull Result result) {
         List<MavenDomDependency> dependencies = model.getDependencies().getDependencies();
         Map<Boolean, List<MavenId>> mavenIdsMap =
             libraries
@@ -123,7 +125,14 @@ final class CloudLibraryDependencyWriter {
         if (!newMavenIds.isEmpty()) {
           newMavenIds.forEach(
               mavenId -> {
-                MavenDomUtil.createDomDependency(model, /* editor= */ null, mavenId);
+                MavenDomDependency domDependency =
+                    MavenDomUtil.createDomDependency(model, /* editor= */ null);
+                domDependency.getGroupId().setStringValue(mavenId.getGroupId());
+                domDependency.getArtifactId().setStringValue(mavenId.getArtifactId());
+                if (!bomVersion.isPresent()) {
+                  domDependency.getVersion().setStringValue(mavenId.getVersion());
+                }
+
                 UsageTrackerProvider.getInstance()
                     .trackEvent(GctTracking.CLIENT_LIBRARY_ADD_LIBRARY)
                     .addMetadata(
@@ -132,6 +141,16 @@ final class CloudLibraryDependencyWriter {
                     .addMetadata(GctTracking.METADATA_LABEL_KEY, mavenId.getDisplayString())
                     .ping();
               });
+
+          bomVersion.ifPresent(
+              bv -> {
+                MavenDomDependency mavenDomDependency =
+                    model.getDependencyManagement().getDependencies().addDependency();
+                mavenDomDependency.getGroupId().setStringValue("com.google.cloud");
+                mavenDomDependency.getArtifactId().setStringValue("google-cloud-bom");
+                mavenDomDependency.getVersion().setStringValue(bomVersion.get());
+              });
+
           notifyAddedDependencies(newMavenIds, project);
         }
       }
