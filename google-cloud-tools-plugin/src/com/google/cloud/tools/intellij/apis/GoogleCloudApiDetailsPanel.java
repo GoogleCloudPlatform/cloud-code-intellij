@@ -267,7 +267,6 @@ public final class GoogleCloudApiDetailsPanel {
                                 CloudApiMavenService.getInstance()
                                     .getManagedDependencyVersion(coordinates, bomVersion);
 
-
                             if (versionOptional.isPresent()) {
                               ApplicationManager.getApplication()
                                   .invokeAndWait(
