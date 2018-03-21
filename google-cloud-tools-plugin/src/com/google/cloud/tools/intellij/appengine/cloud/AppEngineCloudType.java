@@ -92,19 +92,6 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
         return;
       }
 
-      // TODO(ivanporty) need to show this in a better place once, based on an installation status.
-      /*if (!CloudSdkValidator.getInstance().isValidCloudSdk()) {
-        callback.errorOccurred(GctBundle.message("appengine.deployment.error.invalid.cloudsdk"));
-        Notification invalidSdkWarning =
-            new Notification(
-                new PropertiesFileFlagReader().getFlagString("notifications.plugin.groupdisplayid"),
-                GctBundle.message("settings.menu.item.cloud.sdk.text"),
-                GctBundle.message("appengine.deployment.error.invalid.cloudsdk"),
-                NotificationType.ERROR);
-        Notifications.Bus.notify(invalidSdkWarning);
-        // TODO Consider auto opening configuration panel
-      }*/
-
       callback.connected(new AppEngineRuntimeInstance());
     }
   }

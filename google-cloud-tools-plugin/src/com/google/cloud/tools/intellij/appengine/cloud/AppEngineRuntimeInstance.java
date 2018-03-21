@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.UserSpecifiedPathDeploymentSource;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkInstallSupport;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPreconditionsSupport;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.collect.ArrayListMultimap;
@@ -81,24 +81,12 @@ public class AppEngineRuntimeInstance
                 createdDeployments.put(task.getProject(), deployRunner);
               }
 
-              CloudSdkInstallSupport.getInstance()
-                  .deployWhenCloudSdkInstalled(
-                      deployRunner, logManager.getMainLoggingHandler(), callback);
-
-              //              ProgressManager.getInstance()
-              //                  .run(
-              //                      new Task.Backgroundable(
-              //                          task.getProject(),
-              //
-              // GctBundle.message("appengine.deployment.status.deploying"),
-              //                          true /* canBeCancelled */,
-              //                          null /* backgroundOption */) {
-              //                        @Override
-              //                        public void run(@NotNull ProgressIndicator indicator) {
-              //
-              // ApplicationManager.getApplication().invokeLater(deployRunner);
-              //                        }
-              //                      });
+              CloudSdkPreconditionsSupport.getInstance()
+                  .deployAfterCloudSdkPreconditionsMet(
+                      task.getProject(),
+                      deployRunner,
+                      logManager.getMainLoggingHandler(),
+                      callback);
             });
   }
 

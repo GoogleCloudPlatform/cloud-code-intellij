@@ -107,16 +107,6 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       return Optional.empty();
     }
 
-    /*if (CloudSdkValidator.getInstance()
-        .validateCloudSdk()
-        .contains(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND)) {
-      callback.errorOccurred(
-          GctBundle.message("appengine.cloudsdk.location.invalid.message")
-              + " "
-              + CloudSdkService.getInstance().getSdkHomePath());
-      return Optional.empty();
-    }*/
-
     if (source.getFile() == null || !source.getFile().exists()) {
       callback.errorOccurred(
           GctBundle.message("appengine.deployment.source.not.found.error", source.getFilePath()));

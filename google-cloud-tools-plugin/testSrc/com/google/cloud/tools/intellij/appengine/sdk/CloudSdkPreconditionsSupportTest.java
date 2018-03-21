@@ -29,21 +29,21 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 
-/** Tests for {@link CloudSdkInstallSupport}. */
-public class CloudSdkInstallSupportTest {
+/** Tests for {@link CloudSdkPreconditionsSupport}. */
+public class CloudSdkPreconditionsSupportTest {
   @Rule public CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
 
   @Mock @TestService private CloudSdkServiceManager mockCloudSdkServiceManager;
   @Mock private CloudSdkService mockSdkService;
 
-  private CloudSdkInstallSupport cloudSdkInstallSupport;
+  private CloudSdkPreconditionsSupport cloudSdkPreconditionsSupport;
   private SdkStatus installActionResult;
 
   @Before
   public void setUp() {
     when(mockCloudSdkServiceManager.getCloudSdkService()).thenReturn(mockSdkService);
 
-    cloudSdkInstallSupport = new CloudSdkInstallSupport();
+    cloudSdkPreconditionsSupport = new CloudSdkPreconditionsSupport();
   }
 
   @Test

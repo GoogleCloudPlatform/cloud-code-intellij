@@ -269,12 +269,12 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
       if (firstReadySleep) {
         try {
-          firstReadySleep = false;
           System.out.println("wait 30secs for change in status to ready.");
           Thread.sleep(30*1000);
         } catch (InterruptedException e) {
           e.printStackTrace();
         }
+        firstReadySleep = false;
       }
       updateStatus(SdkStatus.READY);
 
