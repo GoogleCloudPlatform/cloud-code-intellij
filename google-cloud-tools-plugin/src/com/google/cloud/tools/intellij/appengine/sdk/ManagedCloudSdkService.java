@@ -234,6 +234,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
         () -> {
           this.sdkStatus = sdkStatus;
           notifyListeners(this, sdkStatus);
+          System.out.println("status updated to: " + sdkStatus);
         });
   }
 

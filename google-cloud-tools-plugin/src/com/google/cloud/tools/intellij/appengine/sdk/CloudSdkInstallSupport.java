@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import java.util.concurrent.CountDownLatch;
@@ -53,7 +54,7 @@ public class CloudSdkInstallSupport {
       CountDownLatch installationCompletionLatch = new CountDownLatch(1);
       final CloudSdkService.SdkStatusUpdateListener sdkStatusUpdateListener =
           (sdkService, status) -> {
-            System.out.println("SDk status change to: " + status);
+            System.out.println("SDK status change to: " + status);
             switch (status) {
               case READY:
               case INVALID:
@@ -91,6 +92,12 @@ public class CloudSdkInstallSupport {
 
       cloudSdkService.removeStatusUpdateListener(sdkStatusUpdateListener);
     }
+
+    ApplicationManager.getApplication().invokeAndWait(() -> {});
+
+    System.out.println("cloud service: " + cloudSdkService);
+    new Exception().printStackTrace();
+    System.out.println("status: " + cloudSdkService.getStatus());
 
     return cloudSdkService.getStatus();
   }
