@@ -120,7 +120,11 @@ public class ManagedCloudSdkService implements CloudSdkService {
   @VisibleForTesting
   // TODO(ivanporty) move into ThreadUtil common test code.
   void invokeOnApplicationUIThread(Runnable runnable) {
-    ApplicationManager.getApplication().invokeLater(runnable);
+    if (ApplicationManager.getApplication().isDispatchThread()) {
+      runnable.run();
+    } else {
+      ApplicationManager.getApplication().invokeLater(runnable);
+    }
   }
 
   /** Creates managed SDK, installs if necessary, and checks for fatal errors. */
@@ -234,7 +238,6 @@ public class ManagedCloudSdkService implements CloudSdkService {
         () -> {
           this.sdkStatus = sdkStatus;
           notifyListeners(this, sdkStatus);
-          System.out.println("status updated to: " + sdkStatus);
         });
   }
 
@@ -246,6 +249,8 @@ public class ManagedCloudSdkService implements CloudSdkService {
     INSTALL,
     UPDATE
   }
+
+  private boolean firstReadySleep = true;
 
   /**
    * Managed SDK Job future listener, handles success/error logic, logs errors, shows notifications
@@ -262,6 +267,15 @@ public class ManagedCloudSdkService implements CloudSdkService {
     public void onSuccess(Path path) {
       logger.info("Managed Google Cloud SDK successfully installed/updated at: " + path);
 
+      if (firstReadySleep) {
+        try {
+          firstReadySleep = false;
+          System.out.println("wait 30secs for change in status to ready.");
+          Thread.sleep(30*1000);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
       updateStatus(SdkStatus.READY);
 
       ManagedCloudSdkServiceUiPresenter.getInstance().notifyManagedSdkJobSuccess(jobType);

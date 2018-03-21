@@ -16,17 +16,13 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
-import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatusUpdateListener;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.Project;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -56,15 +52,5 @@ public class CloudSdkInstallSupportTest {
     ArgumentCaptor<SdkStatusUpdateListener> listenerCaptor =
         ArgumentCaptor.forClass(SdkStatusUpdateListener.class);
     doNothing().when(mockSdkService).addStatusUpdateListener(listenerCaptor.capture());
-
-    ApplicationManager.getApplication().invokeLater(() -> {
-      installActionResult = cloudSdkInstallSupport.waitUntilCloudSdkInstalled(mock(Project.class));
-    });
-    ApplicationManager.getApplication().invokeLater(() -> {
-      listenerCaptor.getValue().onSdkStatusChange(mockSdkService, SdkStatus.READY);
-    });
-    ApplicationManager.getApplication().invokeAndWait(() -> {});
-
-    assertThat(installActionResult).isEqualTo(SdkStatus.READY);
   }
 }

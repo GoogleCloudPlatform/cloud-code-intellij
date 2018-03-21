@@ -16,9 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud;
 
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkInstallSupport;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -93,30 +90,6 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
       if (!Services.getLoginService().isLoggedIn()) {
         callback.errorOccurred(GctBundle.message("appengine.deployment.error.not.logged.in"));
         return;
-      }
-
-      CloudSdkService cloudSdkService = CloudSdkService.getInstance();
-
-      // check the status of SDK after install.
-      SdkStatus sdkStatus =
-          CloudSdkInstallSupport.getInstance().waitUntilCloudSdkInstalled(null);
-      System.out.println("SDK Status post-install check: " + cloudSdkService.getStatus());
-      switch (sdkStatus) {
-        case INSTALLING:
-          callback.errorOccurred(
-              "Google Cloud SDK with App Engine Java needs to be completely installed to perform this action.");
-          return;
-        case NOT_AVAILABLE:
-          callback.errorOccurred(
-              "Google Cloud SDK is not available. Please check Settings -> Google -> Cloud SDK.");
-          return;
-        case INVALID:
-          callback.errorOccurred(
-              "Google Cloud SDK is invalid. Please check Settings -> Google -> Cloud SDK.");
-          return;
-        case READY:
-          // can continue to deployment.
-          break;
       }
 
       // TODO(ivanporty) need to show this in a better place once, based on an installation status.

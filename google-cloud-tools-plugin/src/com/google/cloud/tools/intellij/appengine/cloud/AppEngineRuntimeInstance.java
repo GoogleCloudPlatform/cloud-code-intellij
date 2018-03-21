@@ -17,15 +17,12 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.UserSpecifiedPathDeploymentSource;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkInstallSupport;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerListener;
@@ -84,18 +81,24 @@ public class AppEngineRuntimeInstance
                 createdDeployments.put(task.getProject(), deployRunner);
               }
 
-              ProgressManager.getInstance()
-                  .run(
-                      new Task.Backgroundable(
-                          task.getProject(),
-                          GctBundle.message("appengine.deployment.status.deploying"),
-                          true /* canBeCancelled */,
-                          null /* backgroundOption */) {
-                        @Override
-                        public void run(@NotNull ProgressIndicator indicator) {
-                          ApplicationManager.getApplication().invokeLater(deployRunner);
-                        }
-                      });
+              CloudSdkInstallSupport.getInstance()
+                  .deployWhenCloudSdkInstalled(
+                      deployRunner, logManager.getMainLoggingHandler(), callback);
+
+              //              ProgressManager.getInstance()
+              //                  .run(
+              //                      new Task.Backgroundable(
+              //                          task.getProject(),
+              //
+              // GctBundle.message("appengine.deployment.status.deploying"),
+              //                          true /* canBeCancelled */,
+              //                          null /* backgroundOption */) {
+              //                        @Override
+              //                        public void run(@NotNull ProgressIndicator indicator) {
+              //
+              // ApplicationManager.getApplication().invokeLater(deployRunner);
+              //                        }
+              //                      });
             });
   }
 
