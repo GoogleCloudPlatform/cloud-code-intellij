@@ -31,7 +31,7 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 /** Provides tests for classes that inherit from {@link AddAppEngineFrameworkSupportAction} */
-public abstract class pAddAppEngineFrameworkSupportActionTest extends PlatformTestCase {
+public abstract class AddAppEngineFrameworkSupportActionTest extends PlatformTestCase {
 
   public abstract @NotNull AddAppEngineFrameworkSupportAction getAction();
 
