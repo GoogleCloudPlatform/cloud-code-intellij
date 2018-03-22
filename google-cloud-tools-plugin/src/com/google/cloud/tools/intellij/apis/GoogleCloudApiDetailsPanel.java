@@ -51,7 +51,6 @@ public final class GoogleCloudApiDetailsPanel {
   private JLabel icon;
   private JLabel nameLabel;
   private JLabel versionLabel;
-  private JLabel statusLabel;
   private JPanel panel;
   private JTextPane descriptionTextPane;
   private JTextPane linksTextPane;
@@ -120,12 +119,6 @@ public final class GoogleCloudApiDetailsPanel {
   @VisibleForTesting
   JLabel getVersionLabel() {
     return versionLabel;
-  }
-
-  /** Returns the {@link JLabel} that holds the library's status. */
-  @VisibleForTesting
-  JLabel getStatusLabel() {
-    return statusLabel;
   }
 
   /** Returns the {@link JTextPane} that holds the library's description. */
@@ -216,9 +209,6 @@ public final class GoogleCloudApiDetailsPanel {
                             client.getMavenCoordinates().getVersion()));
                   }
                 }
-
-                statusLabel.setText(
-                    GctBundle.message("cloud.libraries.status.label", client.getLaunchStage()));
 
                 Optional<String> docsLink =
                     makeLink(
