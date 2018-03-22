@@ -47,6 +47,7 @@ import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
 /** A helper class that adds dependencies of Cloud libraries to a given module. */
+// TODO (eshaul) refactor this into a mockable service with non-static methods
 final class CloudLibraryDependencyWriter {
 
   private static final NotificationGroup NOTIFICATION_GROUP =
