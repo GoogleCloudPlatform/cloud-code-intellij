@@ -255,12 +255,21 @@ final class CloudLibraryDependencyWriter {
   /**
    * Joins the given list of {@link MavenId MavenIds} into a human-readable string.
    *
+   * <p>Does not include the version as the version of the dependency may be managed by a BOM.
+   *
    * @param mavenIds the list of {@link MavenId MavenIds} to join
    */
   private static String joinMavenIds(List<MavenId> mavenIds) {
     return mavenIds
         .stream()
-        .map(MavenId::getDisplayString)
+        .map(
+            mavenId -> {
+              StringBuilder builder = new StringBuilder();
+              MavenId.append(builder, mavenId.getGroupId());
+              MavenId.append(builder, mavenId.getArtifactId());
+
+              return builder.toString();
+            })
         .map(string -> "- " + string)
         .collect(Collectors.joining("<br>"));
   }
