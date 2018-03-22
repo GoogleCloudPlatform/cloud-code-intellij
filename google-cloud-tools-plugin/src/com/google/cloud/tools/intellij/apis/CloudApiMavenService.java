@@ -57,6 +57,8 @@ public class CloudApiMavenService {
 
   static final String GOOGLE_CLOUD_JAVA_BOM_GROUP_NAME = "com.google.cloud";
   static final String GOOGLE_CLOUD_JAVA_BOM_ARTIFACT_NAME = "google-cloud-bom";
+  static final String GOOGLE_CLOUD_JAVA_BOM_TYPE = "pom";
+  static final String GOOGLE_CLOUD_JAVA_BOM_SCOPE = "import";
   private static final String GOOGLE_CLOUD_JAVA_BOM_ALL_VERSIONS_CONSTRAINT = "[0,)";
 
   private static final RemoteRepository MAVEN_CENTRAL_REPOSITORY =
