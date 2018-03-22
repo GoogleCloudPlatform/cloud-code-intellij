@@ -109,6 +109,8 @@ public class CloudSdkPreconditionsSupport {
         .run(
             new Task.Backgroundable(
                 project, GctBundle.message("appengine.deployment.status.deploying"), true) {
+              boolean userCancelled;
+
               @Override
               public void run(@NotNull ProgressIndicator indicator) {
                 try {
@@ -116,6 +118,7 @@ public class CloudSdkPreconditionsSupport {
                     // wait interruptibility to check for user cancel each second.
                     installationCompletionLatch.await(1, SECONDS);
                     if (checkIfCancelled()) {
+                      userCancelled = true;
                       break;
                     }
                   }
@@ -124,7 +127,7 @@ public class CloudSdkPreconditionsSupport {
                   ApplicationManager.getApplication()
                       .invokeLater(
                           () -> {
-                            doRun(cloudSdkService, runnable, callback);
+                            doRun(cloudSdkService, runnable, callback, userCancelled);
                           });
 
                 } catch (InterruptedException e) {
@@ -143,15 +146,25 @@ public class CloudSdkPreconditionsSupport {
   }
 
   private void doRun(
-      CloudSdkService cloudSdkService, Runnable runnable, DeploymentOperationCallback callback) {
+      CloudSdkService cloudSdkService,
+      Runnable runnable,
+      DeploymentOperationCallback callback,
+      boolean userCancelled) {
     // check the status of SDK after install.
     SdkStatus postInstallSdkStatus = cloudSdkService.getStatus();
     switch (postInstallSdkStatus) {
       case INSTALLING:
-        String message = GctBundle.message("appengine.deployment.error.sdk.still.installing");
+        String message =
+            GctBundle.message(
+                userCancelled
+                    ? "appengine.deployment.error.cancelled"
+                    : "appengine.deployment.error.sdk.still.installing");
         callback.errorOccurred(message);
-        showCloudSdkNotification(
-            message, NotificationType.WARNING, false /* no settings needed for this case. */);
+
+        if (!userCancelled) {
+          showCloudSdkNotification(
+              message, NotificationType.WARNING, false /* no settings needed for this case. */);
+        }
         return;
       case NOT_AVAILABLE:
         String errorMessage = GctBundle.message("appengine.deployment.error.sdk.not.available");

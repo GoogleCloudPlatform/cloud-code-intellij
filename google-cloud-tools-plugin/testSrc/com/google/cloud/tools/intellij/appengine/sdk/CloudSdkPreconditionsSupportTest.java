@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -101,7 +102,7 @@ public class CloudSdkPreconditionsSupportTest {
   }
 
   @Test
-  public void installingSdk_then_stillInstalling_showsWarningNotification() {
+  public void installingSdk_then_userCancel_doesNotShowWarningNotification() {
     mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.INSTALLING);
     // mock cancel operation for incomplete install.
     doReturn(true).when(cloudSdkPreconditionsSupport).checkIfCancelled();
@@ -112,11 +113,9 @@ public class CloudSdkPreconditionsSupportTest {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () ->
-                verify(cloudSdkPreconditionsSupport)
-                    .showCloudSdkNotification(
-                        GctBundle.message("appengine.deployment.error.sdk.still.installing"),
-                        NotificationType.WARNING,
-                        false));
+                // explicit parameters are not relevant but need to be passed for spy to work.
+                verify(cloudSdkPreconditionsSupport, never())
+                    .showCloudSdkNotification("", NotificationType.WARNING, false));
   }
 
   @Test
