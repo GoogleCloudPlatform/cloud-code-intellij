@@ -133,7 +133,7 @@ final class CloudLibraryDependencyWriter {
           newMavenIds.forEach(mavenId -> writeNewMavenDependency(model, mavenId, bomVersion));
 
           if (bomVersion != null) {
-            addBomToMavenModule(bomVersion, model);
+            addBomToMavenModule(model, bomVersion);
           }
 
           notifyAddedDependencies(newMavenIds, project);
