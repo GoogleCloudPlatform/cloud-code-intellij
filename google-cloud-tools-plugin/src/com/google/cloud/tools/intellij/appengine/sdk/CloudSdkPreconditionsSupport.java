@@ -172,6 +172,8 @@ public class CloudSdkPreconditionsSupport {
               @Override
               public void actionPerformed(AnActionEvent e) {
                 ShowSettingsUtil.getInstance().showSettingsDialog(null, CloudSdkConfigurable.class);
+                // expire if action has been called to avoid error hanging out forever.
+                invalidSdkWarning.expire();
               }
             });
       }
