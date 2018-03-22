@@ -87,7 +87,7 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
     return cloudApiSelectorPanel.getApisToEnable();
   }
 
-  /** Returns, optionally, the selected BOM version. */
+  /** Returns the selected BOM version. */
   String getSelectedBomVersion() {
     return cloudApiSelectorPanel.getSelectedBomVersion();
   }

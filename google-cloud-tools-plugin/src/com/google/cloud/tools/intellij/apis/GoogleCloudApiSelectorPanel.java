@@ -152,7 +152,8 @@ final class GoogleCloudApiSelectorPanel {
 
   /** Returns the selected BOM version. */
   String getSelectedBomVersion() {
-    return bomComboBox.getSelectedItem().toString();
+    Object selectedItem = bomComboBox.getSelectedItem();
+    return selectedItem == null ? null : selectedItem.toString();
   }
 
   CloudProject getCloudProject() {
