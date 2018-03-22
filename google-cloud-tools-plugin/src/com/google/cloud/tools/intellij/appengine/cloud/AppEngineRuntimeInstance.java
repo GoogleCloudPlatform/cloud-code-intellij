@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.UserSpecifiedPathDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPreconditionsSupport;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager.CloudSdkPreconditionCheckCallback;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.collect.ArrayListMultimap;
@@ -81,12 +82,22 @@ public class AppEngineRuntimeInstance
                 createdDeployments.put(task.getProject(), deployRunner);
               }
 
+              CloudSdkPreconditionCheckCallback preconditionCheckCallback =
+                  new CloudSdkPreconditionCheckCallback() {
+                    @Override
+                    public void log(String message) {
+                      logManager.getMainLoggingHandler().print(message + "\n");
+                    }
+
+                    @Override
+                    public void onError(String message) {
+                      callback.errorOccurred(message);
+                    }
+                  };
+
               CloudSdkPreconditionsSupport.getInstance()
                   .runAfterCloudSdkPreconditionsMet(
-                      task.getProject(),
-                      deployRunner,
-                      logManager.getMainLoggingHandler(),
-                      callback);
+                      task.getProject(), deployRunner, preconditionCheckCallback);
             });
   }
 

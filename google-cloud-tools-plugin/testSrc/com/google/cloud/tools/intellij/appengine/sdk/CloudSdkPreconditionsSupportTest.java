@@ -26,14 +26,13 @@ import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatusUpdateListener;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager.CloudSdkPreconditionCheckCallback;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
-import com.intellij.remoteServer.runtime.log.LoggingHandler;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -48,9 +47,8 @@ public class CloudSdkPreconditionsSupportTest {
   @Mock private CloudSdkService mockSdkService;
 
   @Mock private Runnable mockRunnable;
-  @Mock private LoggingHandler mockLoggingHandler;
   @Mock private Project mockProject;
-  @Mock private DeploymentOperationCallback mockErrorCallback;
+  @Mock private CloudSdkPreconditionCheckCallback mockCallback;
 
   @Spy private CloudSdkPreconditionsSupport cloudSdkPreconditionsSupport;
 
@@ -64,7 +62,7 @@ public class CloudSdkPreconditionsSupportTest {
     mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.READY);
 
     cloudSdkPreconditionsSupport.runAfterCloudSdkPreconditionsMet(
-        mockProject, mockRunnable, mockLoggingHandler, mockErrorCallback);
+        mockProject, mockRunnable, mockCallback);
 
     ApplicationManager.getApplication().invokeAndWait(() -> verify(mockRunnable).run());
   }
@@ -76,7 +74,7 @@ public class CloudSdkPreconditionsSupportTest {
     doReturn(true).when(cloudSdkPreconditionsSupport).checkIfCancelled();
 
     cloudSdkPreconditionsSupport.runAfterCloudSdkPreconditionsMet(
-        mockProject, mockRunnable, mockLoggingHandler, mockErrorCallback);
+        mockProject, mockRunnable, mockCallback);
 
     ApplicationManager.getApplication().invokeAndWait(() -> verifyNoMoreInteractions(mockRunnable));
   }
@@ -86,7 +84,7 @@ public class CloudSdkPreconditionsSupportTest {
     mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.INVALID);
 
     cloudSdkPreconditionsSupport.runAfterCloudSdkPreconditionsMet(
-        mockProject, mockRunnable, mockLoggingHandler, mockErrorCallback);
+        mockProject, mockRunnable, mockCallback);
 
     ApplicationManager.getApplication().invokeAndWait(() -> verifyNoMoreInteractions(mockRunnable));
   }
@@ -96,7 +94,7 @@ public class CloudSdkPreconditionsSupportTest {
     mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.NOT_AVAILABLE);
 
     cloudSdkPreconditionsSupport.runAfterCloudSdkPreconditionsMet(
-        mockProject, mockRunnable, mockLoggingHandler, mockErrorCallback);
+        mockProject, mockRunnable, mockCallback);
 
     ApplicationManager.getApplication().invokeAndWait(() -> verifyNoMoreInteractions(mockRunnable));
   }
@@ -108,7 +106,7 @@ public class CloudSdkPreconditionsSupportTest {
     doReturn(true).when(cloudSdkPreconditionsSupport).checkIfCancelled();
 
     cloudSdkPreconditionsSupport.runAfterCloudSdkPreconditionsMet(
-        mockProject, mockRunnable, mockLoggingHandler, mockErrorCallback);
+        mockProject, mockRunnable, mockCallback);
 
     ApplicationManager.getApplication()
         .invokeAndWait(
@@ -123,7 +121,7 @@ public class CloudSdkPreconditionsSupportTest {
     mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.INVALID);
 
     cloudSdkPreconditionsSupport.runAfterCloudSdkPreconditionsMet(
-        mockProject, mockRunnable, mockLoggingHandler, mockErrorCallback);
+        mockProject, mockRunnable, mockCallback);
 
     ApplicationManager.getApplication()
         .invokeAndWait(

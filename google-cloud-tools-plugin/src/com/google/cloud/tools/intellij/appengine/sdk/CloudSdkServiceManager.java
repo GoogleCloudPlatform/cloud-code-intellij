@@ -43,6 +43,13 @@ public class CloudSdkServiceManager {
     }
   }
 
+  /** Callback interface to allow SDK precondition checks to communicate errors and log progress. */
+  public interface CloudSdkPreconditionCheckCallback {
+    void log(String message);
+
+    void onError(String message);
+  }
+
   private static class UnsupportedCloudSdkTypeException extends RuntimeException {
     private UnsupportedCloudSdkTypeException(String message) {
       super(message);

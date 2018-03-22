@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager.CloudSdkPreconditionCheckCallback;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
@@ -33,8 +34,6 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
-import com.intellij.remoteServer.runtime.log.LoggingHandler;
 import java.util.concurrent.CountDownLatch;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -61,14 +60,10 @@ public class CloudSdkPreconditionsSupport {
    *
    * @param project Project to which runnable belongs.
    * @param runnable Runnable to run after Cloud SDK is ready.
-   * @param deploymentLog Log to print SDK statuses.
-   * @param callback Callback to report errors.
+   * @param callback Callback to report errors and log progress.
    */
   public void runAfterCloudSdkPreconditionsMet(
-      @Nullable Project project,
-      Runnable runnable,
-      LoggingHandler deploymentLog,
-      DeploymentOperationCallback callback) {
+      @Nullable Project project, Runnable runnable, CloudSdkPreconditionCheckCallback callback) {
     CloudSdkService cloudSdkService = CloudSdkService.getInstance();
 
     SdkStatus sdkStatus = cloudSdkService.getStatus();
@@ -98,7 +93,7 @@ public class CloudSdkPreconditionsSupport {
 
     if (installInProgress) {
       cloudSdkService.addStatusUpdateListener(sdkStatusUpdateListener);
-      deploymentLog.print(GctBundle.getString("appengine.deployment.status.preparing.sdk") + "\n");
+      callback.log(GctBundle.getString("appengine.deployment.status.preparing.sdk") + "\n");
     } else {
       // no need to wait for install if unsupported or completed.
       installationCompletionLatch.countDown();
@@ -125,10 +120,7 @@ public class CloudSdkPreconditionsSupport {
 
                   // at this point the installation should be either ready or user cancelled.
                   ApplicationManager.getApplication()
-                      .invokeLater(
-                          () -> {
-                            doRun(cloudSdkService, runnable, callback, userCancelled);
-                          });
+                      .invokeLater(() -> doRun(cloudSdkService, runnable, callback, userCancelled));
 
                 } catch (InterruptedException e) {
                   /* valid cancellation exception, no handling needed. */
@@ -148,7 +140,7 @@ public class CloudSdkPreconditionsSupport {
   private void doRun(
       CloudSdkService cloudSdkService,
       Runnable runnable,
-      DeploymentOperationCallback callback,
+      CloudSdkPreconditionCheckCallback callback,
       boolean userCancelled) {
     // check the status of SDK after install.
     SdkStatus postInstallSdkStatus = cloudSdkService.getStatus();
@@ -159,7 +151,7 @@ public class CloudSdkPreconditionsSupport {
                 userCancelled
                     ? "appengine.deployment.error.cancelled"
                     : "appengine.deployment.error.sdk.still.installing");
-        callback.errorOccurred(message);
+        callback.onError(message);
 
         if (!userCancelled) {
           showCloudSdkNotification(
@@ -168,12 +160,12 @@ public class CloudSdkPreconditionsSupport {
         return;
       case NOT_AVAILABLE:
         String errorMessage = GctBundle.message("appengine.deployment.error.sdk.not.available");
-        callback.errorOccurred(errorMessage);
+        callback.onError(errorMessage);
         showCloudSdkNotification(errorMessage, NotificationType.ERROR, true);
         return;
       case INVALID:
         errorMessage = GctBundle.message("appengine.deployment.error.sdk.invalid");
-        callback.errorOccurred(errorMessage);
+        callback.onError(errorMessage);
         showCloudSdkNotification(errorMessage, NotificationType.ERROR, true);
         return;
       case READY:
