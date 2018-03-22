@@ -37,6 +37,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.dom.MavenDomUtil;
 import org.jetbrains.idea.maven.dom.model.MavenDomDependencies;
 import org.jetbrains.idea.maven.dom.model.MavenDomDependency;
@@ -69,8 +70,9 @@ final class CloudLibraryDependencyWriter {
    * @param libraries the set of {@link CloudLibrary CloudLibraries} to add
    * @param module the {@link Module} to add the libraries to
    */
+  // todo refactor to overload for optional bomVersion
   static void addLibraries(
-      @NotNull Set<CloudLibrary> libraries, @NotNull Module module, Optional<String> bomVersion) {
+      @NotNull Set<CloudLibrary> libraries, @NotNull Module module, @Nullable String bomVersion) {
     if (libraries.isEmpty()) {
       return;
     }
@@ -94,7 +96,7 @@ final class CloudLibraryDependencyWriter {
    */
   // todo clean this method up
   private static void addLibrariesToMavenModule(
-      @NotNull Set<CloudLibrary> libraries, @NotNull Module module, Optional<String> bomVersion) {
+      @NotNull Set<CloudLibrary> libraries, @NotNull Module module, @Nullable String bomVersion) {
     Project project = module.getProject();
     MavenProject mavenProject = MavenProjectsManager.getInstance(project).findProject(module);
     MavenDomProjectModel model =
@@ -130,7 +132,9 @@ final class CloudLibraryDependencyWriter {
                     MavenDomUtil.createDomDependency(model, /* editor= */ null);
                 domDependency.getGroupId().setStringValue(mavenId.getGroupId());
                 domDependency.getArtifactId().setStringValue(mavenId.getArtifactId());
-                if (!bomVersion.isPresent()) {
+
+                // Only write the version to the dependency if there is no BOM
+                if (bomVersion == null) {
                   domDependency.getVersion().setStringValue(mavenId.getVersion());
                 }
 
@@ -143,37 +147,47 @@ final class CloudLibraryDependencyWriter {
                     .ping();
               });
 
-          bomVersion.ifPresent(
-              bv -> {
-                MavenDomDependencies mavenDomDependencies =
-                    model.getDependencyManagement().getDependencies();
-                Optional<MavenDomDependency> bomDependencyOptional =
-                    mavenDomDependencies
-                        .getDependencies()
-                        .stream()
-                        .filter(
-                            mdd -> "google-cloud-bom".equals(mdd.getArtifactId().getStringValue()))
-                        .findFirst();
-
-                if (!bomDependencyOptional.isPresent()) {
-                  // write the new dependency
-                  MavenDomDependency mavenDomDependency =
-                      model.getDependencyManagement().getDependencies().addDependency();
-                  mavenDomDependency.getGroupId().setStringValue("com.google.cloud");
-                  mavenDomDependency.getArtifactId().setStringValue("google-cloud-bom");
-                  mavenDomDependency.getVersion().setStringValue(bomVersion.get());
-                  mavenDomDependency.getType().setStringValue("pom");
-                  mavenDomDependency.getScope().setStringValue("import");
-                } else {
-                  // update the version
-                  bomDependencyOptional.get().getVersion().setStringValue(bomVersion.get());
-                }
-              });
+          if (bomVersion != null) {
+            addBomToMavenModule(bomVersion, model);
+            // todo notify BOM??
+          }
 
           notifyAddedDependencies(newMavenIds, project);
         }
       }
     }.execute();
+  }
+
+  private static void addBomToMavenModule(
+      @NotNull String bomVersion, @NotNull MavenDomProjectModel model) {
+    MavenDomDependencies mavenDomDependencies = model.getDependencyManagement().getDependencies();
+    Optional<MavenDomDependency> bomDependencyOptional =
+        mavenDomDependencies
+            .getDependencies()
+            .stream()
+            .filter(
+                mdd ->
+                    CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_ARTIFACT_NAME.equals(
+                        mdd.getArtifactId().getStringValue()))
+            .findFirst();
+
+    if (!bomDependencyOptional.isPresent()) {
+      // write the new dependency
+      MavenDomDependency mavenDomDependency =
+          model.getDependencyManagement().getDependencies().addDependency();
+      mavenDomDependency
+          .getGroupId()
+          .setStringValue(CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_GROUP_NAME);
+      mavenDomDependency
+          .getArtifactId()
+          .setStringValue(CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_ARTIFACT_NAME);
+      mavenDomDependency.getVersion().setStringValue(bomVersion);
+      mavenDomDependency.getType().setStringValue("pom");
+      mavenDomDependency.getScope().setStringValue("import");
+    } else {
+      // update the version
+      bomDependencyOptional.get().getVersion().setStringValue(bomVersion);
+    }
   }
 
   /**
