@@ -83,7 +83,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
   }
 
   @Override
-  public boolean supportsInstall() {
+  public boolean isInstallReady() {
     return managedCloudSdk != null;
   }
 

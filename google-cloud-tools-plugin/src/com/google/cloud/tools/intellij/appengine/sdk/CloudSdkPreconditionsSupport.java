@@ -74,7 +74,7 @@ public class CloudSdkPreconditionsSupport {
     SdkStatus sdkStatus = cloudSdkService.getStatus();
     boolean installInProgress = sdkStatus == SdkStatus.INSTALLING;
     // if not already installing and still not ready, attempt to fix and install now.
-    if (!installInProgress && sdkStatus != SdkStatus.READY && cloudSdkService.supportsInstall()) {
+    if (!installInProgress && sdkStatus != SdkStatus.READY && cloudSdkService.isInstallReady()) {
       cloudSdkService.install();
       installInProgress = true;
     }

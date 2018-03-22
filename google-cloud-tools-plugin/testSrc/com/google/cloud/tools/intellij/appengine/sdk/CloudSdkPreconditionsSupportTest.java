@@ -137,7 +137,7 @@ public class CloudSdkPreconditionsSupportTest {
 
   private void mockSdkStatusChange(SdkStatus fromStatus, SdkStatus toStatus) {
     when(mockSdkService.getStatus()).thenReturn(fromStatus);
-    when(mockSdkService.supportsInstall()).thenReturn(true);
+    when(mockSdkService.isInstallReady()).thenReturn(true);
     // the only way to enable READY status before blocking on the same thread test thread starts.
     doAnswer(
             invocation -> {
