@@ -156,7 +156,7 @@ final class CloudLibraryDependencyWriter {
             .stream()
             .filter(
                 mdd ->
-                    CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_ARTIFACT_NAME.equals(
+                    CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_ARTIFACT.equals(
                         mdd.getArtifactId().getStringValue()))
             .findFirst();
 
@@ -196,12 +196,10 @@ final class CloudLibraryDependencyWriter {
   private static void writeNewBom(MavenDomProjectModel model, String bomVersion) {
     MavenDomDependency bomDependency =
         model.getDependencyManagement().getDependencies().addDependency();
-    bomDependency
-        .getGroupId()
-        .setStringValue(CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_GROUP_NAME);
+    bomDependency.getGroupId().setStringValue(CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_GROUP);
     bomDependency
         .getArtifactId()
-        .setStringValue(CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_ARTIFACT_NAME);
+        .setStringValue(CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_ARTIFACT);
     bomDependency.getVersion().setStringValue(bomVersion);
     bomDependency.getType().setStringValue(CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_TYPE);
     bomDependency.getScope().setStringValue(CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_SCOPE);
