@@ -83,8 +83,13 @@ public class ManagedCloudSdkService implements CloudSdkService {
   }
 
   @Override
-  public boolean install() {
-    return executeManagedSdkJob(ManagedSdkJobType.INSTALL, this::installManagedSdk);
+  public boolean supportsInstall() {
+    return managedCloudSdk != null;
+  }
+
+  @Override
+  public void install() {
+    executeManagedSdkJob(ManagedSdkJobType.INSTALL, this::installManagedSdk);
   }
 
   public boolean update() {
@@ -250,8 +255,6 @@ public class ManagedCloudSdkService implements CloudSdkService {
     UPDATE
   }
 
-  private boolean firstReadySleep = true;
-
   /**
    * Managed SDK Job future listener, handles success/error logic, logs errors, shows notifications
    * to a user, updates SDK service statuses.
@@ -267,15 +270,6 @@ public class ManagedCloudSdkService implements CloudSdkService {
     public void onSuccess(Path path) {
       logger.info("Managed Google Cloud SDK successfully installed/updated at: " + path);
 
-      if (firstReadySleep) {
-        try {
-          System.out.println("wait 30secs for change in status to ready.");
-          Thread.sleep(30*1000);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-        firstReadySleep = false;
-      }
       updateStatus(SdkStatus.READY);
 
       ManagedCloudSdkServiceUiPresenter.getInstance().notifyManagedSdkJobSuccess(jobType);

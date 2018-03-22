@@ -21,6 +21,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.annotations.VisibleForTesting;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
@@ -32,11 +33,11 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vcs.impl.CancellableRunnable;
 import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
 import java.util.concurrent.CountDownLatch;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Utility class providing support for blocking / tracking {@link CloudSdkService#install()} process
@@ -54,19 +55,29 @@ public class CloudSdkPreconditionsSupport {
     return instance;
   }
 
-  public void deployAfterCloudSdkPreconditionsMet(
-      Project project,
-      CancellableRunnable deploymentRunnable,
+  /**
+   * Waits for Cloud SDK to be ready for all operations and then runs the given runnable. If process
+   * results in error or user cancel, shows notification and does not run.
+   *
+   * @param project Project to which runnable belongs.
+   * @param runnable Runnable to run after Cloud SDK is ready.
+   * @param deploymentLog Log to print SDK statuses.
+   * @param callback Callback to report errors.
+   */
+  public void runAfterCloudSdkPreconditionsMet(
+      @Nullable Project project,
+      Runnable runnable,
       LoggingHandler deploymentLog,
       DeploymentOperationCallback callback) {
     CloudSdkService cloudSdkService = CloudSdkService.getInstance();
 
     SdkStatus sdkStatus = cloudSdkService.getStatus();
-    boolean supportsInPlaceInstall = false;
-    if (sdkStatus != SdkStatus.READY) {
-      supportsInPlaceInstall = cloudSdkService.install();
+    boolean installInProgress = sdkStatus == SdkStatus.INSTALLING;
+    // if not already installing and still not ready, attempt to fix and install now.
+    if (!installInProgress && sdkStatus != SdkStatus.READY && cloudSdkService.supportsInstall()) {
+      cloudSdkService.install();
+      installInProgress = true;
     }
-    boolean installInProgress = supportsInPlaceInstall || sdkStatus == SdkStatus.INSTALLING;
 
     CountDownLatch installationCompletionLatch = new CountDownLatch(1);
     // listener for SDK updates, waits until install / update is done. uses latch to notify UI
@@ -104,7 +115,7 @@ public class CloudSdkPreconditionsSupport {
                   while (installationCompletionLatch.getCount() > 0) {
                     // wait interruptibility to check for user cancel each second.
                     installationCompletionLatch.await(1, SECONDS);
-                    if (ProgressManager.getInstance().getProgressIndicator().isCanceled()) {
+                    if (checkIfCancelled()) {
                       break;
                     }
                   }
@@ -113,7 +124,7 @@ public class CloudSdkPreconditionsSupport {
                   ApplicationManager.getApplication()
                       .invokeLater(
                           () -> {
-                            doDeploy(cloudSdkService, deploymentRunnable, callback);
+                            doRun(cloudSdkService, runnable, callback);
                           });
 
                 } catch (InterruptedException e) {
@@ -126,10 +137,13 @@ public class CloudSdkPreconditionsSupport {
             });
   }
 
-  private void doDeploy(
-      CloudSdkService cloudSdkService,
-      CancellableRunnable deploymentRunnable,
-      DeploymentOperationCallback callback) {
+  @VisibleForTesting
+  boolean checkIfCancelled() {
+    return ProgressManager.getInstance().getProgressIndicator().isCanceled();
+  }
+
+  private void doRun(
+      CloudSdkService cloudSdkService, Runnable runnable, DeploymentOperationCallback callback) {
     // check the status of SDK after install.
     SdkStatus postInstallSdkStatus = cloudSdkService.getStatus();
     switch (postInstallSdkStatus) {
@@ -151,12 +165,13 @@ public class CloudSdkPreconditionsSupport {
         return;
       case READY:
         // can continue to deployment.
-        deploymentRunnable.run();
+        runnable.run();
         break;
     }
   }
 
-  private void showCloudSdkNotification(
+  @VisibleForTesting
+  void showCloudSdkNotification(
       String errorMessage, NotificationType notificationType, boolean showSettingsAction) {
     if (!CloudSdkValidator.getInstance().isValidCloudSdk()) {
       Notification invalidSdkWarning =

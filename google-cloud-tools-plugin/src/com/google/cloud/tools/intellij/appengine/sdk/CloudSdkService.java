@@ -36,12 +36,11 @@ public interface CloudSdkService {
 
   SdkStatus getStatus();
 
-  /**
-   * Asks SDK service to attempt install and prepare Cloud SDK if it's not ready for use yet.
-   *
-   * @return true if install is supported and started, false if install is not supported.
-   */
-  boolean install();
+  /** Returns true if install is supported and started, false if install is not supported. */
+  boolean supportsInstall();
+
+  /** Asks SDK service to attempt install and prepare Cloud SDK if it's not ready for use yet. */
+  void install();
 
   void addStatusUpdateListener(SdkStatusUpdateListener listener);
 

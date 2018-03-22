@@ -82,7 +82,7 @@ public class AppEngineRuntimeInstance
               }
 
               CloudSdkPreconditionsSupport.getInstance()
-                  .deployAfterCloudSdkPreconditionsMet(
+                  .runAfterCloudSdkPreconditionsMet(
                       task.getProject(),
                       deployRunner,
                       logManager.getMainLoggingHandler(),

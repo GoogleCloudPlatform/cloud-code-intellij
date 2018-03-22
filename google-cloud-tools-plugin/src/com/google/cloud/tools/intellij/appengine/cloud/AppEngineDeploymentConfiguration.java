@@ -237,9 +237,11 @@ public class AppEngineDeploymentConfiguration
   }
 
   private void checkCommonConfig(AppEngineDeployable deployable) throws RuntimeConfigurationError {
-    // do not check SDK while installing - the deployment runner will block itself until installation is ready.
-    SdkStatus sdkStatus = CloudSdkService.getInstance().getStatus();
-    if (sdkStatus != SdkStatus.INSTALLING) {
+    // do not check SDK if it supports dynamic install - the deployment runner will block itself
+    // until installation is done.
+    CloudSdkService cloudSdkService = CloudSdkService.getInstance();
+    SdkStatus sdkStatus = cloudSdkService.getStatus();
+    if (sdkStatus != SdkStatus.READY && !cloudSdkService.supportsInstall()) {
       Set<CloudSdkValidationResult> sdkValidationResult =
           CloudSdkValidator.getInstance().validateCloudSdk();
       if (!sdkValidationResult.isEmpty()) {

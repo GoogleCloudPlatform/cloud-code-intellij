@@ -16,18 +16,28 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatusUpdateListener;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
+import com.google.cloud.tools.intellij.util.GctBundle;
+import com.intellij.notification.NotificationType;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.Project;
+import com.intellij.remoteServer.runtime.deployment.ServerRuntimeInstance.DeploymentOperationCallback;
+import com.intellij.remoteServer.runtime.log.LoggingHandler;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Spy;
 
 /** Tests for {@link CloudSdkPreconditionsSupport}. */
 public class CloudSdkPreconditionsSupportTest {
@@ -36,21 +46,108 @@ public class CloudSdkPreconditionsSupportTest {
   @Mock @TestService private CloudSdkServiceManager mockCloudSdkServiceManager;
   @Mock private CloudSdkService mockSdkService;
 
-  private CloudSdkPreconditionsSupport cloudSdkPreconditionsSupport;
-  private SdkStatus installActionResult;
+  @Mock private Runnable mockRunnable;
+  @Mock private LoggingHandler mockLoggingHandler;
+  @Mock private Project mockProject;
+  @Mock private DeploymentOperationCallback mockErrorCallback;
+
+  @Spy private CloudSdkPreconditionsSupport cloudSdkPreconditionsSupport;
 
   @Before
   public void setUp() {
     when(mockCloudSdkServiceManager.getCloudSdkService()).thenReturn(mockSdkService);
-
-    cloudSdkPreconditionsSupport = new CloudSdkPreconditionsSupport();
   }
 
   @Test
-  public void installingSdk_then_readySdk_correctly_returnsStatus() {
-    when(mockSdkService.getStatus()).thenReturn(SdkStatus.INSTALLING);
-    ArgumentCaptor<SdkStatusUpdateListener> listenerCaptor =
-        ArgumentCaptor.forClass(SdkStatusUpdateListener.class);
-    doNothing().when(mockSdkService).addStatusUpdateListener(listenerCaptor.capture());
+  public void installingSdk_then_readySdk_correctly_runs() {
+    mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.READY);
+
+    cloudSdkPreconditionsSupport.runAfterCloudSdkPreconditionsMet(
+        mockProject, mockRunnable, mockLoggingHandler, mockErrorCallback);
+
+    ApplicationManager.getApplication().invokeAndWait(() -> verify(mockRunnable).run());
+  }
+
+  @Test
+  public void installingSdk_then_stillInstalling_doesNotRun() {
+    mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.INSTALLING);
+    // mock cancel operation for incomplete install.
+    doReturn(true).when(cloudSdkPreconditionsSupport).checkIfCancelled();
+
+    cloudSdkPreconditionsSupport.runAfterCloudSdkPreconditionsMet(
+        mockProject, mockRunnable, mockLoggingHandler, mockErrorCallback);
+
+    ApplicationManager.getApplication().invokeAndWait(() -> verifyNoMoreInteractions(mockRunnable));
+  }
+
+  @Test
+  public void installingSdk_then_invalidSdk_doesNotRun() {
+    mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.INVALID);
+
+    cloudSdkPreconditionsSupport.runAfterCloudSdkPreconditionsMet(
+        mockProject, mockRunnable, mockLoggingHandler, mockErrorCallback);
+
+    ApplicationManager.getApplication().invokeAndWait(() -> verifyNoMoreInteractions(mockRunnable));
+  }
+
+  @Test
+  public void installingSdk_then_notAvailableSdk_doesNotRun() {
+    mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.NOT_AVAILABLE);
+
+    cloudSdkPreconditionsSupport.runAfterCloudSdkPreconditionsMet(
+        mockProject, mockRunnable, mockLoggingHandler, mockErrorCallback);
+
+    ApplicationManager.getApplication().invokeAndWait(() -> verifyNoMoreInteractions(mockRunnable));
+  }
+
+  @Test
+  public void installingSdk_then_stillInstalling_showsWarningNotification() {
+    mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.INSTALLING);
+    // mock cancel operation for incomplete install.
+    doReturn(true).when(cloudSdkPreconditionsSupport).checkIfCancelled();
+
+    cloudSdkPreconditionsSupport.runAfterCloudSdkPreconditionsMet(
+        mockProject, mockRunnable, mockLoggingHandler, mockErrorCallback);
+
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () ->
+                verify(cloudSdkPreconditionsSupport)
+                    .showCloudSdkNotification(
+                        GctBundle.message("appengine.deployment.error.sdk.still.installing"),
+                        NotificationType.WARNING,
+                        false));
+  }
+
+  @Test
+  public void installingSdk_then_invalidSdk_showsErrorNotification() {
+    mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.INVALID);
+
+    cloudSdkPreconditionsSupport.runAfterCloudSdkPreconditionsMet(
+        mockProject, mockRunnable, mockLoggingHandler, mockErrorCallback);
+
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () ->
+                verify(cloudSdkPreconditionsSupport)
+                    .showCloudSdkNotification(
+                        GctBundle.message("appengine.deployment.error.sdk.invalid"),
+                        NotificationType.ERROR,
+                        true));
+  }
+
+  private void mockSdkStatusChange(SdkStatus fromStatus, SdkStatus toStatus) {
+    when(mockSdkService.getStatus()).thenReturn(fromStatus);
+    when(mockSdkService.supportsInstall()).thenReturn(true);
+    // the only way to enable READY status before blocking on the same thread test thread starts.
+    doAnswer(
+            invocation -> {
+              ((SdkStatusUpdateListener) invocation.getArgument(0))
+                  .onSdkStatusChange(mockSdkService, toStatus);
+              when(mockSdkService.getStatus()).thenReturn(toStatus);
+              return null;
+            })
+        .when(mockSdkService)
+        .addStatusUpdateListener(any());
   }
 }
