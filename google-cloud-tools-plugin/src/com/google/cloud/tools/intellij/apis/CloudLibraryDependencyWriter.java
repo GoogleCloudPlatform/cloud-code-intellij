@@ -37,7 +37,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.dom.MavenDomUtil;
+import org.jetbrains.idea.maven.dom.model.MavenDomDependencies;
 import org.jetbrains.idea.maven.dom.model.MavenDomDependency;
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel;
 import org.jetbrains.idea.maven.model.MavenId;
@@ -45,6 +47,7 @@ import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
 /** A helper class that adds dependencies of Cloud libraries to a given module. */
+// TODO (eshaul) refactor this into a mockable service with non-static methods
 final class CloudLibraryDependencyWriter {
 
   private static final NotificationGroup NOTIFICATION_GROUP =
@@ -65,17 +68,22 @@ final class CloudLibraryDependencyWriter {
    * will be added as dependencies to the {@code pom.xml}. For all other dependency management
    * systems, the libraries will be downloaded and added directly to the module's classpath.
    *
+   * <p>If a BOM version is specified, then the google-cloud-java BOM will be written to the module
+   * and the individual dependencies will defer to this BOM to manage their versions.
+   *
    * @param libraries the set of {@link CloudLibrary CloudLibraries} to add
    * @param module the {@link Module} to add the libraries to
+   * @param bomVersion the version of the BOM to write. May be null
    */
-  static void addLibraries(@NotNull Set<CloudLibrary> libraries, @NotNull Module module) {
+  static void addLibraries(
+      @NotNull Set<CloudLibrary> libraries, @NotNull Module module, @Nullable String bomVersion) {
     if (libraries.isEmpty()) {
       return;
     }
 
     Project project = module.getProject();
     if (MavenProjectsManager.getInstance(project).isMavenizedModule(module)) {
-      addLibrariesToMavenModule(libraries, module);
+      addLibrariesToMavenModule(libraries, module, bomVersion);
     } else {
       // TODO(nkibler): Handle non-Maven projects.
     }
@@ -89,9 +97,10 @@ final class CloudLibraryDependencyWriter {
    *
    * @param libraries the set of {@link CloudLibrary CloudLibraries} to add
    * @param module the Maven {@link Module} to add the libraries to
+   * @param bomVersion the version of the BOM to write. May be null
    */
   private static void addLibrariesToMavenModule(
-      @NotNull Set<CloudLibrary> libraries, @NotNull Module module) {
+      @NotNull Set<CloudLibrary> libraries, @NotNull Module module, @Nullable String bomVersion) {
     Project project = module.getProject();
     MavenProject mavenProject = MavenProjectsManager.getInstance(project).findProject(module);
     MavenDomProjectModel model =
@@ -99,7 +108,7 @@ final class CloudLibraryDependencyWriter {
 
     new WriteCommandAction(project, DomUtil.getFile(model)) {
       @Override
-      protected void run(@NotNull Result result) throws Throwable {
+      protected void run(@NotNull Result result) {
         List<MavenDomDependency> dependencies = model.getDependencies().getDependencies();
         Map<Boolean, List<MavenId>> mavenIdsMap =
             libraries
@@ -122,20 +131,79 @@ final class CloudLibraryDependencyWriter {
         List<MavenId> newMavenIds = mavenIdsMap.get(false);
         if (!newMavenIds.isEmpty()) {
           newMavenIds.forEach(
-              mavenId -> {
-                MavenDomUtil.createDomDependency(model, /* editor= */ null, mavenId);
-                UsageTrackerProvider.getInstance()
-                    .trackEvent(GctTracking.CLIENT_LIBRARY_ADD_LIBRARY)
-                    .addMetadata(
-                        GctTracking.METADATA_BUILD_SYSTEM_KEY,
-                        GctTracking.METADATA_BUILD_SYSTEM_MAVEN)
-                    .addMetadata(GctTracking.METADATA_LABEL_KEY, mavenId.getDisplayString())
-                    .ping();
-              });
+              mavenId -> writeNewMavenDependency(model, mavenId, bomVersion != null));
+
+          if (bomVersion != null) {
+            addBomToMavenModule(model, bomVersion);
+          }
+
           notifyAddedDependencies(newMavenIds, project);
         }
       }
     }.execute();
+  }
+
+  /**
+   * Adds the google-cloud-java BOM dependency to the module's dependencyManagement section.
+   *
+   * <p>If the BOM already exists, then this will update the version of the BOM to match the
+   * supplied version.
+   */
+  private static void addBomToMavenModule(MavenDomProjectModel model, String bomVersion) {
+    MavenDomDependencies mavenDomDependencies = model.getDependencyManagement().getDependencies();
+    Optional<MavenDomDependency> bomDependencyOptional =
+        mavenDomDependencies
+            .getDependencies()
+            .stream()
+            .filter(
+                mdd ->
+                    CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_ARTIFACT.equals(
+                        mdd.getArtifactId().getStringValue()))
+            .findFirst();
+
+    if (!bomDependencyOptional.isPresent()) {
+      writeNewBom(model, bomVersion);
+    } else {
+      // update the version
+      bomDependencyOptional.get().getVersion().setStringValue(bomVersion);
+    }
+  }
+
+  /**
+   * Writes the google-cloud-java dependency to the users pom.xml.
+   *
+   * <p>If the dependency uses a BOM, the dependency will not be written with a version so that the
+   * BOM can manage the version.
+   */
+  private static void writeNewMavenDependency(
+      MavenDomProjectModel model, MavenId mavenId, boolean hasBom) {
+    MavenDomDependency dependency = MavenDomUtil.createDomDependency(model, /* editor= */ null);
+    dependency.getGroupId().setStringValue(mavenId.getGroupId());
+    dependency.getArtifactId().setStringValue(mavenId.getArtifactId());
+
+    // Only write the version to the dependency if there is no BOM
+    if (!hasBom) {
+      dependency.getVersion().setStringValue(mavenId.getVersion());
+    }
+
+    UsageTrackerProvider.getInstance()
+        .trackEvent(GctTracking.CLIENT_LIBRARY_ADD_LIBRARY)
+        .addMetadata(GctTracking.METADATA_BUILD_SYSTEM_KEY, GctTracking.METADATA_BUILD_SYSTEM_MAVEN)
+        .addMetadata(GctTracking.METADATA_LABEL_KEY, mavenId.getDisplayString())
+        .ping();
+  }
+
+  /** Writes the google-cloud-java BOM to the user's pom.xml. */
+  private static void writeNewBom(MavenDomProjectModel model, String bomVersion) {
+    MavenDomDependency bomDependency =
+        model.getDependencyManagement().getDependencies().addDependency();
+    bomDependency.getGroupId().setStringValue(CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_GROUP);
+    bomDependency
+        .getArtifactId()
+        .setStringValue(CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_ARTIFACT);
+    bomDependency.getVersion().setStringValue(bomVersion);
+    bomDependency.getType().setStringValue(CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_TYPE);
+    bomDependency.getScope().setStringValue(CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_SCOPE);
   }
 
   /**
@@ -188,12 +256,21 @@ final class CloudLibraryDependencyWriter {
   /**
    * Joins the given list of {@link MavenId MavenIds} into a human-readable string.
    *
+   * <p>Does not include the version as the version of the dependency may be managed by a BOM.
+   *
    * @param mavenIds the list of {@link MavenId MavenIds} to join
    */
   private static String joinMavenIds(List<MavenId> mavenIds) {
     return mavenIds
         .stream()
-        .map(MavenId::getDisplayString)
+        .map(
+            mavenId -> {
+              StringBuilder builder = new StringBuilder();
+              MavenId.append(builder, mavenId.getGroupId());
+              MavenId.append(builder, mavenId.getArtifactId());
+
+              return builder.toString();
+            })
         .map(string -> "- " + string)
         .collect(Collectors.joining("<br>"));
   }
