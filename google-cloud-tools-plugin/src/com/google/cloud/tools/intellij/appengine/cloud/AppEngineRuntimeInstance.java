@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.UserSpecifiedPathDeploymentSource;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPreconditionsSupport;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager.CloudSdkPreconditionCheckCallback;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -95,7 +95,7 @@ public class AppEngineRuntimeInstance
                     }
                   };
 
-              CloudSdkPreconditionsSupport.getInstance()
+              CloudSdkServiceManager.getInstance()
                   .runAfterCloudSdkPreconditionsMet(
                       task.getProject(),
                       deployRunner,

@@ -18,9 +18,9 @@ package com.google.cloud.tools.intellij.appengine.server.run;
 
 import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineExecutor;
 import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineStandardRunTask;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPreconditionsSupport;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager.CloudSdkPreconditionCheckCallback;
 import com.google.cloud.tools.intellij.appengine.server.instance.AppEngineServerModel;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -82,7 +82,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
                   }
                 };
             CountDownLatch sdkPreconditionsBlockingLatch =
-                CloudSdkPreconditionsSupport.getInstance()
+                CloudSdkServiceManager.getInstance()
                     .runAfterCloudSdkPreconditionsMet(
                         commonModel.getProject(),
                         null /* cannot use runnable since this is a separate thread */,
