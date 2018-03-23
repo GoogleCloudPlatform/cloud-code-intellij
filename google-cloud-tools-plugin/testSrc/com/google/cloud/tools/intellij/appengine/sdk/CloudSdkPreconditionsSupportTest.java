@@ -62,7 +62,7 @@ public class CloudSdkPreconditionsSupportTest {
     mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.READY);
 
     cloudSdkPreconditionsSupport.runAfterCloudSdkPreconditionsMet(
-        mockProject, mockRunnable, mockCallback);
+        mockProject, mockRunnable, "", mockCallback);
 
     ApplicationManager.getApplication().invokeAndWait(() -> verify(mockRunnable).run());
   }
@@ -74,7 +74,7 @@ public class CloudSdkPreconditionsSupportTest {
     doReturn(true).when(cloudSdkPreconditionsSupport).checkIfCancelled();
 
     cloudSdkPreconditionsSupport.runAfterCloudSdkPreconditionsMet(
-        mockProject, mockRunnable, mockCallback);
+        mockProject, mockRunnable, "", mockCallback);
 
     ApplicationManager.getApplication().invokeAndWait(() -> verifyNoMoreInteractions(mockRunnable));
   }
@@ -84,7 +84,7 @@ public class CloudSdkPreconditionsSupportTest {
     mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.INVALID);
 
     cloudSdkPreconditionsSupport.runAfterCloudSdkPreconditionsMet(
-        mockProject, mockRunnable, mockCallback);
+        mockProject, mockRunnable, "", mockCallback);
 
     ApplicationManager.getApplication().invokeAndWait(() -> verifyNoMoreInteractions(mockRunnable));
   }
@@ -94,7 +94,7 @@ public class CloudSdkPreconditionsSupportTest {
     mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.NOT_AVAILABLE);
 
     cloudSdkPreconditionsSupport.runAfterCloudSdkPreconditionsMet(
-        mockProject, mockRunnable, mockCallback);
+        mockProject, mockRunnable, "", mockCallback);
 
     ApplicationManager.getApplication().invokeAndWait(() -> verifyNoMoreInteractions(mockRunnable));
   }
@@ -106,7 +106,7 @@ public class CloudSdkPreconditionsSupportTest {
     doReturn(true).when(cloudSdkPreconditionsSupport).checkIfCancelled();
 
     cloudSdkPreconditionsSupport.runAfterCloudSdkPreconditionsMet(
-        mockProject, mockRunnable, mockCallback);
+        mockProject, mockRunnable, "", mockCallback);
 
     ApplicationManager.getApplication()
         .invokeAndWait(
@@ -121,7 +121,7 @@ public class CloudSdkPreconditionsSupportTest {
     mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.INVALID);
 
     cloudSdkPreconditionsSupport.runAfterCloudSdkPreconditionsMet(
-        mockProject, mockRunnable, mockCallback);
+        mockProject, mockRunnable, "", mockCallback);
 
     ApplicationManager.getApplication()
         .invokeAndWait(

@@ -97,7 +97,10 @@ public class AppEngineRuntimeInstance
 
               CloudSdkPreconditionsSupport.getInstance()
                   .runAfterCloudSdkPreconditionsMet(
-                      task.getProject(), deployRunner, preconditionCheckCallback);
+                      task.getProject(),
+                      deployRunner,
+                      GctBundle.message("appengine.deployment.status.deploying"),
+                      preconditionCheckCallback);
             });
   }
 

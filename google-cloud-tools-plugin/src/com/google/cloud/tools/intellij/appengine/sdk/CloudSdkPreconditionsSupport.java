@@ -59,11 +59,19 @@ public class CloudSdkPreconditionsSupport {
    * results in error or user cancel, shows notification and does not run.
    *
    * @param project Project to which runnable belongs.
-   * @param runnable Runnable to run after Cloud SDK is ready.
+   * @param runnable Optional runnable to run after Cloud SDK is ready. This runnable will be run on
+   *     UI thread.
+   * @param progressMessage Message to show in progress dialog to identify which process is
+   *     starting, i.e. deployment or local server.
    * @param callback Callback to report errors and log progress.
+   * @return blocking latch on which another thread may wait for Cloud SDK precondition checks to
+   *     finish.
    */
-  public void runAfterCloudSdkPreconditionsMet(
-      @Nullable Project project, Runnable runnable, CloudSdkPreconditionCheckCallback callback) {
+  public CountDownLatch runAfterCloudSdkPreconditionsMet(
+      @Nullable Project project,
+      @Nullable Runnable runnable,
+      String progressMessage,
+      CloudSdkPreconditionCheckCallback callback) {
     CloudSdkService cloudSdkService = CloudSdkService.getInstance();
 
     SdkStatus sdkStatus = cloudSdkService.getStatus();
@@ -99,11 +107,12 @@ public class CloudSdkPreconditionsSupport {
       installationCompletionLatch.countDown();
     }
 
+    CountDownLatch blockingCompletedLatch = new CountDownLatch(1);
+
     // wait for SDK to be ready and trigger the actual deployment if it properly installs.
     ProgressManager.getInstance()
         .run(
-            new Task.Backgroundable(
-                project, GctBundle.message("appengine.deployment.status.deploying"), true) {
+            new Task.Backgroundable(project, progressMessage, true) {
               boolean userCancelled;
 
               @Override
@@ -127,9 +136,13 @@ public class CloudSdkPreconditionsSupport {
                 } finally {
                   // remove the notification listener regardless of waiting outcome.
                   cloudSdkService.removeStatusUpdateListener(sdkStatusUpdateListener);
+                  // unblock the waiting latch for external point of synchronization
+                  blockingCompletedLatch.countDown();
                 }
               }
             });
+
+    return blockingCompletedLatch;
   }
 
   @VisibleForTesting
@@ -139,7 +152,7 @@ public class CloudSdkPreconditionsSupport {
 
   private void doRun(
       CloudSdkService cloudSdkService,
-      Runnable runnable,
+      @Nullable Runnable runnable,
       CloudSdkPreconditionCheckCallback callback,
       boolean userCancelled) {
     // check the status of SDK after install.
@@ -170,7 +183,9 @@ public class CloudSdkPreconditionsSupport {
         return;
       case READY:
         // can continue to deployment.
-        runnable.run();
+        if (runnable != null) {
+          runnable.run();
+        }
         break;
     }
   }

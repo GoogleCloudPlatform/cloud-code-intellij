@@ -18,7 +18,10 @@ package com.google.cloud.tools.intellij.appengine.server.run;
 
 import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineExecutor;
 import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineStandardRunTask;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkPreconditionsSupport;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager.CloudSdkPreconditionCheckCallback;
 import com.google.cloud.tools.intellij.appengine.server.instance.AppEngineServerModel;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.collect.Maps;
@@ -31,14 +34,17 @@ import com.intellij.javaee.run.localRun.ExecutableObject;
 import com.intellij.javaee.run.localRun.ExecutableObjectStartupPolicy;
 import com.intellij.javaee.run.localRun.ScriptHelper;
 import com.intellij.javaee.run.localRun.ScriptsHelper;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ProjectRootManager;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import org.jetbrains.annotations.Nullable;
 
 /** Runs a Google App Engine Standard app locally with devappserver, through the tools lib. */
 public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
+  private static final Logger logger = Logger.getInstance(CloudSdkStartupPolicy.class);
 
   // The startup process handler is kept so the process can be explicitly terminated, since we're
   // not delegating that to the framework.
@@ -63,9 +69,46 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
               String workingDirectory, Map<String, String> configuredEnvironment)
               throws ExecutionException {
 
-            if (!CloudSdkValidator.getInstance().isValidCloudSdk()) {
+            CloudSdkPreconditionCheckCallback callback =
+                new CloudSdkPreconditionCheckCallback() {
+                  @Override
+                  public void log(String s) {
+                    logger.info("Cloud SDK precondition check reported: " + s);
+                  }
+
+                  @Override
+                  public void onError(String s) {
+                    logger.warn("Cloud SDK precondition check reported error: " + s);
+                  }
+                };
+            CountDownLatch sdkPreconditionsBlockingLatch =
+                CloudSdkPreconditionsSupport.getInstance()
+                    .runAfterCloudSdkPreconditionsMet(
+                        commonModel.getProject(),
+                        null /* cannot use runnable since this is a separate thread */,
+                        GctBundle.getString("appengine.run.startupscript"),
+                        callback);
+            try {
+              sdkPreconditionsBlockingLatch.await();
+            } catch (InterruptedException e) {
+              // should not happen, but would be an error.
               throw new ExecutionException(
                   GctBundle.message("appengine.run.server.sdk.misconfigured.message"));
+            }
+            // wait complete, check the final status here manually.
+            SdkStatus sdkStatus = CloudSdkService.getInstance().getStatus();
+            switch (sdkStatus) {
+              case INVALID:
+              case NOT_AVAILABLE:
+                throw new ExecutionException(
+                    GctBundle.message("appengine.run.server.sdk.misconfigured.message"));
+              case INSTALLING:
+                // cannot continue still installing.
+                throw new ExecutionException(
+                    GctBundle.message("appengine.run.server.sdk.installing.message"));
+              case READY:
+                // continue to start local dev server process.
+                break;
             }
 
             Sdk javaSdk = ProjectRootManager.getInstance(commonModel.getProject()).getProjectSdk();
