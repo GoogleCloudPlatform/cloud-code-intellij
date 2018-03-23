@@ -31,6 +31,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.swing.JComponent;
@@ -87,8 +88,8 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
     return cloudApiSelectorPanel.getApisToEnable();
   }
 
-  /** Returns the selected BOM version. */
-  String getSelectedBomVersion() {
+  /** Returns, optionally, the selected BOM version. */
+  Optional<String> getSelectedBomVersion() {
     return cloudApiSelectorPanel.getSelectedBomVersion();
   }
 
