@@ -655,9 +655,6 @@ public final class GoogleCloudApiSelectorPanelTest {
             : "Version: " + client.mavenCoordinates().version();
     assertThat(panel.getVersionLabel().getText()).isEqualTo(expectedVersion);
 
-    String expectedStatus = client.launchStage().isEmpty() ? "" : "Status: " + client.launchStage();
-    assertThat(panel.getStatusLabel().getText()).isEqualTo(expectedStatus);
-
     Map<String, String> actualUrlMap = buildActualUrlMap(panel.getLinksTextPane().getText());
     Map<String, String> expectedUrlMap = buildExpectedUrlMap(library, client);
     assertThat(actualUrlMap).containsExactlyEntriesIn(expectedUrlMap);
