@@ -21,7 +21,6 @@ import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.MavenTestUtils;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
-import com.google.cloud.tools.intellij.testing.TestDirectory;
 import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary;
@@ -35,7 +34,6 @@ import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import com.intellij.util.xml.DomUtil;
-import java.io.File;
 import java.util.List;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
@@ -59,9 +57,6 @@ public class CloudLibraryProjectStateTest {
   @TestFixture private IdeaProjectTestFixture testFixture;
 
   @Mock @TestService CloudLibrariesService librariesService;
-
-  @TestDirectory(name = "root")
-  private File root;
 
   private static final TestCloudLibraryClientMavenCoordinates JAVA_CLIENT_MAVEN_COORDS =
       TestCloudLibraryClientMavenCoordinates.create("java", "client", "1.0.0");
