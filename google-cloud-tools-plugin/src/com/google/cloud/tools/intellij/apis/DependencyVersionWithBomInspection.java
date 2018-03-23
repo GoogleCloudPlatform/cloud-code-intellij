@@ -73,14 +73,11 @@ public class DependencyVersionWithBomInspection extends XmlSuppressableInspectio
           return;
         }
 
-        XmlTag parentTag = tag.getParentTag();
-        XmlTag parentParentTag = parentTag != null ? parentTag.getParentTag() : null;
-
-        if (tagNameEquals(tag, "dependency")
-            && tagNameEquals(parentTag, "dependencies")
-            && tagNameEquals(parentParentTag, "project")) {
-          // todo this is not the right level to log, just testing
-          holder.registerProblem(tag, "bom warning!!!", ProblemHighlightType.WEAK_WARNING);
+        if (isNormalDependencyVersionTag(tag)) {
+          holder.registerProblem(
+              tag,
+              "Version should not be specified when you are using the google-cloud-java BOM",
+              ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
         }
       }
     };
@@ -88,6 +85,25 @@ public class DependencyVersionWithBomInspection extends XmlSuppressableInspectio
 
   private boolean tagNameEquals(XmlTag tag, String value) {
     return tag != null && value.equalsIgnoreCase(tag.getName());
+  }
+
+  private boolean isNormalDependencyVersionTag(XmlTag versionTag) {
+    XmlTag dependencyTag = getParentTagNullSafe(versionTag);
+    XmlTag dependenciesTag = getParentTagNullSafe(dependencyTag);
+    XmlTag projectTag = getParentTagNullSafe(dependenciesTag);
+
+    return tagNameEquals(versionTag, "version")
+        && tagNameEquals(dependencyTag, "dependency")
+        && tagNameEquals(dependenciesTag, "dependencies")
+        && tagNameEquals(projectTag, "project");
+  }
+
+  private XmlTag getParentTagNullSafe(XmlTag tag) {
+    if (tag != null && tag.getParentTag() != null) {
+      return tag.getParentTag();
+    }
+
+    return null;
   }
 
   private Module getModule(XmlTag tag) {
