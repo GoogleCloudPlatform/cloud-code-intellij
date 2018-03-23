@@ -447,6 +447,10 @@
 
     <fileTypeFactory implementation="com.google.cloud.tools.intellij.appengine.file.DockerFileTemplateTypeFactory"/>
 
+    <localInspection language="XML" shortName="myShortName" displayName="myDisplayName" groupName="bomStuff"
+                     enabledByDefault="true" level="WARNING"
+                     implementationClass="com.google.cloud.tools.intellij.apis.DependencyVersionWithBomInspection"/>
+
     <localInspection language="JAVA" shortName="GoogleAppEngineForbiddenCode" displayName="Forbidden code in App Engine applications"
                      groupName="Google App Engine" enabledByDefault="true" level="ERROR"
                      implementationClass="com.google.cloud.tools.intellij.appengine.inspections.AppEngineForbiddenCodeInspection"/>
