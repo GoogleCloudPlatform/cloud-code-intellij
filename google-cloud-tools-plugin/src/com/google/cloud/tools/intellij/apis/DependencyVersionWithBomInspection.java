@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.apis;
 
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.intellij.codeInspection.LocalInspectionTool;
+import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.codeInspection.XmlSuppressableInspectionTool;
 import com.intellij.openapi.module.Module;
@@ -66,18 +67,30 @@ public class DependencyVersionWithBomInspection extends XmlSuppressableInspectio
           return;
         }
 
-        if (CloudLibraryProjectState.getInstance(module.getProject())
+        if (!CloudLibraryProjectState.getInstance(module.getProject())
             .getCloudLibraryBom(module)
             .isPresent()) {
           return;
         }
 
-        // look through each dependency for ones that match cloudLibrary, check if it
+        XmlTag parentTag = tag.getParentTag();
+        XmlTag parentParentTag = parentTag != null ? parentTag.getParentTag() : null;
+
+        if (tagNameEquals(tag, "dependency")
+            && tagNameEquals(parentTag, "dependencies")
+            && tagNameEquals(parentParentTag, "project")) {
+          // todo this is not the right level to log, just testing
+          holder.registerProblem(tag, "bom warning!!!", ProblemHighlightType.WEAK_WARNING);
+        }
       }
     };
   }
 
-  public Module getModule(XmlTag tag) {
+  private boolean tagNameEquals(XmlTag tag, String value) {
+    return tag != null && value.equalsIgnoreCase(tag.getName());
+  }
+
+  private Module getModule(XmlTag tag) {
     try {
       Project project = tag.getContainingFile().getProject();
 
