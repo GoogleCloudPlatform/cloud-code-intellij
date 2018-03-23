@@ -26,6 +26,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -33,6 +34,7 @@ import java.util.stream.Stream;
 import org.fest.util.Maps;
 import org.fest.util.VisibleForTesting;
 import org.jetbrains.idea.maven.dom.MavenDomUtil;
+import org.jetbrains.idea.maven.dom.model.MavenDomDependencies;
 import org.jetbrains.idea.maven.dom.model.MavenDomDependency;
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel;
 import org.jetbrains.idea.maven.project.MavenProject;
@@ -46,7 +48,10 @@ import org.jetbrains.idea.maven.project.MavenProjectsManager.Listener;
 public class CloudLibraryProjectState implements ProjectComponent {
 
   private final Project project;
+
   private Map<Module, Set<CloudLibrary>> moduleLibraryMap = Maps.newHashMap();
+  private Map<Module, Optional<MavenDomDependency>> moduleBomMap = Maps.newHashMap();
+
   private List<CloudLibrary> allLibraries;
 
   private CloudLibraryProjectState(Project project) {
@@ -74,6 +79,7 @@ public class CloudLibraryProjectState implements ProjectComponent {
               @Override
               public void projectsScheduled() {
                 syncManagedProjectLibraries();
+                syncCloudLibrariesBom();
               }
             });
   }
@@ -81,6 +87,10 @@ public class CloudLibraryProjectState implements ProjectComponent {
   /** Returns the set of {@link CloudLibrary} currently configured on the given {@link Module}. */
   Set<CloudLibrary> getCloudLibraries(Module module) {
     return moduleLibraryMap.get(module);
+  }
+
+  Optional<MavenDomDependency> getCloudLibraryBom(Module module) {
+    return moduleBomMap.get(module);
   }
 
   /**
@@ -92,6 +102,13 @@ public class CloudLibraryProjectState implements ProjectComponent {
     moduleLibraryMap =
         Stream.of(ModuleManager.getInstance(project).getModules())
             .collect(Collectors.toMap(Function.identity(), this::loadManagedLibraries));
+  }
+
+  @VisibleForTesting
+  void syncCloudLibrariesBom() {
+    moduleBomMap =
+        Stream.of(ModuleManager.getInstance(project).getModules())
+            .collect(Collectors.toMap(Function.identity(), this::loadCloudLibraryBom));
   }
 
   /**
@@ -116,6 +133,24 @@ public class CloudLibraryProjectState implements ProjectComponent {
         .stream()
         .filter(library -> isManagedDependencyInModule(library, moduleDependencies))
         .collect(Collectors.toSet());
+  }
+
+  private Optional<MavenDomDependency> loadCloudLibraryBom(Module module) {
+    MavenProject mavenProject =
+        MavenProjectsManager.getInstance(module.getProject()).findProject(module);
+    MavenDomProjectModel model =
+        MavenDomUtil.getMavenDomProjectModel(project, mavenProject.getFile());
+
+    MavenDomDependencies mavenDomDependencies = model.getDependencyManagement().getDependencies();
+
+    return mavenDomDependencies
+        .getDependencies()
+        .stream()
+        .filter(
+            mdd ->
+                CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_ARTIFACT.equals(
+                    mdd.getArtifactId().getStringValue()))
+        .findFirst();
   }
 
   /**

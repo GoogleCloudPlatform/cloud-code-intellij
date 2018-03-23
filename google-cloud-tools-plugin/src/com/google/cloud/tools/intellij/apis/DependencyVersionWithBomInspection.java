@@ -59,14 +59,18 @@ public class DependencyVersionWithBomInspection extends XmlSuppressableInspectio
       @Override
       public void visitXmlTag(XmlTag tag) {
         Module module = getModule(tag);
-        Set<CloudLibrary> cloudLibraries = CloudLibraryProjectState.getInstance(module.getProject())
-            .getCloudLibraries(module);
+        Set<CloudLibrary> cloudLibraries =
+            CloudLibraryProjectState.getInstance(module.getProject()).getCloudLibraries(module);
 
         if (cloudLibraries.isEmpty()) {
           return;
         }
 
-        // is there a BOM? if not return immediately
+        if (CloudLibraryProjectState.getInstance(module.getProject())
+            .getCloudLibraryBom(module)
+            .isPresent()) {
+          return;
+        }
 
         // look through each dependency for ones that match cloudLibrary, check if it
       }
