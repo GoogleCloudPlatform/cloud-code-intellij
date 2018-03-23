@@ -136,21 +136,27 @@ public class CloudLibraryProjectState implements ProjectComponent {
   }
 
   private Optional<MavenDomDependency> loadCloudLibraryBom(Module module) {
-    MavenProject mavenProject =
-        MavenProjectsManager.getInstance(module.getProject()).findProject(module);
-    MavenDomProjectModel model =
-        MavenDomUtil.getMavenDomProjectModel(project, mavenProject.getFile());
+    return ApplicationManager.getApplication()
+        .runReadAction(
+            (Computable<Optional<MavenDomDependency>>)
+                () -> {
+                  MavenProject mavenProject =
+                      MavenProjectsManager.getInstance(module.getProject()).findProject(module);
+                  MavenDomProjectModel model =
+                      MavenDomUtil.getMavenDomProjectModel(project, mavenProject.getFile());
 
-    MavenDomDependencies mavenDomDependencies = model.getDependencyManagement().getDependencies();
+                  MavenDomDependencies mavenDomDependencies =
+                      model.getDependencyManagement().getDependencies();
 
-    return mavenDomDependencies
-        .getDependencies()
-        .stream()
-        .filter(
-            mdd ->
-                CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_ARTIFACT.equals(
-                    mdd.getArtifactId().getStringValue()))
-        .findFirst();
+                  return mavenDomDependencies
+                      .getDependencies()
+                      .stream()
+                      .filter(
+                          mdd ->
+                              CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_ARTIFACT.equals(
+                                  mdd.getArtifactId().getStringValue()))
+                      .findFirst();
+                });
   }
 
   /**
