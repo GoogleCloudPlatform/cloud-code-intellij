@@ -73,7 +73,7 @@ public class CloudLibraryDependencyWriterTest {
   }
 
   @Test
-  public void addLibraries_withNoBom_writesDependencyWithVersion() {
+  public void addLibraries_withNoBomSelected_writesDependencyWithVersion() {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> {
@@ -92,7 +92,7 @@ public class CloudLibraryDependencyWriterTest {
   }
 
   @Test
-  public void addLibraries_withBom_writesDependencyWithNoVersion() {
+  public void addLibraries_withBomSelected_writesDependencyWithNoVersion() {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> {
