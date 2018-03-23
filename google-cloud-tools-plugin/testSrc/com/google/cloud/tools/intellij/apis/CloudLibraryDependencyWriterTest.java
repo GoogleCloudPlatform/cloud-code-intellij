@@ -118,8 +118,10 @@ public class CloudLibraryDependencyWriterTest {
             () -> {
               MavenDomProjectModel model = createMavenModelWithCloudLibrary(null /*bomVersion*/);
 
-              assertThat(model.getDependencyManagement().getDependencies().getDependencies())
-                  .isEmpty();
+              List<MavenDomDependency> dependencyManagementDependencies =
+                  model.getDependencyManagement().getDependencies().getDependencies();
+              // the BOM lives in the dependencyManagement section
+              assertThat(dependencyManagementDependencies).isEmpty();
             });
   }
 
