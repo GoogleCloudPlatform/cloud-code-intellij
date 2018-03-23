@@ -77,7 +77,7 @@ public class CloudLibraryDependencyWriterTest {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> {
-              MavenDomProjectModel model = getMavenDomProjectModel(null /*bomVersion*/);
+              MavenDomProjectModel model = createMavenModelWithCloudLibrary(null /*bomVersion*/);
 
               List<MavenDomDependency> cloudLibraryDependencies =
                   model.getDependencies().getDependencies();
@@ -97,7 +97,7 @@ public class CloudLibraryDependencyWriterTest {
         .invokeAndWait(
             () -> {
               String bomVersion = "1.0.0-beta";
-              MavenDomProjectModel model = getMavenDomProjectModel(bomVersion);
+              MavenDomProjectModel model = createMavenModelWithCloudLibrary(bomVersion);
 
               List<MavenDomDependency> cloudLibraryDependencies =
                   model.getDependencies().getDependencies();
@@ -116,7 +116,7 @@ public class CloudLibraryDependencyWriterTest {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> {
-              MavenDomProjectModel model = getMavenDomProjectModel(null /*bomVersion*/);
+              MavenDomProjectModel model = createMavenModelWithCloudLibrary(null /*bomVersion*/);
 
               assertThat(model.getDependencyManagement().getDependencies().getDependencies())
                   .isEmpty();
@@ -129,7 +129,7 @@ public class CloudLibraryDependencyWriterTest {
         .invokeAndWait(
             () -> {
               String bomVersion = "1.0.0-beta";
-              MavenDomProjectModel model = getMavenDomProjectModel(bomVersion);
+              MavenDomProjectModel model = createMavenModelWithCloudLibrary(bomVersion);
 
               List<MavenDomDependency> dependencyManagementDependencies =
                   model.getDependencyManagement().getDependencies().getDependencies();
@@ -145,7 +145,7 @@ public class CloudLibraryDependencyWriterTest {
             });
   }
 
-  private MavenDomProjectModel getMavenDomProjectModel(@Nullable String bomVersion) {
+  private MavenDomProjectModel createMavenModelWithCloudLibrary(@Nullable String bomVersion) {
     Module module =
         MavenTestUtils.getInstance().createNewMavenModule(moduleBuilder, testFixture.getProject());
 
