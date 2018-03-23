@@ -73,7 +73,8 @@ public class DependencyVersionWithBomInspection extends XmlSuppressableInspectio
           return;
         }
 
-        if (isNormalDependencyVersionTag(tag)) {
+        if (isNormalDependencyVersionTag(tag)
+            && isCloudLibraryDependency(getParentTagNullSafe(tag))) {
           holder.registerProblem(
               tag,
               "Version should not be specified when you are using the google-cloud-java BOM",
@@ -81,6 +82,14 @@ public class DependencyVersionWithBomInspection extends XmlSuppressableInspectio
         }
       }
     };
+  }
+
+  private boolean isCloudLibraryDependency(XmlTag dependencyTag) {
+    XmlTag groupTag = dependencyTag.findFirstSubTag("groupId");
+
+    // TODO any need to check this against the known state of managed cloud libraries?
+    return groupTag != null
+        && "com.google.cloud".equalsIgnoreCase(groupTag.getValue().getTrimmedText());
   }
 
   private boolean tagNameEquals(XmlTag tag, String value) {
