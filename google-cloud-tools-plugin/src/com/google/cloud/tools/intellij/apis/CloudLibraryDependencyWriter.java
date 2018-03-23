@@ -130,7 +130,8 @@ final class CloudLibraryDependencyWriter {
         // user when it's complete.
         List<MavenId> newMavenIds = mavenIdsMap.get(false);
         if (!newMavenIds.isEmpty()) {
-          newMavenIds.forEach(mavenId -> writeNewMavenDependency(model, mavenId, bomVersion));
+          newMavenIds.forEach(
+              mavenId -> writeNewMavenDependency(model, mavenId, bomVersion != null));
 
           if (bomVersion != null) {
             addBomToMavenModule(model, bomVersion);
@@ -171,17 +172,17 @@ final class CloudLibraryDependencyWriter {
   /**
    * Writes the google-cloud-java dependency to the users pom.xml.
    *
-   * <p>If a BOM version is supplied, the dependency will not be written with a version so that the
+   * <p>If the dependency uses a BOM, the dependency will not be written with a version so that the
    * BOM can manage the version.
    */
   private static void writeNewMavenDependency(
-      MavenDomProjectModel model, MavenId mavenId, @Nullable String bomVersion) {
+      MavenDomProjectModel model, MavenId mavenId, boolean hasBom) {
     MavenDomDependency dependency = MavenDomUtil.createDomDependency(model, /* editor= */ null);
     dependency.getGroupId().setStringValue(mavenId.getGroupId());
     dependency.getArtifactId().setStringValue(mavenId.getArtifactId());
 
     // Only write the version to the dependency if there is no BOM
-    if (bomVersion == null) {
+    if (hasBom) {
       dependency.getVersion().setStringValue(mavenId.getVersion());
     }
 
