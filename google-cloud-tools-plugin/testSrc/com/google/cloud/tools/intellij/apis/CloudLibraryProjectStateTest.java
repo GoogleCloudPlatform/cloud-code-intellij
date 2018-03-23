@@ -19,8 +19,8 @@ package com.google.cloud.tools.intellij.apis;
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.MavenTestUtils;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
-import com.google.cloud.tools.intellij.testing.TestDirectory;
 import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary;
@@ -31,19 +31,11 @@ import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.command.WriteCommandAction;
-import com.intellij.openapi.module.ModifiableModuleModel;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
-import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.util.Computable;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import com.intellij.util.xml.DomUtil;
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
-import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.idea.maven.dom.MavenDomUtil;
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel;
@@ -66,9 +58,6 @@ public class CloudLibraryProjectStateTest {
 
   @Mock @TestService CloudLibrariesService librariesService;
 
-  @TestDirectory(name = "root")
-  private File root;
-
   private static final TestCloudLibraryClientMavenCoordinates JAVA_CLIENT_MAVEN_COORDS =
       TestCloudLibraryClientMavenCoordinates.create("java", "client", "1.0.0");
   private static final TestCloudLibraryClient JAVA_CLIENT =
@@ -86,15 +75,11 @@ public class CloudLibraryProjectStateTest {
 
   private CloudLibraryProjectState state;
   private MavenModuleBuilder moduleBuilder;
-  private MavenId id;
 
   @Before
   public void setUp() {
     state = CloudLibraryProjectState.getInstance(testFixture.getProject());
-    moduleBuilder = new MavenModuleBuilder();
-    id = new MavenId("org.foo", "module", "1.0");
-
-    setModuleNameAndRoot(testFixture.getProject().getBasePath());
+    moduleBuilder = MavenTestUtils.getInstance().initMavenModuleBuilder(testFixture.getProject());
   }
 
   @After
@@ -107,7 +92,9 @@ public class CloudLibraryProjectStateTest {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> {
-              Module module = createNewModule(id);
+              Module module =
+                  MavenTestUtils.getInstance()
+                      .createNewMavenModule(moduleBuilder, testFixture.getProject());
 
               assertThat(state.getCloudLibraries(module)).isEmpty();
             });
@@ -121,7 +108,9 @@ public class CloudLibraryProjectStateTest {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> {
-              Module module = createNewModule(id);
+              Module module =
+                  MavenTestUtils.getInstance()
+                      .createNewMavenModule(moduleBuilder, testFixture.getProject());
               MavenId nonCloudDependency = new MavenId("my-group", "my-artifact", "1.0");
               writeDependenciesToPom(module, ImmutableList.of(nonCloudDependency));
 
@@ -137,7 +126,9 @@ public class CloudLibraryProjectStateTest {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> {
-              Module module = createNewModule(id);
+              Module module =
+                  MavenTestUtils.getInstance()
+                      .createNewMavenModule(moduleBuilder, testFixture.getProject());
 
               TestCloudLibraryClientMavenCoordinates mavenCoordinates =
                   LIBRARY.clients().get(0).mavenCoordinates();
@@ -163,7 +154,9 @@ public class CloudLibraryProjectStateTest {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> {
-              Module module = createNewModule(id);
+              Module module =
+                  MavenTestUtils.getInstance()
+                      .createNewMavenModule(moduleBuilder, testFixture.getProject());
 
               TestCloudLibraryClientMavenCoordinates mavenCoordinates =
                   LIBRARY.clients().get(0).mavenCoordinates();
@@ -184,44 +177,6 @@ public class CloudLibraryProjectStateTest {
     assertThat(cloudLibraries.size()).isEqualTo(1);
     CloudLibrary library = cloudLibraries.iterator().next();
     assertThat(library.getName()).isEqualTo(LIBRARY.name());
-  }
-
-  private void setModuleNameAndRoot(String root) {
-    moduleBuilder.setName("module");
-    moduleBuilder.setModuleFilePath(root + "/module.iml");
-    moduleBuilder.setContentEntryPath(root);
-  }
-
-  private Module createNewModule(MavenId id) {
-    moduleBuilder.setProjectId(id);
-
-    return ApplicationManager.getApplication()
-        .runWriteAction(
-            (Computable<Module>)
-                () -> {
-                  ModifiableModuleModel model =
-                      ModuleManager.getInstance(testFixture.getProject()).getModifiableModel();
-                  Module module;
-                  try {
-                    module = moduleBuilder.createModule(model);
-                  } catch (IOException
-                      | ModuleWithNameAlreadyExists
-                      | JDOMException
-                      | ConfigurationException e) {
-                    throw new AssertionError("Error creating Mavenized module");
-                  }
-                  model.commit();
-
-                  resolveDependenciesAndImport();
-                  return module;
-                });
-  }
-
-  private void resolveDependenciesAndImport() {
-    MavenProjectsManager myProjectsManager =
-        MavenProjectsManager.getInstance(testFixture.getProject());
-    myProjectsManager.waitForResolvingCompletion();
-    myProjectsManager.performScheduledImportInTests();
   }
 
   private void writeDependenciesToPom(Module module, List<MavenId> dependencies) {
