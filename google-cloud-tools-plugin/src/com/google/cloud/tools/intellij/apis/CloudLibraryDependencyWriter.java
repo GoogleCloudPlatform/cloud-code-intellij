@@ -182,7 +182,7 @@ final class CloudLibraryDependencyWriter {
     dependency.getArtifactId().setStringValue(mavenId.getArtifactId());
 
     // Only write the version to the dependency if there is no BOM
-    if (hasBom) {
+    if (!hasBom) {
       dependency.getVersion().setStringValue(mavenId.getVersion());
     }
 
