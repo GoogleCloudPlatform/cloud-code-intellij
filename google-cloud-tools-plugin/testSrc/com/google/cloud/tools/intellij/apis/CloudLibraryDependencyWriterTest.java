@@ -112,7 +112,7 @@ public class CloudLibraryDependencyWriterTest {
   }
 
   @Test
-  public void addLibraries_withNoBom_doesNotWriteBom() {
+  public void addLibraries_withNoBomSelected_doesNotWriteBom() {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> {
@@ -124,7 +124,7 @@ public class CloudLibraryDependencyWriterTest {
   }
 
   @Test
-  public void addLibraries_withBom_writesBom() {
+  public void addLibraries_withBomSelected_writesBom() {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> {
