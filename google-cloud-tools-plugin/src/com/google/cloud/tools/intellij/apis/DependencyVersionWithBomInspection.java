@@ -16,16 +16,28 @@
 
 package com.google.cloud.tools.intellij.apis;
 
+import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.codeInspection.XmlSuppressableInspectionTool;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.PsiInvalidElementAccessException;
 import com.intellij.psi.XmlElementVisitor;
-import com.intellij.psi.xml.XmlElement;
+import com.intellij.psi.xml.XmlTag;
+import java.util.Set;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.idea.maven.project.MavenProject;
+import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
-public class DependencyVersionWithBomInspection extends LocalInspectionTool {
+/**
+ * An {@link LocalInspectionTool} that detects google-cloud-java dependencies that have an explicit
+ * version definition when a BOM is defined.
+ */
+public class DependencyVersionWithBomInspection extends XmlSuppressableInspectionTool {
 
   @Nls
   @NotNull
@@ -45,9 +57,39 @@ public class DependencyVersionWithBomInspection extends LocalInspectionTool {
   public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder holder, boolean isOnTheFly) {
     return new XmlElementVisitor() {
       @Override
-      public void visitXmlElement(XmlElement element) {
-        super.visitXmlElement(element);
+      public void visitXmlTag(XmlTag tag) {
+        Module module = getModule(tag);
+        Set<CloudLibrary> cloudLibraries = CloudLibraryProjectState.getInstance(module.getProject())
+            .getCloudLibraries(module);
+
+        if (cloudLibraries.isEmpty()) {
+          return;
+        }
+
+        // is there a BOM? if not return immediately
+
+        // look through each dependency for ones that match cloudLibrary, check if it
       }
     };
+  }
+
+  public Module getModule(XmlTag tag) {
+    try {
+      Project project = tag.getContainingFile().getProject();
+
+      MavenProject mavenProject =
+          MavenProjectsManager.getInstance(project)
+              .findProject(tag.getContainingFile().getVirtualFile());
+
+      if (mavenProject == null) {
+        return null;
+      }
+
+      return MavenProjectsManager.getInstance(project).findModule(mavenProject);
+
+    } catch (PsiInvalidElementAccessException ex) {
+      //      LOG.error("Error getting project with annotation " + element.getText(), ex);
+      return null;
+    }
   }
 }
