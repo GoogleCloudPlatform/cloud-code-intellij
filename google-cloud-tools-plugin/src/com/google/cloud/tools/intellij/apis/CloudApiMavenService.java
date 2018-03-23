@@ -55,8 +55,10 @@ public class CloudApiMavenService {
   private final RepositorySystem SYSTEM;
   private final RepositorySystemSession SESSION;
 
-  private static final String GOOGLE_CLOUD_JAVA_BOM_GROUP_NAME = "com.google.cloud";
-  private static final String GOOGLE_CLOUD_JAVA_BOM_ARTIFACT_NAME = "google-cloud-bom";
+  static final String GOOGLE_CLOUD_JAVA_BOM_GROUP = "com.google.cloud";
+  static final String GOOGLE_CLOUD_JAVA_BOM_ARTIFACT = "google-cloud-bom";
+  static final String GOOGLE_CLOUD_JAVA_BOM_TYPE = "pom";
+  static final String GOOGLE_CLOUD_JAVA_BOM_SCOPE = "import";
   private static final String GOOGLE_CLOUD_JAVA_BOM_ALL_VERSIONS_CONSTRAINT = "[0,)";
 
   private static final RemoteRepository MAVEN_CENTRAL_REPOSITORY =
@@ -143,8 +145,8 @@ public class CloudApiMavenService {
   private static String toBomCoordinates(String versionConstraint) {
     return String.format(
         "%s:%s:%s:%s",
-        GOOGLE_CLOUD_JAVA_BOM_GROUP_NAME,
-        GOOGLE_CLOUD_JAVA_BOM_ARTIFACT_NAME,
+        GOOGLE_CLOUD_JAVA_BOM_GROUP,
+        GOOGLE_CLOUD_JAVA_BOM_ARTIFACT,
         ArtifactKind.ARTIFACT,
         versionConstraint);
   }

@@ -96,7 +96,9 @@ public final class AddCloudLibrariesAction extends DumbAwareAction {
 
       if (librariesDialog.isOK()) {
         CloudLibraryDependencyWriter.addLibraries(
-            librariesDialog.getSelectedLibraries(), librariesDialog.getSelectedModule());
+            librariesDialog.getSelectedLibraries(),
+            librariesDialog.getSelectedModule(),
+            librariesDialog.getSelectedBomVersion().orElse(null));
       }
     }
   }
