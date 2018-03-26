@@ -21,7 +21,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineStandar
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager.CloudSdkPreconditionCheckCallback;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager.CloudSdkLogger;
 import com.google.cloud.tools.intellij.appengine.server.instance.AppEngineServerModel;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.collect.Maps;
@@ -39,7 +39,6 @@ import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ProjectRootManager;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 import org.jetbrains.annotations.Nullable;
 
 /** Runs a Google App Engine Standard app locally with devappserver, through the tools lib. */
@@ -69,8 +68,8 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
               String workingDirectory, Map<String, String> configuredEnvironment)
               throws ExecutionException {
 
-            CloudSdkPreconditionCheckCallback callback =
-                new CloudSdkPreconditionCheckCallback() {
+            CloudSdkLogger callback =
+                new CloudSdkLogger() {
                   @Override
                   public void log(String s) {
                     logger.info("Cloud SDK precondition check reported: " + s);
@@ -80,16 +79,27 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
                   public void onError(String s) {
                     logger.warn("Cloud SDK precondition check reported error: " + s);
                   }
+
+                  @Override
+                  public void onUserCancel() {}
+
+                  @Override
+                  public String getErrorMessage(SdkStatus sdkStatus) {
+                    switch (sdkStatus) {
+                      case INVALID:
+                      case NOT_AVAILABLE:
+                        return GctBundle.message("appengine.run.server.sdk.misconfigured.message");
+                      default:
+                        return "";
+                    }
+                  }
                 };
-            CountDownLatch sdkPreconditionsBlockingLatch =
-                CloudSdkServiceManager.getInstance()
-                    .runAfterCloudSdkPreconditionsMet(
-                        commonModel.getProject(),
-                        null /* cannot use runnable since this is a separate thread */,
-                        GctBundle.getString("appengine.run.startupscript"),
-                        callback);
             try {
-              sdkPreconditionsBlockingLatch.await();
+              CloudSdkServiceManager.getInstance()
+                  .waitWhenSdkReady(
+                      commonModel.getProject(),
+                      GctBundle.getString("appengine.run.startupscript"),
+                      callback);
             } catch (InterruptedException e) {
               // should not happen, but would be an error.
               throw new ExecutionException(

@@ -10,7 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatusUpdateListener;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager.CloudSdkPreconditionCheckCallback;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager.CloudSdkLogger;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -32,7 +32,7 @@ public class CloudSdkServiceManagerTest {
 
   @Mock private Runnable mockRunnable;
   @Mock private Project mockProject;
-  @Mock private CloudSdkPreconditionCheckCallback mockCallback;
+  @Mock private CloudSdkLogger mockCallback;
 
   @Spy private CloudSdkServiceManager cloudSdkServiceManager;
 
@@ -45,8 +45,7 @@ public class CloudSdkServiceManagerTest {
   public void installingSdk_then_readySdk_correctly_runs() {
     mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.READY);
 
-    cloudSdkServiceManager.runAfterCloudSdkPreconditionsMet(
-        mockProject, mockRunnable, "", mockCallback);
+    cloudSdkServiceManager.runWhenSdkReady(mockProject, mockRunnable, "", mockCallback);
 
     ApplicationManager.getApplication().invokeAndWait(() -> verify(mockRunnable).run());
   }
@@ -57,8 +56,7 @@ public class CloudSdkServiceManagerTest {
     // mock cancel operation for incomplete install.
     doReturn(true).when(cloudSdkServiceManager).checkIfCancelled();
 
-    cloudSdkServiceManager.runAfterCloudSdkPreconditionsMet(
-        mockProject, mockRunnable, "", mockCallback);
+    cloudSdkServiceManager.runWhenSdkReady(mockProject, mockRunnable, "", mockCallback);
 
     ApplicationManager.getApplication().invokeAndWait(() -> verifyNoMoreInteractions(mockRunnable));
   }
@@ -67,8 +65,7 @@ public class CloudSdkServiceManagerTest {
   public void installingSdk_then_invalidSdk_doesNotRun() {
     mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.INVALID);
 
-    cloudSdkServiceManager.runAfterCloudSdkPreconditionsMet(
-        mockProject, mockRunnable, "", mockCallback);
+    cloudSdkServiceManager.runWhenSdkReady(mockProject, mockRunnable, "", mockCallback);
 
     ApplicationManager.getApplication().invokeAndWait(() -> verifyNoMoreInteractions(mockRunnable));
   }
@@ -77,8 +74,7 @@ public class CloudSdkServiceManagerTest {
   public void installingSdk_then_notAvailableSdk_doesNotRun() {
     mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.NOT_AVAILABLE);
 
-    cloudSdkServiceManager.runAfterCloudSdkPreconditionsMet(
-        mockProject, mockRunnable, "", mockCallback);
+    cloudSdkServiceManager.runWhenSdkReady(mockProject, mockRunnable, "", mockCallback);
 
     ApplicationManager.getApplication().invokeAndWait(() -> verifyNoMoreInteractions(mockRunnable));
   }
@@ -89,8 +85,7 @@ public class CloudSdkServiceManagerTest {
     // mock cancel operation for incomplete install.
     doReturn(true).when(cloudSdkServiceManager).checkIfCancelled();
 
-    cloudSdkServiceManager.runAfterCloudSdkPreconditionsMet(
-        mockProject, mockRunnable, "", mockCallback);
+    cloudSdkServiceManager.runWhenSdkReady(mockProject, mockRunnable, "", mockCallback);
 
     ApplicationManager.getApplication()
         .invokeAndWait(
@@ -103,9 +98,10 @@ public class CloudSdkServiceManagerTest {
   @Test
   public void installingSdk_then_invalidSdk_showsErrorNotification() {
     mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.INVALID);
+    when(mockCallback.getErrorMessage(SdkStatus.INVALID))
+        .thenReturn(GctBundle.message("appengine.deployment.error.sdk.invalid"));
 
-    cloudSdkServiceManager.runAfterCloudSdkPreconditionsMet(
-        mockProject, mockRunnable, "", mockCallback);
+    cloudSdkServiceManager.runWhenSdkReady(mockProject, mockRunnable, "", mockCallback);
 
     ApplicationManager.getApplication()
         .invokeAndWait(

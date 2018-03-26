@@ -75,25 +75,58 @@ public class CloudSdkServiceManager {
   }
 
   /**
-   * Waits for Cloud SDK to be ready for all operations and then runs the given runnable. If process
-   * results in error or user cancel, shows notification and does not run.
+   * Waits in background for Cloud SDK to be ready for all operations and then runs the given
+   * runnable. If process results in error or user cancel, shows notification and does not run. This
+   * method does not block.
    *
    * @param project Project to which runnable belongs.
-   * @param runnable Optional runnable to run after Cloud SDK is ready. This runnable will be run on
-   *     UI thread.
+   * @param runWhenSdkReady Optional runnable to run after Cloud SDK is ready. This runnable will be
+   *     run on UI thread.
    * @param progressMessage Message to show in progress dialog to identify which process is
    *     starting, i.e. deployment or local server.
-   * @param callback Callback to report errors and log progress.
-   * @return blocking latch on which another thread may wait for Cloud SDK precondition checks to
-   *     finish.
+   * @param sdkLogger Callback to log errors and progress.
    */
-  public CountDownLatch runAfterCloudSdkPreconditionsMet(
+  public void runWhenSdkReady(
       @Nullable Project project,
-      @Nullable Runnable runnable,
+      @Nullable Runnable runWhenSdkReady,
       String progressMessage,
-      CloudSdkPreconditionCheckCallback callback) {
-    CloudSdkService cloudSdkService = CloudSdkService.getInstance();
+      CloudSdkLogger sdkLogger) {
+    doWait(
+        project,
+        () -> {
+          // at this point the installation should be either ready, failed or user cancelled.
+          ApplicationManager.getApplication().invokeLater(() -> doRun(runWhenSdkReady, sdkLogger));
+        },
+        progressMessage,
+        sdkLogger);
+  }
 
+  /**
+   * Blocks current thread until Cloud SDK is ready for all operations. If process results in error
+   * or user cancel, calls {@link CloudSdkLogger} methods to notify about errors and shows
+   * notifications.
+   *
+   * @param project Project to which runnable belongs.
+   * @param progressMessage Message to show in progress dialog to identify which process is
+   *     starting, i.e. deployment or local server.
+   * @param sdkLogger Callback to log errors and progress.
+   */
+  public void waitWhenSdkReady(
+      @Nullable Project project, String progressMessage, CloudSdkLogger sdkLogger)
+      throws InterruptedException {
+    CountDownLatch blockingCompletedLatch = new CountDownLatch(1);
+    doWait(project, blockingCompletedLatch::countDown, progressMessage, sdkLogger);
+    // at this point the installation should be either ready, failed or user cancelled.
+    // unblock the waiting latch for external point of synchronization
+    blockingCompletedLatch.await();
+  }
+
+  private void doWait(
+      @Nullable Project project,
+      Runnable runWhenSdkReady,
+      String progressMessage,
+      CloudSdkLogger sdkLogging) {
+    CloudSdkService cloudSdkService = CloudSdkService.getInstance();
     SdkStatus sdkStatus = cloudSdkService.getStatus();
     boolean installInProgress = sdkStatus == SdkStatus.INSTALLING;
     // if not already installing and still not ready, attempt to fix and install now.
@@ -121,20 +154,16 @@ public class CloudSdkServiceManager {
 
     if (installInProgress) {
       cloudSdkService.addStatusUpdateListener(sdkStatusUpdateListener);
-      callback.log(GctBundle.getString("appengine.deployment.status.preparing.sdk") + "\n");
+      sdkLogging.log(GctBundle.getString("managedsdk.waiting.for.sdk.ready") + "\n");
     } else {
       // no need to wait for install if unsupported or completed.
       installationCompletionLatch.countDown();
     }
 
-    CountDownLatch blockingCompletedLatch = new CountDownLatch(1);
-
     // wait for SDK to be ready and trigger the actual deployment if it properly installs.
     ProgressManager.getInstance()
         .run(
             new Task.Backgroundable(project, progressMessage, true) {
-              boolean userCancelled;
-
               @Override
               public void run(@NotNull ProgressIndicator indicator) {
                 try {
@@ -142,27 +171,21 @@ public class CloudSdkServiceManager {
                     // wait interruptibility to check for user cancel each second.
                     installationCompletionLatch.await(1, SECONDS);
                     if (checkIfCancelled()) {
-                      userCancelled = true;
+                      sdkLogging.onUserCancel();
                       break;
                     }
                   }
-
-                  // at this point the installation should be either ready or user cancelled.
-                  ApplicationManager.getApplication()
-                      .invokeLater(() -> doRun(cloudSdkService, runnable, callback, userCancelled));
 
                 } catch (InterruptedException e) {
                   /* valid cancellation exception, no handling needed. */
                 } finally {
                   // remove the notification listener regardless of waiting outcome.
                   cloudSdkService.removeStatusUpdateListener(sdkStatusUpdateListener);
-                  // unblock the waiting latch for external point of synchronization
-                  blockingCompletedLatch.countDown();
+                  // run the activity after wait is over.
+                  runWhenSdkReady.run();
                 }
               }
             });
-
-    return blockingCompletedLatch;
   }
 
   @VisibleForTesting
@@ -170,36 +193,18 @@ public class CloudSdkServiceManager {
     return ProgressManager.getInstance().getProgressIndicator().isCanceled();
   }
 
-  private void doRun(
-      CloudSdkService cloudSdkService,
-      @Nullable Runnable runnable,
-      CloudSdkPreconditionCheckCallback callback,
-      boolean userCancelled) {
+  private void doRun(@Nullable Runnable runnable, CloudSdkLogger sdkLogging) {
     // check the status of SDK after install.
-    SdkStatus postInstallSdkStatus = cloudSdkService.getStatus();
+    SdkStatus postInstallSdkStatus = CloudSdkService.getInstance().getStatus();
+    String message = sdkLogging.getErrorMessage(postInstallSdkStatus);
     switch (postInstallSdkStatus) {
       case INSTALLING:
-        String message =
-            GctBundle.message(
-                userCancelled
-                    ? "appengine.deployment.error.cancelled"
-                    : "appengine.deployment.error.sdk.still.installing");
-        callback.onError(message);
-
-        if (!userCancelled) {
-          showCloudSdkNotification(
-              message, NotificationType.WARNING, false /* no settings needed for this case. */);
-        }
+        // still installing, do nothing, up to caller to decide which message to show.
         return;
       case NOT_AVAILABLE:
-        String errorMessage = GctBundle.message("appengine.deployment.error.sdk.not.available");
-        callback.onError(errorMessage);
-        showCloudSdkNotification(errorMessage, NotificationType.ERROR, true);
-        return;
       case INVALID:
-        errorMessage = GctBundle.message("appengine.deployment.error.sdk.invalid");
-        callback.onError(errorMessage);
-        showCloudSdkNotification(errorMessage, NotificationType.ERROR, true);
+        sdkLogging.onError(message);
+        showCloudSdkNotification(message, NotificationType.ERROR, true);
         return;
       case READY:
         // can continue to deployment.
@@ -238,10 +243,14 @@ public class CloudSdkServiceManager {
   }
 
   /** Callback interface to allow SDK precondition checks to communicate errors and log progress. */
-  public interface CloudSdkPreconditionCheckCallback {
+  public interface CloudSdkLogger {
     void log(String message);
 
     void onError(String message);
+
+    void onUserCancel();
+
+    String getErrorMessage(SdkStatus sdkStatus);
   }
 
   private static class UnsupportedCloudSdkTypeException extends RuntimeException {

@@ -17,8 +17,9 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.UserSpecifiedPathDeploymentSource;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager.CloudSdkPreconditionCheckCallback;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager.CloudSdkLogger;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.collect.ArrayListMultimap;
@@ -82,8 +83,8 @@ public class AppEngineRuntimeInstance
                 createdDeployments.put(task.getProject(), deployRunner);
               }
 
-              CloudSdkPreconditionCheckCallback preconditionCheckCallback =
-                  new CloudSdkPreconditionCheckCallback() {
+              CloudSdkLogger cloudSdkLogger =
+                  new CloudSdkLogger() {
                     @Override
                     public void log(String message) {
                       logManager.getMainLoggingHandler().print(message + "\n");
@@ -93,14 +94,31 @@ public class AppEngineRuntimeInstance
                     public void onError(String message) {
                       callback.errorOccurred(message);
                     }
+
+                    @Override
+                    public void onUserCancel() {
+                      callback.errorOccurred(GctBundle.message("appengine.deployment.user.cancel"));
+                    }
+
+                    @Override
+                    public String getErrorMessage(SdkStatus sdkStatus) {
+                      switch (sdkStatus) {
+                        case INVALID:
+                          return GctBundle.message("appengine.deployment.error.sdk.invalid");
+                        case NOT_AVAILABLE:
+                          return GctBundle.message("appengine.deployment.error.sdk.not.available");
+                        default:
+                          return GctBundle.message("appengine.deployment.error.sdk.retry");
+                      }
+                    }
                   };
 
               CloudSdkServiceManager.getInstance()
-                  .runAfterCloudSdkPreconditionsMet(
+                  .runWhenSdkReady(
                       task.getProject(),
                       deployRunner,
                       GctBundle.message("appengine.deployment.status.deploying"),
-                      preconditionCheckCallback);
+                      cloudSdkLogger);
             });
   }
 
