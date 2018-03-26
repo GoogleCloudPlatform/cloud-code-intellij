@@ -46,6 +46,13 @@
       </p>
       <br/>
 
+      <h2>[18.3.2]</h2>
+
+      <h3>Fixed</h3>
+      <ul>
+        <li>Fixed bug causing plugin initialization error on versions less than 2017.3. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1972">#1972</a>)</li>
+      </ul>
+
       <h2>[18.3.1]</h2>
 
       <h3>Added</h3>
