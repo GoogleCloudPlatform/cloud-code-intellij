@@ -1,6 +1,9 @@
 # Release notes
 This page documents production updates to Cloud Tools for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## 18.3.2
+  - Fixed bug causing plugin initialization error on versions less than 2017.3. [1972](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1972)
+
 ## 18.3.1
 
 ### Added
