@@ -35,6 +35,7 @@ import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary.TestCloudLi
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -54,7 +55,6 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
 import org.eclipse.aether.version.Version;
-import org.fest.util.Lists;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Rule;
 import org.junit.Test;
