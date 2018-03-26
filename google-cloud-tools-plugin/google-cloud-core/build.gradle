@@ -16,7 +16,8 @@
 
 // Use IntelliJ src structure for now
 sourceSets.main.java.srcDirs = ['src']
-sourceSets.main.resources.srcDirs = ['resources']
+// 'src' is included in resources to export .form files to upstream modules.
+sourceSets.main.resources.srcDirs = ['resources', 'src']
 sourceSets.test.java.srcDirs = ['testSrc']
 sourceSets.test.resources.srcDirs = ['testResources']
 
