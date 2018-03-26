@@ -20,6 +20,7 @@ import com.google.api.services.iam.v1.model.Role;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
@@ -62,7 +63,6 @@ import javax.swing.JTextPane;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import org.apache.commons.lang3.StringUtils;
-import org.fest.util.VisibleForTesting;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

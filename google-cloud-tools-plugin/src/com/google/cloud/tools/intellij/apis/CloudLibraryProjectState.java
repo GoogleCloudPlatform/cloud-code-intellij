@@ -17,7 +17,9 @@
 package com.google.cloud.tools.intellij.apis;
 
 import com.google.cloud.tools.libraries.json.CloudLibrary;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.module.Module;
@@ -30,8 +32,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.fest.util.Maps;
-import org.fest.util.VisibleForTesting;
 import org.jetbrains.idea.maven.dom.MavenDomUtil;
 import org.jetbrains.idea.maven.dom.model.MavenDomDependency;
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel;

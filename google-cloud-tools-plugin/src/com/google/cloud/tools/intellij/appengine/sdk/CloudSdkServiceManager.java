@@ -16,8 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
+import com.google.common.collect.Maps;
 import java.util.Map;
-import org.fest.util.Maps;
 
 /** Manages current selection of {@link CloudSdkService} implementation. */
 public class CloudSdkServiceManager {
