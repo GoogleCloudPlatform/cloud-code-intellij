@@ -104,7 +104,7 @@ public class CloudLibraryProjectState implements ProjectComponent {
   private Set<CloudLibrary> loadManagedLibraries(Module module) {
     List<MavenDomDependency> moduleDependencies = getModuleDependencies(module);
 
-    if (moduleDependencies.isEmpty()) {
+    if (moduleDependencies != null && moduleDependencies.isEmpty()) {
       return ImmutableSet.of();
     }
 
