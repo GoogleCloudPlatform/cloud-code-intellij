@@ -92,7 +92,7 @@ public class CloudSdkServiceManagerTest {
             () ->
                 // explicit parameters are not relevant but need to be passed for spy to work.
                 verify(cloudSdkServiceManager, never())
-                    .showCloudSdkNotification("", NotificationType.WARNING, false));
+                    .showCloudSdkNotification("", NotificationType.WARNING));
   }
 
   @Test
@@ -109,8 +109,7 @@ public class CloudSdkServiceManagerTest {
                 verify(cloudSdkServiceManager)
                     .showCloudSdkNotification(
                         GctBundle.message("appengine.deployment.error.sdk.invalid"),
-                        NotificationType.ERROR,
-                        true));
+                        NotificationType.ERROR));
   }
 
   private void mockSdkStatusChange(SdkStatus fromStatus, SdkStatus toStatus) {

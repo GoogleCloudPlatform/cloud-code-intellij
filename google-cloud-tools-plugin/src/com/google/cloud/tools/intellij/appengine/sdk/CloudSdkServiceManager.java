@@ -80,22 +80,22 @@ public class CloudSdkServiceManager {
    * method does not block.
    *
    * @param project Project to which runnable belongs.
-   * @param runWhenSdkReady Optional runnable to run after Cloud SDK is ready. This runnable will be
-   *     run on UI thread.
+   * @param runAfterSdkReady Runnable to execute after Cloud SDK is ready. This runnable will be
+   *     executed on the application UI thread.
    * @param progressMessage Message to show in progress dialog to identify which process is
    *     starting, i.e. deployment or local server.
-   * @param sdkLogger Callback to log errors and progress.
+   * @param sdkLogger Logger for errors etc.
    */
   public void runWhenSdkReady(
       @Nullable Project project,
-      @Nullable Runnable runWhenSdkReady,
+      @NotNull Runnable runAfterSdkReady,
       String progressMessage,
       CloudSdkLogger sdkLogger) {
     doWait(
         project,
         () -> {
           // at this point the installation should be either ready, failed or user cancelled.
-          ApplicationManager.getApplication().invokeLater(() -> doRun(runWhenSdkReady, sdkLogger));
+          ApplicationManager.getApplication().invokeLater(() -> doRun(runAfterSdkReady, sdkLogger));
         },
         progressMessage,
         sdkLogger);
@@ -121,6 +121,7 @@ public class CloudSdkServiceManager {
     blockingCompletedLatch.await();
   }
 
+  /** Performs generic wait in a separate thread for SDK to become ready, returns immediately. */
   private void doWait(
       @Nullable Project project,
       Runnable runWhenSdkReady,
@@ -193,6 +194,10 @@ public class CloudSdkServiceManager {
     return ProgressManager.getInstance().getProgressIndicator().isCanceled();
   }
 
+  /**
+   * Checks the current SDK status after waiting for readiness, notifies and logs about errors, and
+   * runs the given runnable if SDK is ready.
+   */
   private void doRun(@Nullable Runnable runnable, CloudSdkLogger sdkLogging) {
     // check the status of SDK after install.
     SdkStatus postInstallSdkStatus = CloudSdkService.getInstance().getStatus();
@@ -204,45 +209,40 @@ public class CloudSdkServiceManager {
       case NOT_AVAILABLE:
       case INVALID:
         sdkLogging.onError(message);
-        showCloudSdkNotification(message, NotificationType.ERROR, true);
+        showCloudSdkNotification(message, NotificationType.ERROR);
         return;
       case READY:
         // can continue to deployment.
-        if (runnable != null) {
-          runnable.run();
-        }
+        runnable.run();
         break;
     }
   }
 
   @VisibleForTesting
-  void showCloudSdkNotification(
-      String errorMessage, NotificationType notificationType, boolean showSettingsAction) {
+  void showCloudSdkNotification(String notificationMessage, NotificationType notificationType) {
     if (!CloudSdkValidator.getInstance().isValidCloudSdk()) {
       Notification invalidSdkWarning =
           new Notification(
               new PropertiesFileFlagReader().getFlagString("notifications.plugin.groupdisplayid"),
               GctBundle.message("settings.menu.item.cloud.sdk.text"),
-              errorMessage,
+              notificationMessage,
               notificationType);
       // add a link to SDK settings for a quick fix.
-      if (showSettingsAction) {
-        invalidSdkWarning.addAction(
-            new AnAction(GctBundle.message("appengine.deployment.error.sdk.settings.action")) {
-              @Override
-              public void actionPerformed(AnActionEvent e) {
-                ShowSettingsUtil.getInstance().showSettingsDialog(null, CloudSdkConfigurable.class);
-                // expire if action has been called to avoid error hanging out forever.
-                invalidSdkWarning.expire();
-              }
-            });
-      }
+      invalidSdkWarning.addAction(
+          new AnAction(GctBundle.message("appengine.deployment.error.sdk.settings.action")) {
+            @Override
+            public void actionPerformed(AnActionEvent e) {
+              ShowSettingsUtil.getInstance().showSettingsDialog(null, CloudSdkConfigurable.class);
+              // expire if action has been called to avoid error hanging out forever.
+              invalidSdkWarning.expire();
+            }
+          });
 
       Notifications.Bus.notify(invalidSdkWarning);
     }
   }
 
-  /** Callback interface to allow SDK precondition checks to communicate errors and log progress. */
+  /** Callback interface to allow SDK blocking code to communicate errors and log progress. */
   public interface CloudSdkLogger {
     void log(String message);
 
