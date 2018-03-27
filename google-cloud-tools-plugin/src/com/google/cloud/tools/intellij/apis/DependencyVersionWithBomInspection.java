@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.apis;
 
+import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.LocalQuickFix;
@@ -42,18 +43,10 @@ import org.jetbrains.idea.maven.project.MavenProjectsManager;
  */
 public class DependencyVersionWithBomInspection extends XmlSuppressableInspectionTool {
 
-  @Nls
-  @NotNull
-  @Override
-  // TODO define this in plugin.xml using key / bundle attrs
-  public String getDisplayName() {
-    return "Dependency Version with BOM inspection";
-  }
-
   @Nullable
   @Override
   public String getStaticDescription() {
-    return "Inspection that checks for presence version tags in google cloud java Maven dependencies when a BOM has been imported.";
+    return GctBundle.getString("cloud.libraries.version.with.bom.inspection.description");
   }
 
   @NotNull
@@ -80,7 +73,7 @@ public class DependencyVersionWithBomInspection extends XmlSuppressableInspectio
             && isCloudLibraryDependency(getParentTagNullSafe(tag))) {
           holder.registerProblem(
               tag,
-              "Version should not be specified when you are using the google-cloud-java BOM",
+              GctBundle.message("cloud.libraries.version.with.bom.inspection.problem.description"),
               ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
               new StripDependencyVersionQuickFix());
         }
@@ -134,6 +127,7 @@ public class DependencyVersionWithBomInspection extends XmlSuppressableInspectio
       return MavenProjectsManager.getInstance(project).findModule(mavenProject);
 
     } catch (PsiInvalidElementAccessException ex) {
+      // TODO logging / error handling
       //      LOG.error("Error getting project with annotation " + element.getText(), ex);
       return null;
     }
@@ -145,7 +139,7 @@ public class DependencyVersionWithBomInspection extends XmlSuppressableInspectio
     @NotNull
     @Override
     public String getFamilyName() {
-      return "Version specified with BOM: delete version tag";
+      return GctBundle.message("cloud.libraries.version.with.bom.quickfix.title");
     }
 
     @Override
