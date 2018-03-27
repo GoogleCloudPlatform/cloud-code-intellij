@@ -56,6 +56,11 @@ public class DependencyVersionWithBomInspection extends XmlSuppressableInspectio
       @Override
       public void visitXmlTag(XmlTag tag) {
         Module module = getModule(tag);
+
+        if (module == null) {
+          return;
+        }
+
         Set<CloudLibrary> cloudLibraries =
             CloudLibraryProjectState.getInstance(module.getProject()).getCloudLibraries(module);
 
@@ -144,6 +149,7 @@ public class DependencyVersionWithBomInspection extends XmlSuppressableInspectio
 
     @Override
     public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
+      // todo error handling on failures
       XmlTag xmlTag = (XmlTag) descriptor.getPsiElement();
       xmlTag.delete();
     }
