@@ -447,7 +447,7 @@
 
     <fileTypeFactory implementation="com.google.cloud.tools.intellij.appengine.file.DockerFileTemplateTypeFactory"/>
 
-    <localInspection language="XML" shortName="myShortName" displayName="myDisplayName" groupName="bomStuff"
+    <localInspection language="XML" shortName="DependencyVersionWithBom" groupName="Google Cloud Java Library BOM Inspections"
                      enabledByDefault="true" level="WARNING"
                      implementationClass="com.google.cloud.tools.intellij.apis.DependencyVersionWithBomInspection"/>
 

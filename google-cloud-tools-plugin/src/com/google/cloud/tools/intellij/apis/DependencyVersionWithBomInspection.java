@@ -45,14 +45,15 @@ public class DependencyVersionWithBomInspection extends XmlSuppressableInspectio
   @Nls
   @NotNull
   @Override
-  public String getGroupDisplayName() {
-    return "set-group-name";
+  // TODO define this in plugin.xml using key / bundle attrs
+  public String getDisplayName() {
+    return "Dependency Version with BOM inspection";
   }
 
   @Nullable
   @Override
   public String getStaticDescription() {
-    return "pom.xml inspection that does blah blah";
+    return "Inspection that checks for presence version tags in google cloud java Maven dependencies when a BOM has been imported.";
   }
 
   @NotNull
