@@ -18,6 +18,8 @@ package com.google.cloud.tools.intellij.apis;
 
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.intellij.codeInspection.LocalInspectionTool;
+import com.intellij.codeInspection.LocalQuickFix;
+import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.codeInspection.XmlSuppressableInspectionTool;
@@ -78,7 +80,8 @@ public class DependencyVersionWithBomInspection extends XmlSuppressableInspectio
           holder.registerProblem(
               tag,
               "Version should not be specified when you are using the google-cloud-java BOM",
-              ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
+              ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
+              new StripDependencyVersionQuickFix());
         }
       }
     };
@@ -132,6 +135,22 @@ public class DependencyVersionWithBomInspection extends XmlSuppressableInspectio
     } catch (PsiInvalidElementAccessException ex) {
       //      LOG.error("Error getting project with annotation " + element.getText(), ex);
       return null;
+    }
+  }
+
+  private static class StripDependencyVersionQuickFix implements LocalQuickFix {
+
+    @Nls
+    @NotNull
+    @Override
+    public String getFamilyName() {
+      return "Version specified with BOM: delete version tag";
+    }
+
+    @Override
+    public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
+      XmlTag xmlTag = (XmlTag) descriptor.getPsiElement();
+      xmlTag.delete();
     }
   }
 }
