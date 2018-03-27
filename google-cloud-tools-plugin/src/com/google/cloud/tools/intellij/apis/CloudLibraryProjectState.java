@@ -134,7 +134,7 @@ public class CloudLibraryProjectState implements ProjectComponent {
                   MavenDomProjectModel model =
                       MavenDomUtil.getMavenDomProjectModel(project, mavenProject.getFile());
 
-                  return model.getDependencies().getDependencies();
+                  return model != null ? model.getDependencies().getDependencies() : null;
                 });
   }
 
