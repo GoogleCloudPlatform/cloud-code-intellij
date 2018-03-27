@@ -199,7 +199,7 @@ public class ProjectSelectorTest {
     when(mockLoginService.isLoggedIn()).thenReturn(false);
     projectSelector.setSelectedProject(TEST_PROJECT);
 
-    assertThat(projectSelector.getAccountInfoLabel().getText())
+    assertThat(projectSelector.getAccountInfoLabel().getHyperlinkText())
         .isEqualTo(
             GoogleCloudCoreMessageBundle.message(
                 "cloud.project.selector.not.signed.in", TEST_PROJECT.googleUsername()));
@@ -228,7 +228,7 @@ public class ProjectSelectorTest {
     // drain UI events.
     ApplicationManager.getApplication().invokeAndWait(() -> {});
 
-    assertThat(projectSelector.getAccountInfoLabel().getText())
+    assertThat(projectSelector.getAccountInfoLabel().getHyperlinkText())
         .isEqualTo(
             GoogleCloudCoreMessageBundle.message(
                 "cloud.project.selector.not.signed.in", TEST_PROJECT.googleUsername()));
