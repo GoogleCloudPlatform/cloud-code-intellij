@@ -30,4 +30,6 @@
 
 cd github/google-cloud-intellij
 ./gradlew check \
-    -Dorg.gradle.project.ideaVersion=2017.2 --stacktrace
+    -Dorg.gradle.project.ideaVersion=2017.2 \
+    -PintellijRepoUrl=https://storage.googleapis.com/cloud-tools-for-java-team-kokoro-build-cache/idea-distributions \
+    --stacktrace
