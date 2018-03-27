@@ -97,22 +97,28 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
 
     for (WebRoot webRoot : webRoots) {
       VirtualFile parent = webRoot.getFile();
-      if (parent.getName().equals(WEB_INF)) {
-        return parent;
-      }
+      if (parent != null) {
+        if (WEB_INF.equals(parent.getName())) {
+          return parent;
+        }
 
-      VirtualFile child = parent.findChild(WEB_INF);
-      if (child != null) {
-        return child;
+        VirtualFile child = parent.findChild(WEB_INF);
+        if (child != null) {
+          return child;
+        }
       }
     }
 
     try {
-      return VfsUtil.createDirectoryIfMissing(webRoots.get(0).getFile(), WEB_INF);
+      VirtualFile webRootFile = webRoots.get(0).getFile();
+      if (webRootFile != null) {
+        return VfsUtil.createDirectoryIfMissing(webRootFile, WEB_INF);
+      }
     } catch (IOException ioe) {
       LOG.info(ioe);
-      return null;
     }
+
+    return null;
   }
 
   @Override
