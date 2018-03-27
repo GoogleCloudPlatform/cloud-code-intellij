@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.apis;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.MavenTestUtils;
@@ -34,6 +35,7 @@ import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import com.intellij.util.xml.DomUtil;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
@@ -95,6 +97,33 @@ public class CloudLibraryProjectStateTest {
               Module module =
                   MavenTestUtils.getInstance()
                       .createNewMavenModule(moduleBuilder, testFixture.getProject());
+
+              assertThat(state.getCloudLibraries(module)).isEmpty();
+            });
+  }
+
+  @Test
+  public void getCloudLibraries_withMalformedPom_isEmpty() {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              Module module =
+                  MavenTestUtils.getInstance()
+                      .createNewMavenModule(moduleBuilder, testFixture.getProject());
+              MavenProject mavenProject =
+                  MavenProjectsManager.getInstance(testFixture.getProject()).findProject(module);
+
+              ApplicationManager.getApplication()
+                  .runWriteAction(
+                      () -> {
+                        try {
+                          mavenProject.getFile().setBinaryContent("not a valid pom.xml".getBytes());
+                        } catch (IOException e) {
+                          fail();
+                        }
+                      });
+
+              state.syncManagedProjectLibraries();
 
               assertThat(state.getCloudLibraries(module)).isEmpty();
             });
