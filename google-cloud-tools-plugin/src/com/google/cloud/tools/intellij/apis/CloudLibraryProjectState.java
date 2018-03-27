@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.apis;
 
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.intellij.openapi.application.ApplicationManager;
@@ -167,7 +168,7 @@ public class CloudLibraryProjectState implements ProjectComponent {
   private List<MavenDomDependency> getModuleDependencies(Module module) {
     MavenProject mavenProject = MavenProjectsManager.getInstance(project).findProject(module);
     if (mavenProject == null) {
-      return null;
+      return ImmutableList.of();
     }
 
     return ApplicationManager.getApplication()
@@ -177,7 +178,9 @@ public class CloudLibraryProjectState implements ProjectComponent {
                   MavenDomProjectModel model =
                       MavenDomUtil.getMavenDomProjectModel(project, mavenProject.getFile());
 
-                  return model.getDependencies().getDependencies();
+                  return model != null
+                      ? model.getDependencies().getDependencies()
+                      : ImmutableList.of();
                 });
   }
 
