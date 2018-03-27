@@ -51,6 +51,16 @@ public class CloudSdkServiceManagerTest {
   }
 
   @Test
+  public void installingSdk_then_readySdk_waits_withoutErrors() throws InterruptedException {
+    mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.READY);
+
+    cloudSdkServiceManager.waitWhenSdkReady(mockProject, "", mockCallback);
+
+    ApplicationManager.getApplication()
+        .invokeAndWait(() -> verify(mockCallback, never()).onError(any()));
+  }
+
+  @Test
   public void installingSdk_then_stillInstalling_doesNotRun() {
     mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.INSTALLING);
     // mock cancel operation for incomplete install.

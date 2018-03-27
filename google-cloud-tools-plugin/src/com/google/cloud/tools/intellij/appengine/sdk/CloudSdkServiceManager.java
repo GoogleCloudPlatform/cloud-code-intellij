@@ -106,7 +106,7 @@ public class CloudSdkServiceManager {
    * or user cancel, calls {@link CloudSdkLogger} methods to notify about errors and shows
    * notifications.
    *
-   * @param project Project to which runnable belongs.
+   * @param project Project to which SDK operation belongs.
    * @param progressMessage Message to show in progress dialog to identify which process is
    *     starting, i.e. deployment or local server.
    * @param sdkLogger Callback to log errors and progress.
@@ -198,7 +198,7 @@ public class CloudSdkServiceManager {
    * Checks the current SDK status after waiting for readiness, notifies and logs about errors, and
    * runs the given runnable if SDK is ready.
    */
-  private void doRun(@Nullable Runnable runnable, CloudSdkLogger sdkLogging) {
+  private void doRun(@NotNull Runnable runnable, CloudSdkLogger sdkLogging) {
     // check the status of SDK after install.
     SdkStatus postInstallSdkStatus = CloudSdkService.getInstance().getStatus();
     String message = sdkLogging.getErrorMessage(postInstallSdkStatus);
