@@ -122,7 +122,7 @@ public class CloudLibraryProjectStateTest {
                               .setBinaryContent(
                                   "not a valid pom.xml".getBytes(Charset.defaultCharset()));
                         } catch (IOException e) {
-                          throw new AssertionError(e);
+                          throw new AssertionError("failed to write test content to pom.xml", e);
                         }
                       });
 
