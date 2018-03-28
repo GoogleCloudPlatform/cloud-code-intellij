@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.apis;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.MavenTestUtils;
@@ -36,6 +35,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import com.intellij.util.xml.DomUtil;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
@@ -117,9 +117,12 @@ public class CloudLibraryProjectStateTest {
                   .runWriteAction(
                       () -> {
                         try {
-                          mavenProject.getFile().setBinaryContent("not a valid pom.xml".getBytes());
+                          mavenProject
+                              .getFile()
+                              .setBinaryContent(
+                                  "not a valid pom.xml".getBytes(Charset.defaultCharset()));
                         } catch (IOException e) {
-                          fail();
+                          throw new AssertionError(e);
                         }
                       });
 
