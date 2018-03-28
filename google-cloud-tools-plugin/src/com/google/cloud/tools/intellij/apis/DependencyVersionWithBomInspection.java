@@ -24,6 +24,7 @@ import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.codeInspection.XmlSuppressableInspectionTool;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElementVisitor;
@@ -43,7 +44,10 @@ import org.jetbrains.idea.maven.project.MavenProjectsManager;
  *
  * <p>Provides a quick-fix to strip out the version tag from the dependency.
  */
+// TODO refactor to use the (probably more efficient) DomElementInsepction as a base
 public class DependencyVersionWithBomInspection extends XmlSuppressableInspectionTool {
+
+  private static final Logger logger = Logger.getInstance(AddCloudLibrariesAction.class);
 
   @Nullable
   @Override
@@ -106,7 +110,7 @@ public class DependencyVersionWithBomInspection extends XmlSuppressableInspectio
    */
   private boolean isCloudLibraryDependency(XmlTag dependencyTag, Set<CloudLibrary> cloudLibraries) {
     XmlTag groupTag = dependencyTag.findFirstSubTag("groupId");
-    XmlTag artifactTag = dependencyTag.findFirstSubTag("artifactTag");
+    XmlTag artifactTag = dependencyTag.findFirstSubTag("artifactId");
 
     return cloudLibraries
         .stream()
@@ -178,8 +182,7 @@ public class DependencyVersionWithBomInspection extends XmlSuppressableInspectio
       return MavenProjectsManager.getInstance(project).findModule(mavenProject);
 
     } catch (PsiInvalidElementAccessException ex) {
-      // TODO logging / error handling
-      //      LOG.error("Error getting project with annotation " + element.getText(), ex);
+      logger.warn("Error retrieving module containing pom.xml version tag");
       return null;
     }
   }
