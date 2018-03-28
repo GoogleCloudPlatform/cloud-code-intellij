@@ -40,6 +40,8 @@ import org.jetbrains.idea.maven.project.MavenProjectsManager;
 /**
  * An {@link LocalInspectionTool} that detects google-cloud-java dependencies that have an explicit
  * version definition when a BOM is defined.
+ *
+ * <p>Provides a quick-fix to strip out the version tag from the dependency.
  */
 public class DependencyVersionWithBomInspection extends XmlSuppressableInspectionTool {
 
@@ -49,6 +51,12 @@ public class DependencyVersionWithBomInspection extends XmlSuppressableInspectio
     return GctBundle.getString("cloud.libraries.version.with.bom.inspection.description");
   }
 
+  /**
+   * Returns a new {@link XmlElementVisitor} that visits each tag in the pom.xml.
+   *
+   * <p>If it finds a version tag defined within a google-cloud-java dependency AND a BOM is also
+   * imported in the pom, then an inspection warning will be registered with a quickfix.
+   */
   @NotNull
   @Override
   public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder holder, boolean isOnTheFly) {
@@ -68,14 +76,16 @@ public class DependencyVersionWithBomInspection extends XmlSuppressableInspectio
           return;
         }
 
+        // TODO dig into the lifecycle of these inspections - does this check need to be done on
+        // each visit?
         if (!CloudLibraryProjectState.getInstance(module.getProject())
             .getCloudLibraryBom(module)
             .isPresent()) {
           return;
         }
 
-        if (isNormalDependencyVersionTag(tag)
-            && isCloudLibraryDependency(getParentTagNullSafe(tag))) {
+        if (isRegularDependencyVersionTag(tag)
+            && isCloudLibraryDependency(getParentTagNullSafe(tag), cloudLibraries)) {
           holder.registerProblem(
               tag,
               GctBundle.message("cloud.libraries.version.with.bom.inspection.problem.description"),
@@ -86,19 +96,47 @@ public class DependencyVersionWithBomInspection extends XmlSuppressableInspectio
     };
   }
 
-  private boolean isCloudLibraryDependency(XmlTag dependencyTag) {
+  /**
+   * Checks the supplied maven dependency {@link XmlTag} to see if it is contained in the known set
+   * of managed Google {@link CloudLibrary cloudLibraries}.
+   *
+   * @param dependencyTag the maven dependency tag we are checking
+   * @param cloudLibraries the set of {@link CloudLibrary cloudLibraries} configured in the project
+   * @return {@code true} if the maven dependency is managed, and {@code false} otherwise
+   */
+  private boolean isCloudLibraryDependency(XmlTag dependencyTag, Set<CloudLibrary> cloudLibraries) {
     XmlTag groupTag = dependencyTag.findFirstSubTag("groupId");
+    XmlTag artifactTag = dependencyTag.findFirstSubTag("artifactTag");
 
-    // TODO any need to check this against the known state of managed cloud libraries?
-    return groupTag != null
-        && "com.google.cloud".equalsIgnoreCase(groupTag.getValue().getTrimmedText());
+    return cloudLibraries
+        .stream()
+        .anyMatch(
+            library ->
+                CloudLibraryUtils.getFirstJavaClientMavenCoordinates(library)
+                    .map(
+                        coords ->
+                            tagValueEquals(artifactTag, coords.getArtifactId())
+                                && tagValueEquals(groupTag, coords.getGroupId()))
+                    .orElse(false));
   }
 
-  private boolean tagNameEquals(XmlTag tag, String value) {
-    return tag != null && value.equalsIgnoreCase(tag.getName());
-  }
-
-  private boolean isNormalDependencyVersionTag(XmlTag versionTag) {
+  /**
+   * Checks the supplied maven dependency version {@link XmlTag} to see if it is contained within a
+   * regular maven dependency.
+   *
+   * <p>A regular dependency is defined here as a "dependency" tag that lives under the root project
+   * (in contrast to dependencies living under "dependencyManagement"):
+   *
+   * <pre>{@code
+   * <project>
+   *   <dependencies>
+   *     <dependency></dependency>
+   *    </dependencies>
+   * </project>
+   *
+   * }</pre>
+   */
+  private boolean isRegularDependencyVersionTag(XmlTag versionTag) {
     XmlTag dependencyTag = getParentTagNullSafe(versionTag);
     XmlTag dependenciesTag = getParentTagNullSafe(dependencyTag);
     XmlTag projectTag = getParentTagNullSafe(dependenciesTag);
@@ -107,6 +145,14 @@ public class DependencyVersionWithBomInspection extends XmlSuppressableInspectio
         && tagNameEquals(dependencyTag, "dependency")
         && tagNameEquals(dependenciesTag, "dependencies")
         && tagNameEquals(projectTag, "project");
+  }
+
+  private boolean tagNameEquals(XmlTag tag, String name) {
+    return tag != null && name.equals(tag.getName());
+  }
+
+  private boolean tagValueEquals(XmlTag tag, String value) {
+    return tag != null && value.equals(tag.getValue().getTrimmedText());
   }
 
   private XmlTag getParentTagNullSafe(XmlTag tag) {
@@ -138,8 +184,11 @@ public class DependencyVersionWithBomInspection extends XmlSuppressableInspectio
     }
   }
 
+  /**
+   * A {@link LocalQuickFix} that will delete the {@link XmlTag} contained within the {@link
+   * ProblemDescriptor}.
+   */
   private static class StripDependencyVersionQuickFix implements LocalQuickFix {
-
     @Nls
     @NotNull
     @Override
