@@ -35,6 +35,9 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.wm.StatusBar;
+import com.intellij.openapi.wm.WindowManager;
+import com.intellij.openapi.wm.ex.StatusBarEx;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import org.jetbrains.annotations.NotNull;
@@ -156,6 +159,13 @@ public class CloudSdkServiceManager {
     if (installInProgress) {
       cloudSdkService.addStatusUpdateListener(sdkStatusUpdateListener);
       sdkLogging.log(GctBundle.getString("managedsdk.waiting.for.sdk.ready") + "\n");
+
+      // expose process window so that installation / dependent processes are explicitly visible.
+      WindowManager windowManager = WindowManager.getInstance();
+      StatusBar statusBar = windowManager.getStatusBar(project);
+      if (statusBar != null && statusBar instanceof StatusBarEx) {
+        ((StatusBarEx) statusBar).setProcessWindowOpen(true);
+      }
     } else {
       // no need to wait for install if unsupported or completed.
       installationCompletionLatch.countDown();
