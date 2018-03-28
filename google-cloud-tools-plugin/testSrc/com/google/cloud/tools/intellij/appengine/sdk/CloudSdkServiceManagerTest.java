@@ -39,6 +39,8 @@ public class CloudSdkServiceManagerTest {
   @Before
   public void setUp() {
     when(mockCloudSdkServiceManager.getCloudSdkService()).thenReturn(mockSdkService);
+    // empty error messages by default
+    when(mockCallback.getErrorMessage(any())).thenReturn("");
   }
 
   @Test
@@ -51,7 +53,7 @@ public class CloudSdkServiceManagerTest {
   }
 
   @Test
-  public void installingSdk_then_readySdk_waits_withoutErrors() throws InterruptedException {
+  public void waitFor_installingSdk_then_readySdk_noErrors() throws InterruptedException {
     mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.READY);
 
     cloudSdkServiceManager.waitWhenSdkReady(mockProject, "", mockCallback);
@@ -78,6 +80,15 @@ public class CloudSdkServiceManagerTest {
     cloudSdkServiceManager.runWhenSdkReady(mockProject, mockRunnable, "", mockCallback);
 
     ApplicationManager.getApplication().invokeAndWait(() -> verifyNoMoreInteractions(mockRunnable));
+  }
+
+  @Test
+  public void waitFor_installingSdk_then_invalidSdk_reportsError() throws InterruptedException {
+    mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.INVALID);
+
+    cloudSdkServiceManager.waitWhenSdkReady(mockProject, "", mockCallback);
+
+    ApplicationManager.getApplication().invokeAndWait(() -> verify(mockCallback).onError(any()));
   }
 
   @Test
@@ -120,6 +131,21 @@ public class CloudSdkServiceManagerTest {
                     .showCloudSdkNotification(
                         GctBundle.message("appengine.deployment.error.sdk.invalid"),
                         NotificationType.ERROR));
+  }
+
+  @Test
+  public void waitFor_installingSdk_then_invalidSdk_showsErrorNotification()
+      throws InterruptedException {
+    mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.INVALID);
+    when(mockCallback.getErrorMessage(SdkStatus.INVALID)).thenReturn("invalid SDK after waiting");
+
+    cloudSdkServiceManager.waitWhenSdkReady(mockProject, "", mockCallback);
+
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () ->
+                verify(cloudSdkServiceManager)
+                    .showCloudSdkNotification("invalid SDK after waiting", NotificationType.ERROR));
   }
 
   private void mockSdkStatusChange(SdkStatus fromStatus, SdkStatus toStatus) {

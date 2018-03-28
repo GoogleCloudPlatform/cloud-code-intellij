@@ -98,7 +98,10 @@ public class CloudSdkServiceManager {
         project,
         () -> {
           // at this point the installation should be either ready, failed or user cancelled.
-          ApplicationManager.getApplication().invokeLater(() -> doRun(runAfterSdkReady, sdkLogger));
+          // run only if ready.
+          if (CloudSdkService.getInstance().getStatus() == SdkStatus.READY) {
+            ApplicationManager.getApplication().invokeLater(runAfterSdkReady);
+          }
         },
         progressMessage,
         sdkLogger);
@@ -127,7 +130,7 @@ public class CloudSdkServiceManager {
   /** Performs generic wait in a separate thread for SDK to become ready, returns immediately. */
   private void doWait(
       @Nullable Project project,
-      Runnable runWhenSdkReady,
+      Runnable runAfterWaitCompletes,
       String progressMessage,
       CloudSdkLogger sdkLogging) {
     CloudSdkService cloudSdkService = CloudSdkService.getInstance();
@@ -192,8 +195,10 @@ public class CloudSdkServiceManager {
                 } finally {
                   // remove the notification listener regardless of waiting outcome.
                   cloudSdkService.removeStatusUpdateListener(sdkStatusUpdateListener);
-                  // run the activity after wait is over.
-                  runWhenSdkReady.run();
+                  // process logging and error notifications.
+                  ApplicationManager.getApplication().invokeLater(() -> handleErrors(sdkLogging));
+                  // run the activity after wait is over, regardless of outcome.
+                  runAfterWaitCompletes.run();
                 }
               }
             });
@@ -204,26 +209,22 @@ public class CloudSdkServiceManager {
     return ProgressManager.getInstance().getProgressIndicator().isCanceled();
   }
 
-  /**
-   * Checks the current SDK status after waiting for readiness, notifies and logs about errors, and
-   * runs the given runnable if SDK is ready.
-   */
-  private void doRun(@NotNull Runnable runnable, CloudSdkLogger sdkLogging) {
+  /** Checks the current SDK status after waiting for readiness, notifies and logs about errors. */
+  private void handleErrors(CloudSdkLogger sdkLogging) {
     // check the status of SDK after install.
     SdkStatus postInstallSdkStatus = CloudSdkService.getInstance().getStatus();
-    String message = sdkLogging.getErrorMessage(postInstallSdkStatus);
     switch (postInstallSdkStatus) {
+      case READY:
+        // can continue without logging anything.
+        break;
       case INSTALLING:
         // still installing, do nothing, up to caller to decide which message to show.
-        return;
+        break;
       case NOT_AVAILABLE:
       case INVALID:
+        String message = sdkLogging.getErrorMessage(postInstallSdkStatus);
         sdkLogging.onError(message);
         showCloudSdkNotification(message, NotificationType.ERROR);
-        return;
-      case READY:
-        // can continue to deployment.
-        runnable.run();
         break;
     }
   }
