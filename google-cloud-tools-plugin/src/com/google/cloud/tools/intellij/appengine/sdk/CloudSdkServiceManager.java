@@ -80,7 +80,7 @@ public class CloudSdkServiceManager {
   /**
    * Waits in background for Cloud SDK to be ready for all operations and then runs the given
    * runnable. If process results in error or user cancel, shows notification and does not run. This
-   * method does not block.
+   * method does not block and must be called from application UI thread.
    *
    * @param project Project to which runnable belongs.
    * @param runAfterSdkReady Runnable to execute after Cloud SDK is ready. This runnable will be
@@ -110,7 +110,7 @@ public class CloudSdkServiceManager {
   /**
    * Blocks current thread until Cloud SDK is ready for all operations. If process results in error
    * or user cancel, calls {@link CloudSdkLogger} methods to notify about errors and shows
-   * notifications.
+   * notifications. This method is expected to be called from non-UI background thread.
    *
    * @param project Project to which SDK operation belongs.
    * @param progressMessage Message to show in progress dialog to identify which process is
@@ -121,16 +121,19 @@ public class CloudSdkServiceManager {
       @Nullable Project project, String progressMessage, CloudSdkLogger sdkLogger)
       throws InterruptedException {
     CountDownLatch blockingCompletedLatch = new CountDownLatch(1);
-    doWait(project, blockingCompletedLatch::countDown, progressMessage, sdkLogger);
-    // at this point the installation should be either ready, failed or user cancelled.
-    // unblock the waiting latch for external point of synchronization
+    ApplicationManager.getApplication()
+        .invokeLater(
+            () -> doWait(project, blockingCompletedLatch::countDown, progressMessage, sdkLogger));
     blockingCompletedLatch.await();
   }
 
-  /** Performs generic wait in a separate thread for SDK to become ready, returns immediately. */
+  /**
+   * Performs generic wait in a separate thread for SDK to become ready, returns immediately. Must
+   * be called from UI thread.
+   */
   private void doWait(
       @Nullable Project project,
-      Runnable runAfterWaitCompletes,
+      Runnable runAfterWaitComplete,
       String progressMessage,
       CloudSdkLogger sdkLogging) {
     CloudSdkService cloudSdkService = CloudSdkService.getInstance();
@@ -198,7 +201,7 @@ public class CloudSdkServiceManager {
                   // process logging and error notifications.
                   ApplicationManager.getApplication().invokeLater(() -> handleErrors(sdkLogging));
                   // run the activity after wait is over, regardless of outcome.
-                  runAfterWaitCompletes.run();
+                  runAfterWaitComplete.run();
                 }
               }
             });
