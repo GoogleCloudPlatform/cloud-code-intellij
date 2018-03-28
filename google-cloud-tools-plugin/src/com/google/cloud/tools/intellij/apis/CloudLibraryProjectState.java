@@ -153,11 +153,11 @@ public class CloudLibraryProjectState implements ProjectComponent {
                       .getDependencies()
                       .stream()
                       .filter(
-                          mdd ->
+                          managedDependency ->
                               CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_ARTIFACT.equalsIgnoreCase(
-                                      mdd.getArtifactId().getStringValue())
+                                      managedDependency.getArtifactId().getStringValue())
                                   && CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_GROUP
-                                      .equalsIgnoreCase(mdd.getGroupId().getStringValue()))
+                                      .equalsIgnoreCase(managedDependency.getGroupId().getStringValue()))
                       .findFirst();
                 });
   }
