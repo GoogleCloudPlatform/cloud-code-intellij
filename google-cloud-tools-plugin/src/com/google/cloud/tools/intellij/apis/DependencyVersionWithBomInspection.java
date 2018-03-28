@@ -40,8 +40,8 @@ import org.jetbrains.idea.maven.dom.model.MavenDomDependency;
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel;
 
 /**
- * An {@link LocalInspectionTool} that detects google-cloud-java dependencies that have an explicit
- * version definition when a BOM is defined.
+ * An {@link DomElementsInspection} that detects google-cloud-java dependencies that have an
+ * explicit version definition when a BOM is defined.
  *
  * <p>Provides a quick-fix to strip out the version tag from the dependency.
  */
