@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.facet.impl;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
@@ -106,5 +107,16 @@ public class AppEngineStandardUltimateWebIntegrationTest {
         webIntegration.suggestParentDirectoryForAppEngineWebXml(
             mockModule, mockModifiableRootModel);
     assertEquals(mockVirtualFile1, suggestedDirectory);
+  }
+
+  @Test
+  public void malformedWebRoot_noFile_suggestsNullDirectory() {
+    when(mockWebRoot.getFile()).thenReturn(null);
+
+    VirtualFile suggestedDirectory =
+        webIntegration.suggestParentDirectoryForAppEngineWebXml(
+            mockModule, mockModifiableRootModel);
+
+    assertThat(suggestedDirectory).isNull();
   }
 }
