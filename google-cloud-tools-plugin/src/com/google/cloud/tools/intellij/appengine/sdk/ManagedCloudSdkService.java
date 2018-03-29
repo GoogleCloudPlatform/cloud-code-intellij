@@ -83,7 +83,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
   }
 
   @Override
-  public boolean isInstallReady() {
+  public boolean isInstallSupported() {
     return managedCloudSdk != null;
   }
 
@@ -155,7 +155,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
    * @return {@code true} if task started, {@code false} if Managed SDK is not supported at all.
    */
   private boolean executeManagedSdkJob(ManagedSdkJobType jobType, Callable<Path> managedSdkTask) {
-    if (managedCloudSdk == null) {
+    if (!isInstallSupported()) {
       return false;
     }
 

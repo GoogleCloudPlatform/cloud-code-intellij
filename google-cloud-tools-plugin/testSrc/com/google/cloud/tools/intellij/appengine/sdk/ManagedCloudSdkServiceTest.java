@@ -128,7 +128,7 @@ public class ManagedCloudSdkServiceTest {
   public void install_isSupported() {
     makeMockSdkInstalled(MOCK_SDK_PATH);
 
-    assertThat(sdkService.isInstallReady()).isTrue();
+    assertThat(sdkService.isInstallSupported()).isTrue();
   }
 
   @Test

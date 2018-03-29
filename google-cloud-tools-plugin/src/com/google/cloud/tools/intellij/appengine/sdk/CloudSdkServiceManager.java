@@ -83,47 +83,49 @@ public class CloudSdkServiceManager {
    * method does not block and must be called from application UI thread.
    *
    * @param project Project to which runnable belongs.
-   * @param runAfterSdkReady Runnable to execute after Cloud SDK is ready. This runnable will be
+   * @param afterSdkReady Runnable to execute after Cloud SDK is ready. This runnable will be
    *     executed on the application UI thread.
    * @param progressMessage Message to show in progress dialog to identify which process is
    *     starting, i.e. deployment or local server.
-   * @param sdkLogger Logger for errors etc.
+   * @param sdkStatusHandler Logger for errors etc.
    */
   public void runWhenSdkReady(
       @Nullable Project project,
-      @NotNull Runnable runAfterSdkReady,
+      @NotNull Runnable afterSdkReady,
       String progressMessage,
-      CloudSdkLogger sdkLogger) {
+      CloudSdkStatusHandler sdkStatusHandler) {
     doWait(
         project,
         () -> {
           // at this point the installation should be either ready, failed or user cancelled.
           // run only if ready.
           if (CloudSdkService.getInstance().getStatus() == SdkStatus.READY) {
-            ApplicationManager.getApplication().invokeLater(runAfterSdkReady);
+            ApplicationManager.getApplication().invokeLater(afterSdkReady);
           }
         },
         progressMessage,
-        sdkLogger);
+        sdkStatusHandler);
   }
 
   /**
    * Blocks current thread until Cloud SDK is ready for all operations. If process results in error
-   * or user cancel, calls {@link CloudSdkLogger} methods to notify about errors and shows
+   * or user cancel, calls {@link CloudSdkStatusHandler} methods to notify about errors and shows
    * notifications. This method is expected to be called from non-UI background thread.
    *
    * @param project Project to which SDK operation belongs.
    * @param progressMessage Message to show in progress dialog to identify which process is
    *     starting, i.e. deployment or local server.
-   * @param sdkLogger Callback to log errors and progress.
+   * @param sdkStatusHandler Callback to log errors and progress.
    */
-  public void waitWhenSdkReady(
-      @Nullable Project project, String progressMessage, CloudSdkLogger sdkLogger)
+  public void blockUntilSdkReady(
+      @Nullable Project project, String progressMessage, CloudSdkStatusHandler sdkStatusHandler)
       throws InterruptedException {
     CountDownLatch blockingCompletedLatch = new CountDownLatch(1);
     ApplicationManager.getApplication()
         .invokeLater(
-            () -> doWait(project, blockingCompletedLatch::countDown, progressMessage, sdkLogger));
+            () ->
+                doWait(
+                    project, blockingCompletedLatch::countDown, progressMessage, sdkStatusHandler));
     blockingCompletedLatch.await();
   }
 
@@ -133,14 +135,16 @@ public class CloudSdkServiceManager {
    */
   private void doWait(
       @Nullable Project project,
-      Runnable runAfterWaitComplete,
+      Runnable afterWaitComplete,
       String progressMessage,
-      CloudSdkLogger sdkLogging) {
+      CloudSdkStatusHandler sdkLogging) {
     CloudSdkService cloudSdkService = CloudSdkService.getInstance();
     SdkStatus sdkStatus = cloudSdkService.getStatus();
     boolean installInProgress = sdkStatus == SdkStatus.INSTALLING;
     // if not already installing and still not ready, attempt to fix and install now.
-    if (!installInProgress && sdkStatus != SdkStatus.READY && cloudSdkService.isInstallReady()) {
+    if (!installInProgress
+        && sdkStatus != SdkStatus.READY
+        && cloudSdkService.isInstallSupported()) {
       cloudSdkService.install();
       installInProgress = true;
     }
@@ -201,7 +205,7 @@ public class CloudSdkServiceManager {
                   // process logging and error notifications.
                   ApplicationManager.getApplication().invokeLater(() -> handleErrors(sdkLogging));
                   // run the activity after wait is over, regardless of outcome.
-                  runAfterWaitComplete.run();
+                  afterWaitComplete.run();
                 }
               }
             });
@@ -213,7 +217,7 @@ public class CloudSdkServiceManager {
   }
 
   /** Checks the current SDK status after waiting for readiness, notifies and logs about errors. */
-  private void handleErrors(CloudSdkLogger sdkLogging) {
+  private void handleErrors(CloudSdkStatusHandler sdkLogging) {
     // check the status of SDK after install.
     SdkStatus postInstallSdkStatus = CloudSdkService.getInstance().getStatus();
     switch (postInstallSdkStatus) {
@@ -256,8 +260,8 @@ public class CloudSdkServiceManager {
     }
   }
 
-  /** Callback interface to allow SDK blocking code to communicate errors and log progress. */
-  public interface CloudSdkLogger {
+  /** Handler interface to allow SDK blocking code to communicate errors and log progress. */
+  public interface CloudSdkStatusHandler {
     void log(String message);
 
     void onError(String message);

@@ -10,7 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatusUpdateListener;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager.CloudSdkLogger;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager.CloudSdkStatusHandler;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -32,7 +32,7 @@ public class CloudSdkServiceManagerTest {
 
   @Mock private Runnable mockRunnable;
   @Mock private Project mockProject;
-  @Mock private CloudSdkLogger mockCallback;
+  @Mock private CloudSdkStatusHandler mockStatusHandler;
 
   @Spy private CloudSdkServiceManager cloudSdkServiceManager;
 
@@ -40,14 +40,14 @@ public class CloudSdkServiceManagerTest {
   public void setUp() {
     when(mockCloudSdkServiceManager.getCloudSdkService()).thenReturn(mockSdkService);
     // empty error messages by default
-    when(mockCallback.getErrorMessage(any())).thenReturn("");
+    when(mockStatusHandler.getErrorMessage(any())).thenReturn("");
   }
 
   @Test
   public void installingSdk_then_readySdk_correctly_runs() {
     mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.READY);
 
-    cloudSdkServiceManager.runWhenSdkReady(mockProject, mockRunnable, "", mockCallback);
+    cloudSdkServiceManager.runWhenSdkReady(mockProject, mockRunnable, "", mockStatusHandler);
 
     ApplicationManager.getApplication().invokeAndWait(() -> verify(mockRunnable).run());
   }
@@ -56,10 +56,10 @@ public class CloudSdkServiceManagerTest {
   public void waitFor_installingSdk_then_readySdk_noErrors() throws InterruptedException {
     mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.READY);
 
-    cloudSdkServiceManager.waitWhenSdkReady(mockProject, "", mockCallback);
+    cloudSdkServiceManager.blockUntilSdkReady(mockProject, "", mockStatusHandler);
 
     ApplicationManager.getApplication()
-        .invokeAndWait(() -> verify(mockCallback, never()).onError(any()));
+        .invokeAndWait(() -> verify(mockStatusHandler, never()).onError(any()));
   }
 
   @Test
@@ -68,7 +68,7 @@ public class CloudSdkServiceManagerTest {
     // mock cancel operation for incomplete install.
     doReturn(true).when(cloudSdkServiceManager).checkIfCancelled();
 
-    cloudSdkServiceManager.runWhenSdkReady(mockProject, mockRunnable, "", mockCallback);
+    cloudSdkServiceManager.runWhenSdkReady(mockProject, mockRunnable, "", mockStatusHandler);
 
     ApplicationManager.getApplication().invokeAndWait(() -> verifyNoMoreInteractions(mockRunnable));
   }
@@ -77,7 +77,7 @@ public class CloudSdkServiceManagerTest {
   public void installingSdk_then_invalidSdk_doesNotRun() {
     mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.INVALID);
 
-    cloudSdkServiceManager.runWhenSdkReady(mockProject, mockRunnable, "", mockCallback);
+    cloudSdkServiceManager.runWhenSdkReady(mockProject, mockRunnable, "", mockStatusHandler);
 
     ApplicationManager.getApplication().invokeAndWait(() -> verifyNoMoreInteractions(mockRunnable));
   }
@@ -86,16 +86,17 @@ public class CloudSdkServiceManagerTest {
   public void waitFor_installingSdk_then_invalidSdk_reportsError() throws InterruptedException {
     mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.INVALID);
 
-    cloudSdkServiceManager.waitWhenSdkReady(mockProject, "", mockCallback);
+    cloudSdkServiceManager.blockUntilSdkReady(mockProject, "", mockStatusHandler);
 
-    ApplicationManager.getApplication().invokeAndWait(() -> verify(mockCallback).onError(any()));
+    ApplicationManager.getApplication()
+        .invokeAndWait(() -> verify(mockStatusHandler).onError(any()));
   }
 
   @Test
   public void installingSdk_then_notAvailableSdk_doesNotRun() {
     mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.NOT_AVAILABLE);
 
-    cloudSdkServiceManager.runWhenSdkReady(mockProject, mockRunnable, "", mockCallback);
+    cloudSdkServiceManager.runWhenSdkReady(mockProject, mockRunnable, "", mockStatusHandler);
 
     ApplicationManager.getApplication().invokeAndWait(() -> verifyNoMoreInteractions(mockRunnable));
   }
@@ -106,7 +107,7 @@ public class CloudSdkServiceManagerTest {
     // mock cancel operation for incomplete install.
     doReturn(true).when(cloudSdkServiceManager).checkIfCancelled();
 
-    cloudSdkServiceManager.runWhenSdkReady(mockProject, mockRunnable, "", mockCallback);
+    cloudSdkServiceManager.runWhenSdkReady(mockProject, mockRunnable, "", mockStatusHandler);
 
     ApplicationManager.getApplication()
         .invokeAndWait(
@@ -119,10 +120,10 @@ public class CloudSdkServiceManagerTest {
   @Test
   public void installingSdk_then_invalidSdk_showsErrorNotification() {
     mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.INVALID);
-    when(mockCallback.getErrorMessage(SdkStatus.INVALID))
+    when(mockStatusHandler.getErrorMessage(SdkStatus.INVALID))
         .thenReturn(GctBundle.message("appengine.deployment.error.sdk.invalid"));
 
-    cloudSdkServiceManager.runWhenSdkReady(mockProject, mockRunnable, "", mockCallback);
+    cloudSdkServiceManager.runWhenSdkReady(mockProject, mockRunnable, "", mockStatusHandler);
 
     ApplicationManager.getApplication()
         .invokeAndWait(
@@ -137,9 +138,10 @@ public class CloudSdkServiceManagerTest {
   public void waitFor_installingSdk_then_invalidSdk_showsErrorNotification()
       throws InterruptedException {
     mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.INVALID);
-    when(mockCallback.getErrorMessage(SdkStatus.INVALID)).thenReturn("invalid SDK after waiting");
+    when(mockStatusHandler.getErrorMessage(SdkStatus.INVALID))
+        .thenReturn("invalid SDK after waiting");
 
-    cloudSdkServiceManager.waitWhenSdkReady(mockProject, "", mockCallback);
+    cloudSdkServiceManager.blockUntilSdkReady(mockProject, "", mockStatusHandler);
 
     ApplicationManager.getApplication()
         .invokeAndWait(
@@ -150,7 +152,7 @@ public class CloudSdkServiceManagerTest {
 
   private void mockSdkStatusChange(SdkStatus fromStatus, SdkStatus toStatus) {
     when(mockSdkService.getStatus()).thenReturn(fromStatus);
-    when(mockSdkService.isInstallReady()).thenReturn(true);
+    when(mockSdkService.isInstallSupported()).thenReturn(true);
     // the only way to enable READY status before blocking on the same thread test thread starts.
     doAnswer(
             invocation -> {

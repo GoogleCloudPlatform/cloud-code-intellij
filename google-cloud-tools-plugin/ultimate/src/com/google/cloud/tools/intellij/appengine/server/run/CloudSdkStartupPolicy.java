@@ -21,7 +21,7 @@ import com.google.cloud.tools.intellij.appengine.cloud.executor.AppEngineStandar
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager.CloudSdkLogger;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager.CloudSdkStatusHandler;
 import com.google.cloud.tools.intellij.appengine.server.instance.AppEngineServerModel;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.collect.Maps;
@@ -68,38 +68,37 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
               String workingDirectory, Map<String, String> configuredEnvironment)
               throws ExecutionException {
 
-            CloudSdkLogger callback =
-                new CloudSdkLogger() {
-                  @Override
-                  public void log(String s) {
-                    logger.info("Cloud SDK precondition check reported: " + s);
-                  }
-
-                  @Override
-                  public void onError(String s) {
-                    logger.warn("Cloud SDK precondition check reported error: " + s);
-                  }
-
-                  @Override
-                  public void onUserCancel() {}
-
-                  @Override
-                  public String getErrorMessage(SdkStatus sdkStatus) {
-                    switch (sdkStatus) {
-                      case INVALID:
-                      case NOT_AVAILABLE:
-                        return GctBundle.message("appengine.run.server.sdk.misconfigured.message");
-                      default:
-                        return "";
-                    }
-                  }
-                };
             try {
               CloudSdkServiceManager.getInstance()
-                  .waitWhenSdkReady(
+                  .blockUntilSdkReady(
                       commonModel.getProject(),
                       GctBundle.getString("appengine.run.startupscript"),
-                      callback);
+                      new CloudSdkStatusHandler() {
+                        @Override
+                        public void log(String s) {
+                          logger.info("Cloud SDK precondition check reported: " + s);
+                        }
+
+                        @Override
+                        public void onError(String s) {
+                          logger.warn("Cloud SDK precondition check reported error: " + s);
+                        }
+
+                        @Override
+                        public void onUserCancel() {}
+
+                        @Override
+                        public String getErrorMessage(SdkStatus sdkStatus) {
+                          switch (sdkStatus) {
+                            case INVALID:
+                            case NOT_AVAILABLE:
+                              return GctBundle.message(
+                                  "appengine.run.server.sdk.misconfigured.message");
+                            default:
+                              return "";
+                          }
+                        }
+                      });
             } catch (InterruptedException e) {
               // should not happen, but would be an error.
               throw new ExecutionException(

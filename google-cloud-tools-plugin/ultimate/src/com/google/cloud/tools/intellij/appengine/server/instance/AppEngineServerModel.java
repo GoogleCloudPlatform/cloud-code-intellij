@@ -132,7 +132,7 @@ public class AppEngineServerModel
     // until installation is done.
     CloudSdkService cloudSdkService = CloudSdkService.getInstance();
     SdkStatus sdkStatus = cloudSdkService.getStatus();
-    if (sdkStatus != SdkStatus.READY && !cloudSdkService.isInstallReady()) {
+    if (sdkStatus != SdkStatus.READY && !cloudSdkService.isInstallSupported()) {
       if (!CloudSdkValidator.getInstance().isValidCloudSdk()) {
         throw new RuntimeConfigurationError(
             GctBundle.message("appengine.run.server.sdk.misconfigured.panel.message"));

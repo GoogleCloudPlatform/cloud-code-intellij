@@ -241,7 +241,7 @@ public class AppEngineDeploymentConfiguration
     // until installation is done.
     CloudSdkService cloudSdkService = CloudSdkService.getInstance();
     SdkStatus sdkStatus = cloudSdkService.getStatus();
-    if (sdkStatus != SdkStatus.READY && !cloudSdkService.isInstallReady()) {
+    if (sdkStatus != SdkStatus.READY && !cloudSdkService.isInstallSupported()) {
       Set<CloudSdkValidationResult> sdkValidationResult =
           CloudSdkValidator.getInstance().validateCloudSdk();
       if (!sdkValidationResult.isEmpty()) {
