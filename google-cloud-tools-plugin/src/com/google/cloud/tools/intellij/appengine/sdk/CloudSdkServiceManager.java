@@ -139,17 +139,11 @@ public class CloudSdkServiceManager {
       String progressMessage,
       CloudSdkStatusHandler sdkLogging) {
     CloudSdkService cloudSdkService = CloudSdkService.getInstance();
-    SdkStatus sdkStatus = cloudSdkService.getStatus();
-    boolean installInProgress = sdkStatus == SdkStatus.INSTALLING;
-    // if not already installing and still not ready, attempt to fix and install now.
-    if (!installInProgress
-        && sdkStatus != SdkStatus.READY
-        && cloudSdkService.isInstallSupported()) {
-      cloudSdkService.install();
-      installInProgress = true;
-    }
+    boolean installInProgress = isInstallInProgress();
 
-    CountDownLatch installationCompletionLatch = new CountDownLatch(1);
+    // no need to wait for install if unsupported or completed.
+    CountDownLatch installationCompletionLatch = new CountDownLatch(installInProgress ? 1 : 0);
+
     // listener for SDK updates, waits until install / update is done. uses latch to notify UI
     // blocking thread.
     final CloudSdkService.SdkStatusUpdateListener sdkStatusUpdateListener =
@@ -170,15 +164,7 @@ public class CloudSdkServiceManager {
       cloudSdkService.addStatusUpdateListener(sdkStatusUpdateListener);
       sdkLogging.log(GctBundle.getString("managedsdk.waiting.for.sdk.ready") + "\n");
 
-      // expose process window so that installation / dependent processes are explicitly visible.
-      WindowManager windowManager = WindowManager.getInstance();
-      StatusBar statusBar = windowManager.getStatusBar(project);
-      if (statusBar != null && statusBar instanceof StatusBarEx) {
-        ((StatusBarEx) statusBar).setProcessWindowOpen(true);
-      }
-    } else {
-      // no need to wait for install if unsupported or completed.
-      installationCompletionLatch.countDown();
+      openBackgroundProcessWindow(project);
     }
 
     // wait for SDK to be ready and trigger the actual deployment if it properly installs.
@@ -214,6 +200,34 @@ public class CloudSdkServiceManager {
   @VisibleForTesting
   boolean checkIfCancelled() {
     return ProgressManager.getInstance().getProgressIndicator().isCanceled();
+  }
+
+  /**
+   * Checks if current SDK service is ready for operations. If it's not, install is attempted if
+   * supported, and true is returned.
+   */
+  private boolean isInstallInProgress() {
+    CloudSdkService cloudSdkService = CloudSdkService.getInstance();
+    SdkStatus sdkStatus = cloudSdkService.getStatus();
+    boolean installInProgress = sdkStatus == SdkStatus.INSTALLING;
+    // if not already installing and still not ready, attempt to fix and install now.
+    if (!installInProgress
+        && sdkStatus != SdkStatus.READY
+        && cloudSdkService.isInstallSupported()) {
+      cloudSdkService.install();
+      installInProgress = true;
+    }
+
+    return installInProgress;
+  }
+
+  /** Exposes process window so that installation / dependent processes are explicitly visible. */
+  private void openBackgroundProcessWindow(Project project) {
+    WindowManager windowManager = WindowManager.getInstance();
+    StatusBar statusBar = windowManager.getStatusBar(project);
+    if (statusBar != null && statusBar instanceof StatusBarEx) {
+      ((StatusBarEx) statusBar).setProcessWindowOpen(true);
+    }
   }
 
   /** Checks the current SDK status after waiting for readiness, notifies and logs about errors. */
