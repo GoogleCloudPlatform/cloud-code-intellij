@@ -139,18 +139,13 @@ public class CloudSdkServiceManager {
       String progressMessage,
       CloudSdkStatusHandler sdkLogging) {
     CloudSdkService cloudSdkService = CloudSdkService.getInstance();
-    SdkStatus sdkStatus = cloudSdkService.getStatus();
-    boolean installInProgress = sdkStatus == SdkStatus.INSTALLING;
-    // if not already installing and still not ready, attempt to fix and install now.
-    if (!installInProgress
-        && sdkStatus != SdkStatus.READY
-        && cloudSdkService.isInstallSupported()) {
+    // if not ready, attempt to fix and install now.
+    if (cloudSdkService.getStatus() != SdkStatus.READY && cloudSdkService.isInstallSupported()) {
       cloudSdkService.install();
-      installInProgress = true;
     }
 
     // no need to wait for install if unsupported or completed.
-    CountDownLatch installationCompletionLatch = new CountDownLatch(installInProgress ? 1 : 0);
+    CountDownLatch installationCompletionLatch = new CountDownLatch(isInstallInProgress() ? 1 : 0);
 
     // listener for SDK updates, waits until install / update is done. uses latch to notify UI
     // blocking thread.
@@ -168,7 +163,7 @@ public class CloudSdkServiceManager {
           }
         };
 
-    if (installInProgress) {
+    if (isInstallInProgress()) {
       cloudSdkService.addStatusUpdateListener(sdkStatusUpdateListener);
       sdkLogging.log(GctBundle.getString("managedsdk.waiting.for.sdk.ready") + "\n");
 
@@ -208,6 +203,11 @@ public class CloudSdkServiceManager {
   @VisibleForTesting
   boolean checkIfCancelled() {
     return ProgressManager.getInstance().getProgressIndicator().isCanceled();
+  }
+
+  /** Checks if current SDK service is currently installing and not ready for operations. */
+  private boolean isInstallInProgress() {
+    return CloudSdkService.getInstance().getStatus() == SdkStatus.INSTALLING;
   }
 
   /** Exposes process window so that installation / dependent processes are explicitly visible. */
