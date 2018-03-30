@@ -22,7 +22,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.components.ServiceManager;
-import com.sun.istack.NotNull;
+import org.jetbrains.annotations.NotNull;
 
 /** Stores user settings for {@link CloudSdkService}, including choice of implementation. */
 public class CloudSdkServiceUserSettings {
