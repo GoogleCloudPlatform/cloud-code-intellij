@@ -9,6 +9,7 @@
 **/*.iml
 .gradle/
 **/build/
+**/out/
 
 # Whitelist iml files needed for tests
 !**/testData/**/*.iml
