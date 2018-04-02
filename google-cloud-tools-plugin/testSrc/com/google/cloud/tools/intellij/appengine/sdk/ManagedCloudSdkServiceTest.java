@@ -29,6 +29,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
+import com.google.cloud.tools.intellij.appengine.sdk.ManagedCloudSdkService.ManagedSdkJobResult;
 import com.google.cloud.tools.intellij.appengine.sdk.ManagedCloudSdkService.ManagedSdkJobType;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.log.TestInMemoryLogger;
@@ -167,7 +168,8 @@ public class ManagedCloudSdkServiceTest {
     emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
     sdkService.install();
 
-    verify(mockUiPresenter).notifyManagedSdkJobSuccess(ManagedSdkJobType.INSTALL);
+    verify(mockUiPresenter)
+        .notifyManagedSdkJobSuccess(ManagedSdkJobType.INSTALL, ManagedSdkJobResult.PROCESSED);
   }
 
   @Test
@@ -285,7 +287,8 @@ public class ManagedCloudSdkServiceTest {
 
     sdkService.update();
 
-    verify(mockUiPresenter).notifyManagedSdkJobSuccess(ManagedSdkJobType.UPDATE);
+    verify(mockUiPresenter)
+        .notifyManagedSdkJobSuccess(ManagedSdkJobType.UPDATE, ManagedSdkJobResult.PROCESSED);
   }
 
   @Test
