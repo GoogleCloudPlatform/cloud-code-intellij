@@ -17,15 +17,14 @@
 package com.google.cloud.tools.intellij.appengine.cloud;
 
 import com.google.cloud.tools.intellij.appengine.cloud.flexible.UserSpecifiedPathDeploymentSource;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager.CloudSdkStatusHandler;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerListener;
@@ -84,16 +83,41 @@ public class AppEngineRuntimeInstance
                 createdDeployments.put(task.getProject(), deployRunner);
               }
 
-              ProgressManager.getInstance()
-                  .run(
-                      new Task.Backgroundable(
-                          task.getProject(),
-                          GctBundle.message("appengine.deployment.status.deploying"),
-                          true /* canBeCancelled */,
-                          null /* backgroundOption */) {
+              CloudSdkServiceManager.getInstance()
+                  .runWhenSdkReady(
+                      task.getProject(),
+                      deployRunner,
+                      GctBundle.message("appengine.deployment.status.deploying"),
+                      new CloudSdkStatusHandler() {
                         @Override
-                        public void run(@NotNull ProgressIndicator indicator) {
-                          ApplicationManager.getApplication().invokeLater(deployRunner);
+                        public void log(String message) {
+                          logManager.getMainLoggingHandler().print(message + "\n");
+                        }
+
+                        @Override
+                        public void onError(String message) {
+                          callback.errorOccurred(message);
+                        }
+
+                        @Override
+                        public void onUserCancel() {
+                          String cancelMessage =
+                              GctBundle.message("appengine.deployment.user.cancel");
+                          callback.errorOccurred(cancelMessage);
+                          logManager.getMainLoggingHandler().print(cancelMessage + "\n");
+                        }
+
+                        @Override
+                        public String getErrorMessage(SdkStatus sdkStatus) {
+                          switch (sdkStatus) {
+                            case INVALID:
+                              return GctBundle.message("appengine.deployment.error.sdk.invalid");
+                            case NOT_AVAILABLE:
+                              return GctBundle.message(
+                                  "appengine.deployment.error.sdk.not.available");
+                            default:
+                              return GctBundle.message("appengine.deployment.error.sdk.retry");
+                          }
                         }
                       });
             });

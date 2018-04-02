@@ -26,7 +26,6 @@ import static org.mockito.Mockito.withSettings;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
@@ -46,7 +45,6 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.Before;
@@ -134,25 +132,6 @@ public class CloudSdkAppEngineHelperTest {
 
     assertFalse(runner.isPresent());
     verify(callback, times(1)).errorOccurred("Deployment source not found: null.");
-  }
-
-  @Test
-  public void testCreateDeployRunnerInvalidSdk() {
-    when(cloudSdkValidator.validateCloudSdk())
-        .thenReturn(ImmutableSet.of(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND));
-    Path path = Paths.get(("/this/path"));
-    when(sdkService.getSdkHomePath()).thenReturn(path);
-
-    Optional<CancellableRunnable> runner =
-        helper.createDeployRunner(
-            loggingHandler,
-            createMockDeployableDeploymentSource(),
-            deploymentConfiguration,
-            callback);
-
-    assertFalse(runner.isPresent());
-    verify(callback, times(1))
-        .errorOccurred("No Cloud SDK was found in the specified directory. " + path.toString());
   }
 
   @Test
