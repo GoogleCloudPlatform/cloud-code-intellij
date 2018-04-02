@@ -140,7 +140,7 @@ public class CloudSdkServiceManager {
       CloudSdkStatusHandler sdkLogging) {
     CloudSdkService cloudSdkService = CloudSdkService.getInstance();
     // if not ready, attempt to fix and install now.
-    if (cloudSdkService.getStatus() != SdkStatus.READY && cloudSdkService.isInstallSupported()) {
+    if (!isSdkReady() && cloudSdkService.isInstallSupported()) {
       cloudSdkService.install();
     }
 
@@ -157,9 +157,8 @@ public class CloudSdkServiceManager {
             case NOT_AVAILABLE:
               installationCompletionLatch.countDown();
               break;
-            case INSTALLING:
+            default:
               // continue waiting for completion.
-              break;
           }
         };
 
@@ -210,6 +209,10 @@ public class CloudSdkServiceManager {
     return CloudSdkService.getInstance().getStatus() == SdkStatus.INSTALLING;
   }
 
+  private boolean isSdkReady() {
+    return CloudSdkService.getInstance().getStatus() == SdkStatus.READY;
+  }
+
   /** Exposes process window so that installation / dependent processes are explicitly visible. */
   private void openBackgroundProcessWindow(Project project) {
     WindowManager windowManager = WindowManager.getInstance();
@@ -236,6 +239,8 @@ public class CloudSdkServiceManager {
         sdkLogging.onError(message);
         showCloudSdkNotification(message, NotificationType.ERROR);
         break;
+      default:
+        // do nothing, no error, not ready.
     }
   }
 
