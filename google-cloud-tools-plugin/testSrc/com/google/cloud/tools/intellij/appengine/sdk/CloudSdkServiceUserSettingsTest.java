@@ -54,6 +54,14 @@ public class CloudSdkServiceUserSettingsTest {
   }
 
   @Test
+  public void empty_sdkPath_managedSdk_selectedByDefault() {
+    userSettings.setCustomSdkPath("");
+
+    assertThat(userSettings.getUserSelectedSdkServiceType())
+        .isEqualTo(CloudSdkServiceType.MANAGED_SDK);
+  }
+
+  @Test
   public void previous_sdkPath_exists_customSdk_type_selectedByDefault() {
     userSettings.setCustomSdkPath("/home/gcloud");
 
