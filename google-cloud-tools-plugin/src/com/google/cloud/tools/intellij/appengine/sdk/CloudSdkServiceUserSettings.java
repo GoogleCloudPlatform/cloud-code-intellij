@@ -60,6 +60,11 @@ public class CloudSdkServiceUserSettings {
       sdkType = CloudSdkServiceType.valueOf(Strings.nullToEmpty(sdkTypeName));
     } catch (Exception ex) {
       sdkType = DEFAULT_SDK_TYPE;
+      // sdk type is unset - probably previous version of the SDK support didn't have it.
+      // check for custom SDK path and use custom if it's set.
+      if (getCustomSdkPath() != null) {
+        sdkType = CloudSdkServiceType.CUSTOM_SDK;
+      }
     }
 
     // override result based on feature status until feature is done.
