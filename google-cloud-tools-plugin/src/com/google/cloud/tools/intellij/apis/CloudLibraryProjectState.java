@@ -157,7 +157,8 @@ public class CloudLibraryProjectState implements ProjectComponent {
                               CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_ARTIFACT.equalsIgnoreCase(
                                       managedDependency.getArtifactId().getStringValue())
                                   && CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_GROUP
-                                      .equalsIgnoreCase(managedDependency.getGroupId().getStringValue()))
+                                      .equalsIgnoreCase(
+                                          managedDependency.getGroupId().getStringValue()))
                       .findFirst();
                 });
   }
