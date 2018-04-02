@@ -94,11 +94,15 @@ public class CloudLibraryProjectStateTest {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> {
-              Module module =
-                  MavenTestUtils.getInstance()
-                      .createNewMavenModule(moduleBuilder, testFixture.getProject());
+              try {
+                Module module =
+                    MavenTestUtils.getInstance()
+                        .createNewMavenModule(moduleBuilder, testFixture.getProject());
 
-              assertThat(state.getCloudLibraries(module)).isEmpty();
+                assertThat(state.getCloudLibraries(module)).isEmpty();
+              } finally {
+                MavenServerManager.getInstance().shutdown(true);
+              }
             });
   }
 
@@ -107,28 +111,32 @@ public class CloudLibraryProjectStateTest {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> {
-              Module module =
-                  MavenTestUtils.getInstance()
-                      .createNewMavenModule(moduleBuilder, testFixture.getProject());
-              MavenProject mavenProject =
-                  MavenProjectsManager.getInstance(testFixture.getProject()).findProject(module);
+              try {
+                Module module =
+                    MavenTestUtils.getInstance()
+                        .createNewMavenModule(moduleBuilder, testFixture.getProject());
+                MavenProject mavenProject =
+                    MavenProjectsManager.getInstance(testFixture.getProject()).findProject(module);
 
-              ApplicationManager.getApplication()
-                  .runWriteAction(
-                      () -> {
-                        try {
-                          mavenProject
-                              .getFile()
-                              .setBinaryContent(
-                                  "not a valid pom.xml".getBytes(Charset.defaultCharset()));
-                        } catch (IOException e) {
-                          throw new AssertionError("failed to write test content to pom.xml", e);
-                        }
-                      });
+                ApplicationManager.getApplication()
+                    .runWriteAction(
+                        () -> {
+                          try {
+                            mavenProject
+                                .getFile()
+                                .setBinaryContent(
+                                    "not a valid pom.xml".getBytes(Charset.defaultCharset()));
+                          } catch (IOException e) {
+                            throw new AssertionError("failed to write test content to pom.xml", e);
+                          }
+                        });
 
-              state.syncManagedProjectLibraries();
+                state.syncManagedProjectLibraries();
 
-              assertThat(state.getCloudLibraries(module)).isEmpty();
+                assertThat(state.getCloudLibraries(module)).isEmpty();
+              } finally {
+                MavenServerManager.getInstance().shutdown(true);
+              }
             });
   }
 
@@ -140,13 +148,17 @@ public class CloudLibraryProjectStateTest {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> {
-              Module module =
-                  MavenTestUtils.getInstance()
-                      .createNewMavenModule(moduleBuilder, testFixture.getProject());
-              MavenId nonCloudDependency = new MavenId("my-group", "my-artifact", "1.0");
-              writeDependenciesToPom(module, ImmutableList.of(nonCloudDependency));
+              try {
+                Module module =
+                    MavenTestUtils.getInstance()
+                        .createNewMavenModule(moduleBuilder, testFixture.getProject());
+                MavenId nonCloudDependency = new MavenId("my-group", "my-artifact", "1.0");
+                writeDependenciesToPom(module, ImmutableList.of(nonCloudDependency));
 
-              assertThat(state.getCloudLibraries(module)).isEmpty();
+                assertThat(state.getCloudLibraries(module)).isEmpty();
+              } finally {
+                MavenServerManager.getInstance().shutdown(true);
+              }
             });
   }
 
@@ -158,23 +170,28 @@ public class CloudLibraryProjectStateTest {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> {
-              Module module =
-                  MavenTestUtils.getInstance()
-                      .createNewMavenModule(moduleBuilder, testFixture.getProject());
+              try {
+                Module module =
+                    MavenTestUtils.getInstance()
+                        .createNewMavenModule(moduleBuilder, testFixture.getProject());
 
-              TestCloudLibraryClientMavenCoordinates mavenCoordinates =
-                  LIBRARY.clients().get(0).mavenCoordinates();
-              String groupId = mavenCoordinates.groupId();
-              String artifactId = mavenCoordinates.artifactId();
+                TestCloudLibraryClientMavenCoordinates mavenCoordinates =
+                    LIBRARY.clients().get(0).mavenCoordinates();
+                String groupId = mavenCoordinates.groupId();
+                String artifactId = mavenCoordinates.artifactId();
 
-              MavenId cloudDependency = new MavenId(groupId, artifactId, "1.0");
-              MavenId nonCloudDependency = new MavenId("my-group", "my-artifact", "1.0");
-              writeDependenciesToPom(module, ImmutableList.of(cloudDependency, nonCloudDependency));
+                MavenId cloudDependency = new MavenId(groupId, artifactId, "1.0");
+                MavenId nonCloudDependency = new MavenId("my-group", "my-artifact", "1.0");
+                writeDependenciesToPom(
+                    module, ImmutableList.of(cloudDependency, nonCloudDependency));
 
-              state.syncManagedProjectLibraries();
+                state.syncManagedProjectLibraries();
 
-              Set<CloudLibrary> libraries = state.getCloudLibraries(module);
-              assertThat_cloudLibrariesContainsExactlyOne(libraries);
+                Set<CloudLibrary> libraries = state.getCloudLibraries(module);
+                assertThat_cloudLibrariesContainsExactlyOne(libraries);
+              } finally {
+                MavenServerManager.getInstance().shutdown(true);
+              }
             });
   }
 
@@ -186,22 +203,26 @@ public class CloudLibraryProjectStateTest {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> {
-              Module module =
-                  MavenTestUtils.getInstance()
-                      .createNewMavenModule(moduleBuilder, testFixture.getProject());
+              try {
+                Module module =
+                    MavenTestUtils.getInstance()
+                        .createNewMavenModule(moduleBuilder, testFixture.getProject());
 
-              TestCloudLibraryClientMavenCoordinates mavenCoordinates =
-                  LIBRARY.clients().get(0).mavenCoordinates();
-              String groupId = mavenCoordinates.groupId();
-              String artifactId = mavenCoordinates.artifactId();
+                TestCloudLibraryClientMavenCoordinates mavenCoordinates =
+                    LIBRARY.clients().get(0).mavenCoordinates();
+                String groupId = mavenCoordinates.groupId();
+                String artifactId = mavenCoordinates.artifactId();
 
-              MavenId managedDependency = new MavenId(groupId, artifactId, "1.0");
-              writeDependenciesToPom(module, ImmutableList.of(managedDependency));
+                MavenId managedDependency = new MavenId(groupId, artifactId, "1.0");
+                writeDependenciesToPom(module, ImmutableList.of(managedDependency));
 
-              state.syncManagedProjectLibraries();
+                state.syncManagedProjectLibraries();
 
-              Set<CloudLibrary> libraries = state.getCloudLibraries(module);
-              assertThat_cloudLibrariesContainsExactlyOne(libraries);
+                Set<CloudLibrary> libraries = state.getCloudLibraries(module);
+                assertThat_cloudLibrariesContainsExactlyOne(libraries);
+              } finally {
+                MavenServerManager.getInstance().shutdown(true);
+              }
             });
   }
 
