@@ -17,6 +17,8 @@
 package com.google.cloud.tools.intellij.appengine.server.instance;
 
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.base.Joiner;
@@ -126,9 +128,15 @@ public class AppEngineServerModel
           GctBundle.message("appengine.run.server.artifact.missing"));
     }
 
-    if (!CloudSdkValidator.getInstance().isValidCloudSdk()) {
-      throw new RuntimeConfigurationError(
-          GctBundle.message("appengine.run.server.sdk.misconfigured.panel.message"));
+    // do not check SDK if it supports dynamic install - the deployment runner will block itself
+    // until installation is done.
+    CloudSdkService cloudSdkService = CloudSdkService.getInstance();
+    SdkStatus sdkStatus = cloudSdkService.getStatus();
+    if (sdkStatus != SdkStatus.READY && !cloudSdkService.isInstallSupported()) {
+      if (!CloudSdkValidator.getInstance().isValidCloudSdk()) {
+        throw new RuntimeConfigurationError(
+            GctBundle.message("appengine.run.server.sdk.misconfigured.panel.message"));
+      }
     }
 
     if (ProjectRootManager.getInstance(commonModel.getProject()).getProjectSdk() == null) {
