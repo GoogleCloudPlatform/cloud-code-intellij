@@ -53,6 +53,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.DialogWrapper;
 import git4idea.DialogManager;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -430,8 +431,8 @@ class CloudApiManager {
     notification.notify(project);
   }
 
-  private static void notifyServiceAccountCreated(Project project, String gcpProjectId, String name,
-      Path downloadDir) {
+  private static void notifyServiceAccountCreated(
+      Project project, String gcpProjectId, String name, Path downloadDir) {
     Notification notification =
         NOTIFICATION_GROUP.createNotification(
             GctBundle.message("cloud.apis.service.account.created.title"),
@@ -443,8 +444,10 @@ class CloudApiManager {
     ApplicationManager.getApplication()
         .invokeLater(
             () -> {
-              ServiceAccountKeyDisplayDialog keyDialog =
-                  new ServiceAccountKeyDisplayDialog(project, gcpProjectId, downloadDir.toString());
+              ServiceAccountKeyDialogService dialogService =
+                  ServiceManager.getService(ServiceAccountKeyDialogService.class);
+              DialogWrapper keyDialog =
+                  dialogService.getDialog(project, gcpProjectId, downloadDir.toString());
               DialogManager.show(keyDialog);
             });
   }

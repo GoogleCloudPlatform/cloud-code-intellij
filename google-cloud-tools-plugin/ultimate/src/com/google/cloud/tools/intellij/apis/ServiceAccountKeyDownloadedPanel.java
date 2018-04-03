@@ -16,8 +16,12 @@
 
 package com.google.cloud.tools.intellij.apis;
 
-import com.google.cloud.tools.intellij.ui.CopyToClipboardActionListener;
 import com.intellij.openapi.project.Project;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -26,6 +30,7 @@ import javax.swing.table.DefaultTableModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+// TODO: delete file after fix to error accessing a nested form from another module is fixed
 /**
  * Panel confirming the download of the service account JSON key with information on how to set the
  * credential environment variables for local run.
@@ -68,5 +73,20 @@ public final class ServiceAccountKeyDownloadedPanel {
 
     copyToClipboardButton.addActionListener(
         new CopyToClipboardActionListener(credentialEnvVar + "\n" + cloudProjectEnvVar));
+  }
+
+  // TODO: temporary fix to dependency errors
+  static class CopyToClipboardActionListener implements ActionListener {
+    private final String text;
+
+    CopyToClipboardActionListener(String text) {
+      this.text = text;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent event) {
+      Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+      clipboard.setContents(new StringSelection(text), null /*owner*/);
+    }
   }
 }

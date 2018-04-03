@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,49 +16,46 @@
 
 package com.google.cloud.tools.intellij.apis;
 
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JTable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Dialog confirming the download of the service account JSON key with information on how to set the
- * credential environment variables for local run.
- */
-public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
+/** Created by nbashirbello on 4/2/18. */
+public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
   private final Project project;
   private final String gcpProjectId;
   private final String downloadPath;
-  private JPanel panel;
-  private ServiceAccountKeyDownloadedPanel keyDownloadedPanel;
+  private JPanel panel1;
+  private JTable serverTable;
+  private ServiceAccountKeyDownloadedPanel commonPanel;
 
-  ServiceAccountKeyDisplayDialog(
-      @Nullable Project project, String gcpProjectId, String downloadPath) {
+  public ServiceAccountKeyUltimateDisplayDialog(
+      @Nullable Project project, @NotNull String gcpProjectId, @NotNull String downloadPath) {
     super(project);
     this.project = project;
     this.gcpProjectId = gcpProjectId;
     this.downloadPath = downloadPath;
     init();
-    setTitle(GctBundle.message("cloud.apis.service.account.key.downloaded.title"));
   }
 
   @Nullable
   @Override
   protected JComponent createCenterPanel() {
-    return panel;
-  }
-
-  private void createUIComponents() {
-    keyDownloadedPanel = new ServiceAccountKeyDownloadedPanel(project, gcpProjectId, downloadPath);
+    return panel1;
   }
 
   @NotNull
   @Override
   protected Action[] createActions() {
     return new Action[] {getOKAction()};
+  }
+
+  private void createUIComponents() {
+    commonPanel = new ServiceAccountKeyDownloadedPanel(project, gcpProjectId, downloadPath);
   }
 }
