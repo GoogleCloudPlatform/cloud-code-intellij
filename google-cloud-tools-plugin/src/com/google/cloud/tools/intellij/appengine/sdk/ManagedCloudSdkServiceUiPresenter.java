@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
+import com.google.cloud.tools.intellij.appengine.sdk.ManagedCloudSdkService.ManagedSdkJobResult;
 import com.google.cloud.tools.intellij.appengine.sdk.ManagedCloudSdkService.ManagedSdkJobType;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -51,9 +52,15 @@ public class ManagedCloudSdkServiceUiPresenter {
     ManagedCloudSdkServiceUiPresenter.instance = uiPresenter;
   }
 
-  public void notifyManagedSdkJobSuccess(ManagedSdkJobType jobType) {
+  public void notifyManagedSdkJobSuccess(ManagedSdkJobType jobType, ManagedSdkJobResult jobResult) {
     String message = GctBundle.message("managedsdk.success." + jobType.name().toLowerCase());
-    showNotification(message, NotificationType.INFORMATION);
+    switch (jobResult) {
+      case PROCESSED:
+        showNotification(message, NotificationType.INFORMATION);
+        return;
+      default:
+        // do nothing, everything is up-to-date.
+    }
   }
 
   public void notifyManagedSdkJobFailure(ManagedSdkJobType jobType, String errorMessage) {

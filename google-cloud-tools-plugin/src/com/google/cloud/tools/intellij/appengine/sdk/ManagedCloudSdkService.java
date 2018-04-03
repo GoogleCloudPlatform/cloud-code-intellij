@@ -55,7 +55,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
   private final Collection<SdkStatusUpdateListener> statusUpdateListeners = Lists.newArrayList();
 
-  private volatile ListenableFuture<Path> managedSdkBackgroundJob;
+  private volatile ListenableFuture<ManagedSdkJobResult> managedSdkBackgroundJob;
 
   private ProgressListener progressListener;
 
@@ -154,7 +154,8 @@ public class ManagedCloudSdkService implements CloudSdkService {
    * @param managedSdkTask Task to execute.
    * @return {@code true} if task started, {@code false} if Managed SDK is not supported at all.
    */
-  private boolean executeManagedSdkJob(ManagedSdkJobType jobType, Callable<Path> managedSdkTask) {
+  private boolean executeManagedSdkJob(
+      ManagedSdkJobType jobType, Callable<ManagedSdkJobResult> managedSdkTask) {
     if (!isInstallSupported()) {
       return false;
     }
@@ -175,27 +176,33 @@ public class ManagedCloudSdkService implements CloudSdkService {
    * @throws InterruptedException if Managed Cloud SDK has been interrupted by {@link
    *     #cancelInstallOrUpdate()} ()}
    */
-  private Path installManagedSdk() throws Exception {
-    Path installedManagedSdkPath = installSdk();
-    installAppEngineJavaComponent();
+  private ManagedSdkJobResult installManagedSdk() throws Exception {
+    ManagedSdkJobResult installResult = installSdk();
+    ManagedSdkJobResult appEngineJavaResult = installAppEngineJavaComponent();
 
-    return installedManagedSdkPath;
+    // return up-to-date only if both SDK and app engine Java were up-to-date
+    return (installResult == ManagedSdkJobResult.UP_TO_DATE
+            && appEngineJavaResult == ManagedSdkJobResult.UP_TO_DATE)
+        ? ManagedSdkJobResult.UP_TO_DATE
+        : ManagedSdkJobResult.PROCESSED;
   }
 
   /** Installs core managed SDK if needed and returns its path if successful. */
-  private Path installSdk() throws Exception {
+  private ManagedSdkJobResult installSdk() throws Exception {
     if (!safeCheckSdkStatus(() -> managedCloudSdk.isInstalled())) {
       ConsoleListener sdkConsoleListener = logger::debug;
       progressListener =
           ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
 
-      return managedCloudSdk.newInstaller().install(progressListener, sdkConsoleListener);
+      managedCloudSdk.newInstaller().install(progressListener, sdkConsoleListener);
+
+      return ManagedSdkJobResult.PROCESSED;
     }
 
-    return managedCloudSdk.getSdkHome();
+    return ManagedSdkJobResult.UP_TO_DATE;
   }
 
-  private void installAppEngineJavaComponent() throws Exception {
+  private ManagedSdkJobResult installAppEngineJavaComponent() throws Exception {
     if (!safeCheckSdkStatus(() -> managedCloudSdk.hasComponent(SdkComponent.APP_ENGINE_JAVA))) {
       ConsoleListener appEngineConsoleListener = logger::debug;
 
@@ -205,19 +212,25 @@ public class ManagedCloudSdkService implements CloudSdkService {
           .newComponentInstaller()
           .installComponent(
               SdkComponent.APP_ENGINE_JAVA, progressListener, appEngineConsoleListener);
+
+      return ManagedSdkJobResult.PROCESSED;
+    } else {
+      return ManagedSdkJobResult.UP_TO_DATE;
     }
   }
 
-  private Path updateManagedSdk() throws Exception {
+  private ManagedSdkJobResult updateManagedSdk() throws Exception {
     if (!safeCheckSdkStatus(() -> managedCloudSdk.isUpToDate())) {
       ConsoleListener sdkUpdateListener = logger::debug;
       progressListener =
           ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
 
       managedCloudSdk.newUpdater().update(progressListener, sdkUpdateListener);
-    }
 
-    return managedCloudSdk.getSdkHome();
+      return ManagedSdkJobResult.PROCESSED;
+    } else {
+      return ManagedSdkJobResult.UP_TO_DATE;
+    }
   }
 
   /**
@@ -255,11 +268,18 @@ public class ManagedCloudSdkService implements CloudSdkService {
     UPDATE
   }
 
+  enum ManagedSdkJobResult {
+    // work has been done and completed
+    PROCESSED,
+    // no work has been done since SDK is up-to-date.
+    UP_TO_DATE
+  }
+
   /**
    * Managed SDK Job future listener, handles success/error logic, logs errors, shows notifications
    * to a user, updates SDK service statuses.
    */
-  private final class ManagedSdkJobListener implements FutureCallback<Path> {
+  private final class ManagedSdkJobListener implements FutureCallback<ManagedSdkJobResult> {
     private final ManagedSdkJobType jobType;
 
     private ManagedSdkJobListener(ManagedSdkJobType jobType) {
@@ -267,12 +287,13 @@ public class ManagedCloudSdkService implements CloudSdkService {
     }
 
     @Override
-    public void onSuccess(Path path) {
-      logger.info("Managed Google Cloud SDK successfully installed/updated at: " + path);
+    public void onSuccess(ManagedSdkJobResult result) {
+      logger.info(
+          "Managed Google Cloud SDK successfully installed/updated at: " + getSdkHomePath());
 
       updateStatus(SdkStatus.READY);
 
-      ManagedCloudSdkServiceUiPresenter.getInstance().notifyManagedSdkJobSuccess(jobType);
+      ManagedCloudSdkServiceUiPresenter.getInstance().notifyManagedSdkJobSuccess(jobType, result);
     }
 
     @Override
