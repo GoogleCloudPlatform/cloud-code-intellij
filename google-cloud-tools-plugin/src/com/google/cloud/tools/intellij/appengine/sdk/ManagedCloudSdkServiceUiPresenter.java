@@ -57,8 +57,7 @@ public class ManagedCloudSdkServiceUiPresenter {
     switch (jobResult) {
       case PROCESSED:
         showNotification(message, NotificationType.INFORMATION);
-        break;
-      case UP_TO_DATE:
+        return;
       default:
         // do nothing, everything is up-to-date.
     }
