@@ -139,8 +139,9 @@ public class CloudSdkServiceManager {
       String progressMessage,
       CloudSdkStatusHandler sdkLogging) {
     CloudSdkService cloudSdkService = CloudSdkService.getInstance();
-    // if not ready, attempt to fix and install now.
-    if (!isSdkReady() && cloudSdkService.isInstallSupported()) {
+    // if install supported, make sure SDK is in good shape and installed.
+    // even if status is READY, this will double-check the current state from the last install.
+    if (cloudSdkService.isInstallSupported()) {
       cloudSdkService.install();
     }
 
@@ -207,10 +208,6 @@ public class CloudSdkServiceManager {
   /** Checks if current SDK service is currently installing and not ready for operations. */
   private boolean isInstallInProgress() {
     return CloudSdkService.getInstance().getStatus() == SdkStatus.INSTALLING;
-  }
-
-  private boolean isSdkReady() {
-    return CloudSdkService.getInstance().getStatus() == SdkStatus.READY;
   }
 
   /** Exposes process window so that installation / dependent processes are explicitly visible. */

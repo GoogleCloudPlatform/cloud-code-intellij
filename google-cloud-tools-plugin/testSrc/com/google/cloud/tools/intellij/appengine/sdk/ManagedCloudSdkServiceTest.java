@@ -29,11 +29,13 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
+import com.google.cloud.tools.intellij.appengine.sdk.ManagedCloudSdkService.ManagedSdkJobResult;
 import com.google.cloud.tools.intellij.appengine.sdk.ManagedCloudSdkService.ManagedSdkJobType;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.log.TestInMemoryLogger;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.managedcloudsdk.ManagedCloudSdk;
+import com.google.cloud.tools.managedcloudsdk.ManagedSdkVerificationException;
 import com.google.cloud.tools.managedcloudsdk.ProgressListener;
 import com.google.cloud.tools.managedcloudsdk.UnsupportedOsException;
 import com.google.cloud.tools.managedcloudsdk.command.CommandExecutionException;
@@ -167,7 +169,17 @@ public class ManagedCloudSdkServiceTest {
     emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
     sdkService.install();
 
-    verify(mockUiPresenter).notifyManagedSdkJobSuccess(ManagedSdkJobType.INSTALL);
+    verify(mockUiPresenter)
+        .notifyManagedSdkJobSuccess(ManagedSdkJobType.INSTALL, ManagedSdkJobResult.PROCESSED);
+  }
+
+  @Test
+  public void sdkUpToDate_install_passes_valid_jobSuccessResult() {
+    makeMockSdkInstalled(MOCK_SDK_PATH);
+    sdkService.install();
+
+    verify(mockUiPresenter)
+        .notifyManagedSdkJobSuccess(ManagedSdkJobType.INSTALL, ManagedSdkJobResult.UP_TO_DATE);
   }
 
   @Test
@@ -285,7 +297,19 @@ public class ManagedCloudSdkServiceTest {
 
     sdkService.update();
 
-    verify(mockUiPresenter).notifyManagedSdkJobSuccess(ManagedSdkJobType.UPDATE);
+    verify(mockUiPresenter)
+        .notifyManagedSdkJobSuccess(ManagedSdkJobType.UPDATE, ManagedSdkJobResult.PROCESSED);
+  }
+
+  @Test
+  public void upToDate_sdk_passes_valid_jobSuccessResult() throws ManagedSdkVerificationException {
+    makeMockSdkInstalled(MOCK_SDK_PATH);
+    when(mockManagedCloudSdk.isUpToDate()).thenReturn(true);
+
+    sdkService.update();
+
+    verify(mockUiPresenter)
+        .notifyManagedSdkJobSuccess(ManagedSdkJobType.UPDATE, ManagedSdkJobResult.UP_TO_DATE);
   }
 
   @Test

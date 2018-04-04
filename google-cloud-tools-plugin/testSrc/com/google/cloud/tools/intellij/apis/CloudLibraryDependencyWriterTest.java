@@ -36,6 +36,7 @@ import org.jetbrains.idea.maven.dom.model.MavenDomDependency;
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
+import org.jetbrains.idea.maven.server.MavenServerManager;
 import org.jetbrains.idea.maven.wizards.MavenModuleBuilder;
 import org.junit.Before;
 import org.junit.Rule;
@@ -77,17 +78,21 @@ public class CloudLibraryDependencyWriterTest {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> {
-              MavenDomProjectModel model = createMavenModelWithCloudLibrary(null /*bomVersion*/);
+              try {
+                MavenDomProjectModel model = createMavenModelWithCloudLibrary(null /*bomVersion*/);
 
-              List<MavenDomDependency> cloudLibraryDependencies =
-                  model.getDependencies().getDependencies();
-              assertThat(cloudLibraryDependencies.size()).isEqualTo(1);
+                List<MavenDomDependency> cloudLibraryDependencies =
+                    model.getDependencies().getDependencies();
+                assertThat(cloudLibraryDependencies.size()).isEqualTo(1);
 
-              MavenDomDependency dependency = cloudLibraryDependencies.get(0);
-              assertThat(dependency.getGroupId().getStringValue()).isEqualTo(CLOUD_LIB_GROUP_ID);
-              assertThat(dependency.getArtifactId().getStringValue())
-                  .isEqualTo(CLOUD_LIB_ARTIFACT_ID);
-              assertThat(dependency.getVersion().getStringValue()).isEqualTo(CLOUD_LIB_VERSION);
+                MavenDomDependency dependency = cloudLibraryDependencies.get(0);
+                assertThat(dependency.getGroupId().getStringValue()).isEqualTo(CLOUD_LIB_GROUP_ID);
+                assertThat(dependency.getArtifactId().getStringValue())
+                    .isEqualTo(CLOUD_LIB_ARTIFACT_ID);
+                assertThat(dependency.getVersion().getStringValue()).isEqualTo(CLOUD_LIB_VERSION);
+              } finally {
+                MavenServerManager.getInstance().shutdown(true);
+              }
             });
   }
 
@@ -96,18 +101,22 @@ public class CloudLibraryDependencyWriterTest {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> {
-              String bomVersion = "1.0.0-beta";
-              MavenDomProjectModel model = createMavenModelWithCloudLibrary(bomVersion);
+              try {
+                String bomVersion = "1.0.0-beta";
+                MavenDomProjectModel model = createMavenModelWithCloudLibrary(bomVersion);
 
-              List<MavenDomDependency> cloudLibraryDependencies =
-                  model.getDependencies().getDependencies();
-              assertThat(cloudLibraryDependencies.size()).isEqualTo(1);
+                List<MavenDomDependency> cloudLibraryDependencies =
+                    model.getDependencies().getDependencies();
+                assertThat(cloudLibraryDependencies.size()).isEqualTo(1);
 
-              MavenDomDependency dependency = cloudLibraryDependencies.get(0);
-              assertThat(dependency.getGroupId().getStringValue()).isEqualTo(CLOUD_LIB_GROUP_ID);
-              assertThat(dependency.getArtifactId().getStringValue())
-                  .isEqualTo(CLOUD_LIB_ARTIFACT_ID);
-              assertThat(dependency.getVersion().getStringValue()).isNull();
+                MavenDomDependency dependency = cloudLibraryDependencies.get(0);
+                assertThat(dependency.getGroupId().getStringValue()).isEqualTo(CLOUD_LIB_GROUP_ID);
+                assertThat(dependency.getArtifactId().getStringValue())
+                    .isEqualTo(CLOUD_LIB_ARTIFACT_ID);
+                assertThat(dependency.getVersion().getStringValue()).isNull();
+              } finally {
+                MavenServerManager.getInstance().shutdown(true);
+              }
             });
   }
 
@@ -116,12 +125,16 @@ public class CloudLibraryDependencyWriterTest {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> {
-              MavenDomProjectModel model = createMavenModelWithCloudLibrary(null /*bomVersion*/);
+              try {
+                MavenDomProjectModel model = createMavenModelWithCloudLibrary(null /*bomVersion*/);
 
-              List<MavenDomDependency> dependencyManagementDependencies =
-                  model.getDependencyManagement().getDependencies().getDependencies();
-              // the BOM lives in the dependencyManagement section
-              assertThat(dependencyManagementDependencies).isEmpty();
+                List<MavenDomDependency> dependencyManagementDependencies =
+                    model.getDependencyManagement().getDependencies().getDependencies();
+                // the BOM lives in the dependencyManagement section
+                assertThat(dependencyManagementDependencies).isEmpty();
+              } finally {
+                MavenServerManager.getInstance().shutdown(true);
+              }
             });
   }
 
@@ -130,20 +143,25 @@ public class CloudLibraryDependencyWriterTest {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> {
-              String bomVersion = "1.0.0-beta";
-              MavenDomProjectModel model = createMavenModelWithCloudLibrary(bomVersion);
+              try {
+                String bomVersion = "1.0.0-beta";
+                MavenDomProjectModel model = createMavenModelWithCloudLibrary(bomVersion);
 
-              List<MavenDomDependency> dependencyManagementDependencies =
-                  model.getDependencyManagement().getDependencies().getDependencies();
-              assertThat(dependencyManagementDependencies.size()).isEqualTo(1);
+                List<MavenDomDependency> dependencyManagementDependencies =
+                    model.getDependencyManagement().getDependencies().getDependencies();
+                assertThat(dependencyManagementDependencies.size()).isEqualTo(1);
 
-              MavenDomDependency bomDependency = dependencyManagementDependencies.get(0);
-              assertThat(bomDependency.getGroupId().getStringValue()).isEqualTo("com.google.cloud");
-              assertThat(bomDependency.getArtifactId().getStringValue())
-                  .isEqualTo("google-cloud-bom");
-              assertThat(bomDependency.getScope().getStringValue()).isEqualTo("import");
-              assertThat(bomDependency.getType().getStringValue()).isEqualTo("pom");
-              assertThat(bomDependency.getVersion().getStringValue()).isEqualTo(bomVersion);
+                MavenDomDependency bomDependency = dependencyManagementDependencies.get(0);
+                assertThat(bomDependency.getGroupId().getStringValue())
+                    .isEqualTo("com.google.cloud");
+                assertThat(bomDependency.getArtifactId().getStringValue())
+                    .isEqualTo("google-cloud-bom");
+                assertThat(bomDependency.getScope().getStringValue()).isEqualTo("import");
+                assertThat(bomDependency.getType().getStringValue()).isEqualTo("pom");
+                assertThat(bomDependency.getVersion().getStringValue()).isEqualTo(bomVersion);
+              } finally {
+                MavenServerManager.getInstance().shutdown(true);
+              }
             });
   }
 
