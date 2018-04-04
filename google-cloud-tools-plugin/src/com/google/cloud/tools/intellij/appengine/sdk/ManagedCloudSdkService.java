@@ -59,11 +59,19 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
   private ProgressListener progressListener;
 
+  private ManagedCloudSdkUpdater managedCloudSdkUpdater;
+
   @Override
   public void activate() {
     // TODO track event that custom SDK is activated and used.
 
     initManagedSdk();
+    if (isInstallSupported()) {
+      if (managedCloudSdkUpdater == null) {
+        managedCloudSdkUpdater = new ManagedCloudSdkUpdater();
+      }
+      managedCloudSdkUpdater.activate();
+    }
   }
 
   @Nullable

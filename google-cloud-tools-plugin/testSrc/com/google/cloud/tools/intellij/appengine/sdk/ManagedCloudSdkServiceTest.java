@@ -45,6 +45,8 @@ import com.google.cloud.tools.managedcloudsdk.components.SdkComponentInstaller;
 import com.google.cloud.tools.managedcloudsdk.components.SdkUpdater;
 import com.google.cloud.tools.managedcloudsdk.install.SdkInstaller;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.testFramework.ThreadTracker;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -77,6 +79,10 @@ public class ManagedCloudSdkServiceTest {
 
   @Before
   public void setUp() throws UnsupportedOsException {
+    // add timer thread to one not to be checked for 'leaks'
+    ThreadTracker.longRunningThreadCreated(
+        ApplicationManager.getApplication(), ManagedCloudSdkUpdater.SDK_UPDATER_THREAD_NAME);
+
     doReturn(mockManagedCloudSdk).when(sdkService).createManagedSdk();
     // TODO(ivanporty) remove once test logging system is done via CloudToolsRule
     sdkService.setLogger(new TestInMemoryLogger());
