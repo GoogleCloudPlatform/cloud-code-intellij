@@ -16,7 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
 import com.google.common.annotations.VisibleForTesting;
+import com.intellij.openapi.application.ApplicationManager;
 import java.time.Clock;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -35,6 +37,10 @@ public class ManagedCloudSdkUpdater {
     if (updateTimer == null) {
       updateTimer = new Timer(SDK_UPDATER_THREAD_NAME);
     }
+    // cancel tasks from previous activation.
+    if (sdkUpdateTask != null) {
+      sdkUpdateTask.cancel();
+    }
 
     sdkUpdateTask =
         new TimerTask() {
@@ -45,14 +51,16 @@ public class ManagedCloudSdkUpdater {
         };
     long lastTimeOfUpdate =
         CloudSdkServiceUserSettings.getInstance().getLastAutomaticUpdateTimestamp();
-    long delayBeforeCheckSeconds = SDK_UPDATE_INTERVAL;
+    long delayBeforeCheckMillis = SDK_UPDATE_INTERVAL;
     long now = getClock().millis();
     if (lastTimeOfUpdate != 0 && lastTimeOfUpdate < now) {
-      delayBeforeCheckSeconds =
-          Math.min(SDK_UPDATE_INTERVAL, getClock().millis() - lastTimeOfUpdate);
+      delayBeforeCheckMillis =
+          Math.min(
+              SDK_UPDATE_INTERVAL,
+              Math.max(0, SDK_UPDATE_INTERVAL - (getClock().millis() - lastTimeOfUpdate)));
     }
 
-    updateTimer.scheduleAtFixedRate(sdkUpdateTask, delayBeforeCheckSeconds, SDK_UPDATE_INTERVAL);
+    schedule(sdkUpdateTask, delayBeforeCheckMillis, SDK_UPDATE_INTERVAL);
   }
 
   @VisibleForTesting
@@ -60,10 +68,19 @@ public class ManagedCloudSdkUpdater {
     return Clock.systemDefaultZone();
   }
 
+  @VisibleForTesting
+  void schedule(TimerTask timerTask, long delay, long period) {
+    updateTimer.scheduleAtFixedRate(timerTask, delay, period);
+  }
+
   private void doUpdate() {
     CloudSdkService cloudSdkService = CloudSdkService.getInstance();
     if (cloudSdkService instanceof ManagedCloudSdkService) {
-      ((ManagedCloudSdkService) cloudSdkService).update();
+      // only update if ready, otherwise it needs to be installed first.
+      if (cloudSdkService.getStatus() == SdkStatus.READY) {
+        ApplicationManager.getApplication()
+            .invokeLater(((ManagedCloudSdkService) cloudSdkService)::update);
+      }
     } else {
       // current SDK service is not managed SDk anymore, cancel the update until activated again.
       sdkUpdateTask.cancel();

@@ -16,14 +16,22 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.testFramework.ThreadTracker;
 import java.time.Clock;
+import java.util.TimerTask;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -49,13 +57,46 @@ public class ManagedCloudSdkUpdaterTest {
     when(mockSdkServiceManager.getCloudSdkService()).thenReturn(mockSdkService);
 
     doReturn(mockClock).when(managedCloudSdkUpdater).getClock();
+
+    // directly execute scheduled tasks.
+    doAnswer(
+            invocationOnMock -> {
+              ((TimerTask) invocationOnMock.getArgument(0)).run();
+              return null;
+            })
+        .when(managedCloudSdkUpdater)
+        .schedule(any(), anyLong(), anyLong());
   }
 
   @Test
-  public void update_called_afterPeriod_elapses() {
+  public void update_scheduledNow_ifLastUpdate_elapsed() {
     CloudSdkServiceUserSettings.getInstance().setLastAutomaticUpdateTimestamp(1);
-    when(mockClock.millis()).thenReturn(ManagedCloudSdkUpdater.SDK_UPDATE_INTERVAL + 1);
+    when(mockClock.millis()).thenReturn(ManagedCloudSdkUpdater.SDK_UPDATE_INTERVAL + 2);
 
     managedCloudSdkUpdater.activate();
+
+    verify(managedCloudSdkUpdater)
+        .schedule(any(), eq(0L), eq(ManagedCloudSdkUpdater.SDK_UPDATE_INTERVAL));
+  }
+
+  @Test
+  public void update_called_when_sdkStatusReady() {
+    when(mockSdkService.getStatus()).thenReturn(SdkStatus.READY);
+
+    managedCloudSdkUpdater.activate();
+
+    // managed SDK is UI thread only,
+    ApplicationManager.getApplication().invokeAndWait(() -> verify(mockSdkService).update());
+  }
+
+  @Test
+  public void update_notCalled_when_sdkStatus_notReady() {
+    when(mockSdkService.getStatus()).thenReturn(SdkStatus.INSTALLING);
+
+    managedCloudSdkUpdater.activate();
+
+    // managed SDK is UI thread only,
+    ApplicationManager.getApplication()
+        .invokeAndWait(() -> verify(mockSdkService, never()).update());
   }
 }
