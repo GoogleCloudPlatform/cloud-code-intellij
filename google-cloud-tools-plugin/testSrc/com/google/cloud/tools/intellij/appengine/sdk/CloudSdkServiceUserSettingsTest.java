@@ -68,4 +68,17 @@ public class CloudSdkServiceUserSettingsTest {
     assertThat(userSettings.getUserSelectedSdkServiceType())
         .isEqualTo(CloudSdkServiceType.CUSTOM_SDK);
   }
+
+  @Test
+  public void unset_lastUpdateTime_returns_zero() {
+    assertThat(userSettings.getLastAutomaticUpdateTimestamp()).isEqualTo(0);
+  }
+
+  @Test
+  public void lastUpdateTime_properly_set() {
+    long timestamp = System.currentTimeMillis();
+    userSettings.setLastAutomaticUpdateTimestamp(timestamp);
+
+    assertThat(userSettings.getLastAutomaticUpdateTimestamp()).isEqualTo(timestamp);
+  }
 }
