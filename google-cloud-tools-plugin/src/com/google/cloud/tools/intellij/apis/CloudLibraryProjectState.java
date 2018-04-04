@@ -51,6 +51,7 @@ public class CloudLibraryProjectState implements ProjectComponent {
   private final Project project;
 
   private Map<Module, Set<CloudLibrary>> moduleLibraryMap = Maps.newHashMap();
+  // Map of project module to BOM xml DOM element in the module's pom.xml
   private Map<Module, Optional<MavenDomDependency>> moduleBomMap = Maps.newHashMap();
 
   private List<CloudLibrary> allLibraries;

@@ -39,8 +39,8 @@ import org.jetbrains.idea.maven.dom.model.MavenDomDependency;
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel;
 
 /**
- * An {@link DomElementsInspection} that detects google-cloud-java dependencies that have an
- * explicit version definition when a BOM is defined.
+ * A {@link DomElementsInspection} that detects google-cloud-java dependencies in pom.xml files that
+ * have an explicit version definition when a BOM is defined.
  *
  * <p>Provides a quick-fix to strip out the version tag from the dependency.
  */
@@ -111,7 +111,9 @@ public class DependencyVersionWithBomInspection
 
   /** Checks to see if the {@link MavenDomDependency} has a version defined. */
   private boolean hasVersion(MavenDomDependency dependency) {
-    return dependency.getVersion().exists();
+    GenericDomValue<String> version = dependency.getVersion();
+
+    return version != null && version.exists();
   }
 
   /**
@@ -139,7 +141,9 @@ public class DependencyVersionWithBomInspection
   }
 
   private boolean domValueEquals(GenericDomValue domValue, @Nullable String value) {
-    return domValue.getStringValue() != null && domValue.getStringValue().equals(value);
+    return domValue != null
+        && domValue.getStringValue() != null
+        && domValue.getStringValue().equals(value);
   }
 
   /**
@@ -157,6 +161,13 @@ public class DependencyVersionWithBomInspection
     @Override
     public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
       XmlTextImpl xmlElement = (XmlTextImpl) descriptor.getPsiElement();
+      if (xmlElement == null) {
+        logger.error(
+            "Unexpected null xml element when attempting to apply DependencyVersionWithBom "
+                + "quick-fix");
+        return;
+      }
+
       XmlTag versionTag = xmlElement.getParentTag();
       if (versionTag != null) {
         try {
