@@ -26,6 +26,7 @@ import com.google.api.services.clouddebugger.v2.model.SetBreakpointResponse;
 import com.google.api.services.clouddebugger.v2.model.SourceLocation;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -53,6 +54,7 @@ public class CloudDebugProcessStateController {
   private static final int INITIAL_DELAY_MS = 2000;
   private static final Logger LOG = Logger.getInstance(CloudDebugProcessStateController.class);
   private static final int PERIOD_MS = 500;
+  @VisibleForTesting static final String LIST_BREAKPOINTS_TIMER_NAME = "list breakpoints";
   private final List<CloudBreakpointListener> breakpointListChangedListeners = new ArrayList<>();
   private final ConcurrentHashMap<String, Breakpoint> fullFinalBreakpoints =
       new ConcurrentHashMap<>();
@@ -282,7 +284,7 @@ public class CloudDebugProcessStateController {
   public void startBackgroundListening() {
     assert state != null;
     if (listBreakpointsJob == null) {
-      listBreakpointsJob = new Timer("list breakpoints");
+      listBreakpointsJob = new Timer(LIST_BREAKPOINTS_TIMER_NAME);
       final Runnable runnable =
           new Runnable() {
             @Override
