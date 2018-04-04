@@ -54,6 +54,7 @@ public class CloudSdkServiceUserSettings {
     getInstance().propertiesComponent.unsetValue(SDK_TYPE_PROPERTY_NAME);
     getInstance().propertiesComponent.unsetValue(CUSTOM_CLOUD_SDK_PATH_PROPERTY_NAME);
     getInstance().propertiesComponent.unsetValue(SDK_AUTOMATIC_UPDATES_PROPERTY_NAME);
+    getInstance().propertiesComponent.unsetValue(SDK_LAST_AUTOMATIC_UPDATE_TMESTAMP_PROPERTY_NAME);
   }
 
   @NotNull
