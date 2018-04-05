@@ -39,6 +39,7 @@ import com.intellij.ui.TableUtil;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import com.intellij.util.ui.UIUtil;
+import com.intellij.util.xml.GenericDomValue;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -67,8 +68,8 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
-import org.eclipse.aether.version.Version;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.idea.maven.dom.model.MavenDomDependency;
 
 /** The form-bound class for the Cloud API selector panel. */
 final class GoogleCloudApiSelectorPanel {
@@ -82,7 +83,7 @@ final class GoogleCloudApiSelectorPanel {
   private JLabel modulesLabel;
   private ModulesComboBox modulesComboBox;
   private ProjectSelector projectSelector;
-  private JComboBox<Version> bomComboBox;
+  private JComboBox<String> bomComboBox;
   private JLabel bomSelectorLabel;
 
   private final Map<CloudLibrary, CloudApiManagementSpec> apiManagementMap;
@@ -117,10 +118,14 @@ final class GoogleCloudApiSelectorPanel {
       bomComboBox.addActionListener(
           event -> {
             if (cloudLibrariesTable.getSelectedRow() != -1) {
-              detailsPanel.updateManagedLibraryVersionFromBom(
-                  bomComboBox.getSelectedItem().toString());
+              if (bomComboBox.getSelectedItem() != null) {
+                detailsPanel.updateManagedLibraryVersionFromBom(
+                    bomComboBox.getSelectedItem().toString());
+              }
             }
           });
+
+      modulesComboBox.addActionListener(event -> populateBomVersions());
     } else {
       hideBomUI();
     }
@@ -210,7 +215,7 @@ final class GoogleCloudApiSelectorPanel {
   }
 
   @VisibleForTesting
-  public JComboBox<Version> getBomComboBox() {
+  public JComboBox<String> getBomComboBox() {
     return bomComboBox;
   }
 
@@ -269,33 +274,58 @@ final class GoogleCloudApiSelectorPanel {
   }
 
   /**
-   * Populates the BOM {@link JComboBox} with the fetched versions. If there are no versions
-   * returned, then the BOM UX is hidden.
+   * Populates the BOM {@link JComboBox} with the fetched versions. If there is already a
+   * preconfigured BOM in the corresponding module's pom.xml, then its version will be preselected.
+   * If there are no versions returned and there is no preconfigured BOM, then the BOM UX is hidden.
    *
    * <p>Sorts the displayable versions in reverse order, and limits the number shown to some value
    * N.
    */
   // TODO (eshaul): make async with loader icons
   private void populateBomVersions() {
-    List<Version> bomVersions =
+    List<String> availableBomVersions =
         Lists.newArrayList(CloudApiMavenService.getInstance().getBomVersions());
 
-    if (bomVersions.isEmpty()) {
+    Optional<String> configuredBomVersion =
+        CloudLibraryProjectState.getInstance(project)
+            .getCloudLibraryBom(modulesComboBox.getSelectedModule())
+            .map(MavenDomDependency::getVersion)
+            .map(GenericDomValue::getRawText);
+
+    if (availableBomVersions.isEmpty() && !configuredBomVersion.isPresent()) {
       hideBomUI();
     } else {
-      bomVersions.sort(Comparator.reverseOrder());
+      sortBomList(availableBomVersions);
 
-      if (bomVersions.size() > NUM_BOM_VERSIONS_TO_SHOW) {
-        bomVersions = bomVersions.subList(0, NUM_BOM_VERSIONS_TO_SHOW);
+      if (availableBomVersions.size() > NUM_BOM_VERSIONS_TO_SHOW) {
+        availableBomVersions = availableBomVersions.subList(0, NUM_BOM_VERSIONS_TO_SHOW);
       }
 
-      bomVersions.forEach(bomComboBox::addItem);
+      // If there is a preconfigured BOM not already in the list, add it to the list, and re-sort
+      if (configuredBomVersion.isPresent()
+          && availableBomVersions.indexOf(configuredBomVersion.get()) == -1) {
+        availableBomVersions.add(configuredBomVersion.get());
+        sortBomList(availableBomVersions);
+      }
+
+      bomComboBox.removeAllItems();
+      availableBomVersions.forEach(bomComboBox::addItem);
+
+      // If there is a preconfigured BOM, select it by default
+      if (configuredBomVersion.isPresent()) {
+        bomComboBox.setSelectedIndex(availableBomVersions.indexOf(configuredBomVersion.get()));
+      }
     }
   }
 
   private void hideBomUI() {
     bomComboBox.setVisible(false);
     bomSelectorLabel.setVisible(false);
+  }
+
+  /** Sorts the list of BOM version in reverse order */
+  private void sortBomList(List<String> boms) {
+    boms.sort(Comparator.reverseOrder());
   }
 
   /** The custom {@link JBTable} for the table of supported Cloud libraries. */

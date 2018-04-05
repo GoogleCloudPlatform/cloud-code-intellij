@@ -24,6 +24,7 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -76,9 +77,9 @@ public class CloudApiMavenService {
   /**
    * Returns the available Google Cloud Java client library BOM versions from Maven Central.
    *
-   * @return returns the {@link Version versions} of the BOMs
+   * @return returns the versions of the BOMs
    */
-  List<Version> getBomVersions() {
+  List<String> getBomVersions() {
     Artifact artifact =
         new DefaultArtifact(toBomCoordinates(GOOGLE_CLOUD_JAVA_BOM_ALL_VERSIONS_CONSTRAINT));
 
@@ -89,7 +90,7 @@ public class CloudApiMavenService {
     try {
       VersionRangeResult result = SYSTEM.resolveVersionRange(SESSION, rangeRequest);
 
-      return result.getVersions();
+      return result.getVersions().stream().map(Version::toString).collect(Collectors.toList());
     } catch (VersionRangeResolutionException e) {
       logger.warn("Error fetching available BOM versions from Maven Central", e);
       return ImmutableList.of();

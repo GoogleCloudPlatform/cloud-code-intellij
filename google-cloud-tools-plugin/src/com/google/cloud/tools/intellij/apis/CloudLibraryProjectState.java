@@ -88,11 +88,11 @@ public class CloudLibraryProjectState implements ProjectComponent {
 
   /** Returns the set of {@link CloudLibrary} currently configured on the given {@link Module}. */
   Set<CloudLibrary> getCloudLibraries(Module module) {
-    return moduleLibraryMap.get(module);
+    return moduleLibraryMap.getOrDefault(module, ImmutableSet.of());
   }
 
   Optional<MavenDomDependency> getCloudLibraryBom(Module module) {
-    return moduleBomMap.get(module);
+    return moduleBomMap.getOrDefault(module, Optional.empty());
   }
 
   /**
@@ -144,8 +144,17 @@ public class CloudLibraryProjectState implements ProjectComponent {
                 () -> {
                   MavenProject mavenProject =
                       MavenProjectsManager.getInstance(module.getProject()).findProject(module);
+
+                  if (mavenProject == null) {
+                    return Optional.empty();
+                  }
+
                   MavenDomProjectModel model =
                       MavenDomUtil.getMavenDomProjectModel(project, mavenProject.getFile());
+
+                  if (model == null) {
+                    return Optional.empty();
+                  }
 
                   MavenDomDependencies mavenDomDependencies =
                       model.getDependencyManagement().getDependencies();
