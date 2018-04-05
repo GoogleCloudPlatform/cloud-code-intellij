@@ -39,7 +39,6 @@ import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.dom.MavenDomUtil;
-import org.jetbrains.idea.maven.dom.model.MavenDomDependencies;
 import org.jetbrains.idea.maven.dom.model.MavenDomDependency;
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel;
 import org.jetbrains.idea.maven.model.MavenId;
@@ -134,7 +133,7 @@ final class CloudLibraryDependencyWriter {
               mavenId -> writeNewMavenDependency(model, mavenId, bomVersion != null));
 
           if (bomVersion != null) {
-            addBomToMavenModule(model, bomVersion);
+            addBomToMavenModule(module, model, bomVersion);
           }
 
           notifyAddedDependencies(newMavenIds, project);
@@ -149,17 +148,10 @@ final class CloudLibraryDependencyWriter {
    * <p>If the BOM already exists, then this will update the version of the BOM to match the
    * supplied version.
    */
-  private static void addBomToMavenModule(MavenDomProjectModel model, String bomVersion) {
-    MavenDomDependencies mavenDomDependencies = model.getDependencyManagement().getDependencies();
+  private static void addBomToMavenModule(
+      Module module, MavenDomProjectModel model, String bomVersion) {
     Optional<MavenDomDependency> bomDependencyOptional =
-        mavenDomDependencies
-            .getDependencies()
-            .stream()
-            .filter(
-                mdd ->
-                    CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_ARTIFACT.equals(
-                        mdd.getArtifactId().getStringValue()))
-            .findFirst();
+        CloudLibraryProjectState.getInstance(module.getProject()).getCloudLibraryBom(module);
 
     if (!bomDependencyOptional.isPresent()) {
       writeNewBom(model, bomVersion);
