@@ -464,6 +464,43 @@ public final class GoogleCloudApiSelectorPanelTest {
   }
 
   @Test
+  public void getPanel_withBomInPom_withNoAvailableBoms_hasOnlyPreconfiguredBom() {
+    // TODO (eshaul): remove once feature is released
+    when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
+
+    when(mavenService.getBomVersions()).thenReturn(ImmutableList.of());
+
+    try {
+      ApplicationManager.getApplication()
+          .invokeAndWait(
+              () -> {
+                Module module =
+                    MavenTestUtils.getInstance()
+                        .createNewMavenModule(moduleBuilder, testFixture.getProject());
+
+                String preconfigureBomVersion = "v1";
+                writeBomDependency(module, preconfigureBomVersion);
+                CloudLibraryProjectState.getInstance(testFixture.getProject())
+                    .syncCloudLibrariesBom();
+
+                GoogleCloudApiSelectorPanel panel =
+                    new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
+
+                // Set the selected module to the one with the preconfigured BOM
+                panel.getModulesComboBox().setSelectedItem(module);
+
+                JComboBox<String> bomComboBox = panel.getBomComboBox();
+                assertThat(bomComboBox.getItemCount()).isEqualTo(1);
+                assertThat(bomComboBox.getItemAt(0)).isEqualTo("v1");
+
+                assertThat(bomComboBox.getSelectedItem()).isEqualTo(preconfigureBomVersion);
+              });
+    } finally {
+      MavenServerManager.getInstance().shutdown(true);
+    }
+  }
+
+  @Test
   public void getSelectedModule_withNoneSelected_returnsDefaultModule() {
     GoogleCloudApiSelectorPanel panel =
         new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
