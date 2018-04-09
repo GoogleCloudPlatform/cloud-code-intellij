@@ -16,8 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud.executor;
 
-import com.google.cloud.tools.intellij.util.ThreadUtil;
-import com.intellij.execution.process.ProcessWaitFor;
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
 
 /** Executor of {@link AppEngineTask}'s. */
@@ -46,14 +44,6 @@ public class AppEngineExecutor implements CancellableRunnable {
 
   private void setProcess(Process process) {
     this.process = process;
-    System.out.println("app engine executor process started: " + task.toString());
-    ProcessWaitFor processWaitFor =
-        new ProcessWaitFor(
-            this.process,
-            task -> ThreadUtil.getInstance().executeInBackground(task),
-            task.toString());
-    processWaitFor.setTerminationCallback(
-        integer -> System.out.println("app engine executor process exited: " + task.toString()));
   }
 
   public Process getProcess() {
