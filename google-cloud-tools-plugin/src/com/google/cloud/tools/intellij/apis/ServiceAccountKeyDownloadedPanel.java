@@ -18,6 +18,8 @@ package com.google.cloud.tools.intellij.apis;
 
 import com.google.cloud.tools.intellij.ui.CopyToClipboardActionListener;
 import com.intellij.openapi.project.Project;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -41,10 +43,10 @@ public final class ServiceAccountKeyDownloadedPanel {
   private JLabel envVarInfoText;
   private JTable envVarTable;
   private JButton copyToClipboardButton;
+  private Map<String, String> envVarsMap = new HashMap();
 
   public ServiceAccountKeyDownloadedPanel(
       @Nullable Project project, @NotNull String gcpProjectId, @NotNull String downloadPath) {
-
     downloadPathLabel.setText(downloadPath);
 
     DefaultTableModel tableModel =
@@ -68,5 +70,13 @@ public final class ServiceAccountKeyDownloadedPanel {
 
     copyToClipboardButton.addActionListener(
         new CopyToClipboardActionListener(credentialEnvVar + "\n" + cloudProjectEnvVar));
+
+    envVarsMap.put(CLOUD_PROJECT_ENV_VAR_KEY, gcpProjectId);
+    envVarsMap.put(CREDENTIAL_ENV_VAR_KEY, downloadPath);
+  }
+
+  @NotNull
+  public Map<String, String> getEnvironmentVariables(){
+    return envVarsMap;
   }
 }
