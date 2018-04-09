@@ -22,6 +22,8 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -47,6 +49,8 @@ public final class ServiceAccountKeyDownloadedPanel {
   private JTable envVarTable;
   private JButton copyToClipboardButton;
 
+  private Map<String, String> envVarsMap = new HashMap();
+
   public ServiceAccountKeyDownloadedPanel(
       @Nullable Project project, @NotNull String gcpProjectId, @NotNull String downloadPath) {
 
@@ -65,6 +69,11 @@ public final class ServiceAccountKeyDownloadedPanel {
     String cloudProjectEnvVar =
         String.format(ENV_VAR_DISPLAY_FORMAT, CLOUD_PROJECT_ENV_VAR_KEY, gcpProjectId);
 
+    //TODO: refactor
+    envVarsMap.put(CLOUD_PROJECT_ENV_VAR_KEY, gcpProjectId);
+    envVarsMap.put(CREDENTIAL_ENV_VAR_KEY, downloadPath);
+
+
     tableModel.setColumnCount(1);
     tableModel.addRow(new String[] {credentialEnvVar});
     tableModel.addRow(new String[] {cloudProjectEnvVar});
@@ -74,6 +83,11 @@ public final class ServiceAccountKeyDownloadedPanel {
     copyToClipboardButton.addActionListener(
         new CopyToClipboardActionListener(credentialEnvVar + "\n" + cloudProjectEnvVar));
   }
+
+  public Map<String, String> getEnvironmentVariables(){
+    return envVarsMap;
+  }
+
 
   // TODO: temporary fix to dependency errors
   static class CopyToClipboardActionListener implements ActionListener {
