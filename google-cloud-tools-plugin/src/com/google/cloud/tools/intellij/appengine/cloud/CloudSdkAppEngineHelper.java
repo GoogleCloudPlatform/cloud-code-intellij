@@ -34,8 +34,6 @@ import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
@@ -106,16 +104,6 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
     if (!(source instanceof AppEngineDeployable)) {
       callback.errorOccurred(GctBundle.message("appengine.deployment.invalid.source.error"));
-      return Optional.empty();
-    }
-
-    if (CloudSdkValidator.getInstance()
-        .validateCloudSdk()
-        .contains(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND)) {
-      callback.errorOccurred(
-          GctBundle.message("appengine.cloudsdk.location.invalid.message")
-              + " "
-              + CloudSdkService.getInstance().getSdkHomePath());
       return Optional.empty();
     }
 

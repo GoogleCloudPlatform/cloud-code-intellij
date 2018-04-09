@@ -30,6 +30,9 @@ import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibl
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestDirectory;
@@ -39,6 +42,7 @@ import com.google.cloud.tools.intellij.testing.TestModule;
 import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.common.collect.ImmutableSet;
 import com.intellij.execution.configurations.RuntimeConfigurationError;
+import com.intellij.execution.configurations.RuntimeConfigurationException;
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -66,6 +70,8 @@ public final class AppEngineDeploymentConfigurationTest {
   @Mock private UserSpecifiedPathDeploymentSource mockUserSpecifiedPathDeploymentSource;
   @Mock private DeploymentSource mockOtherDeploymentSource;
 
+  @Mock @TestService private CloudSdkService mockSdkService;
+  @Mock @TestService private CloudSdkServiceManager mockSdkServiceManager;
   @Mock @TestService private CloudSdkValidator mockSdkValidator;
   @Mock @TestService private AppEngineProjectService mockAppEngineProjectService;
 
@@ -111,6 +117,8 @@ public final class AppEngineDeploymentConfigurationTest {
     when(mockAppEngineDeployable.isValid()).thenReturn(true);
     configuration = new AppEngineDeploymentConfiguration();
     project = testFixture.getProject();
+
+    when(mockSdkServiceManager.getCloudSdkService()).thenReturn(mockSdkService);
   }
 
   @Test
@@ -214,6 +222,20 @@ public final class AppEngineDeploymentConfigurationTest {
         .contains(
             "Server is misconfigured: The Cloud SDK does not contain the app-engine-java "
                 + "component.");
+  }
+
+  @Test
+  public void checkConfiguration_when_sdkSupportsInstallation_doesNotThrowException() {
+    setUpValidFlexConfiguration();
+    when(mockSdkService.getStatus()).thenReturn(SdkStatus.NOT_AVAILABLE);
+    when(mockSdkService.isInstallSupported()).thenReturn(true);
+    when(mockSdkValidator.validateCloudSdk()).thenReturn(ImmutableSet.of(CLOUD_SDK_NOT_FOUND));
+
+    try {
+      configuration.checkConfiguration(mockRemoteServer, mockAppEngineDeployable, project);
+    } catch (RuntimeConfigurationException e) {
+      throw new AssertionError("installable SDK should not be validated", e);
+    }
   }
 
   @Test

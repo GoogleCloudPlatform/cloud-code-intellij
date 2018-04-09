@@ -21,6 +21,8 @@ import com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibl
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.project.MalformedYamlFileException;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -235,12 +237,18 @@ public class AppEngineDeploymentConfiguration
   }
 
   private void checkCommonConfig(AppEngineDeployable deployable) throws RuntimeConfigurationError {
-    Set<CloudSdkValidationResult> sdkValidationResult =
-        CloudSdkValidator.getInstance().validateCloudSdk();
-    if (!sdkValidationResult.isEmpty()) {
-      CloudSdkValidationResult result = Iterables.getFirst(sdkValidationResult, null);
-      throw new RuntimeConfigurationError(
-          GctBundle.message("appengine.flex.config.server.error", result.getMessage()));
+    // do not check SDK if it supports dynamic install - the deployment runner will block itself
+    // until installation is done.
+    CloudSdkService cloudSdkService = CloudSdkService.getInstance();
+    SdkStatus sdkStatus = cloudSdkService.getStatus();
+    if (sdkStatus != SdkStatus.READY && !cloudSdkService.isInstallSupported()) {
+      Set<CloudSdkValidationResult> sdkValidationResult =
+          CloudSdkValidator.getInstance().validateCloudSdk();
+      if (!sdkValidationResult.isEmpty()) {
+        CloudSdkValidationResult result = Iterables.getFirst(sdkValidationResult, null);
+        throw new RuntimeConfigurationError(
+            GctBundle.message("appengine.flex.config.server.error", result.getMessage()));
+      }
     }
 
     check(

@@ -22,7 +22,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.components.ServiceManager;
-import com.sun.istack.NotNull;
+import org.jetbrains.annotations.NotNull;
 
 /** Stores user settings for {@link CloudSdkService}, including choice of implementation. */
 public class CloudSdkServiceUserSettings {
@@ -60,6 +60,11 @@ public class CloudSdkServiceUserSettings {
       sdkType = CloudSdkServiceType.valueOf(Strings.nullToEmpty(sdkTypeName));
     } catch (Exception ex) {
       sdkType = DEFAULT_SDK_TYPE;
+      // sdk type is unset - probably previous version of the SDK support didn't have it.
+      // check for custom SDK path and use custom if it's set.
+      if (!Strings.isNullOrEmpty(getCustomSdkPath())) {
+        sdkType = CloudSdkServiceType.CUSTOM_SDK;
+      }
     }
 
     // override result based on feature status until feature is done.

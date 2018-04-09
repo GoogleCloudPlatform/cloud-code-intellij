@@ -42,9 +42,11 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.IdeActions;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.impl.ProjectImpl;
 import com.intellij.testFramework.PlatformTestCase;
+import com.intellij.testFramework.ThreadTracker;
 import com.intellij.ui.content.Content;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.ui.UIUtil;
@@ -72,6 +74,10 @@ public class CloudDebugProcessTest extends PlatformTestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
+
+    ThreadTracker.longRunningThreadCreated(
+        ApplicationManager.getApplication(),
+        CloudDebugProcessStateController.LIST_BREAKPOINTS_TIMER_NAME);
 
     XDebugSession session = mock(XDebugSession.class);
     when(session.getProject()).thenReturn(this.getProject());
