@@ -20,7 +20,7 @@ import com.intellij.openapi.components.ServiceManager;
 import org.jetbrains.annotations.Nullable;
 
 /**
- *
+ * This service provides management APIs for the analytics UI and tracking components.
  */
 public interface UsageTrackingManagementService {
 
