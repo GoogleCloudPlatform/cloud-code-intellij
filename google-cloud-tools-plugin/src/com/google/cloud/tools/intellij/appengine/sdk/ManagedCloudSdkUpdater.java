@@ -17,17 +17,35 @@
 package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.notification.Notification;
+import java.awt.event.ActionListener;
 import java.time.Clock;
 import java.util.Timer;
 import java.util.TimerTask;
 
 /** Schedules and manages automatic updates for {@link ManagedCloudSdkService}. */
 public class ManagedCloudSdkUpdater {
-  @VisibleForTesting static final long SDK_UPDATE_INTERVAL = 1000 * 60 * 60 * 24 * 7; // one week.
+  private static ManagedCloudSdkUpdater instance;
+
+  // one week.
+  @VisibleForTesting static final long SDK_UPDATE_INTERVAL = 1000 * 60 * 60 * 24 * 7;
+  // 30 seconds to show notification.
+  private static final int UPDATE_NOTIFICATION_DELAY = 1000 * 30;
 
   @VisibleForTesting
   static final String SDK_UPDATER_THREAD_NAME = "managed-google-cloud-sdk-updates";
+
+  static ManagedCloudSdkUpdater getInstance() {
+    if (instance == null) {
+      instance = new ManagedCloudSdkUpdater();
+    }
+    return instance;
+  }
+
+  @VisibleForTesting
+  static void setInstance(ManagedCloudSdkUpdater instance) {
+    ManagedCloudSdkUpdater.instance = instance;
+  }
 
   private Timer updateTimer;
   private TimerTask sdkUpdateTask;
@@ -72,11 +90,41 @@ public class ManagedCloudSdkUpdater {
     updateTimer.scheduleAtFixedRate(timerTask, delay, period);
   }
 
+  @VisibleForTesting
+  javax.swing.Timer createUiTimer(int delayMillis) {
+    return new javax.swing.Timer(delayMillis, null);
+  }
+
   private void doUpdate() {
     CloudSdkService cloudSdkService = CloudSdkService.getInstance();
     if (cloudSdkService instanceof ManagedCloudSdkService) {
-      ApplicationManager.getApplication()
-          .invokeLater(((ManagedCloudSdkService) cloudSdkService)::update);
+      // do not show notifications and start update process if SDK is still up-to-date.
+      if (!((ManagedCloudSdkService) cloudSdkService).isUpToDate()) {
+        // schedule UI timer to let a user decide about proceeding with the update.
+        javax.swing.Timer uiTimer = createUiTimer(UPDATE_NOTIFICATION_DELAY);
+        ActionListener cancelListener = (e) -> uiTimer.stop();
+        ActionListener disableUpdateListener =
+            (e) -> {
+              uiTimer.stop();
+              CloudSdkServiceUserSettings.getInstance().setEnableAutomaticUpdates(false);
+            };
+        Notification updateNotification =
+            ManagedCloudSdkServiceUiPresenter.getInstance()
+                .notifyManagedSdkUpdate(cancelListener, disableUpdateListener);
+
+        uiTimer.addActionListener(
+            e -> {
+              updateNotification.expire();
+              // grab a current SDK service, might have changed while waiting for notification.
+              CloudSdkService afterNotificationCloudSdkService = CloudSdkService.getInstance();
+              if (afterNotificationCloudSdkService instanceof ManagedCloudSdkService) {
+                ((ManagedCloudSdkService) afterNotificationCloudSdkService).update();
+              }
+              uiTimer.stop();
+            });
+
+        uiTimer.start();
+      }
     } else {
       // current SDK service is not managed SDk anymore, cancel the update until activated again.
       sdkUpdateTask.cancel();

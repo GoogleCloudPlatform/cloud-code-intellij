@@ -17,20 +17,26 @@
 package com.google.cloud.tools.intellij.appengine.sdk;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
+import com.intellij.notification.Notification;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.testFramework.ThreadTracker;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.time.Clock;
 import java.util.TimerTask;
+import javax.swing.Timer;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,6 +50,9 @@ public class ManagedCloudSdkUpdaterTest {
   @Mock private ManagedCloudSdkService mockSdkService;
   @TestService @Mock private CloudSdkServiceManager mockSdkServiceManager;
   @Mock private Clock mockClock;
+  @Mock private Timer mockUiTimer;
+  @Mock private ManagedCloudSdkServiceUiPresenter mockUiPresenter;
+  @Mock private Notification mockNotification;
 
   @Spy private ManagedCloudSdkUpdater managedCloudSdkUpdater;
 
@@ -56,6 +65,9 @@ public class ManagedCloudSdkUpdaterTest {
     when(mockSdkServiceManager.getCloudSdkService()).thenReturn(mockSdkService);
 
     doReturn(mockClock).when(managedCloudSdkUpdater).getClock();
+    doReturn(mockUiTimer).when(managedCloudSdkUpdater).createUiTimer(anyInt());
+
+    when(mockUiPresenter.notifyManagedSdkUpdate(any(), any())).thenReturn(mockNotification);
 
     // directly execute scheduled tasks.
     doAnswer(
@@ -65,6 +77,15 @@ public class ManagedCloudSdkUpdaterTest {
             })
         .when(managedCloudSdkUpdater)
         .schedule(any(), anyLong(), anyLong());
+    // directly call task assigned to UI timer.
+    doAnswer(
+            invocationOnMock -> {
+              ((ActionListener) invocationOnMock.getArgument(0))
+                  .actionPerformed(mock(ActionEvent.class));
+              return null;
+            })
+        .when(mockUiTimer)
+        .addActionListener(any());
   }
 
   @Test

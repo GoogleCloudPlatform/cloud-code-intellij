@@ -77,6 +77,8 @@ public class ManagedCloudSdkServiceTest {
 
   @Mock private ProgressListener mockProgressListener;
 
+  @Mock private ManagedCloudSdkUpdater mockUpdater;
+
   @Before
   public void setUp() throws UnsupportedOsException {
     // add timer thread to one not to be checked for 'leaks'
@@ -84,6 +86,7 @@ public class ManagedCloudSdkServiceTest {
         ApplicationManager.getApplication(), ManagedCloudSdkUpdater.SDK_UPDATER_THREAD_NAME);
 
     doReturn(mockManagedCloudSdk).when(sdkService).createManagedSdk();
+    ManagedCloudSdkUpdater.setInstance(mockUpdater);
     // TODO(ivanporty) remove once test logging system is done via CloudToolsRule
     sdkService.setLogger(new TestInMemoryLogger());
     // make sure everything in test is done synchronously

@@ -59,18 +59,13 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
   private ProgressListener progressListener;
 
-  private ManagedCloudSdkUpdater managedCloudSdkUpdater;
-
   @Override
   public void activate() {
     // TODO track event that custom SDK is activated and used.
 
     initManagedSdk();
     if (isInstallSupported()) {
-      if (managedCloudSdkUpdater == null) {
-        managedCloudSdkUpdater = new ManagedCloudSdkUpdater();
-      }
-      managedCloudSdkUpdater.activate();
+      ManagedCloudSdkUpdater.getInstance().activate();
     }
   }
 
@@ -102,6 +97,15 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
   public boolean update() {
     return executeManagedSdkJob(ManagedSdkJobType.UPDATE, this::updateManagedSdk);
+  }
+
+  public boolean isUpToDate() {
+    try {
+      return managedCloudSdk.isUpToDate();
+    } catch (Exception e) {
+      // we ignore the exception and just assume SDK is either not up-to-date or in invalid state.
+      return false;
+    }
   }
 
   @Override
