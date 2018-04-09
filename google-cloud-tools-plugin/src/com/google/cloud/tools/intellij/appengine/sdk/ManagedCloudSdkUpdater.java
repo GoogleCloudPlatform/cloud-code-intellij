@@ -29,8 +29,8 @@ public class ManagedCloudSdkUpdater {
 
   // one week.
   @VisibleForTesting static final long SDK_UPDATE_INTERVAL = 1000 * 60 * 60 * 24 * 7;
-  // 30 seconds to show notification.
-  private static final int UPDATE_NOTIFICATION_DELAY = 1000 * 30;
+  // 20 seconds to show notification.
+  private static final int UPDATE_NOTIFICATION_DELAY = 1000 * 20;
 
   @VisibleForTesting
   static final String SDK_UPDATER_THREAD_NAME = "managed-google-cloud-sdk-updates";
@@ -106,6 +106,7 @@ public class ManagedCloudSdkUpdater {
         ActionListener disableUpdateListener =
             (e) -> {
               uiTimer.stop();
+              sdkUpdateTask.cancel();
               CloudSdkServiceUserSettings.getInstance().setEnableAutomaticUpdates(false);
             };
         Notification updateNotification =
