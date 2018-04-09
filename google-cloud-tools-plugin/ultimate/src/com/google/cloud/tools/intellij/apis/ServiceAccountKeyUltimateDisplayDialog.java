@@ -119,7 +119,7 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
       oldData = new HashMap<>();
     }
 
-    Map<String, String> newValues = commonPanel.getEnvironmentVariables();
+    Map<String, String> newValues = new HashMap<>();//commonPanel.getEnvironmentVariables();
     oldData.putAll(newValues);
     configuration.setEnvs(oldData);
   }
