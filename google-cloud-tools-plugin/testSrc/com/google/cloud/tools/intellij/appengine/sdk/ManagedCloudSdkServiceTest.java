@@ -387,8 +387,8 @@ public class ManagedCloudSdkServiceTest {
     emulateMockSdkUpdateProcess();
     SdkUpdater mockUpdater = mockManagedCloudSdk.newUpdater();
     doThrow(new CommandExitException(-1, "")).when(mockUpdater).update(any(), any());
-    // update breaks SDK
-    when(mockManagedCloudSdk.isInstalled()).thenReturn(false);
+    // initially SDK is installed, then update breaks SDK
+    when(mockManagedCloudSdk.isInstalled()).thenReturn(true).thenReturn(false);
 
     sdkService.addStatusUpdateListener(mockStatusUpdateListener);
     sdkService.update();

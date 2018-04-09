@@ -74,6 +74,11 @@ public class ManagedCloudSdkServiceUiPresenter {
     showNotification(message, NotificationType.WARNING);
   }
 
+  public void notifyManagedSdkUpdate() {
+    showNotification(
+        "Managed Google Cloud SDK is about to be updated.", NotificationType.INFORMATION);
+  }
+
   public ProgressListener createProgressListener(ManagedCloudSdkService managedCloudSdkService) {
     return new ManagedCloudSdkProgressListener(managedCloudSdkService);
   }

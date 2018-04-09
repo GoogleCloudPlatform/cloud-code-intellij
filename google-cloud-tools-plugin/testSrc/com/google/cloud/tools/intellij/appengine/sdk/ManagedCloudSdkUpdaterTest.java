@@ -21,7 +21,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -80,6 +79,20 @@ public class ManagedCloudSdkUpdaterTest {
   }
 
   @Test
+  public void update_scheduledOnShorterTime_ifLastUpdate_fartherInterval() {
+    CloudSdkServiceUserSettings.getInstance().setLastAutomaticUpdateTimestamp(1);
+    when(mockClock.millis()).thenReturn(ManagedCloudSdkUpdater.SDK_UPDATE_INTERVAL / 2);
+
+    managedCloudSdkUpdater.activate();
+
+    verify(managedCloudSdkUpdater)
+        .schedule(
+            any(),
+            eq((ManagedCloudSdkUpdater.SDK_UPDATE_INTERVAL / 2) + 1),
+            eq(ManagedCloudSdkUpdater.SDK_UPDATE_INTERVAL));
+  }
+
+  @Test
   public void update_called_when_sdkStatusReady() {
     when(mockSdkService.getStatus()).thenReturn(SdkStatus.READY);
 
@@ -87,16 +100,5 @@ public class ManagedCloudSdkUpdaterTest {
 
     // managed SDK is UI thread only,
     ApplicationManager.getApplication().invokeAndWait(() -> verify(mockSdkService).update());
-  }
-
-  @Test
-  public void update_notCalled_when_sdkStatus_notReady() {
-    when(mockSdkService.getStatus()).thenReturn(SdkStatus.INSTALLING);
-
-    managedCloudSdkUpdater.activate();
-
-    // managed SDK is UI thread only,
-    ApplicationManager.getApplication()
-        .invokeAndWait(() -> verify(mockSdkService, never()).update());
   }
 }

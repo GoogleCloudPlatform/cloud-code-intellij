@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.application.ApplicationManager;
 import java.time.Clock;
@@ -76,11 +75,8 @@ public class ManagedCloudSdkUpdater {
   private void doUpdate() {
     CloudSdkService cloudSdkService = CloudSdkService.getInstance();
     if (cloudSdkService instanceof ManagedCloudSdkService) {
-      // only update if ready, otherwise it needs to be installed first.
-      if (cloudSdkService.getStatus() == SdkStatus.READY) {
-        ApplicationManager.getApplication()
-            .invokeLater(((ManagedCloudSdkService) cloudSdkService)::update);
-      }
+      ApplicationManager.getApplication()
+          .invokeLater(((ManagedCloudSdkService) cloudSdkService)::update);
     } else {
       // current SDK service is not managed SDk anymore, cancel the update until activated again.
       sdkUpdateTask.cancel();

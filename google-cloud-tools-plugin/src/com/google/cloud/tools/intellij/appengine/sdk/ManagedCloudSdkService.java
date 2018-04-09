@@ -228,7 +228,8 @@ public class ManagedCloudSdkService implements CloudSdkService {
   }
 
   private ManagedSdkJobResult updateManagedSdk() throws Exception {
-    if (!safeCheckSdkStatus(() -> managedCloudSdk.isUpToDate())) {
+    if (safeCheckSdkStatus(() -> managedCloudSdk.isInstalled())
+        && !safeCheckSdkStatus(() -> managedCloudSdk.isUpToDate())) {
       ConsoleListener sdkUpdateListener = logger::debug;
       progressListener =
           ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
