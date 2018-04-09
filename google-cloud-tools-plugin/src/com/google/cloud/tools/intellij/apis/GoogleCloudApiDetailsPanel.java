@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.apis;
 
 import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
+import com.google.cloud.tools.intellij.apis.CloudApiMavenService.LibraryVersionFromBomException;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
@@ -253,24 +254,36 @@ public final class GoogleCloudApiDetailsPanel {
                   ThreadUtil.getInstance()
                       .executeInBackground(
                           () -> {
-                            Optional<String> versionOptional =
-                                CloudApiMavenService.getInstance()
-                                    .getManagedDependencyVersion(coordinates, bomVersion);
+                            try {
+                              Optional<String> versionOptional =
+                                  CloudApiMavenService.getInstance()
+                                      .getManagedDependencyVersion(coordinates, bomVersion);
 
-                            if (versionOptional.isPresent()) {
-                              ApplicationManager.getApplication()
-                                  .invokeAndWait(
-                                      () -> {
-                                        versionLabel.setIcon(null);
-                                        versionLabel.setText(
-                                            GctBundle.message(
-                                                "cloud.libraries.version.label",
-                                                versionOptional.get()));
-                                      },
-                                      ModalityState.any());
-                            } else {
-                              versionLabel.setIcon(null);
+                              if (versionOptional.isPresent()) {
+                                ApplicationManager.getApplication()
+                                    .invokeAndWait(
+                                        () -> {
+                                          versionLabel.setText(
+                                              GctBundle.message(
+                                                  "cloud.libraries.version.label",
+                                                  versionOptional.get()));
+                                        },
+                                        ModalityState.any());
+                              } else {
+                                versionLabel.setText(
+                                    GctBundle.message(
+                                        "cloud.libraries.version.label",
+                                        GctBundle.message(
+                                            "cloud.libraries.version.notfound.text")));
+                              }
+                            } catch (LibraryVersionFromBomException ex) {
+                              versionLabel.setText(
+                                  GctBundle.message(
+                                      "cloud.libraries.version.label",
+                                      GctBundle.message("cloud.libraries.version.exception.text")));
                             }
+
+                            versionLabel.setIcon(null);
                           });
                 }
               });

@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.GctFeature;
 import com.google.cloud.tools.intellij.MavenTestUtils;
+import com.google.cloud.tools.intellij.apis.CloudApiMavenService.LibraryVersionFromBomException;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
@@ -326,7 +327,8 @@ public final class GoogleCloudApiSelectorPanelTest {
   }
 
   @Test
-  public void getPanel_withVersionReturnedFromBomQuery_displaysVersionFromBom() {
+  public void getPanel_withVersionReturnedFromBomQuery_displaysVersionFromBom()
+      throws LibraryVersionFromBomException {
     // TODO (eshaul): remove once feature is released
     when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
 
@@ -366,7 +368,8 @@ public final class GoogleCloudApiSelectorPanelTest {
   }
 
   @Test
-  public void getPanel_withBomAndNoDependencyVersion_displaysEmptyVersion() {
+  public void getPanel_withBomAndNoDependencyVersion_displaysVersionNotFoundMessage()
+      throws LibraryVersionFromBomException {
     // TODO (eshaul): remove once feature is released
     when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
 
@@ -380,7 +383,30 @@ public final class GoogleCloudApiSelectorPanelTest {
         .getDetailsPanel()
         .setCloudLibrary(cloudLibrary, BOM_VERSION, panel.getApiManagementMap().get(cloudLibrary));
 
-    assertThat(panel.getDetailsPanel().getVersionLabel().getText()).isEqualTo("");
+    assertThat(panel.getDetailsPanel().getVersionLabel().getText())
+        .isEqualTo("Version: No version found for the selected Cloud Libraries version");
+    assertThat(panel.getDetailsPanel().getVersionLabel().getIcon()).isNull();
+  }
+
+  @Test
+  public void getPanel_whenFetchingDependencyVersionFromBomThrowsException_displaysErrorMessage()
+      throws LibraryVersionFromBomException {
+    // TODO (eshaul): remove once feature is released
+    when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
+
+    when(mavenService.getManagedDependencyVersion(any(), anyString()))
+        .thenThrow(new LibraryVersionFromBomException("Bom not found"));
+
+    CloudLibrary cloudLibrary = LIBRARY_1.toCloudLibrary();
+    GoogleCloudApiSelectorPanel panel =
+        new GoogleCloudApiSelectorPanel(ImmutableList.of(cloudLibrary), testFixture.getProject());
+
+    panel
+        .getDetailsPanel()
+        .setCloudLibrary(cloudLibrary, BOM_VERSION, panel.getApiManagementMap().get(cloudLibrary));
+
+    assertThat(panel.getDetailsPanel().getVersionLabel().getText())
+        .isEqualTo("Version: Error fetching library version");
     assertThat(panel.getDetailsPanel().getVersionLabel().getIcon()).isNull();
   }
 
