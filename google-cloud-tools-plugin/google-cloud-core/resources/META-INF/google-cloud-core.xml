@@ -36,6 +36,10 @@
     <applicationConfigurable parentId="google.settings"
                              provider="com.google.cloud.tools.intellij.analytics.UsageTrackerConfigurableProvider"/>
 
+
+    <applicationService
+            serviceInterface="com.google.cloud.tools.intellij.analytics.UsageTrackingManagementService"
+            serviceImplementation="com.google.cloud.tools.intellij.analytics.UsageTrackerManager"/>
     <applicationService
             serviceInterface="com.google.cloud.tools.intellij.analytics.UsageTrackerProvider"
             serviceImplementation="com.google.cloud.tools.intellij.analytics.KeyedExtensionUsageTrackerProvider"/>
