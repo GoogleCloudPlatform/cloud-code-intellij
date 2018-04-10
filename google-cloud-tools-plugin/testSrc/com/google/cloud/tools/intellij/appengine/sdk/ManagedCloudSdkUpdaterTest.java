@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -23,11 +24,11 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.GctFeature;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
@@ -42,6 +43,7 @@ import javax.swing.Timer;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Spy;
 
@@ -69,6 +71,7 @@ public class ManagedCloudSdkUpdaterTest {
     when(mockPluginInfoService.shouldEnable(GctFeature.MANAGED_SDK_UPDATE)).thenReturn(true);
 
     when(mockSdkServiceManager.getCloudSdkService()).thenReturn(mockSdkService);
+    ManagedCloudSdkServiceUiPresenter.setInstance(mockUiPresenter);
 
     doReturn(mockClock).when(managedCloudSdkUpdater).getClock();
     doReturn(mockUiTimer).when(managedCloudSdkUpdater).createUiTimer(anyInt());
@@ -120,12 +123,53 @@ public class ManagedCloudSdkUpdaterTest {
   }
 
   @Test
-  public void update_called_when_sdkStatusReady() {
-    when(mockSdkService.getStatus()).thenReturn(SdkStatus.READY);
+  public void update_called_when_sdk_notUpToDate() {
+    when(mockSdkService.isUpToDate()).thenReturn(false);
 
     managedCloudSdkUpdater.activate();
 
     // managed SDK is UI thread only,
     ApplicationManager.getApplication().invokeAndWait(() -> verify(mockSdkService).update());
+  }
+
+  @Test
+  public void update_notCalled_when_sdk_upToDate() {
+    when(mockSdkService.isUpToDate()).thenReturn(true);
+
+    managedCloudSdkUpdater.activate();
+
+    // managed SDK is UI thread only,
+    ApplicationManager.getApplication()
+        .invokeAndWait(() -> verify(mockSdkService, never()).update());
+  }
+
+  @Test
+  public void notification_shown_beforeUpdate() {
+    when(mockSdkService.isUpToDate()).thenReturn(false);
+
+    managedCloudSdkUpdater.activate();
+
+    ApplicationManager.getApplication()
+        .invokeAndWait(() -> verify(mockUiPresenter).notifyManagedSdkUpdate(any(), any()));
+  }
+
+  @Test
+  public void notification_disableUpdates_updatesSettings() {
+    when(mockSdkService.isUpToDate()).thenReturn(false);
+    CloudSdkServiceUserSettings.getInstance().setEnableAutomaticUpdates(true);
+
+    managedCloudSdkUpdater.activate();
+
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              ArgumentCaptor<ActionListener> disableListener =
+                  ArgumentCaptor.forClass(ActionListener.class);
+              verify(mockUiPresenter).notifyManagedSdkUpdate(any(), disableListener.capture());
+              disableListener.getValue().actionPerformed(mock(ActionEvent.class));
+
+              assertThat(CloudSdkServiceUserSettings.getInstance().getEnableAutomaticUpdates())
+                  .isFalse();
+            });
   }
 }

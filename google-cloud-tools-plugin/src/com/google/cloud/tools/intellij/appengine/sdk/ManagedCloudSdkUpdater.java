@@ -109,6 +109,7 @@ public class ManagedCloudSdkUpdater {
       boolean updateFeatureEnabled =
           ServiceManager.getService(PluginInfoService.class)
               .shouldEnable(GctFeature.MANAGED_SDK_UPDATE);
+
       if (updateFeatureEnabled && !((ManagedCloudSdkService) cloudSdkService).isUpToDate()) {
         // schedule UI timer to let a user decide about proceeding with the update.
         javax.swing.Timer uiTimer = createUiTimer(UPDATE_NOTIFICATION_DELAY);
