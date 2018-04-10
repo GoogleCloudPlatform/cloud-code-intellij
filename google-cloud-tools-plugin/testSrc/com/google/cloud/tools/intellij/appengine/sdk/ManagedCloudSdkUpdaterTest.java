@@ -95,6 +95,8 @@ public class ManagedCloudSdkUpdaterTest {
             })
         .when(mockUiTimer)
         .addActionListener(any());
+
+    CloudSdkServiceUserSettings.reset();
   }
 
   @Test

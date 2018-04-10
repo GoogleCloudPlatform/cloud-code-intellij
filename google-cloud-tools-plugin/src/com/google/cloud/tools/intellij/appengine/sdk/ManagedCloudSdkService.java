@@ -306,6 +306,10 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
       updateStatus(SdkStatus.READY);
 
+      if (result == ManagedSdkJobResult.PROCESSED) {
+        ManagedCloudSdkUpdater.getInstance().notifySdkUpdate();
+      }
+
       ManagedCloudSdkServiceUiPresenter.getInstance().notifyManagedSdkJobSuccess(jobType, result);
     }
 

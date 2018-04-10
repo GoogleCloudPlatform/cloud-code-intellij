@@ -87,6 +87,11 @@ public class ManagedCloudSdkUpdater {
     schedule(sdkUpdateTask, delayBeforeCheckMillis, SDK_UPDATE_INTERVAL);
   }
 
+  /** Called when managed SDK update operation (update or install) successfully completes. */
+  void notifySdkUpdate() {
+    CloudSdkServiceUserSettings.getInstance().setLastAutomaticUpdateTimestamp(getClock().millis());
+  }
+
   @VisibleForTesting
   Clock getClock() {
     return Clock.systemDefaultZone();
@@ -138,7 +143,7 @@ public class ManagedCloudSdkUpdater {
         uiTimer.start();
       }
     } else {
-      // current SDK service is not managed SDk anymore, cancel the update until activated again.
+      // current SDK service is not managed SDK anymore, cancel the update until activated again.
       sdkUpdateTask.cancel();
     }
   }
