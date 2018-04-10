@@ -89,16 +89,6 @@ configurations {
     tests
 }
 
-processResources {
-    def trackerProperty =  System.getenv("ANALYTICS_ID")
-    if (trackerProperty) {
-        inputs.property("usageTrackerProperty", trackerProperty)
-        filesMatching("**/config.properties") {
-            expand "usageTrackerProperty": trackerProperty
-        }
-    }
-}
-
 artifacts {
     tests testJar
 }
