@@ -51,12 +51,16 @@ public class BooleanTableModel<T> implements TableModel {
   }
 
   /** Returns the set of selected items. */
-  public Set<Object> getSelectedItems() {
+  public Set<T> getSelectedItems() {
     return map.entrySet()
         .stream()
         .filter(Entry::getValue)
         .map(Entry::getKey)
         .collect(ImmutableSet.toImmutableSet());
+  }
+
+  public int getBooleanColumn() {
+    return BOOLEAN_COL;
   }
 
   @Override
