@@ -40,6 +40,6 @@ public class UsageTrackerConfigurableProvider extends ConfigurableProvider {
     // other Google related account settings in the IJ UI.
     // Create a sub-menu item for the cloud SDK and hide the usage tracker if not avaible
     return PlatformUtils.isIntelliJ()
-        && UsageTrackerManager.getInstance().isUsageTrackingAvailable();
+        && UsageTrackingManagementService.getInstance().isUsageTrackingAvailable();
   }
 }

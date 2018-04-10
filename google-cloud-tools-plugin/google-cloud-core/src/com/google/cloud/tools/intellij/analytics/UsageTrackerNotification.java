@@ -33,10 +33,10 @@ public class UsageTrackerNotification {
 
   private static final Logger LOG = Logger.getInstance(UsageTrackerNotification.class);
   private static final UsageTrackerNotification INSTANCE = new UsageTrackerNotification();
-  private final UsageTrackerManager usageTrackerManager;
+  private final UsageTrackingManagementService usageTrackingManagementService;
 
   private UsageTrackerNotification() {
-    usageTrackerManager = UsageTrackerManager.getInstance();
+    usageTrackingManagementService = UsageTrackingManagementService.getInstance();
   }
 
   public static UsageTrackerNotification getInstance() {
@@ -52,11 +52,10 @@ public class UsageTrackerNotification {
             if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
               final String description = event.getDescription();
               if ("allow".equals(description)) {
-                usageTrackerManager.setTrackingPreference(true);
+                usageTrackingManagementService.setTrackingPreference(true);
                 notification.expire();
               } else if ("decline".equals(description)) {
-                UsageTrackerManager usageTrackerManager = UsageTrackerManager.getInstance();
-                usageTrackerManager.setTrackingPreference(false);
+                usageTrackingManagementService.setTrackingPreference(false);
                 notification.expire();
               } else if ("policy".equals(description)) {
                 try {

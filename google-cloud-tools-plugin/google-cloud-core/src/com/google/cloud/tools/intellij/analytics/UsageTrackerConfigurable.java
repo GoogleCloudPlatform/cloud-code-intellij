@@ -27,10 +27,10 @@ import org.jetbrains.annotations.Nullable;
 public class UsageTrackerConfigurable implements Configurable {
 
   private UsageTrackerPanel usageTrackerPanel;
-  private UsageTrackerManager usageTrackerManager;
+  private UsageTrackingManagementService usageTrackerManager;
 
   public UsageTrackerConfigurable() {
-    usageTrackerManager = UsageTrackerManager.getInstance();
+    usageTrackerManager = UsageTrackingManagementService.getInstance();
   }
 
   @Nls
