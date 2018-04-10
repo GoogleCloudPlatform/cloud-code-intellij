@@ -38,17 +38,17 @@ public class UsageTrackerPanel {
   private JCheckBox enableUsageTrackerBox;
   private JPanel mainPanel;
   private JLabel privacyPolicyText;
-  private UsageTrackerManager usageTrackerManager;
+  private UsageTrackingManagementService usageTrackingManagementService;
 
-  public UsageTrackerPanel(UsageTrackerManager usageTrackerManager) {
-    this.usageTrackerManager = usageTrackerManager;
+  public UsageTrackerPanel(UsageTrackingManagementService usageTrackingManagementService) {
+    this.usageTrackingManagementService = usageTrackingManagementService;
 
-    enableUsageTrackerBox.setSelected(usageTrackerManager.hasUserOptedIn());
+    enableUsageTrackerBox.setSelected(usageTrackingManagementService.hasUserOptedIn());
     privacyPolicyText.setText(
         TrackerMessageBundle.message("settings.privacy.policy.comment", PRIVACY_POLICY_URL));
 
     // Disable checkbox if usage tracker property has not been configured
-    if (!usageTrackerManager.isUsageTrackingAvailable()) {
+    if (!usageTrackingManagementService.isUsageTrackingAvailable()) {
       enableUsageTrackerBox.setEnabled(false);
     }
 
@@ -76,19 +76,19 @@ public class UsageTrackerPanel {
   }
 
   public boolean isModified() {
-    return usageTrackerManager.isUsageTrackingAvailable()
-        && usageTrackerManager.hasUserOptedIn() != enableUsageTrackerBox.isSelected();
+    return usageTrackingManagementService.isUsageTrackingAvailable()
+        && usageTrackingManagementService.hasUserOptedIn() != enableUsageTrackerBox.isSelected();
   }
 
   public void apply() {
-    if (usageTrackerManager.isUsageTrackingAvailable()) {
-      usageTrackerManager.setTrackingPreference(enableUsageTrackerBox.isSelected());
+    if (usageTrackingManagementService.isUsageTrackingAvailable()) {
+      usageTrackingManagementService.setTrackingPreference(enableUsageTrackerBox.isSelected());
     }
   }
 
   public void reset() {
-    if (usageTrackerManager.isUsageTrackingAvailable()) {
-      enableUsageTrackerBox.setSelected(usageTrackerManager.hasUserOptedIn());
+    if (usageTrackingManagementService.isUsageTrackingAvailable()) {
+      enableUsageTrackerBox.setSelected(usageTrackingManagementService.hasUserOptedIn());
     }
   }
 

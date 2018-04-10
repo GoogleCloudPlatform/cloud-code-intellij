@@ -104,7 +104,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
    * environment.
    */
   public GoogleUsageTracker() {
-    analyticsId = UsageTrackerManager.getInstance().getAnalyticsProperty();
+    analyticsId = UsageTrackingManagementService.getInstance().getAnalyticsProperty();
 
     PluginInfoService pluginInfo = ServiceManager.getService(PluginInfoService.class);
     externalPluginName = pluginInfo.getExternalPluginName();
@@ -130,7 +130,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
       @NotNull String eventAction,
       @Nullable Map<String, String> metadataMap) {
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
-      if (UsageTrackerManager.getInstance().isTrackingEnabled()) {
+      if (UsageTrackingManagementService.getInstance().isTrackingEnabled()) {
         // For the semantics of each parameter, consult the followings:
         //
         // https://github.com/google/cloud-reporting/blob/master/src/main/java/com/google/cloud/metrics/MetricsUtils.java#L183
