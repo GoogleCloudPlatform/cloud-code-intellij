@@ -39,7 +39,6 @@ import com.intellij.ui.TableUtil;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import com.intellij.util.ui.UIUtil;
-import com.intellij.util.xml.GenericDomValue;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -69,7 +68,6 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.idea.maven.dom.model.MavenDomDependency;
 
 /** The form-bound class for the Cloud API selector panel. */
 final class GoogleCloudApiSelectorPanel {
@@ -288,9 +286,7 @@ final class GoogleCloudApiSelectorPanel {
 
     Optional<String> configuredBomVersion =
         CloudLibraryProjectState.getInstance(project)
-            .getCloudLibraryBom(modulesComboBox.getSelectedModule())
-            .map(MavenDomDependency::getVersion)
-            .map(GenericDomValue::getRawText);
+            .getCloudLibraryBomVersion(modulesComboBox.getSelectedModule());
 
     if (availableBomVersions.isEmpty() && !configuredBomVersion.isPresent()) {
       hideBomUI();

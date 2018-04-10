@@ -27,6 +27,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
+import com.intellij.util.xml.GenericValue;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -51,8 +52,8 @@ public class CloudLibraryProjectState implements ProjectComponent {
   private final Project project;
 
   private Map<Module, Set<CloudLibrary>> moduleLibraryMap = Maps.newHashMap();
-  // Map of project module to BOM xml DOM element in the module's pom.xml
-  private Map<Module, Optional<MavenDomDependency>> moduleBomMap = Maps.newHashMap();
+  // Map of project module to BOM version in the module's pom.xml
+  private Map<Module, Optional<String>> moduleBomVersionMap = Maps.newHashMap();
 
   private List<CloudLibrary> allLibraries;
 
@@ -91,8 +92,8 @@ public class CloudLibraryProjectState implements ProjectComponent {
     return moduleLibraryMap.getOrDefault(module, ImmutableSet.of());
   }
 
-  Optional<MavenDomDependency> getCloudLibraryBom(Module module) {
-    return moduleBomMap.getOrDefault(module, Optional.empty());
+  Optional<String> getCloudLibraryBomVersion(Module module) {
+    return moduleBomVersionMap.getOrDefault(module, Optional.empty());
   }
 
   /**
@@ -108,9 +109,9 @@ public class CloudLibraryProjectState implements ProjectComponent {
 
   @VisibleForTesting
   void syncCloudLibrariesBom() {
-    moduleBomMap =
+    moduleBomVersionMap =
         Stream.of(ModuleManager.getInstance(project).getModules())
-            .collect(Collectors.toMap(Function.identity(), this::loadCloudLibraryBom));
+            .collect(Collectors.toMap(Function.identity(), this::loadCloudLibraryBomVersion));
   }
 
   /**
@@ -137,7 +138,21 @@ public class CloudLibraryProjectState implements ProjectComponent {
         .collect(Collectors.toSet());
   }
 
-  private Optional<MavenDomDependency> loadCloudLibraryBom(Module module) {
+  private Optional<String> loadCloudLibraryBomVersion(Module module) {
+    return loadCloudLibraryBom(module)
+        .map(MavenDomDependency::getVersion)
+        .map(GenericValue::getStringValue);
+  }
+
+  /**
+   * Fetches the {@link MavenDomDependency} DOM element corresponding to the google-cloud-java BOM
+   * in the {@link Module} pom.xml.
+   *
+   * @param module the {@link Module} from which to load the BOM DOM element
+   * @return the optional {@link MavenDomDependency} corresponding the the BOM element in the
+   *     pom.xml
+   */
+  Optional<MavenDomDependency> loadCloudLibraryBom(Module module) {
     return ApplicationManager.getApplication()
         .runReadAction(
             (Computable<Optional<MavenDomDependency>>)
@@ -169,8 +184,7 @@ public class CloudLibraryProjectState implements ProjectComponent {
                                   && CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_GROUP
                                       .equalsIgnoreCase(
                                           managedDependency.getGroupId().getStringValue()))
-                      .findFirst()
-                      .map(domDependency -> (MavenDomDependency) domDependency.createStableCopy());
+                      .findFirst();
                 });
   }
 
