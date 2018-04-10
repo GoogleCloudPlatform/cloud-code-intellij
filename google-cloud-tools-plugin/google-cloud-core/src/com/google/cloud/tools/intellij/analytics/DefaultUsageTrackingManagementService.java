@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.analytics;
 
 import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
 import com.google.cloud.tools.intellij.login.PluginFlagsService;
-import com.google.cloud.tools.intellij.login.PropertiesFilePluginFlagsService;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.util.PlatformUtils;
 import org.jetbrains.annotations.Nullable;
