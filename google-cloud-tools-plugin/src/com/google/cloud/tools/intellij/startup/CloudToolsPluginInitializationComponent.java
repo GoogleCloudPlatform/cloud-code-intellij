@@ -16,8 +16,8 @@
 
 package com.google.cloud.tools.intellij.startup;
 
-import com.google.cloud.tools.intellij.analytics.UsageTrackerManager;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerNotification;
+import com.google.cloud.tools.intellij.analytics.UsageTrackingManagementService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.login.util.TrackerMessageBundle;
@@ -77,9 +77,10 @@ public class CloudToolsPluginInitializationComponent implements ApplicationCompo
    */
   @VisibleForTesting
   void configureUsageTracking() {
-    UsageTrackerManager usageTrackerManager = UsageTrackerManager.getInstance();
-    if (usageTrackerManager.isUsageTrackingAvailable()
-        && !usageTrackerManager.hasUserRecordedTrackingPreference()) {
+    UsageTrackingManagementService usageTrackingManagementService =
+        UsageTrackingManagementService.getInstance();
+    if (usageTrackingManagementService.isUsageTrackingAvailable()
+        && !usageTrackingManagementService.hasUserRecordedTrackingPreference()) {
       NotificationsManager.getNotificationsManager();
       NotificationsConfiguration.getNotificationsConfiguration()
           .register(
