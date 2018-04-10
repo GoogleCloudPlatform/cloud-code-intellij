@@ -32,7 +32,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 /** Tests for {@link DefaultUsageTrackingManagementService}. */
 @RunWith(MockitoJUnitRunner.class)
-public class UsageTrackerManagerTest {
+public class DefaultUsageTrackingManagementServiceTest {
 
   @Mock private PropertiesComponent mockComponent;
   @Mock private PluginFlags mockFlags;
