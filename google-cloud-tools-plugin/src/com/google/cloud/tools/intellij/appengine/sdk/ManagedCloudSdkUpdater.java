@@ -51,6 +51,10 @@ public class ManagedCloudSdkUpdater {
   private TimerTask sdkUpdateTask;
 
   void activate() {
+    if (!CloudSdkServiceUserSettings.getInstance().getEnableAutomaticUpdates()) {
+      return;
+    }
+
     if (updateTimer == null) {
       updateTimer = new Timer(SDK_UPDATER_THREAD_NAME);
     }

@@ -218,7 +218,12 @@ public class CloudSdkPanel {
     }
     sdkServiceUserSettings.setUserSelectedSdkServiceType(selectedCloudSdkServiceType);
 
+    boolean previousAutomaticUpdateEnabled = sdkServiceUserSettings.getEnableAutomaticUpdates();
     sdkServiceUserSettings.setEnableAutomaticUpdates(enableAutomaticUpdatesCheckbox.isSelected());
+    if (enableAutomaticUpdatesCheckbox.isSelected() && !previousAutomaticUpdateEnabled) {
+      // activate updates again.
+      ManagedCloudSdkUpdater.getInstance().activate();
+    }
 
     // settings are applied and saved, clear modification status
     settingsModified = false;
