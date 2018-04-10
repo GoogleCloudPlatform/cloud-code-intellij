@@ -19,14 +19,10 @@ package com.google.cloud.tools.intellij.analytics;
 import com.intellij.openapi.components.ServiceManager;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * This service provides management APIs for the analytics UI and tracking components.
- */
+/** This service provides management APIs for the analytics UI and tracking components. */
 public interface UsageTrackingManagementService {
 
-  /**
-   * Returns the service bound to this interface in the plugin.xml
-   */
+  /** Returns the service bound to this interface in the plugin.xml */
   static UsageTrackingManagementService getInstance() {
     return ServiceManager.getService(UsageTrackingManagementService.class);
   }
@@ -38,9 +34,7 @@ public interface UsageTrackingManagementService {
    */
   void setTrackingPreference(boolean optIn);
 
-  /**
-   * Returns whether the user is opted in to anonymous usage monitoring or not.
-   */
+  /** Returns whether the user is opted in to anonymous usage monitoring or not. */
   boolean hasUserOptedIn();
 
   /**
@@ -48,7 +42,7 @@ public interface UsageTrackingManagementService {
    * whether the user has set a preference for providing anonymous usage data.
    *
    * @return {@code true} if the user has either consented or declined to provide anonymous usage
-   *        data, and {@code false} if the user has never indicated a preference.
+   *     data, and {@code false} if the user has never indicated a preference.
    */
   boolean hasUserRecordedTrackingPreference();
 
@@ -62,14 +56,12 @@ public interface UsageTrackingManagementService {
    */
   boolean isUsageTrackingAvailable();
 
-  /**
-   * Returns the plugin's analytics ID.
-   */
+  /** Returns the plugin's analytics ID. */
   @Nullable
   String getAnalyticsProperty();
 
   /**
-   * Returns whether tracking is turned on.  This means that the user has explicitly consented to
+   * Returns whether tracking is turned on. This means that the user has explicitly consented to
    * anonymous usage tracking and the plugin is configured with analytics turned on so that usage
    * tracking is possible.
    */

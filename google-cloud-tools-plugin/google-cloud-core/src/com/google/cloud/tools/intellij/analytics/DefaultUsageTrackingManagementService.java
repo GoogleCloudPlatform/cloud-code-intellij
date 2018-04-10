@@ -24,7 +24,7 @@ import com.intellij.util.PlatformUtils;
 import org.jetbrains.annotations.Nullable;
 
 /** Stores the user's choice to opt in/out of sending usage metrics via the Google Usage Tracker. */
-public final class UsageTrackerManager implements UsageTrackingManagementService {
+public final class DefaultUsageTrackingManagementService implements UsageTrackingManagementService {
   @VisibleForTesting
   static final String USAGE_TRACKER_KEY = "GOOGLE_CLOUD_TOOLS_USAGE_TRACKER_OPT_IN";
 
@@ -34,13 +34,14 @@ public final class UsageTrackerManager implements UsageTrackingManagementService
   private PropertiesComponent datastore;
   private PluginFlags flags;
 
-  public UsageTrackerManager() {
+  public DefaultUsageTrackingManagementService() {
     datastore = PropertiesComponent.getInstance();
     flags = new PropertiesFilePluginFlags();
   }
 
   @VisibleForTesting
-  UsageTrackerManager(PropertiesComponent propertiesComponent, PluginFlags flags) {
+  DefaultUsageTrackingManagementService(
+      PropertiesComponent propertiesComponent, PluginFlags flags) {
     this.datastore = propertiesComponent;
     this.flags = flags;
   }

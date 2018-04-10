@@ -16,8 +16,8 @@
 
 package com.google.cloud.tools.intellij.startup;
 
-import com.google.cloud.tools.intellij.analytics.UsageTrackingManagementService;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerNotification;
+import com.google.cloud.tools.intellij.analytics.UsageTrackingManagementService;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.login.util.TrackerMessageBundle;
