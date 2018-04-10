@@ -22,7 +22,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
-import com.google.cloud.tools.intellij.login.PluginFlags;
+import com.google.cloud.tools.intellij.login.PluginFlagsService;
 import com.intellij.ide.util.PropertiesComponent;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +35,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class DefaultUsageTrackingManagementServiceTest {
 
   @Mock private PropertiesComponent mockComponent;
-  @Mock private PluginFlags mockFlags;
+  @Mock private PluginFlagsService mockFlags;
 
   private DefaultUsageTrackingManagementService manager;
 

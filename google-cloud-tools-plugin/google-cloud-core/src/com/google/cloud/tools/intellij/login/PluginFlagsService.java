@@ -17,9 +17,15 @@
 package com.google.cloud.tools.intellij.login;
 
 import com.google.api.client.repackaged.javax.annotation.Nullable;
+import com.intellij.openapi.components.ServiceManager;
 
 /** Login Plugin configuration flags. */
-public interface PluginFlags {
+public interface PluginFlagsService {
+
+  /** Returns the service bound to this interface in the plugin.xml */
+  static PluginFlagsService getInstance() {
+    return ServiceManager.getService(PluginFlagsService.class);
+  }
 
   @Nullable
   String getAnalyticsId();
