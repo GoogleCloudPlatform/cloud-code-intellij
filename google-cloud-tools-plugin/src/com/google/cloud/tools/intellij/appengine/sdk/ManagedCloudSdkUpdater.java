@@ -16,8 +16,11 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
+import com.google.cloud.tools.intellij.GctFeature;
+import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.notification.Notification;
+import com.intellij.openapi.components.ServiceManager;
 import java.awt.event.ActionListener;
 import java.time.Clock;
 import java.util.Timer;
@@ -29,7 +32,7 @@ public class ManagedCloudSdkUpdater {
 
   // one week.
   @VisibleForTesting static final long SDK_UPDATE_INTERVAL = 1000 * 60 * 60 * 24 * 7;
-  // 20 seconds to show notification.
+  // 20 seconds to show notification and then proceed with update.
   private static final int UPDATE_NOTIFICATION_DELAY = 1000 * 20;
 
   @VisibleForTesting
@@ -103,7 +106,10 @@ public class ManagedCloudSdkUpdater {
     CloudSdkService cloudSdkService = CloudSdkService.getInstance();
     if (cloudSdkService instanceof ManagedCloudSdkService) {
       // do not show notifications and start update process if SDK is still up-to-date.
-      if (!((ManagedCloudSdkService) cloudSdkService).isUpToDate()) {
+      boolean updateFeatureEnabled =
+          ServiceManager.getService(PluginInfoService.class)
+              .shouldEnable(GctFeature.MANAGED_SDK_UPDATE);
+      if (updateFeatureEnabled && !((ManagedCloudSdkService) cloudSdkService).isUpToDate()) {
         // schedule UI timer to let a user decide about proceeding with the update.
         javax.swing.Timer uiTimer = createUiTimer(UPDATE_NOTIFICATION_DELAY);
         ActionListener cancelListener = (e) -> uiTimer.stop();

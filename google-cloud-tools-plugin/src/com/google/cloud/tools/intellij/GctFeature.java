@@ -37,6 +37,7 @@ public enum GctFeature implements Feature {
   APPENGINE_FLEX(null, "feature.appengine.flex", "ct4ij.feature.appengine.flex"),
 
   MANAGED_SDK(null, "feature.managed.sdk", "ct4ij.feature.managed.sdk"),
+  MANAGED_SDK_UPDATE(null, "feature.managed.sdk.update", "ct4ij.feature.managed.sdk.update"),
   BOM(null, "feature.bom", "ct4ij.feature.bom");
 
   private final ImmutableSet<IntelliJPlatform> supportedPlatforms;

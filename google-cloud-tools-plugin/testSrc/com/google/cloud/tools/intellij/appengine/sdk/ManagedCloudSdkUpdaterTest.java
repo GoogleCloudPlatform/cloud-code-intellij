@@ -26,7 +26,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.GctFeature;
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
+import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
 import com.intellij.notification.Notification;
@@ -54,6 +56,8 @@ public class ManagedCloudSdkUpdaterTest {
   @Mock private ManagedCloudSdkServiceUiPresenter mockUiPresenter;
   @Mock private Notification mockNotification;
 
+  @TestService @Mock private PluginInfoService mockPluginInfoService;
+
   @Spy private ManagedCloudSdkUpdater managedCloudSdkUpdater;
 
   @Before
@@ -61,6 +65,8 @@ public class ManagedCloudSdkUpdaterTest {
     // add timer thread to one not to be checked for 'leaks'
     ThreadTracker.longRunningThreadCreated(
         ApplicationManager.getApplication(), ManagedCloudSdkUpdater.SDK_UPDATER_THREAD_NAME);
+
+    when(mockPluginInfoService.shouldEnable(GctFeature.MANAGED_SDK_UPDATE)).thenReturn(true);
 
     when(mockSdkServiceManager.getCloudSdkService()).thenReturn(mockSdkService);
 
