@@ -17,8 +17,8 @@
 package com.google.cloud.tools.intellij.analytics;
 
 import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
-import com.google.cloud.tools.intellij.login.PluginFlags;
-import com.google.cloud.tools.intellij.login.PropertiesFilePluginFlags;
+import com.google.cloud.tools.intellij.login.PluginFlagsService;
+import com.google.cloud.tools.intellij.login.PropertiesFilePluginFlagsService;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.util.PlatformUtils;
 import org.jetbrains.annotations.Nullable;
@@ -32,16 +32,16 @@ public final class DefaultUsageTrackingManagementService implements UsageTrackin
   static final String USAGE_TRACKER_PROPERTY_PLACEHOLDER = "${usageTrackerProperty}";
 
   private PropertiesComponent datastore;
-  private PluginFlags flags;
+  private PluginFlagsService flags;
 
   public DefaultUsageTrackingManagementService() {
     datastore = PropertiesComponent.getInstance();
-    flags = new PropertiesFilePluginFlags();
+    flags = PluginFlagsService.getInstance();
   }
 
   @VisibleForTesting
   DefaultUsageTrackingManagementService(
-      PropertiesComponent propertiesComponent, PluginFlags flags) {
+      PropertiesComponent propertiesComponent, PluginFlagsService flags) {
     this.datastore = propertiesComponent;
     this.flags = flags;
   }
