@@ -174,7 +174,17 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
     if (managedSdkBackgroundJob == null || managedSdkBackgroundJob.isDone()) {
       updateStatus(SdkStatus.INSTALLING);
-      managedSdkBackgroundJob = ThreadUtil.getInstance().executeInBackground(managedSdkTask);
+      managedSdkBackgroundJob =
+          ThreadUtil.getInstance()
+              .executeInBackground(
+                  () -> {
+                    try {
+                      CloudSdkServiceManager.getInstance().getSdkWriteLock().lock();
+                      return managedSdkTask.call();
+                    } finally {
+                      CloudSdkServiceManager.getInstance().getSdkWriteLock().unlock();
+                    }
+                  });
       Futures.addCallback(managedSdkBackgroundJob, new ManagedSdkJobListener(jobType));
     }
 

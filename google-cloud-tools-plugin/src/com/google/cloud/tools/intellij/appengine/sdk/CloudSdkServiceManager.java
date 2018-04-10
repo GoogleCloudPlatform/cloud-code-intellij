@@ -40,6 +40,9 @@ import com.intellij.openapi.wm.WindowManager;
 import com.intellij.openapi.wm.ex.StatusBarEx;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,6 +55,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public class CloudSdkServiceManager {
   private final Map<CloudSdkServiceType, CloudSdkService> supportedCloudSdkServices;
+
+  private final ReadWriteLock sdkReadWriteOperationLock = new ReentrantReadWriteLock();
 
   public static CloudSdkServiceManager getInstance() {
     return ServiceManager.getService(CloudSdkServiceManager.class);
@@ -75,6 +80,14 @@ public class CloudSdkServiceManager {
     } else {
       throw new UnsupportedCloudSdkTypeException(newServiceType.name());
     }
+  }
+
+  public Lock getSdkReadLock() {
+    return sdkReadWriteOperationLock.readLock();
+  }
+
+  public Lock getSdkWriteLock() {
+    return sdkReadWriteOperationLock.writeLock();
   }
 
   /**
