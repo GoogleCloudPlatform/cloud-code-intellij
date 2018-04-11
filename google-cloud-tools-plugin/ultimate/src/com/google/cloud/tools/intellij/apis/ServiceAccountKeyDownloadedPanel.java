@@ -32,6 +32,8 @@ import org.jetbrains.annotations.Nullable;
  * Panel confirming the download of the service account JSON key with information on how to set the
  * credential environment variables for local run.
  */
+// TODO: This is temporary and will be removed onve the error that occurs when nesting forms from
+// different modules is fixed
 public final class ServiceAccountKeyDownloadedPanel {
   private static final String CLOUD_PROJECT_ENV_VAR_KEY = "GOOGLE_CLOUD_PROJECT";
   private static final String CREDENTIAL_ENV_VAR_KEY = "GOOGLE_APPLICATION_CREDENTIALS";
