@@ -22,7 +22,6 @@ import com.intellij.CommonBundle;
 import com.intellij.execution.ProgramRunnerUtil;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
-import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.execution.runners.ProgramRunner;
 import com.intellij.execution.util.EnvironmentVariable;
@@ -130,17 +129,17 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
     return tableModel.getSelectedItems();
   }
 
-  private void updateConfigurationsWithEnvVars(Set<RunnerAndConfigurationSettings> configurations) {
+  private void addEnvironmentVariablesToConfiguration(Set<RunnerAndConfigurationSettings> configurations) {
     String executorId = DefaultRunExecutor.getRunExecutorInstance().getId();
     configurations.forEach(
-        configurationSettings -> updateConfigurationWithEnvVars(executorId, configurationSettings));
+        configurationSettings -> addEnvironmentVariablesToConfiguration(executorId, configurationSettings));
   }
 
   /**
    * Adds the environment variables for the Google Cloud Libraries to the list of environment
    * variables for {@code configuration} if they don't exist. If they exist, it replaces them.
    */
-  private void updateConfigurationWithEnvVars(
+  private void addEnvironmentVariablesToConfiguration(
       String executorId, RunnerAndConfigurationSettings configuration) {
 
     ProgramRunner runner = ProgramRunnerUtil.getRunner(executorId, configuration);
@@ -184,7 +183,7 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
 
     @Override
     protected void doAction(ActionEvent event) {
-      updateConfigurationsWithEnvVars(getSelectedConfigurations());
+      addEnvironmentVariablesToConfiguration(getSelectedConfigurations());
     }
   }
 
@@ -229,7 +228,7 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
 
     @Override
     public void setValue(Object value) {
-      if (value instanceof RunConfiguration) {
+      if (value instanceof RunnerAndConfigurationSettings) {
         RunnerAndConfigurationSettings runnerAndConfigurationSettings =
             (RunnerAndConfigurationSettings) value;
         setText(runnerAndConfigurationSettings.getName());
