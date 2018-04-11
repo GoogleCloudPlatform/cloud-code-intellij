@@ -27,6 +27,7 @@ import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.execution.runners.ProgramRunner;
 import com.intellij.execution.util.EnvironmentVariable;
 import com.intellij.javaee.run.configuration.RunnerSpecificLocalConfigurationBit;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.BooleanTableCellEditor;
@@ -37,6 +38,7 @@ import com.intellij.util.ui.UIUtil;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.OptionalInt;
@@ -44,7 +46,9 @@ import java.util.Set;
 import java.util.stream.IntStream;
 import javax.swing.Action;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
@@ -62,12 +66,16 @@ import org.jetbrains.annotations.Nullable;
 // TODO: Add tests
 public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
 
+  private static final Logger LOG = Logger.getInstance(ServiceAccountKeyUltimateDisplayDialog.class);
+
   private final Project project;
   private final String gcpProjectId;
   private final String downloadPath;
   private JPanel mainPanel;
   private ServiceAccountKeyDownloadedPanel commonPanel;
   private JTable table;
+  private JLabel label;
+  private JScrollPane scrollPane;
   private BooleanTableModel tableModel;
 
   public ServiceAccountKeyUltimateDisplayDialog(
@@ -78,6 +86,12 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
     this.downloadPath = downloadPath;
     init();
     table.setTableHeader(null);
+
+    if (tableModel.getRowCount() == 0){
+      label.setVisible(false);
+      scrollPane.setVisible(false);
+      table.setVisible(false);
+    }
   }
 
   @Nullable
@@ -89,15 +103,21 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
   @NotNull
   @Override
   protected Action[] createActions() {
-    return new Action[] {getOKAction(), new ApplyAction()};
+    List<Action> actions = new ArrayList<>();
+    actions.add(getOKAction());
+    if (tableModel.getRowCount() > 0) {
+      actions.add(new ApplyAction());
+    }
+    return actions.toArray(new Action[0]);
   }
 
   private void createUIComponents() {
     commonPanel = new ServiceAccountKeyDownloadedPanel(project, gcpProjectId, downloadPath);
-    List<RunnerAndConfigurationSettings> servers = getAppEngineStandardConfigurationSettingsList();
+    List<RunnerAndConfigurationSettings> configurationSettingsList = getAppEngineStandardConfigurationSettingsList();
     tableModel =
         new BooleanTableModel<>(
-            servers, Comparator.comparing(RunnerAndConfigurationSettings::getName), true);
+            configurationSettingsList,
+            Comparator.comparing(RunnerAndConfigurationSettings::getName), true);
     table = new ServerTable(tableModel);
   }
 
@@ -124,6 +144,11 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
       String executorId, RunnerAndConfigurationSettings configuration) {
 
     ProgramRunner runner = ProgramRunnerUtil.getRunner(executorId, configuration);
+    if (runner == null){
+      LOG.error("Error updating run configuration with Google CLoud Library environment variables");
+      return;
+    }
+
     RunnerSpecificLocalConfigurationBit configurationSettings =
         (RunnerSpecificLocalConfigurationBit) configuration.getConfigurationSettings(runner);
 
