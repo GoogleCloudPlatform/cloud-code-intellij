@@ -28,7 +28,6 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Storage.BlobListOption;
 import com.google.cloud.storage.StorageException;
 import com.google.cloud.tools.intellij.analytics.UsageTrackingManagementService;
-import com.google.cloud.tools.intellij.flags.FlagReader;
 import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
 import com.google.cloud.tools.intellij.login.PluginFlagsService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
