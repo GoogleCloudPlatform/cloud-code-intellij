@@ -277,7 +277,7 @@ public final class GoogleCloudApiDetailsPanel {
                                     GctBundle.message(
                                         "cloud.libraries.version.label",
                                         GctBundle.message(
-                                            "cloud.libraries.version.notfound.text")));
+                                            "cloud.libraries.version.notfound.text", bomVersion)));
                                 versionLabel.setIcon(General.Error);
                               }
                             } catch (LibraryVersionFromBomException ex) {
