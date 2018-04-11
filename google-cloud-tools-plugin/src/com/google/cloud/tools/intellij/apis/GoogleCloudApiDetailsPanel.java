@@ -25,6 +25,7 @@ import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.cloud.tools.libraries.json.CloudLibraryClientMavenCoordinates;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
+import com.intellij.icons.AllIcons.General;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.ui.IdeBorderFactory;
@@ -269,21 +270,23 @@ public final class GoogleCloudApiDetailsPanel {
                                                   versionOptional.get()));
                                         },
                                         ModalityState.any());
+
+                                versionLabel.setIcon(null);
                               } else {
                                 versionLabel.setText(
                                     GctBundle.message(
                                         "cloud.libraries.version.label",
                                         GctBundle.message(
                                             "cloud.libraries.version.notfound.text")));
+                                versionLabel.setIcon(General.Error);
                               }
                             } catch (LibraryVersionFromBomException ex) {
                               versionLabel.setText(
                                   GctBundle.message(
                                       "cloud.libraries.version.label",
                                       GctBundle.message("cloud.libraries.version.exception.text")));
+                              versionLabel.setIcon(General.Error);
                             }
-
-                            versionLabel.setIcon(null);
                           });
                 }
               });

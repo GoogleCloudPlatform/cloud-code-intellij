@@ -139,9 +139,13 @@ public class CloudLibraryProjectState implements ProjectComponent {
   }
 
   private Optional<String> loadCloudLibraryBomVersion(Module module) {
-    return loadCloudLibraryBom(module)
-        .map(MavenDomDependency::getVersion)
-        .map(GenericValue::getStringValue);
+    return ApplicationManager.getApplication()
+        .runReadAction(
+            (Computable<Optional<String>>)
+                () ->
+                    loadCloudLibraryBom(module)
+                        .map(MavenDomDependency::getVersion)
+                        .map(GenericValue::getStringValue));
   }
 
   /**
