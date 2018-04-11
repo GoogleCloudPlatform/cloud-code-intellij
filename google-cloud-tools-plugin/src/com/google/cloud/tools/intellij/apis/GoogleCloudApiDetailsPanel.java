@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.apis;
 
 import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
+import com.google.cloud.tools.intellij.apis.CloudApiMavenService.LibraryVersionFromBomException;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
@@ -24,6 +25,7 @@ import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.cloud.tools.libraries.json.CloudLibraryClientMavenCoordinates;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
+import com.intellij.icons.AllIcons.General;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.ui.IdeBorderFactory;
@@ -253,23 +255,37 @@ public final class GoogleCloudApiDetailsPanel {
                   ThreadUtil.getInstance()
                       .executeInBackground(
                           () -> {
-                            Optional<String> versionOptional =
-                                CloudApiMavenService.getInstance()
-                                    .getManagedDependencyVersion(coordinates, bomVersion);
+                            try {
+                              Optional<String> versionOptional =
+                                  CloudApiMavenService.getInstance()
+                                      .getManagedDependencyVersion(coordinates, bomVersion);
 
-                            if (versionOptional.isPresent()) {
-                              ApplicationManager.getApplication()
-                                  .invokeAndWait(
-                                      () -> {
-                                        versionLabel.setIcon(null);
-                                        versionLabel.setText(
-                                            GctBundle.message(
-                                                "cloud.libraries.version.label",
-                                                versionOptional.get()));
-                                      },
-                                      ModalityState.any());
-                            } else {
-                              versionLabel.setIcon(null);
+                              if (versionOptional.isPresent()) {
+                                ApplicationManager.getApplication()
+                                    .invokeAndWait(
+                                        () -> {
+                                          versionLabel.setText(
+                                              GctBundle.message(
+                                                  "cloud.libraries.version.label",
+                                                  versionOptional.get()));
+                                        },
+                                        ModalityState.any());
+
+                                versionLabel.setIcon(null);
+                              } else {
+                                versionLabel.setText(
+                                    GctBundle.message(
+                                        "cloud.libraries.version.label",
+                                        GctBundle.message(
+                                            "cloud.libraries.version.notfound.text", bomVersion)));
+                                versionLabel.setIcon(General.Error);
+                              }
+                            } catch (LibraryVersionFromBomException ex) {
+                              versionLabel.setText(
+                                  GctBundle.message(
+                                      "cloud.libraries.version.label",
+                                      GctBundle.message("cloud.libraries.version.exception.text")));
+                              versionLabel.setIcon(General.Error);
                             }
                           });
                 }

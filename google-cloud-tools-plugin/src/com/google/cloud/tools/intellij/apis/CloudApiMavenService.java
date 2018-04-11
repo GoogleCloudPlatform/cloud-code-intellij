@@ -24,6 +24,7 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -76,9 +77,9 @@ public class CloudApiMavenService {
   /**
    * Returns the available Google Cloud Java client library BOM versions from Maven Central.
    *
-   * @return returns the {@link Version versions} of the BOMs
+   * @return returns the versions of the BOMs
    */
-  List<Version> getBomVersions() {
+  List<String> getBomVersions() {
     Artifact artifact =
         new DefaultArtifact(toBomCoordinates(GOOGLE_CLOUD_JAVA_BOM_ALL_VERSIONS_CONSTRAINT));
 
@@ -89,7 +90,7 @@ public class CloudApiMavenService {
     try {
       VersionRangeResult result = SYSTEM.resolveVersionRange(SESSION, rangeRequest);
 
-      return result.getVersions();
+      return result.getVersions().stream().map(Version::toString).collect(Collectors.toList());
     } catch (VersionRangeResolutionException e) {
       logger.warn("Error fetching available BOM versions from Maven Central", e);
       return ImmutableList.of();
@@ -104,9 +105,11 @@ public class CloudApiMavenService {
    *     are finding the version
    * @param bomVersion the version of the BOM from which to fetch the library version
    * @return the optional version of the library found in the given BOM
+   * @throws LibraryVersionFromBomException if the library version can be fetched for the given BOM
    */
   Optional<String> getManagedDependencyVersion(
-      CloudLibraryClientMavenCoordinates libraryMavenCoordinates, String bomVersion) {
+      CloudLibraryClientMavenCoordinates libraryMavenCoordinates, String bomVersion)
+      throws LibraryVersionFromBomException {
     Artifact bomArtifact = new DefaultArtifact(toBomCoordinates(bomVersion));
 
     ArtifactDescriptorRequest request = new ArtifactDescriptorRequest();
@@ -133,8 +136,9 @@ public class CloudApiMavenService {
           .findFirst()
           .map(dependency -> dependency.getArtifact().getVersion());
     } catch (ArtifactDescriptorException e) {
-      logger.warn("Error fetching version of client library from bom version " + bomVersion);
-      return Optional.empty();
+      String message = "Error fetching version of client library from bom version " + bomVersion;
+      logger.warn(message);
+      throw new LibraryVersionFromBomException(message, e);
     }
   }
 
@@ -176,5 +180,19 @@ public class CloudApiMavenService {
             session, new LocalRepository(JarRepositoryManager.getLocalRepositoryPath())));
 
     return session;
+  }
+
+  /**
+   * Exception indicating failure when fetching a Cloud library's version from a given BOM version.
+   */
+  static class LibraryVersionFromBomException extends Exception {
+
+    LibraryVersionFromBomException(String message) {
+      super(message);
+    }
+
+    LibraryVersionFromBomException(String message, Throwable cause) {
+      super(message, cause);
+    }
   }
 }
