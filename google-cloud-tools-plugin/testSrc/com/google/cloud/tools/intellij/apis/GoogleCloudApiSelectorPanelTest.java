@@ -38,6 +38,7 @@ import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.intellij.icons.AllIcons.General;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -384,8 +385,11 @@ public final class GoogleCloudApiSelectorPanelTest {
         .setCloudLibrary(cloudLibrary, BOM_VERSION, panel.getApiManagementMap().get(cloudLibrary));
 
     assertThat(panel.getDetailsPanel().getVersionLabel().getText())
-        .isEqualTo("Version: No version found for the selected Cloud Libraries version");
-    assertThat(panel.getDetailsPanel().getVersionLabel().getIcon()).isNull();
+        .isEqualTo(
+            "Version: Library was not found in version "
+                + BOM_VERSION
+                + " of the Google Cloud Java Libraries");
+    assertThat(panel.getDetailsPanel().getVersionLabel().getIcon()).isEqualTo(General.Error);
   }
 
   @Test
@@ -406,8 +410,8 @@ public final class GoogleCloudApiSelectorPanelTest {
         .setCloudLibrary(cloudLibrary, BOM_VERSION, panel.getApiManagementMap().get(cloudLibrary));
 
     assertThat(panel.getDetailsPanel().getVersionLabel().getText())
-        .isEqualTo("Version: Error fetching library version");
-    assertThat(panel.getDetailsPanel().getVersionLabel().getIcon()).isNull();
+        .isEqualTo("Version: Error occurred fetching library version");
+    assertThat(panel.getDetailsPanel().getVersionLabel().getIcon()).isEqualTo(General.Error);
   }
 
   @Test
