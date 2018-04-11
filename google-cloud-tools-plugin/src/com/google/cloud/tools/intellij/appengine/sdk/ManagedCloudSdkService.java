@@ -259,8 +259,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
         ProgressListener waitForSdkProcessesProgress =
             ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
         waitForSdkProcessesProgress.start(
-            "Waiting for app engine deployment / local run processes to finish...",
-            ProgressListener.UNKNOWN);
+            GctBundle.message("managedsdk.progress.wait.for.processes"), ProgressListener.UNKNOWN);
         try {
           CloudSdkServiceManager.getInstance().getSdkWriteLock().lockInterruptibly();
         } finally {
