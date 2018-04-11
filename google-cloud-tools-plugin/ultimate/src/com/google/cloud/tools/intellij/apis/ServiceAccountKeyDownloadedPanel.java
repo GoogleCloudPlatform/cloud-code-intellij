@@ -69,6 +69,7 @@ public final class ServiceAccountKeyDownloadedPanel {
     tableModel.addRow(new String[] {cloudProjectEnvVar});
     envVarTable.setModel(tableModel);
     envVarTable.setRowSelectionAllowed(false);
+    envVarTable.setTableHeader(null);
 
     // copyToClipboardButton.addActionListener(
     // new CopyToClipboardActionListener(credentialEnvVar + "\n" + cloudProjectEnvVar));
