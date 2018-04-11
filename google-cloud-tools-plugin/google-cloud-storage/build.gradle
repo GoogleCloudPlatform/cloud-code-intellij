@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,18 +22,11 @@ sourceSets.test.java.srcDirs = ['testSrc']
 sourceSets.test.resources.srcDirs = ['testResources']
 
 intellij {
-    plugins 'git4idea'
 }
 
 dependencies {
-    compile files('lib/google.gdt.eclipse.login.common.jar')
-    compile files('lib/google-gct-login-context-ij-pg.jar')
-    compile files('lib/GoogleFeedback.jar')
-    compile files('third_party/repackaged/google-api-java-client-min-repackaged-1.20.0.jar')
-    compile 'com.google.apis:google-api-services-clouddebugger:v2-rev7-1.21.0'
-    compile 'com.google.apis:google-api-services-cloudresourcemanager:v1beta1-rev12-1.21.0'
-    compile 'com.google.apis:google-api-services-iam:v1-rev225-1.22.0'
-    compile 'com.google.apis:google-api-services-appengine:v1-rev8-1.22.0'
+    compile(project(':google-cloud-tools-plugin:google-cloud-core'))
+
     compile ('com.google.cloud:google-cloud-storage:1.2.0') {
         exclude group: 'com.google.http-client', module: 'google-http-client'
         exclude group: 'com.google.http-client', module: 'google-http-client-jackson'
@@ -43,18 +36,10 @@ dependencies {
         exclude group: 'com.google.protobuf', module: 'protobuf-java'
         exclude group: 'com.google.protobuf', module: 'protobuf-java-util'
     }
-    compile 'com.google.apis:google-api-services-servicemanagement:v1-rev374-1.22.0'
-    // TODO : see #350
-    compile 'com.google.http-client:google-http-client-jackson:1.20.0'
-    compile 'org.codehaus.jackson:jackson-core-asl:1.9.11'
-
-    compile 'com.google.apis:google-api-services-oauth2:v2-rev98-1.20.0'
-    compile 'javax.servlet:javax.servlet-api:3.0.1'
 
     compileOnly 'com.google.auto.value:auto-value:1.4.1'
     apt         'com.google.auto.value:auto-value:1.4.1'
 
-    testCompile 'xalan:serializer:2.7.1'
     testCompile files("${System.properties['java.home']}/../lib/tools.jar")
     testCompile(project(':common-test-lib'))
 }
@@ -63,14 +48,4 @@ configurations {
     // these are already obtained from google-api-java-client-min-repackaged
     compile.exclude group: 'com.google.api-client', module: 'google-api-client'
     compile.exclude group: 'com.google.http-client', module: 'google-http-client'
-}
-
-processResources {
-    def trackerProperty =  System.getenv("ANALYTICS_ID")
-    if (trackerProperty) {
-        inputs.property("usageTrackerProperty", trackerProperty)
-        filesMatching("**/config.properties") {
-            expand "usageTrackerProperty": trackerProperty
-        }
-    }
 }

@@ -21,22 +21,18 @@ import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.intellij.openapi.diagnostic.Logger;
 
 /**
- * This is a standard {@link PluginFlags} implementation that reads its values from the default
- * properties file.
+ * This is a standard {@link PluginFlagsService} implementation that reads its values from the
+ * default properties file.
  */
-public class PropertiesFilePluginFlags implements PluginFlags {
-  private static final Logger LOGGER = Logger.getInstance(PropertiesFilePluginFlags.class);
+public class PropertiesFilePluginFlagsService implements PluginFlagsService {
+
+  private static final Logger LOGGER = Logger.getInstance(PropertiesFilePluginFlagsService.class);
   private static final String USAGE_TRACKER_PROPERTY = "usage.tracker.property";
   private FlagReader flagReader;
 
   /** Initialize the property flag reader. */
-  public PropertiesFilePluginFlags() {
-    try {
-      flagReader = new PropertiesFileFlagReader();
-    } catch (IllegalArgumentException ex) {
-      // TODO: Fail hard once we refactor to services and using aswb service mockable tests
-      LOGGER.warn(ex);
-    }
+  public PropertiesFilePluginFlagsService() {
+    flagReader = new PropertiesFileFlagReader();
   }
 
   @Override

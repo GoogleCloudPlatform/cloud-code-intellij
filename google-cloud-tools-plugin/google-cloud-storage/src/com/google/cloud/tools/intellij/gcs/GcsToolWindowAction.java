@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 package com.google.cloud.tools.intellij.gcs;
 
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
@@ -32,9 +30,9 @@ public final class GcsToolWindowAction extends DumbAwareAction {
 
   public GcsToolWindowAction() {
     super(
-        GctBundle.message("gcs.tools.menu.action.text"),
-        GctBundle.message("gcs.tools.menu.action.description"),
-        GoogleCloudToolsIcons.CLOUD_STORAGE);
+        GoogleCloudStorageMessageBundle.message("gcs.tools.menu.action.text"),
+        GoogleCloudStorageMessageBundle.message("gcs.tools.menu.action.description"),
+        GoogleCloudStorageIcons.CLOUD_STORAGE);
   }
 
   @Override

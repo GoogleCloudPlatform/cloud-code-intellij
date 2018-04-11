@@ -26,8 +26,6 @@ import javax.swing.Icon;
 public final class GoogleCloudToolsIcons {
 
   public static final Icon APP_ENGINE = load("/icons/appEngine.png"); // 16x16
-  public static final Icon CLOUD_STORAGE = load("/icons/cloudStorage.png");
-  public static final Icon CLOUD_STORAGE_BUCKET = load("/icons/cloudStorageBucket.png");
   public static final Icon CLOUD_BREAKPOINT_FINAL = load("/icons/cloudsnapshotfinal.png");
   public static final Icon CLOUD_BREAKPOINT = load("/icons/cloudbreakpoint.png");
   public static final Icon CLOUD_BREAKPOINT_CHECKED = load("/icons/cloudbreakpointchecked.png");

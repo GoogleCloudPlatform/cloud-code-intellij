@@ -88,7 +88,7 @@ public class DependencyVersionWithBomInspection
     }
 
     if (!CloudLibraryProjectState.getInstance(module.getProject())
-        .getCloudLibraryBom(module)
+        .getCloudLibraryBomVersion(module)
         .isPresent()) {
       return;
     }

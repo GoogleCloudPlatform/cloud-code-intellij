@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.gcs;
 
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
@@ -41,6 +40,6 @@ public final class GcsToolWindowFactory implements ToolWindowFactory, DumbAware 
 
   @Override
   public void init(ToolWindow window) {
-    window.setIcon(GoogleCloudToolsIcons.CLOUD_STORAGE);
+    window.setIcon(GoogleCloudStorageIcons.CLOUD_STORAGE);
   }
 }
