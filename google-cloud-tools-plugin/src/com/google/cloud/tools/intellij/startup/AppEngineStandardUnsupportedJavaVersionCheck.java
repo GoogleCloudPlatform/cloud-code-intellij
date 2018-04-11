@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.startup;
 
-import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
+import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;

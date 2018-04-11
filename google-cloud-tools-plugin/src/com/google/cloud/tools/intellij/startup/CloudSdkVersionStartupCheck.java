@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.startup;
 
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkVersionNotifier;
+import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkVersionNotifier;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
 import org.jetbrains.annotations.NotNull;

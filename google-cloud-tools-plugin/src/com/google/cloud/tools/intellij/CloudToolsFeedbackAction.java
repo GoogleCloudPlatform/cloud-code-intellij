@@ -18,7 +18,7 @@ package com.google.cloud.tools.intellij;
 
 import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
@@ -67,12 +67,12 @@ public class CloudToolsFeedbackAction extends DumbAwareAction {
 
   private static String formatUrl() {
     String pluginVersion = ServiceManager.getService(PluginInfoService.class).getPluginVersion();
-
+    String cloudSdkVersion = getCloudSdkVersion();
     String issueBody =
         MessageFormat.format(
             BODY_TEMPLATE,
             pluginVersion,
-            getCloudSdkVersion(),
+            cloudSdkVersion == null ? "No Cloud SDK Service Installed": cloudSdkVersion,
             System.getProperty("os.name"),
             System.getProperty("os.version"));
 
@@ -81,8 +81,12 @@ public class CloudToolsFeedbackAction extends DumbAwareAction {
 
   private static String getCloudSdkVersion() {
     try {
+      CloudSdkService cloudSdkService = CloudSdkService.getInstance();
+      if (cloudSdkService == null) {
+        return null;
+      }
       CloudSdk sdk =
-          new CloudSdk.Builder().sdkPath(CloudSdkService.getInstance().getSdkHomePath()).build();
+          new CloudSdk.Builder().sdkPath(cloudSdkService.getSdkHomePath()).build();
       return sdk.getVersion().toString();
     } catch (AppEngineException aee) {
       return "";

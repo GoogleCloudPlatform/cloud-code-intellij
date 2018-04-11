@@ -34,22 +34,12 @@ publishPlugin {
     channels ijPluginRepoChannel
 }
 
-project.afterEvaluate {
-    //todo: currently we need this to include 'ultimate' module to the plugin zip; it would be better to support such inclusion in 'intellij' plugin
-    def prepareSandboxTask = project.tasks.findByName("prepareSandbox")
-    prepareSandboxTask.dependsOn project('ultimate').jar
-
-    prepareSandboxTask.doLast {
-        copy {
-            from files(project('ultimate').jar)
-            into "$prepareSandboxTask.destinationDir/$intellij.pluginName/lib"
-        }
-    }
-}
 
 dependencies {
     compile(project(':google-cloud-tools-plugin:google-cloud-core'))
     compile(project(':google-cloud-tools-plugin:google-cloud-storage'))
+    compile(project(':google-cloud-tools-plugin:app-engine:java'))
+    compile(project(':google-cloud-tools-plugin:app-engine:java:ultimate'))
     compile(project(':google-cloud-tools-plugin:stackdriver-debugger'))
 
     compile 'com.google.apis:google-api-services-clouddebugger:v2-rev7-1.21.0'

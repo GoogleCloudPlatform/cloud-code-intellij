@@ -16,6 +16,6 @@
 
 <idea-plugin url="https://www.jetbrains.com/idea">
   <extensions defaultExtensionNs="org.jetbrains.idea.maven">
-    <importer implementation="com.google.cloud.tools.intellij.appengine.maven.AppEngineFacetImporter"/>
+    <importer implementation="com.google.cloud.tools.intellij.appengine.java.maven.AppEngineFacetImporter"/>
   </extensions>
 </idea-plugin>

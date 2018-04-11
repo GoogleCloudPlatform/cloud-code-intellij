@@ -19,8 +19,8 @@ package com.google.cloud.tools.intellij.startup;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkVersionNotifier;
+import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkVersionNotifier;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 import com.intellij.openapi.project.Project;
 import org.junit.Before;
