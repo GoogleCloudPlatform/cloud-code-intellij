@@ -16,8 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.java.facet.standard;
 
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineIcons;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetType;
 import com.intellij.facet.FacetTypeId;
@@ -36,7 +36,7 @@ public class AppEngineStandardFacetType
   public static final String STRING_ID = "app-engine-standard";
 
   public AppEngineStandardFacetType() {
-    super(ID, STRING_ID, GctBundle.message("appengine.standard.facet.name.title"));
+    super(ID, STRING_ID, AppEngineMessageBundle.message("appengine.standard.facet.name.title"));
   }
 
   @Override
@@ -60,6 +60,6 @@ public class AppEngineStandardFacetType
 
   @Override
   public Icon getIcon() {
-    return GoogleCloudToolsIcons.APP_ENGINE;
+    return AppEngineIcons.APP_ENGINE;
   }
 }

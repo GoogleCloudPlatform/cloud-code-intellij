@@ -21,7 +21,7 @@ import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.intellij.openapi.project.Project;
@@ -63,18 +63,18 @@ public final class AppEngineDeploymentConfigurationPanel {
 
     versionIdField
         .getEmptyText()
-        .setText(GctBundle.message("appengine.flex.version.placeholder.text"));
+        .setText(AppEngineMessageBundle.message("appengine.flex.version.placeholder.text"));
 
     promoteCheckbox.setSelected(PROMOTE_DEFAULT);
     stopPreviousVersionCheckbox.setSelected(STOP_PREVIOUS_VERSION_DEFAULT);
     stopPreviousVersionCheckbox.setEnabled(STOP_PREVIOUS_VERSION_DEFAULT);
 
     promoteInfoLabel.setHyperlinkText(
-        GctBundle.getString("appengine.promote.info.label.beforeLink") + " ",
-        GctBundle.getString("appengine.promote.info.label.link"),
+        AppEngineMessageBundle.getString("appengine.promote.info.label.beforeLink") + " ",
+        AppEngineMessageBundle.getString("appengine.promote.info.label.link"),
         "");
     promoteInfoLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
-    promoteInfoLabel.setHyperlinkTarget(GctBundle.getString("appengine.promoteinfo.url"));
+    promoteInfoLabel.setHyperlinkTarget(AppEngineMessageBundle.getString("appengine.promoteinfo.url"));
 
     promoteCheckbox.addItemListener(
         event -> {
@@ -85,9 +85,9 @@ public final class AppEngineDeploymentConfigurationPanel {
         });
 
     appEngineCostWarningLabel.setHyperlinkText(
-        GctBundle.getString("appengine.flex.deployment.cost.warning.beforeLink"),
-        GctBundle.getString("appengine.flex.deployment.cost.warning.link"),
-        " " + GctBundle.getString("appengine.flex.deployment.cost.warning.afterLink"));
+        AppEngineMessageBundle.getString("appengine.flex.deployment.cost.warning.beforeLink"),
+        AppEngineMessageBundle.getString("appengine.flex.deployment.cost.warning.link"),
+        " " + AppEngineMessageBundle.getString("appengine.flex.deployment.cost.warning.afterLink"));
     appEngineCostWarningLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
     appEngineCostWarningLabel.setHyperlinkTarget(CloudSdkAppEngineHelper.APP_ENGINE_BILLING_URL);
 
@@ -189,7 +189,7 @@ public final class AppEngineDeploymentConfigurationPanel {
       applicationInfoPanel.refresh(selectedProject.projectId(), user.get().getCredential());
     } else {
       applicationInfoPanel.setMessage(
-          GctBundle.getString("appengine.infopanel.no.region"), true /* isError*/);
+          AppEngineMessageBundle.getString("appengine.infopanel.no.region"), true /* isError*/);
     }
   }
 

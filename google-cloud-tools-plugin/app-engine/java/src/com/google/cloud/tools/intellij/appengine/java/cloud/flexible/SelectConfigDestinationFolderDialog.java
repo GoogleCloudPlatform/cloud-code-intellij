@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.java.cloud.flexible;
 
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -47,7 +47,7 @@ public class SelectConfigDestinationFolderDialog extends DialogWrapper {
 
     init();
     destinationFolderChooser.addBrowseFolderListener(
-        GctBundle.message("appengine.flex.config.choose.destination.folder.window.title"),
+        AppEngineMessageBundle.message("appengine.flex.config.choose.destination.folder.window.title"),
         null,
         project,
         FileChooserDescriptorFactory.createSingleFolderDescriptor());
@@ -84,7 +84,7 @@ public class SelectConfigDestinationFolderDialog extends DialogWrapper {
   protected ValidationInfo doValidate() {
     if (StringUtil.isEmpty(destinationFolderChooser.getText())) {
       return new ValidationInfo(
-          GctBundle.message("appengine.flex.config.destination.chooser.directory.missing"),
+          AppEngineMessageBundle.message("appengine.flex.config.destination.chooser.directory.missing"),
           destinationFolderChooser);
     }
     return null;

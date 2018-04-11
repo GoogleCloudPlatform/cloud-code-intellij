@@ -20,7 +20,7 @@ import static com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDepl
 import static com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeploymentConfiguration.STAGED_ARTIFACT_NAME_LEGACY;
 
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineEnvironment;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.common.base.Strings;
 import com.intellij.conversion.CannotConvertException;
 import com.intellij.conversion.ConversionContext;
@@ -56,7 +56,7 @@ public final class StagedArtifactNameConverterProvider extends ConverterProvider
   @NotNull
   @Override
   public String getConversionDescription() {
-    return GctBundle.message("appengine.staged.artifact.name.converter.description");
+    return AppEngineMessageBundle.message("appengine.staged.artifact.name.converter.description");
   }
 
   @NotNull

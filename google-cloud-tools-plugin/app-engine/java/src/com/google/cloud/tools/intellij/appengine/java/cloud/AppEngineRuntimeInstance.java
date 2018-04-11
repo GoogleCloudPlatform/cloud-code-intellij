@@ -21,7 +21,7 @@ import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService.SdkSta
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceManager;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceManager.CloudSdkStatusHandler;
 import com.google.cloud.tools.intellij.login.Services;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -64,7 +64,7 @@ public class AppEngineRuntimeInstance
 
     Services.getLoginService().logInIfNot();
     if (!Services.getLoginService().isLoggedIn()) {
-      callback.errorOccurred(GctBundle.message("appengine.deployment.error.not.logged.in"));
+      callback.errorOccurred(AppEngineMessageBundle.message("appengine.deployment.error.not.logged.in"));
       return;
     }
 
@@ -87,7 +87,7 @@ public class AppEngineRuntimeInstance
                   .runWhenSdkReady(
                       task.getProject(),
                       deployRunner,
-                      GctBundle.message("appengine.deployment.status.deploying"),
+                      AppEngineMessageBundle.message("appengine.deployment.status.deploying"),
                       new CloudSdkStatusHandler() {
                         @Override
                         public void log(String message) {
@@ -102,7 +102,7 @@ public class AppEngineRuntimeInstance
                         @Override
                         public void onUserCancel() {
                           String cancelMessage =
-                              GctBundle.message("appengine.deployment.user.cancel");
+                              AppEngineMessageBundle.message("appengine.deployment.user.cancel");
                           callback.errorOccurred(cancelMessage);
                           logManager.getMainLoggingHandler().print(cancelMessage + "\n");
                         }
@@ -111,12 +111,12 @@ public class AppEngineRuntimeInstance
                         public String getErrorMessage(SdkStatus sdkStatus) {
                           switch (sdkStatus) {
                             case INVALID:
-                              return GctBundle.message("appengine.deployment.error.sdk.invalid");
+                              return AppEngineMessageBundle.message("appengine.deployment.error.sdk.invalid");
                             case NOT_AVAILABLE:
-                              return GctBundle.message(
+                              return AppEngineMessageBundle.message(
                                   "appengine.deployment.error.sdk.not.available");
                             default:
-                              return GctBundle.message("appengine.deployment.error.sdk.retry");
+                              return AppEngineMessageBundle.message("appengine.deployment.error.sdk.retry");
                           }
                         }
                       });

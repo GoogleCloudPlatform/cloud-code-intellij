@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.java.facet.standard;
 
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.intellij.openapi.roots.DependencyScope;
 import java.util.Arrays;
 import java.util.Optional;
@@ -25,31 +25,31 @@ import org.apache.commons.lang.WordUtils;
 /** Defines the available App Engine standard maven-sourced libraries. */
 public enum AppEngineStandardMavenLibrary {
   SERVLET_API(
-      GctBundle.message("appengine.library.servlet.api.name"),
+      AppEngineMessageBundle.message("appengine.library.servlet.api.name"),
       "javax.servlet",
       "servlet-api",
       "2.5",
       DependencyScope.PROVIDED),
   JSTL(
-      GctBundle.message("appengine.library.jstl.api.name"),
+      AppEngineMessageBundle.message("appengine.library.jstl.api.name"),
       "javax.servlet",
       "jstl",
       "1.2",
       DependencyScope.PROVIDED),
   APP_ENGINE_API(
-      GctBundle.message("appengine.library.app.engine.api.name"),
+      AppEngineMessageBundle.message("appengine.library.app.engine.api.name"),
       "com.google.appengine",
       "appengine-api-1.0-sdk",
       AppEngineStandardMavenLibrary.RELEASE_VERSION_ID,
       DependencyScope.COMPILE),
   ENDPOINTS(
-      GctBundle.message("appengine.library.endpoints.api.name"),
+      AppEngineMessageBundle.message("appengine.library.endpoints.api.name"),
       "com.google.endpoints",
       "endpoints-framework",
       AppEngineStandardMavenLibrary.RELEASE_VERSION_ID,
       DependencyScope.COMPILE),
   OBJECTIFY(
-      GctBundle.message("appengine.library.objectify.api.name"),
+      AppEngineMessageBundle.message("appengine.library.objectify.api.name"),
       "com.googlecode.objectify",
       "objectify",
       AppEngineStandardMavenLibrary.RELEASE_VERSION_ID,

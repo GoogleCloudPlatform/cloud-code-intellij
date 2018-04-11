@@ -20,7 +20,7 @@ import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
 import com.google.cloud.tools.intellij.appengine.java.sdk.ManagedCloudSdkService.ManagedSdkJobResult;
 import com.google.cloud.tools.intellij.appengine.java.sdk.ManagedCloudSdkService.ManagedSdkJobType;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.managedcloudsdk.ProgressListener;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.notification.Notification;
@@ -58,7 +58,7 @@ public class ManagedCloudSdkServiceUiPresenter {
   }
 
   public void notifyManagedSdkJobSuccess(ManagedSdkJobType jobType, ManagedSdkJobResult jobResult) {
-    String message = GctBundle.message("managedsdk.success." + jobType.name().toLowerCase());
+    String message = AppEngineMessageBundle.message("managedsdk.success." + jobType.name().toLowerCase());
     switch (jobResult) {
       case PROCESSED:
         showNotification(message, NotificationType.INFORMATION);
@@ -70,12 +70,12 @@ public class ManagedCloudSdkServiceUiPresenter {
 
   public void notifyManagedSdkJobFailure(ManagedSdkJobType jobType, String errorMessage) {
     String message =
-        GctBundle.message("managedsdk.failure." + jobType.name().toLowerCase(), errorMessage);
+        AppEngineMessageBundle.message("managedsdk.failure." + jobType.name().toLowerCase(), errorMessage);
     showNotification(message, NotificationType.ERROR);
   }
 
   public void notifyManagedSdkJobCancellation(ManagedSdkJobType jobType) {
-    String message = GctBundle.message("managedsdk.cancel." + jobType.name().toLowerCase());
+    String message = AppEngineMessageBundle.message("managedsdk.cancel." + jobType.name().toLowerCase());
     showNotification(message, NotificationType.WARNING);
   }
 
@@ -118,7 +118,7 @@ public class ManagedCloudSdkServiceUiPresenter {
   private Notification showNotification(String message, NotificationType notificationType) {
     Notification notification =
         NOTIFICATION_GROUP.createNotification(
-            GctBundle.message("managedsdk.notifications.title"),
+            AppEngineMessageBundle.message("managedsdk.notifications.title"),
             null /*subtitle*/,
             message,
             notificationType);

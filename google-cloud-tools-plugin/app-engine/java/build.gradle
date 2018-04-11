@@ -19,6 +19,9 @@ sourceSets.main.resources.srcDirs = ['resources', 'src']
 sourceSets.test.java.srcDirs = ['testSrc']
 sourceSets.test.resources.srcDirs = ['testResources', 'testData']
 
+intellij {
+    plugins 'gradle', 'maven'
+}
 
 dependencies {
     compile(project(':google-cloud-tools-plugin:google-cloud-core'))

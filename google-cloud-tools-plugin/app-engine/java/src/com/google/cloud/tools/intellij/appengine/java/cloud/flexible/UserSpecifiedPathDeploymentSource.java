@@ -18,7 +18,7 @@ package com.google.cloud.tools.intellij.appengine.java.cloud.flexible;
 
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeployable;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineEnvironment;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.intellij.icons.AllIcons.FileTypes;
 import com.intellij.openapi.module.ModulePointer;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
@@ -58,7 +58,7 @@ public class UserSpecifiedPathDeploymentSource extends ModuleDeploymentSourceImp
   @NotNull
   @Override
   public String getPresentableName() {
-    return GctBundle.message("appengine.flex.user.specified.deploymentsource.name");
+    return AppEngineMessageBundle.message("appengine.flex.user.specified.deploymentsource.name");
   }
 
   @Override

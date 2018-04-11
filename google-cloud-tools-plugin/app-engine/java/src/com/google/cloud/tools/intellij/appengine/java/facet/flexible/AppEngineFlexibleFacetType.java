@@ -16,8 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.java.facet.flexible;
 
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineIcons;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetType;
 import com.intellij.facet.FacetTypeId;
@@ -37,7 +37,7 @@ public class AppEngineFlexibleFacetType
   public static final String STRING_ID = "app-engine-flexible";
 
   public AppEngineFlexibleFacetType() {
-    super(ID, STRING_ID, GctBundle.getString("appengine.flexible.facet.name.title"));
+    super(ID, STRING_ID, AppEngineMessageBundle.getString("appengine.flexible.facet.name.title"));
   }
 
   @Override
@@ -62,6 +62,6 @@ public class AppEngineFlexibleFacetType
   @Nullable
   @Override
   public Icon getIcon() {
-    return GoogleCloudToolsIcons.APP_ENGINE;
+    return AppEngineIcons.APP_ENGINE;
   }
 }

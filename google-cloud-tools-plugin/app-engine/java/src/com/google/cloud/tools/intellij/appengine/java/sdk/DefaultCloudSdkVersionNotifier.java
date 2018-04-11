@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.java.sdk;
 
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
@@ -39,7 +39,7 @@ public class DefaultCloudSdkVersionNotifier extends CloudSdkVersionNotifier {
   void showNotification() {
     NotificationGroup notification =
         new NotificationGroup(
-            GctBundle.message("appengine.cloudsdk.version.support.title"),
+            AppEngineMessageBundle.message("appengine.cloudsdk.version.support.title"),
             NotificationDisplayType.BALLOON,
             true);
 
@@ -48,7 +48,7 @@ public class DefaultCloudSdkVersionNotifier extends CloudSdkVersionNotifier {
 
     notification
         .createNotification(
-            GctBundle.message("appengine.cloudsdk.version.support.title"),
+            AppEngineMessageBundle.message("appengine.cloudsdk.version.support.title"),
             message,
             NotificationType.WARNING,
             null /* notificationListener */)

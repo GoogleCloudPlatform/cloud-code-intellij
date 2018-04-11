@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.java.cloud.flexible;
 
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import java.nio.file.Path;
@@ -55,18 +55,18 @@ public class FileConfirmationDialog extends DialogWrapper {
 
     switch (dialogType) {
       case CONFIRM_OVERWRITE:
-        setTitle(GctBundle.message("appengine.flex.config.destination.overwrite.title"));
-        warningLabel.setText(GctBundle.message("appengine.flex.config.destination.overwrite"));
+        setTitle(AppEngineMessageBundle.message("appengine.flex.config.destination.overwrite.title"));
+        warningLabel.setText(AppEngineMessageBundle.message("appengine.flex.config.destination.overwrite"));
         break;
 
       case CONFIRM_CREATE_DIR:
-        setTitle(GctBundle.message("appengine.flex.config.destination.create.dir.title"));
-        warningLabel.setText(GctBundle.message("appengine.flex.config.destination.create.dir"));
+        setTitle(AppEngineMessageBundle.message("appengine.flex.config.destination.create.dir.title"));
+        warningLabel.setText(AppEngineMessageBundle.message("appengine.flex.config.destination.create.dir"));
         break;
 
       case NOT_DIRECTORY_ERROR:
-        setTitle(GctBundle.message("appengine.flex.config.destination.not.directory.title"));
-        warningLabel.setText(GctBundle.message("appengine.flex.config.destination.not.directory"));
+        setTitle(AppEngineMessageBundle.message("appengine.flex.config.destination.not.directory.title"));
+        warningLabel.setText(AppEngineMessageBundle.message("appengine.flex.config.destination.not.directory"));
         break;
 
       default:

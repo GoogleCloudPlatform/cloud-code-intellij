@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.java.facet.standard;
 
 import com.google.cloud.tools.intellij.appengine.java.facet.AddAppEngineFrameworkSupportAction;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleConfigurable;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModelImpl;
@@ -38,8 +38,8 @@ public class AddAppEngineStandardFrameworkSupportToolsMenuAction
 
   public AddAppEngineStandardFrameworkSupportToolsMenuAction() {
     super(
-        GctBundle.message("appengine.standard.facet.name.title"),
-        GctBundle.message("appengine.standard.facet.name"));
+        AppEngineMessageBundle.message("appengine.standard.facet.name.title"),
+        AppEngineMessageBundle.message("appengine.standard.facet.name"));
     provider = new AppEngineStandardSupportProvider();
   }
 

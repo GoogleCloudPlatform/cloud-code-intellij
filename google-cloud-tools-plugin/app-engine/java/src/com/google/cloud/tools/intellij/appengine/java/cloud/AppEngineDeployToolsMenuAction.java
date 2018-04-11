@@ -17,8 +17,8 @@
 package com.google.cloud.tools.intellij.appengine.java.cloud;
 
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineIcons;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
@@ -44,9 +44,9 @@ public class AppEngineDeployToolsMenuAction extends AnAction {
 
   public AppEngineDeployToolsMenuAction() {
     super(
-        GctBundle.message("appengine.tools.menu.deploy.text"),
-        GctBundle.message("appengine.tools.menu.deploy.description"),
-        GoogleCloudToolsIcons.APP_ENGINE);
+        AppEngineMessageBundle.message("appengine.tools.menu.deploy.text"),
+        AppEngineMessageBundle.message("appengine.tools.menu.deploy.description"),
+        AppEngineIcons.APP_ENGINE);
   }
 
   @Override
@@ -84,14 +84,14 @@ public class AppEngineDeployToolsMenuAction extends AnAction {
   private void notifyNotAppEngineProject(@NotNull Project project) {
     NotificationGroup notification =
         new NotificationGroup(
-            GctBundle.message("appengine.tools.menu.deploy.error.title"),
+            AppEngineMessageBundle.message("appengine.tools.menu.deploy.error.title"),
             NotificationDisplayType.BALLOON,
             true);
 
     notification
         .createNotification(
-            GctBundle.message("appengine.tools.menu.deploy.error.title"),
-            GctBundle.message("appengine.tools.menu.deploy.error.message"),
+            AppEngineMessageBundle.message("appengine.tools.menu.deploy.error.title"),
+            AppEngineMessageBundle.message("appengine.tools.menu.deploy.error.message"),
             NotificationType.ERROR,
             null /*listener*/)
         .notify(project);

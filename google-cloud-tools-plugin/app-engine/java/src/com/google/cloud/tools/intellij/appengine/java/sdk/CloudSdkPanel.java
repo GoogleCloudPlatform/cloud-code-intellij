@@ -19,7 +19,7 @@ package com.google.cloud.tools.intellij.appengine.java.sdk;
 import com.google.cloud.tools.intellij.GctFeature;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.intellij.icons.AllIcons.RunConfigurations;
@@ -101,7 +101,7 @@ public class CloudSdkPanel {
 
   public static String buildSdkMessage(String path, boolean htmlEnabled) {
     if (StringUtil.isEmpty(path)) {
-      String missingMessage = GctBundle.message("cloudsdk.location.missing.message");
+      String missingMessage = AppEngineMessageBundle.message("cloudsdk.location.missing.message");
 
       return htmlEnabled ? missingMessage + " " + getCloudSdkDownloadMessage() : missingMessage;
     }
@@ -204,7 +204,7 @@ public class CloudSdkPanel {
           .validateCloudSdk(customSdkPathText)
           .contains(CloudSdkValidationResult.MALFORMED_PATH)) {
         throw new ConfigurationException(
-            GctBundle.message("appengine.cloudsdk.location.badchars.message"));
+            AppEngineMessageBundle.message("appengine.cloudsdk.location.badchars.message"));
       }
 
       sdkServiceUserSettings.setCustomSdkPath(customSdkPathText);
@@ -272,7 +272,7 @@ public class CloudSdkPanel {
 
   private static String getCloudSdkDownloadMessage() {
     String openTag = "<a href='" + CLOUD_SDK_DOWNLOAD_LINK + "'>";
-    return GctBundle.message("cloudsdk.download.message", openTag, "</a>");
+    return AppEngineMessageBundle.message("cloudsdk.download.message", openTag, "</a>");
   }
 
   private void checkManagedSdkFeatureStatus() {
@@ -282,14 +282,14 @@ public class CloudSdkPanel {
       customRadioButton.setSelected(true);
       // more specific title for this case as this panel will be re-used in multiple places.
       customRadioButton.setText(
-          GctBundle.getString("cloudsdk.customsdk.without.managedsdk.feature"));
+          AppEngineMessageBundle.getString("cloudsdk.customsdk.without.managedsdk.feature"));
     }
   }
 
   private void createUIComponents() {
     checkForUpdatesHyperlink = new HyperlinkLabel();
     checkForUpdatesHyperlink.setHyperlinkText(
-        GctBundle.getString("cloudsdk.check.for.updates.action"));
+        AppEngineMessageBundle.getString("cloudsdk.check.for.updates.action"));
   }
 
   private void initEvents() {
@@ -327,7 +327,7 @@ public class CloudSdkPanel {
         });
 
     cloudSdkDirectoryField.addBrowseFolderListener(
-        GctBundle.message("cloudsdk.location.browse.window.title"),
+        AppEngineMessageBundle.message("cloudsdk.location.browse.window.title"),
         null, /* description */
         null, /* project */
         FileChooserDescriptorFactory.createSingleFolderDescriptor());

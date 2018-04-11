@@ -22,7 +22,7 @@ import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.ui.FontUtils;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.progress.ProgressManager;
@@ -78,7 +78,7 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
   protected void init() {
     super.init();
 
-    setTitle(GctBundle.message("appengine.application.region.select"));
+    setTitle(AppEngineMessageBundle.message("appengine.application.region.select"));
     refreshLocationsSelector();
 
     statusPanel.setVisible(false);
@@ -95,9 +95,9 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
     instructionsTextPane.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
     instructionsTextPane.setText(
         HTML_OPEN_TAG
-            + GctBundle.message("appengine.application.create.instructions")
+            + AppEngineMessageBundle.message("appengine.application.create.instructions")
             + "<p>"
-            + GctBundle.message(
+            + AppEngineMessageBundle.message(
                 "appengine.application.create.documentation",
                 "<a href=\"" + LOCATIONS_DOCUMENTATION_URL + "\">",
                 "</a>")
@@ -127,7 +127,7 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
                   AppEngineAdminService.getInstance()
                       .createApplication(
                           selectedLocation.getLocationId(), gcpProjectId, userCredential),
-              GctBundle.message(
+              AppEngineMessageBundle.message(
                   "appengine.application.create.loading", selectedLocation.getLocationId()),
               true /* cancellable */,
               ProjectManager.getInstance().getDefaultProject());
@@ -140,7 +140,7 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
 
     } catch (IOException e) {
       trackApplicationCreateFailure();
-      setStatusMessage(GctBundle.message("appengine.application.create.error.transient"), true);
+      setStatusMessage(AppEngineMessageBundle.message("appengine.application.create.error.transient"), true);
 
     } catch (GoogleApiException e) {
       trackApplicationCreateFailure();
@@ -194,7 +194,7 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
                     AppEngineAdminService.getInstance().getAllAppEngineLocations(userCredential);
               } catch (IOException | GoogleApiException e) {
                 setStatusMessageAsync(
-                    GctBundle.message("appengine.application.region.list.fetch.error"));
+                    AppEngineMessageBundle.message("appengine.application.region.list.fetch.error"));
                 enable();
                 return;
               }
@@ -229,7 +229,7 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
 
     String displayText =
         HTML_OPEN_TAG
-            + GctBundle.message(
+            + AppEngineMessageBundle.message(
                 "appengine.application.region.supported.environments",
                 "<strong>" + item.getLocation().getLocationId() + "</strong>")
             + "<ul>";
@@ -237,7 +237,7 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
     if (item.isStandardSupported()) {
       displayText +=
           "<li>"
-              + GctBundle.message(
+              + AppEngineMessageBundle.message(
                   "appengine.application.region.supports.standard",
                   "<a href=\"" + STANDARD_DOCUMENTATION_URL + "\">",
                   "</a>")
@@ -246,7 +246,7 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
     if (item.isFlexSupported()) {
       displayText +=
           "<li>"
-              + GctBundle.message(
+              + AppEngineMessageBundle.message(
                   "appengine.application.region.supports.flex",
                   "<a href=\"" + FLEX_DOCUMENTATION_URL + "\">",
                   "</a>")

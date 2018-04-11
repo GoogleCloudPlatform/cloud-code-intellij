@@ -22,7 +22,7 @@ import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineVersions;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.intellij.icons.AllIcons.General;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.Messages;
@@ -108,15 +108,15 @@ public class AppEngineStop {
                 @Override
                 public void run() {
                   Messages.showMessageDialog(
-                      GctBundle.message("appengine.stop.modules.version.success.dialog.message"),
-                      GctBundle.message("appengine.stop.modules.version.success.dialog.title"),
+                      AppEngineMessageBundle.message("appengine.stop.modules.version.success.dialog.message"),
+                      AppEngineMessageBundle.message("appengine.stop.modules.version.success.dialog.title"),
                       General.Information);
                 }
               });
         } else {
           logger.warn("Application stop process exited with an error. Exit Code:" + exitCode);
           callback.errorOccurred(
-              GctBundle.message(
+              AppEngineMessageBundle.message(
                   "appengine.stop.modules.version.execution.error.with.code", exitCode));
         }
       } finally {

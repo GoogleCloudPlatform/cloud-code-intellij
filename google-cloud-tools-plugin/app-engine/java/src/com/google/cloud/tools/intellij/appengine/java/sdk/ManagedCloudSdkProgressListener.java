@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.java.sdk;
 
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.managedcloudsdk.ChildProgressListener;
 import com.google.cloud.tools.managedcloudsdk.ProgressListener;
 import com.google.common.annotations.VisibleForTesting;
@@ -94,7 +94,7 @@ class ManagedCloudSdkProgressListener implements ProgressListener {
   }
 
   private void setProgressText(String message) {
-    progressIndicator.setText(GctBundle.message("managedsdk.progress.message", message));
+    progressIndicator.setText(AppEngineMessageBundle.message("managedsdk.progress.message", message));
   }
 
   @VisibleForTesting
@@ -106,7 +106,7 @@ class ManagedCloudSdkProgressListener implements ProgressListener {
               task =
                   new Backgroundable(
                       null /* not project specific task */,
-                      GctBundle.message("managedsdk.notifications.title"),
+                      AppEngineMessageBundle.message("managedsdk.notifications.title"),
                       true /* cancellable */,
                       PerformInBackgroundOption.ALWAYS_BACKGROUND) {
                     /**

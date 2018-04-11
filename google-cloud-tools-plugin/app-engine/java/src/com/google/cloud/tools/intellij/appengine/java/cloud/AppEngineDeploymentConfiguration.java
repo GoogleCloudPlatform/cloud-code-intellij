@@ -25,7 +25,7 @@ import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkValidationResult;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkValidator;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.common.collect.Iterables;
 import com.intellij.execution.configurations.RuntimeConfigurationError;
 import com.intellij.execution.configurations.RuntimeConfigurationException;
@@ -182,7 +182,7 @@ public class AppEngineDeploymentConfiguration
       throws RuntimeConfigurationException {
     if (!(deploymentSource instanceof AppEngineDeployable)) {
       throw new RuntimeConfigurationError(
-          GctBundle.message("appengine.deployment.invalid.source.error"));
+          AppEngineMessageBundle.message("appengine.deployment.invalid.source.error"));
     }
 
     AppEngineDeployable deployable = (AppEngineDeployable) deploymentSource;
@@ -247,7 +247,7 @@ public class AppEngineDeploymentConfiguration
       if (!sdkValidationResult.isEmpty()) {
         CloudSdkValidationResult result = Iterables.getFirst(sdkValidationResult, null);
         throw new RuntimeConfigurationError(
-            GctBundle.message("appengine.flex.config.server.error", result.getMessage()));
+            AppEngineMessageBundle.message("appengine.flex.config.server.error", result.getMessage()));
       }
     }
 
@@ -296,7 +296,7 @@ public class AppEngineDeploymentConfiguration
             "appengine.deployment.config.dockerfile.error");
       }
     } catch (MalformedYamlFileException e) {
-      throw new RuntimeConfigurationError(GctBundle.message("appengine.appyaml.malformed"));
+      throw new RuntimeConfigurationError(AppEngineMessageBundle.message("appengine.appyaml.malformed"));
     }
   }
 
@@ -305,13 +305,13 @@ public class AppEngineDeploymentConfiguration
    * RuntimeConfigurationError} with the given message.
    *
    * @param expression the expression to test
-   * @param message the key of the message (as described by {@link GctBundle#message}) to show in
+   * @param message the key of the message (as described by {@link AppEngineMessageBundle#message}) to show in
    *     the error
    * @throws RuntimeConfigurationError if the given expression is false
    */
   private static void check(boolean expression, String message) throws RuntimeConfigurationError {
     if (!expression) {
-      throw new RuntimeConfigurationError(GctBundle.message(message));
+      throw new RuntimeConfigurationError(AppEngineMessageBundle.message(message));
     }
   }
 

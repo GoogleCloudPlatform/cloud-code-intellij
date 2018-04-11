@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.java.migration;
 
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.intellij.conversion.ConversionContext;
 import com.intellij.conversion.ConversionProcessor;
 import com.intellij.conversion.ConverterProvider;
@@ -36,7 +36,7 @@ public class AppEngineConverterProvider extends ConverterProvider {
   @NotNull
   @Override
   public String getConversionDescription() {
-    return GctBundle.message("appengine.converter.description");
+    return AppEngineMessageBundle.message("appengine.converter.description");
   }
 
   @NotNull

@@ -25,7 +25,7 @@ import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.java.facet.flexible.AppEngineFlexibleFacet;
 import com.google.cloud.tools.intellij.appengine.java.facet.flexible.FlexibleFacetEditor;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkVersionNotifier;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
@@ -92,7 +92,7 @@ public class AppEngineDeploy {
       String moduleName = deploymentConfiguration.getModuleName();
       if (StringUtils.isEmpty(moduleName)) {
         callback.errorOccurred(
-            GctBundle.message("appengine.deployment.error.appyaml.notspecified"));
+            AppEngineMessageBundle.message("appengine.deployment.error.appyaml.notspecified"));
         return;
       }
 
@@ -100,7 +100,7 @@ public class AppEngineDeploy {
           AppEngineFlexibleFacet.getFacetByModuleName(moduleName, helper.getProject());
       if (flexFacet == null) {
         // This should not happen since staging already verified the file
-        callback.errorOccurred(GctBundle.message("appengine.deployment.error.appyaml.notfound"));
+        callback.errorOccurred(AppEngineMessageBundle.message("appengine.deployment.error.appyaml.notfound"));
         return;
       } else {
         appYamlName =
@@ -190,9 +190,9 @@ public class AppEngineDeploy {
               || deployOutput.getService() == null
               || deployOutput.getVersion() == null) {
             loggingHandler.print(
-                GctBundle.message("appengine.deployment.version.extract.failure")
+                AppEngineMessageBundle.message("appengine.deployment.version.extract.failure")
                     + "\n"
-                    + GctBundle.message("appengine.action.error.update.message")
+                    + AppEngineMessageBundle.message("appengine.action.error.update.message")
                     + "\n");
           }
 
@@ -208,9 +208,9 @@ public class AppEngineDeploy {
         } else {
           logger.warn("Deployment process exited with an error. Exit Code:" + exitCode);
           callback.errorOccurred(
-              GctBundle.message("appengine.deployment.error.with.code", exitCode)
+              AppEngineMessageBundle.message("appengine.deployment.error.with.code", exitCode)
                   + "\n"
-                  + GctBundle.message("appengine.action.error.update.message"));
+                  + AppEngineMessageBundle.message("appengine.action.error.update.message"));
         }
       } finally {
         helper.deleteCredentials();

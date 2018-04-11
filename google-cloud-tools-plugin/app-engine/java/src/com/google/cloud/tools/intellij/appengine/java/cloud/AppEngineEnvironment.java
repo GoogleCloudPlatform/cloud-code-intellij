@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.java.cloud;
 
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 
 /**
  * Specifies an App Engine environment.
@@ -54,6 +54,6 @@ public enum AppEngineEnvironment {
   }
 
   public String localizedLabel() {
-    return GctBundle.message(label);
+    return AppEngineMessageBundle.message(label);
   }
 }

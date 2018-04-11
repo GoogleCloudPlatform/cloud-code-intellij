@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.java.sdk;
 
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import javax.swing.JComponent;
@@ -31,7 +31,7 @@ public class CloudSdkConfigurable implements Configurable {
   @Nls
   @Override
   public String getDisplayName() {
-    return GctBundle.message("settings.menu.item.cloud.sdk.text");
+    return AppEngineMessageBundle.message("settings.menu.item.cloud.sdk.text");
   }
 
   @Nullable

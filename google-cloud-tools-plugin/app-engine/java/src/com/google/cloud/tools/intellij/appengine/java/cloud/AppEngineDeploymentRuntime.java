@@ -18,7 +18,7 @@ package com.google.cloud.tools.intellij.appengine.java.cloud;
 
 import com.google.cloud.tools.intellij.appengine.java.cloud.executor.AppEngineExecutor;
 import com.google.cloud.tools.intellij.appengine.java.cloud.executor.AppEngineStopTask;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.intellij.icons.AllIcons.General;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -75,18 +75,18 @@ public class AppEngineDeploymentRuntime extends DeploymentRuntime {
           public void run() {
             int doStop =
                 Messages.showOkCancelDialog(
-                    GctBundle.message(
+                    AppEngineMessageBundle.message(
                         "appengine.stop.modules.version.confirmation.message",
                         STOP_CONFIRMATION_URI_OPEN_TAG,
                         STOP_CONFIRMATION_URI_CLOSE_TAG),
-                    GctBundle.message("appengine.stop.modules.version.confirmation.title"),
+                    AppEngineMessageBundle.message("appengine.stop.modules.version.confirmation.title"),
                     General.Warning);
 
             if (doStop == Messages.YES) {
               stop(callback);
             } else {
               callback.errorOccurred(
-                  GctBundle.message("appengine.stop.modules.version.canceled.message"));
+                  AppEngineMessageBundle.message("appengine.stop.modules.version.canceled.message"));
             }
           }
         });

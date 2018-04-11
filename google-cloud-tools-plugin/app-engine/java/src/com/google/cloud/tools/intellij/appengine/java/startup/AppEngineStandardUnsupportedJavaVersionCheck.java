@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.java.startup;
 
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacet;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
@@ -98,7 +98,7 @@ public class AppEngineStandardUnsupportedJavaVersionCheck implements StartupActi
         new StringBuilder()
             .append("<p>")
             .append(
-                GctBundle.message(
+                AppEngineMessageBundle.message(
                     "appengine.support.java.version.alert.detail",
                     "<a href=\"" + UPDATE_HREF + "\">",
                     "</a>"))
@@ -107,13 +107,13 @@ public class AppEngineStandardUnsupportedJavaVersionCheck implements StartupActi
 
     NotificationGroup notification =
         new NotificationGroup(
-            GctBundle.message("appengine.support.java.version.alert.title"),
+            AppEngineMessageBundle.message("appengine.support.java.version.alert.title"),
             NotificationDisplayType.BALLOON,
             true);
 
     notification
         .createNotification(
-            GctBundle.message("appengine.support.java.version.alert.title"),
+            AppEngineMessageBundle.message("appengine.support.java.version.alert.title"),
             message,
             NotificationType.WARNING,
             new LanguageLevelLinkListener(invalidModules))

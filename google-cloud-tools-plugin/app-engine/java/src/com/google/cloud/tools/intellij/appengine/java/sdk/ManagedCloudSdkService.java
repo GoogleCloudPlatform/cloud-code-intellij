@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.appengine.java.sdk;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.managedcloudsdk.ConsoleListener;
 import com.google.cloud.tools.managedcloudsdk.ManagedCloudSdk;
@@ -155,7 +156,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
       updateStatus(SdkStatus.NOT_AVAILABLE);
       ManagedCloudSdkServiceUiPresenter.getInstance()
           .notifyManagedSdkJobFailure(
-              ManagedSdkJobType.INSTALL, GctBundle.message("managedsdk.unsupported.os"));
+              ManagedSdkJobType.INSTALL, AppEngineMessageBundle.message("managedsdk.unsupported.os"));
     }
   }
 

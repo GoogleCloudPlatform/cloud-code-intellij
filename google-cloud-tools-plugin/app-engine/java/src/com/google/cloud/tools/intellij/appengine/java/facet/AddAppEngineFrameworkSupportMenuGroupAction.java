@@ -16,15 +16,15 @@
 
 package com.google.cloud.tools.intellij.appengine.java.facet;
 
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineIcons;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 
 /** Creates the menu group for Add App Engine framework support. */
 public class AddAppEngineFrameworkSupportMenuGroupAction extends DefaultActionGroup {
 
   public AddAppEngineFrameworkSupportMenuGroupAction() {
-    getTemplatePresentation().setText(GctBundle.message("appengine.add.facet.group.menu.text"));
-    getTemplatePresentation().setIcon(GoogleCloudToolsIcons.APP_ENGINE);
+    getTemplatePresentation().setText(AppEngineMessageBundle.message("appengine.add.facet.group.menu.text"));
+    getTemplatePresentation().setIcon(AppEngineIcons.APP_ENGINE);
   }
 }

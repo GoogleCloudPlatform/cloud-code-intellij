@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.java.project;
 
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 
 /**
  * Checked exception that signals that a YAML file is malformed, which causes the parser to throw
@@ -24,6 +24,6 @@ import com.google.cloud.tools.intellij.util.GctBundle;
  */
 public class MalformedYamlFileException extends Exception {
   public MalformedYamlFileException(Throwable throwable) {
-    super(GctBundle.message("appengine.appyaml.malformed"), throwable);
+    super(AppEngineMessageBundle.message("appengine.appyaml.malformed"), throwable);
   }
 }

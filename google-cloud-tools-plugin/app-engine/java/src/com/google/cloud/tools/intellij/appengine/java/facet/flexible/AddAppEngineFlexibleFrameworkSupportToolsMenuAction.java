@@ -18,7 +18,7 @@ package com.google.cloud.tools.intellij.appengine.java.facet.flexible;
 
 import com.google.cloud.tools.intellij.appengine.java.facet.AddAppEngineFrameworkSupportAction;
 import com.google.cloud.tools.intellij.appengine.java.facet.flexible.AppEngineFlexibleSupportProvider.AppEngineFlexibleSupportConfigurable;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleConfigurable;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
 import com.intellij.openapi.module.Module;
@@ -32,8 +32,8 @@ public class AddAppEngineFlexibleFrameworkSupportToolsMenuAction
     extends AddAppEngineFrameworkSupportAction {
   public AddAppEngineFlexibleFrameworkSupportToolsMenuAction() {
     super(
-        GctBundle.message("appengine.flexible.facet.name.title"),
-        GctBundle.message("appengine.flexible.facet.name"));
+        AppEngineMessageBundle.message("appengine.flexible.facet.name.title"),
+        AppEngineMessageBundle.message("appengine.flexible.facet.name"));
   }
 
   @NotNull

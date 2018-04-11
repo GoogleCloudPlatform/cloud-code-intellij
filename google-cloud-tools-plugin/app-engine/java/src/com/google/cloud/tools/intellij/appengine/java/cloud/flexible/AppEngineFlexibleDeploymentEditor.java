@@ -29,7 +29,7 @@ import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectSe
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.java.project.MalformedYamlFileException;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.module.ModuleManager;
@@ -98,7 +98,7 @@ public final class AppEngineFlexibleDeploymentEditor
     addSettingsEditorListener(editor -> updateStagedArtifactNameEmptyText());
 
     archiveSelector.addBrowseFolderListener(
-        GctBundle.message("appengine.flex.config.user.specified.artifact.title"),
+        AppEngineMessageBundle.message("appengine.flex.config.user.specified.artifact.title"),
         null /* description */,
         project,
         FileChooserDescriptorFactory.createSingleFileDescriptor()

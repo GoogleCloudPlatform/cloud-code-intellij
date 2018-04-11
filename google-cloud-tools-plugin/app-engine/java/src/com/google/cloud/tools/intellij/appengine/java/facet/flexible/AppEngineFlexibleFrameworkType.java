@@ -16,8 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.java.facet.flexible;
 
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineIcons;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.intellij.framework.FrameworkTypeEx;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
 import javax.swing.Icon;
@@ -45,12 +45,12 @@ public class AppEngineFlexibleFrameworkType extends FrameworkTypeEx {
   @NotNull
   @Override
   public String getPresentableName() {
-    return GctBundle.getString("appengine.flexible.facet.name.title");
+    return AppEngineMessageBundle.getString("appengine.flexible.facet.name.title");
   }
 
   @NotNull
   @Override
   public Icon getIcon() {
-    return GoogleCloudToolsIcons.APP_ENGINE;
+    return AppEngineIcons.APP_ENGINE;
   }
 }

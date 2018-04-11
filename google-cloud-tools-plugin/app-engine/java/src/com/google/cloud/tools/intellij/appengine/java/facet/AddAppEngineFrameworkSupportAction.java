@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.java.facet;
 
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.facet.impl.DefaultFacetsProvider;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleConfigurable;
@@ -46,7 +46,7 @@ public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
   public AddAppEngineFrameworkSupportAction(@NotNull String nameInTitle, @NotNull String name) {
     super(
         nameInTitle,
-        GctBundle.message("appengine.add.framework.support.tools.menu.description", name),
+        AppEngineMessageBundle.message("appengine.add.framework.support.tools.menu.description", name),
         null /* icon */);
     FRAMEWORK_NAME = name;
   }
@@ -74,8 +74,8 @@ public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
     if (suitableModules.isEmpty()) {
       Messages.showErrorDialog(
           project,
-          GctBundle.message("appengine.add.framework.support.no.modules.message", FRAMEWORK_NAME),
-          GctBundle.message(
+          AppEngineMessageBundle.message("appengine.add.framework.support.no.modules.message", FRAMEWORK_NAME),
+          AppEngineMessageBundle.message(
               "appengine.add.framework.support.no.modules.title", frameworkNameInTitle));
       return;
     }
@@ -84,8 +84,8 @@ public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
         new ChooseModulesDialog(
             project,
             suitableModules,
-            GctBundle.message("appengine.add.framework.support.choose.module.dialog.title"),
-            GctBundle.message(
+            AppEngineMessageBundle.message("appengine.add.framework.support.choose.module.dialog.title"),
+            AppEngineMessageBundle.message(
                 "appengine.add.framework.support.choose.module.dialog.description",
                 FRAMEWORK_NAME));
     chooseModulesDialog.setSingleSelectionMode();
@@ -111,7 +111,7 @@ public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
     Module module = elements.get(0);
     AddAppEngineFrameworkSupportDialog frameworkSupportDialog =
         new AddAppEngineFrameworkSupportDialog(
-            GctBundle.message("appengine.add.framework.support.dialog.title", frameworkNameInTitle),
+            AppEngineMessageBundle.message("appengine.add.framework.support.dialog.title", frameworkNameInTitle),
             project,
             module,
             getModuleConfigurable(module));

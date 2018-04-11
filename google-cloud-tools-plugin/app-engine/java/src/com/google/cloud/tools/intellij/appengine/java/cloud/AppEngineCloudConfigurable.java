@@ -23,7 +23,7 @@ import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceUserSet
 import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.ui.FontUtils;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.options.Configurable;
@@ -46,7 +46,7 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
   private static final String MORE_INFO_URI_CLOSE_TAG = "</a>";
   private static final String PSEUDO_GOOGLE_SDK_LINK = "http://google-sdk/";
 
-  private String displayName = GctBundle.message("appengine.name");
+  private String displayName = AppEngineMessageBundle.message("appengine.name");
   private JPanel mainPanel;
   private JTextPane appEngineMoreInfoLabel;
   private JBLabel sdkValidationErrorLabel;
@@ -58,11 +58,11 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
     StringBuilder messageBuilder = new StringBuilder();
     if (!ServiceManager.getService(PluginInfoService.class).shouldEnable(GctFeature.MANAGED_SDK)) {
       messageBuilder.append(
-          GctBundle.message("appengine.cloud.sdk.settings", PSEUDO_GOOGLE_SDK_LINK));
+          AppEngineMessageBundle.message("appengine.cloud.sdk.settings", PSEUDO_GOOGLE_SDK_LINK));
       messageBuilder.append("<p/>");
     }
     messageBuilder.append(
-        GctBundle.message("appengine.more.info", MORE_INFO_URI_OPEN_TAG, MORE_INFO_URI_CLOSE_TAG));
+        AppEngineMessageBundle.message("appengine.more.info", MORE_INFO_URI_OPEN_TAG, MORE_INFO_URI_CLOSE_TAG));
 
     appEngineMoreInfoLabel.setText(messageBuilder.toString());
     appEngineMoreInfoLabel.addHyperlinkListener(
