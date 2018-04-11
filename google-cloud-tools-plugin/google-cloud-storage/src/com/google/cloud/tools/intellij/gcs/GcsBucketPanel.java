@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
 import com.google.cloud.tools.intellij.ui.CopyToClipboardActionListener;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Iterators;
 import com.intellij.openapi.application.ApplicationManager;
@@ -54,7 +53,7 @@ import org.jetbrains.annotations.NotNull;
  * UI definition for the Google Cloud Storage panel. Displays the panel components and invokes the
  * Storage API to load project buckets.
  */
-final class GcsBucketPanel {
+public final class GcsBucketPanel {
 
   private static final Logger log = Logger.getInstance(GcsBucketPanel.class);
 
@@ -115,9 +114,11 @@ final class GcsBucketPanel {
     showNotificationPanel();
 
     if (!Services.getLoginService().isLoggedIn()) {
-      notificationLabel.setText(GctBundle.message("gcs.panel.bucket.listing.not.logged.in"));
+      notificationLabel.setText(
+          GoogleCloudStorageMessageBundle.message("gcs.panel.bucket.listing.not.logged.in"));
     } else if (projectSelector.getSelectedProject() == null) {
-      notificationLabel.setText(GctBundle.message("gcs.panel.bucket.listing.no.project.selected"));
+      notificationLabel.setText(
+          GoogleCloudStorageMessageBundle.message("gcs.panel.bucket.listing.no.project.selected"));
     } else {
       CloudProject cloudProject = projectSelector.getSelectedProject();
       Optional<CredentialedUser> user =
@@ -127,7 +128,8 @@ final class GcsBucketPanel {
         loadAndDisplayBuckets(cloudProject.projectId(), user.get());
       } else {
         notificationLabel.setText(
-            GctBundle.message("gcs.panel.bucket.listing.error.loading.buckets"));
+            GoogleCloudStorageMessageBundle.message(
+                "gcs.panel.bucket.listing.error.loading.buckets"));
         log.warn("Cloud not load credentialed user for GCS operation. User may not be logged.");
       }
     }
@@ -175,7 +177,8 @@ final class GcsBucketPanel {
     UsageTrackerProvider.getInstance().trackEvent(GctTracking.GCS_BUCKET_LIST).ping();
 
     bucketListModel.clear();
-    notificationLabel.setText(GctBundle.message("gcs.panel.bucket.listing.loading.text"));
+    notificationLabel.setText(
+        GoogleCloudStorageMessageBundle.message("gcs.panel.bucket.listing.loading.text"));
 
     bucketLoadExecution =
         ApplicationManager.getApplication()
@@ -190,7 +193,8 @@ final class GcsBucketPanel {
 
                     if (Iterators.size(buckets.iterator()) == 0) {
                       notificationLabel.setText(
-                          GctBundle.message("gcs.panel.bucket.listing.no.buckets.found"));
+                          GoogleCloudStorageMessageBundle.message(
+                              "gcs.panel.bucket.listing.no.buckets.found"));
                       return;
                     }
 
@@ -201,7 +205,8 @@ final class GcsBucketPanel {
                     showBucketListPanel();
                   } catch (StorageException se) {
                     notificationLabel.setText(
-                        GctBundle.message("gcs.panel.bucket.listing.error.loading.buckets"));
+                        GoogleCloudStorageMessageBundle.message(
+                            "gcs.panel.bucket.listing.error.loading.buckets"));
 
                     UsageTrackerProvider.getInstance()
                         .trackEvent(GctTracking.GCS_BUCKET_LIST_EXCEPTION)
@@ -251,7 +256,9 @@ final class GcsBucketPanel {
   private void showRightClickMenu(MouseEvent event) {
     JPopupMenu rightClickMenu = new JPopupMenu();
     JMenuItem copyBucketNameMenuItem =
-        new JMenuItem(GctBundle.message("gcs.content.explorer.right.click.menu.copy.bucket.text"));
+        new JMenuItem(
+            GoogleCloudStorageMessageBundle.message(
+                "gcs.content.explorer.right.click.menu.copy.bucket.text"));
     rightClickMenu.add(copyBucketNameMenuItem);
 
     int index = bucketList.locationToIndex(event.getPoint());
