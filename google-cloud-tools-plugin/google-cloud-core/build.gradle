@@ -64,3 +64,13 @@ configurations {
     compile.exclude group: 'com.google.api-client', module: 'google-api-client'
     compile.exclude group: 'com.google.http-client', module: 'google-http-client'
 }
+
+processResources {
+    def trackerProperty =  System.getenv("ANALYTICS_ID")
+    if (trackerProperty) {
+        inputs.property("usageTrackerProperty", trackerProperty)
+        filesMatching("**/config.properties") {
+            expand "usageTrackerProperty": trackerProperty
+        }
+    }
+}
