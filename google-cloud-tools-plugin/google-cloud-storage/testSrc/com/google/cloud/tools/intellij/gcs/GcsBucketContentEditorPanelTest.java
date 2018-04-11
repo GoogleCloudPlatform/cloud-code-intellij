@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,9 @@ import com.google.api.gax.paging.Page;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Storage.BlobListOption;
 import com.google.cloud.storage.StorageException;
+import com.google.cloud.tools.intellij.analytics.UsageTrackingManagementService;
 import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
+import com.google.cloud.tools.intellij.login.PluginFlagsService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.DelayedSubmitExecutorServiceProxy;
 import com.google.cloud.tools.intellij.testing.TestService;
@@ -68,6 +70,8 @@ public class GcsBucketContentEditorPanelTest {
   private GcsBucketContentEditorPanel editorPanel;
 
   @TestService @Mock private IntegratedGoogleLoginService loginService;
+  @TestService @Mock private UsageTrackingManagementService usageTrackingManagementService;
+  @TestService @Mock private PluginFlagsService pluginFlagsService;
   @Mock private Blob binaryBlob;
   @Mock private Blob directoryBlob;
   @Mock private Blob binaryBlobInDirectory;

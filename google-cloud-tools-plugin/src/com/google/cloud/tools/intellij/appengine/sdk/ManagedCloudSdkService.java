@@ -66,7 +66,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
     initManagedSdk();
     if (isInstallSupported()) {
-      ManagedCloudSdkUpdater.getInstance().activate();
+      ManagedCloudSdkUpdateService.getInstance().activate();
     }
   }
 
@@ -335,7 +335,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
       updateStatus(SdkStatus.READY);
 
       if (result == ManagedSdkJobResult.PROCESSED) {
-        ManagedCloudSdkUpdater.getInstance().notifySdkUpdate();
+        ManagedCloudSdkUpdateService.getInstance().notifySdkUpdate();
       }
 
       ManagedCloudSdkServiceUiPresenter.getInstance().notifyManagedSdkJobSuccess(jobType, result);

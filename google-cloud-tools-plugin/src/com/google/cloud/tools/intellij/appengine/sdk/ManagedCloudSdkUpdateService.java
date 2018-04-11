@@ -27,34 +27,24 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /** Schedules and manages automatic updates for {@link ManagedCloudSdkService}. */
-public class ManagedCloudSdkUpdater {
-  private static ManagedCloudSdkUpdater instance;
-
+public class ManagedCloudSdkUpdateService {
   // one week.
-  @VisibleForTesting static final long SDK_UPDATE_INTERVAL = 1000 * 60 * 60 * 24 * 7;
+  @VisibleForTesting static final long SDK_UPDATE_INTERVAL_MS = 1000 * 60 * 60 * 24 * 7;
   // 20 seconds to show notification and then proceed with update.
-  private static final int UPDATE_NOTIFICATION_DELAY = 1000 * 20;
+  private static final int UPDATE_NOTIFICATION_DELAY_MS = 1000 * 20;
 
   @VisibleForTesting
   static final String SDK_UPDATER_THREAD_NAME = "managed-google-cloud-sdk-updates";
 
-  static ManagedCloudSdkUpdater getInstance() {
-    if (instance == null) {
-      instance = new ManagedCloudSdkUpdater();
-    }
-    return instance;
-  }
-
-  @VisibleForTesting
-  static void setInstance(ManagedCloudSdkUpdater instance) {
-    ManagedCloudSdkUpdater.instance = instance;
+  static ManagedCloudSdkUpdateService getInstance() {
+    return ServiceManager.getService(ManagedCloudSdkUpdateService.class);
   }
 
   private Timer updateTimer;
   private TimerTask sdkUpdateTask;
 
   void activate() {
-    if (!CloudSdkServiceUserSettings.getInstance().getEnableAutomaticUpdates()) {
+    if (!CloudSdkServiceUserSettings.getInstance().isAutomaticUpdateEnabled()) {
       return;
     }
 
@@ -75,16 +65,16 @@ public class ManagedCloudSdkUpdater {
         };
     long lastTimeOfUpdate =
         CloudSdkServiceUserSettings.getInstance().getLastAutomaticUpdateTimestamp();
-    long delayBeforeCheckMillis = SDK_UPDATE_INTERVAL;
+    long delayBeforeCheckMillis = SDK_UPDATE_INTERVAL_MS;
     long now = getClock().millis();
     if (lastTimeOfUpdate != 0 && lastTimeOfUpdate < now) {
       delayBeforeCheckMillis =
           Math.min(
-              SDK_UPDATE_INTERVAL,
-              Math.max(0, SDK_UPDATE_INTERVAL - (getClock().millis() - lastTimeOfUpdate)));
+              SDK_UPDATE_INTERVAL_MS,
+              Math.max(0, SDK_UPDATE_INTERVAL_MS - (getClock().millis() - lastTimeOfUpdate)));
     }
 
-    schedule(sdkUpdateTask, delayBeforeCheckMillis, SDK_UPDATE_INTERVAL);
+    schedule(sdkUpdateTask, delayBeforeCheckMillis, SDK_UPDATE_INTERVAL_MS);
   }
 
   /** Called when managed SDK update operation (update or install) successfully completes. */
@@ -117,7 +107,7 @@ public class ManagedCloudSdkUpdater {
 
       if (updateFeatureEnabled && !((ManagedCloudSdkService) cloudSdkService).isUpToDate()) {
         // schedule UI timer to let a user decide about proceeding with the update.
-        javax.swing.Timer uiTimer = createUiTimer(UPDATE_NOTIFICATION_DELAY);
+        javax.swing.Timer uiTimer = createUiTimer(UPDATE_NOTIFICATION_DELAY_MS);
         ActionListener cancelListener = (e) -> uiTimer.stop();
         ActionListener disableUpdateListener =
             (e) -> {

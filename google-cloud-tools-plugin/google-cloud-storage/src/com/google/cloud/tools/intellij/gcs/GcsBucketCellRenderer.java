@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.gcs;
 
 import com.google.cloud.storage.Bucket;
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import java.awt.Component;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -37,7 +36,7 @@ final class GcsBucketCellRenderer extends JLabel implements ListCellRenderer<Buc
       int index,
       boolean isSelected,
       boolean cellHasFocus) {
-    setIcon(GoogleCloudToolsIcons.CLOUD_STORAGE_BUCKET);
+    setIcon(GoogleCloudStorageIcons.CLOUD_STORAGE_BUCKET);
     setText(bucket.getName());
 
     if (isSelected) {
