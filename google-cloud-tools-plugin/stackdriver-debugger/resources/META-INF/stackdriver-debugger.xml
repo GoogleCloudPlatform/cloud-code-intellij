@@ -1,0 +1,54 @@
+<!--
+  ~ Copyright 2018 Google Inc. All Rights Reserved.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<idea-plugin xmlns:xi="http://www.w3.org/2001/XInclude">
+
+    <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.vcs</depends>
+    <depends>com.intellij.modules.xdebugger</depends>
+    <depends>Git4Idea</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <configurationType
+                implementation="com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugConfigType"/>
+        <programRunner implementation="com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebuggerRunner"/>
+        <xdebugger.breakpointType implementation="com.google.cloud.tools.intellij.stackdriver.debugger.CloudLineBreakpointType"/>
+        <projectService serviceImplementation="com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcessStateSerializer"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService serviceImplementation="com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcessStateCollector" />
+    </extensions>
+
+    <actions>
+        <action id="AddSnapshotLocation" class="com.google.cloud.tools.intellij.stackdriver.debugger.actions.ToggleSnapshotLocationAction"/>
+
+        <group id="EditorGutterCloudDebuggerMenu">
+            <separator/>
+            <reference ref="AddSnapshotLocation"/>
+            <add-to-group group-id="EditorGutterPopupMenu" anchor="last"/>
+        </group>
+
+        <group id="GoogleCloudTools.BreakpointWatchContextMenu">
+            <reference ref="XDebugger.NewWatch"/>
+            <reference ref="XDebugger.EditWatch"/>
+            <reference ref="XDebugger.CopyWatch"/>
+            <reference ref="XDebugger.RemoveWatch"/>
+            <reference ref="XDebugger.RemoveAllWatches"/>
+        </group>
+    </actions>
+
+</idea-plugin>

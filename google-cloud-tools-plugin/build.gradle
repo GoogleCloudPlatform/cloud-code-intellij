@@ -50,6 +50,7 @@ project.afterEvaluate {
 dependencies {
     compile(project(':google-cloud-tools-plugin:google-cloud-core'))
     compile(project(':google-cloud-tools-plugin:google-cloud-storage'))
+    compile(project(':google-cloud-tools-plugin:stackdriver-debugger'))
 
     compile 'com.google.apis:google-api-services-clouddebugger:v2-rev7-1.21.0'
     compile 'com.google.apis:google-api-services-cloudresourcemanager:v1beta1-rev12-1.21.0'

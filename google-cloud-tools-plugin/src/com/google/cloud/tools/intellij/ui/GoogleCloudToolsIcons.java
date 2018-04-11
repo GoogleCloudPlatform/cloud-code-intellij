@@ -26,16 +26,6 @@ import javax.swing.Icon;
 public final class GoogleCloudToolsIcons {
 
   public static final Icon APP_ENGINE = load("/icons/appEngine.png"); // 16x16
-  public static final Icon CLOUD_BREAKPOINT_FINAL = load("/icons/cloudsnapshotfinal.png");
-  public static final Icon CLOUD_BREAKPOINT = load("/icons/cloudbreakpoint.png");
-  public static final Icon CLOUD_BREAKPOINT_CHECKED = load("/icons/cloudbreakpointchecked.png");
-  public static final Icon CLOUD_BREAKPOINT_ERROR = load("/icons/cloudbreakpointerror.png");
-  public static final Icon CLOUD_BREAKPOINT_DISABLED = load("/icons/cloudbreakpointdisabled.png");
-  public static final Icon CLOUD_DEBUG_SAVE_EXIT = load("/icons/debugsaveexit.png");
-  public static final Icon CLOUD_DEBUG_REACTIVATE_BREAKPOINT =
-      load("/icons/debugreactivatebreakpoint.png");
-  public static final Icon CLOUD_DEBUG_DELETE_ALL_BREAKPOINTS = load("/icons/debugdeleteall.png");
-  public static final Icon STACKDRIVER_DEBUGGER = load("/icons/stackdriverdebugger.png");
   public static final Icon FEEDBACK = load("/icons/cloudtoolsfeedback.png");
 
   private static Icon load(String path) {
