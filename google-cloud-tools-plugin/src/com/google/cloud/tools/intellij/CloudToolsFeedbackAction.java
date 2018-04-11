@@ -33,6 +33,7 @@ import java.text.MessageFormat;
 /** Adds a Cloud Tools menu shortcut link to the GitHub issue creation page. */
 public class CloudToolsFeedbackAction extends DumbAwareAction {
 
+  // TODO: use interface for reading flags for easier testing.
   private static final String NEW_ISSUE_URL =
       new PropertiesFileFlagReader().getFlagString("plugin.github.new.issue.url");
 

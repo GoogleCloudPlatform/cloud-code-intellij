@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.ui.CopyToClipboardActionListener;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
@@ -49,7 +48,7 @@ import javax.swing.table.TableCellRenderer;
 import org.jetbrains.annotations.NotNull;
 
 /** Defines the Google Cloud Storage bucket content browsing UI panel. */
-final class GcsBucketContentEditorPanel {
+public final class GcsBucketContentEditorPanel {
   private static final Logger log = Logger.getInstance(GcsBucketContentEditorPanel.class);
 
   private final Bucket bucket;
@@ -125,7 +124,8 @@ final class GcsBucketContentEditorPanel {
 
   void initTableModel() {
     if (!Services.getLoginService().isLoggedIn()) {
-      showMessage(GctBundle.message("gcs.content.explorer.not.logged.in.text"));
+      showMessage(
+          GoogleCloudStorageMessageBundle.message("gcs.content.explorer.not.logged.in.text"));
       return;
     }
 
@@ -134,7 +134,8 @@ final class GcsBucketContentEditorPanel {
     Consumer<List<Blob>> afterLoad =
         blobs -> {
           if (blobs.isEmpty()) {
-            showMessage(GctBundle.message("gcs.content.explorer.empty.bucket.text"));
+            showMessage(
+                GoogleCloudStorageMessageBundle.message("gcs.content.explorer.empty.bucket.text"));
           } else {
             showBlobTable();
             tableModel = new GcsBlobTableModel();
@@ -149,7 +150,8 @@ final class GcsBucketContentEditorPanel {
 
   void updateTableModel(String prefix) {
     if (!Services.getLoginService().isLoggedIn()) {
-      showMessage(GctBundle.message("gcs.content.explorer.not.logged.in.text"));
+      showMessage(
+          GoogleCloudStorageMessageBundle.message("gcs.content.explorer.not.logged.in.text"));
       return;
     }
 
@@ -167,8 +169,10 @@ final class GcsBucketContentEditorPanel {
           if (isEmptyDirectory(prefix, blobs)) {
             String message =
                 prefix.isEmpty()
-                    ? GctBundle.message("gcs.content.explorer.empty.bucket.text")
-                    : GctBundle.message("gcs.content.explorer.empty.directory.text");
+                    ? GoogleCloudStorageMessageBundle.message(
+                        "gcs.content.explorer.empty.bucket.text")
+                    : GoogleCloudStorageMessageBundle.message(
+                        "gcs.content.explorer.empty.directory.text");
             showMessage(message);
           } else {
             showBlobTable();
@@ -185,9 +189,13 @@ final class GcsBucketContentEditorPanel {
   private void showRightClickMenu(MouseEvent event) {
     JPopupMenu rightClickMenu = new JPopupMenu();
     JMenuItem copyBlobNameMenuItem =
-        new JMenuItem(GctBundle.message("gcs.content.explorer.right.click.menu.copy.blob.text"));
+        new JMenuItem(
+            GoogleCloudStorageMessageBundle.message(
+                "gcs.content.explorer.right.click.menu.copy.blob.text"));
     JMenuItem copyBucketNameMenuItem =
-        new JMenuItem(GctBundle.message("gcs.content.explorer.right.click.menu.copy.bucket.text"));
+        new JMenuItem(
+            GoogleCloudStorageMessageBundle.message(
+                "gcs.content.explorer.right.click.menu.copy.bucket.text"));
     rightClickMenu.add(copyBlobNameMenuItem);
     rightClickMenu.add(copyBucketNameMenuItem);
 
