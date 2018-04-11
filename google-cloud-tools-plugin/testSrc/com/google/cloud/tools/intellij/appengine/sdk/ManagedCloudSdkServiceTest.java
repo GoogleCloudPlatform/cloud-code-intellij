@@ -32,6 +32,7 @@ import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.appengine.sdk.ManagedCloudSdkService.ManagedSdkJobResult;
 import com.google.cloud.tools.intellij.appengine.sdk.ManagedCloudSdkService.ManagedSdkJobType;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.cloud.tools.intellij.testing.log.TestInMemoryLogger;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.managedcloudsdk.ManagedCloudSdk;
@@ -77,16 +78,15 @@ public class ManagedCloudSdkServiceTest {
 
   @Mock private ProgressListener mockProgressListener;
 
-  @Mock private ManagedCloudSdkUpdater mockUpdater;
+  @TestService @Mock private ManagedCloudSdkUpdateService mockUpdater;
 
   @Before
   public void setUp() throws UnsupportedOsException {
     // add timer thread to one not to be checked for 'leaks'
     ThreadTracker.longRunningThreadCreated(
-        ApplicationManager.getApplication(), ManagedCloudSdkUpdater.SDK_UPDATER_THREAD_NAME);
+        ApplicationManager.getApplication(), ManagedCloudSdkUpdateService.SDK_UPDATER_THREAD_NAME);
 
     doReturn(mockManagedCloudSdk).when(sdkService).createManagedSdk();
-    ManagedCloudSdkUpdater.setInstance(mockUpdater);
     // TODO(ivanporty) remove once test logging system is done via CloudToolsRule
     sdkService.setLogger(new TestInMemoryLogger());
     // make sure everything in test is done synchronously

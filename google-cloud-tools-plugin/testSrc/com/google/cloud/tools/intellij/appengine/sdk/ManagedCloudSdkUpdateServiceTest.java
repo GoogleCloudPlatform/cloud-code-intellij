@@ -47,8 +47,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Spy;
 
-/** Tests for {@link ManagedCloudSdkUpdater}. */
-public class ManagedCloudSdkUpdaterTest {
+/** Tests for {@link ManagedCloudSdkUpdateService}. */
+public class ManagedCloudSdkUpdateServiceTest {
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
 
   @Mock private ManagedCloudSdkService mockSdkService;
@@ -60,21 +60,21 @@ public class ManagedCloudSdkUpdaterTest {
 
   @TestService @Mock private PluginInfoService mockPluginInfoService;
 
-  @Spy private ManagedCloudSdkUpdater managedCloudSdkUpdater;
+  @Spy private ManagedCloudSdkUpdateService managedCloudSdkUpdateService;
 
   @Before
   public void setUp() {
     // add timer thread to one not to be checked for 'leaks'
     ThreadTracker.longRunningThreadCreated(
-        ApplicationManager.getApplication(), ManagedCloudSdkUpdater.SDK_UPDATER_THREAD_NAME);
+        ApplicationManager.getApplication(), ManagedCloudSdkUpdateService.SDK_UPDATER_THREAD_NAME);
 
     when(mockPluginInfoService.shouldEnable(GctFeature.MANAGED_SDK_UPDATE)).thenReturn(true);
 
     when(mockSdkServiceManager.getCloudSdkService()).thenReturn(mockSdkService);
     ManagedCloudSdkServiceUiPresenter.setInstance(mockUiPresenter);
 
-    doReturn(mockClock).when(managedCloudSdkUpdater).getClock();
-    doReturn(mockUiTimer).when(managedCloudSdkUpdater).createUiTimer(anyInt());
+    doReturn(mockClock).when(managedCloudSdkUpdateService).getClock();
+    doReturn(mockUiTimer).when(managedCloudSdkUpdateService).createUiTimer(anyInt());
 
     when(mockUiPresenter.notifyManagedSdkUpdate(any(), any())).thenReturn(mockNotification);
 
@@ -84,7 +84,7 @@ public class ManagedCloudSdkUpdaterTest {
               ((TimerTask) invocationOnMock.getArgument(0)).run();
               return null;
             })
-        .when(managedCloudSdkUpdater)
+        .when(managedCloudSdkUpdateService)
         .schedule(any(), anyLong(), anyLong());
     // directly call task assigned to UI timer.
     doAnswer(
@@ -102,33 +102,33 @@ public class ManagedCloudSdkUpdaterTest {
   @Test
   public void update_scheduledNow_ifLastUpdate_elapsed() {
     CloudSdkServiceUserSettings.getInstance().setLastAutomaticUpdateTimestamp(1);
-    when(mockClock.millis()).thenReturn(ManagedCloudSdkUpdater.SDK_UPDATE_INTERVAL + 2);
+    when(mockClock.millis()).thenReturn(ManagedCloudSdkUpdateService.SDK_UPDATE_INTERVAL_MS + 2);
 
-    managedCloudSdkUpdater.activate();
+    managedCloudSdkUpdateService.activate();
 
-    verify(managedCloudSdkUpdater)
-        .schedule(any(), eq(0L), eq(ManagedCloudSdkUpdater.SDK_UPDATE_INTERVAL));
+    verify(managedCloudSdkUpdateService)
+        .schedule(any(), eq(0L), eq(ManagedCloudSdkUpdateService.SDK_UPDATE_INTERVAL_MS));
   }
 
   @Test
   public void update_scheduledOnShorterTime_ifLastUpdate_fartherInterval() {
     CloudSdkServiceUserSettings.getInstance().setLastAutomaticUpdateTimestamp(1);
-    when(mockClock.millis()).thenReturn(ManagedCloudSdkUpdater.SDK_UPDATE_INTERVAL / 2);
+    when(mockClock.millis()).thenReturn(ManagedCloudSdkUpdateService.SDK_UPDATE_INTERVAL_MS / 2);
 
-    managedCloudSdkUpdater.activate();
+    managedCloudSdkUpdateService.activate();
 
-    verify(managedCloudSdkUpdater)
+    verify(managedCloudSdkUpdateService)
         .schedule(
             any(),
-            eq((ManagedCloudSdkUpdater.SDK_UPDATE_INTERVAL / 2) + 1),
-            eq(ManagedCloudSdkUpdater.SDK_UPDATE_INTERVAL));
+            eq((ManagedCloudSdkUpdateService.SDK_UPDATE_INTERVAL_MS / 2) + 1),
+            eq(ManagedCloudSdkUpdateService.SDK_UPDATE_INTERVAL_MS));
   }
 
   @Test
   public void update_called_when_sdk_notUpToDate() {
     when(mockSdkService.isUpToDate()).thenReturn(false);
 
-    managedCloudSdkUpdater.activate();
+    managedCloudSdkUpdateService.activate();
 
     // managed SDK is UI thread only,
     ApplicationManager.getApplication().invokeAndWait(() -> verify(mockSdkService).update());
@@ -138,7 +138,7 @@ public class ManagedCloudSdkUpdaterTest {
   public void update_notCalled_when_sdk_upToDate() {
     when(mockSdkService.isUpToDate()).thenReturn(true);
 
-    managedCloudSdkUpdater.activate();
+    managedCloudSdkUpdateService.activate();
 
     // managed SDK is UI thread only,
     ApplicationManager.getApplication()
@@ -149,7 +149,7 @@ public class ManagedCloudSdkUpdaterTest {
   public void notification_shown_beforeUpdate() {
     when(mockSdkService.isUpToDate()).thenReturn(false);
 
-    managedCloudSdkUpdater.activate();
+    managedCloudSdkUpdateService.activate();
 
     ApplicationManager.getApplication()
         .invokeAndWait(() -> verify(mockUiPresenter).notifyManagedSdkUpdate(any(), any()));
@@ -160,7 +160,7 @@ public class ManagedCloudSdkUpdaterTest {
     when(mockSdkService.isUpToDate()).thenReturn(false);
     CloudSdkServiceUserSettings.getInstance().setEnableAutomaticUpdates(true);
 
-    managedCloudSdkUpdater.activate();
+    managedCloudSdkUpdateService.activate();
 
     ApplicationManager.getApplication()
         .invokeAndWait(
@@ -170,7 +170,7 @@ public class ManagedCloudSdkUpdaterTest {
               verify(mockUiPresenter).notifyManagedSdkUpdate(any(), disableListener.capture());
               disableListener.getValue().actionPerformed(mock(ActionEvent.class));
 
-              assertThat(CloudSdkServiceUserSettings.getInstance().getEnableAutomaticUpdates())
+              assertThat(CloudSdkServiceUserSettings.getInstance().isAutomaticUpdateEnabled())
                   .isFalse();
             });
   }

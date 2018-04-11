@@ -218,11 +218,11 @@ public class CloudSdkPanel {
     }
     sdkServiceUserSettings.setUserSelectedSdkServiceType(selectedCloudSdkServiceType);
 
-    boolean previousAutomaticUpdateEnabled = sdkServiceUserSettings.getEnableAutomaticUpdates();
+    boolean previousAutomaticUpdateEnabled = sdkServiceUserSettings.isAutomaticUpdateEnabled();
     sdkServiceUserSettings.setEnableAutomaticUpdates(enableAutomaticUpdatesCheckbox.isSelected());
     if (enableAutomaticUpdatesCheckbox.isSelected() && !previousAutomaticUpdateEnabled) {
       // activate updates again.
-      ManagedCloudSdkUpdater.getInstance().activate();
+      ManagedCloudSdkUpdateService.getInstance().activate();
     }
 
     // settings are applied and saved, clear modification status
@@ -245,7 +245,7 @@ public class CloudSdkPanel {
 
     setCloudSdkDirectoryText(Strings.nullToEmpty(sdkServiceUserSettings.getCustomSdkPath()));
 
-    enableAutomaticUpdatesCheckbox.setSelected(sdkServiceUserSettings.getEnableAutomaticUpdates());
+    enableAutomaticUpdatesCheckbox.setSelected(sdkServiceUserSettings.isAutomaticUpdateEnabled());
 
     // reset modified flag too so user won't see this as changed state.
     settingsModified = false;

@@ -47,7 +47,7 @@ public class CloudSdkPanelTest {
   @Mock @TestService private PluginInfoService pluginInfoService;
 
   @Mock private CloudSdkService mockCloudSdkService;
-  @Mock private ManagedCloudSdkUpdater managedCloudSdkUpdater;
+  @Mock @TestService private ManagedCloudSdkUpdateService managedCloudSdkUpdateService;
   @Mock @TestService private CloudSdkServiceManager mockCloudSdkServiceManager;
   @Mock @TestService private CloudSdkValidator cloudSdkValidator;
 
@@ -67,7 +67,6 @@ public class CloudSdkPanelTest {
     when(mockCloudSdkServiceManager.getCloudSdkService()).thenReturn(mockCloudSdkService);
     // enable managed SDK UI - remove when feature is rolled out.
     when(pluginInfoService.shouldEnable(GctFeature.MANAGED_SDK)).thenReturn(true);
-    ManagedCloudSdkUpdater.setInstance(managedCloudSdkUpdater);
     // now safe to create panel spy.
     panel = spy(new CloudSdkPanel());
     // reset SDK settings on each run to clean previous settings.
@@ -303,7 +302,7 @@ public class CloudSdkPanelTest {
                 throw new AssertionError(e);
               }
 
-              verify(managedCloudSdkUpdater).activate();
+              verify(managedCloudSdkUpdateService).activate();
             });
   }
 
@@ -319,7 +318,7 @@ public class CloudSdkPanelTest {
       String customSdkPath) {
     CloudSdkServiceUserSettings userSettings = CloudSdkServiceUserSettings.getInstance();
     assertThat(cloudSdkServiceType).isEqualTo(userSettings.getUserSelectedSdkServiceType());
-    assertThat(enableAutomaticUpdates).isEqualTo(userSettings.getEnableAutomaticUpdates());
+    assertThat(enableAutomaticUpdates).isEqualTo(userSettings.isAutomaticUpdateEnabled());
     assertThat(customSdkPath).isEqualTo(userSettings.getCustomSdkPath());
   }
 
@@ -342,7 +341,7 @@ public class CloudSdkPanelTest {
     }
 
     assertThat(sdkPanel.getEnableAutomaticUpdatesCheckbox().isSelected())
-        .isEqualTo(userSettings.getEnableAutomaticUpdates());
+        .isEqualTo(userSettings.isAutomaticUpdateEnabled());
 
     assertThat(sdkPanel.getCloudSdkDirectoryText())
         .isEqualTo(Strings.nullToEmpty(userSettings.getCustomSdkPath()));

@@ -84,7 +84,7 @@ public class CloudSdkServiceUserSettings {
     propertiesComponent.setValue(SDK_TYPE_PROPERTY_NAME, cloudSdkServiceType.name());
   }
 
-  boolean getEnableAutomaticUpdates() {
+  boolean isAutomaticUpdateEnabled() {
     return propertiesComponent.getBoolean(
         SDK_AUTOMATIC_UPDATES_PROPERTY_NAME, DEFAULT_MANAGED_SDK_AUTOMATIC_UPDATES);
   }
