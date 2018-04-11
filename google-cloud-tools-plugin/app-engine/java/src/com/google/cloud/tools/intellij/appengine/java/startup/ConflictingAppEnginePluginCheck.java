@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.startup;
+package com.google.cloud.tools.intellij.appengine.java.startup;
 
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.service.ApplicationPluginInfoService;
 import com.google.cloud.tools.intellij.ui.DisablePluginWarningDialog;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
@@ -59,19 +59,19 @@ public class ConflictingAppEnginePluginCheck {
   private void showNotification(@NotNull IdeaPluginDescriptor plugin) {
     NotificationGroup notification =
         new NotificationGroup(
-            GctBundle.message("plugin.conflict.error.title"),
+            AppEngineMessageBundle.message("plugin.conflict.error.title"),
             NotificationDisplayType.BALLOON,
             true);
 
     String errorMessage =
         new StringBuilder()
             .append("<p>")
-            .append(GctBundle.message("plugin.conflict.error.detail", plugin.getName()))
+            .append(AppEngineMessageBundle.message("plugin.conflict.error.detail", plugin.getName()))
             .append("</p>")
             .append("<br />")
             .append("<p>")
             .append(
-                GctBundle.message(
+                AppEngineMessageBundle.message(
                     "plugin.conflict.error.action",
                     "<a href=\"" + DEACTIVATE_LINK_HREF + "\">",
                     "</a>"))
@@ -80,7 +80,7 @@ public class ConflictingAppEnginePluginCheck {
 
     notification
         .createNotification(
-            GctBundle.message("plugin.conflict.error.title"),
+            AppEngineMessageBundle.message("plugin.conflict.error.title"),
             errorMessage,
             NotificationType.ERROR,
             new IdeaAppEnginePluginLinkListener(plugin))
