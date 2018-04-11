@@ -39,7 +39,9 @@ import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.util.Comparator;
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.Set;
+import java.util.stream.IntStream;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -75,6 +77,7 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
     this.gcpProjectId = gcpProjectId;
     this.downloadPath = downloadPath;
     init();
+    table.setTableHeader(null);
   }
 
   @Nullable
@@ -104,7 +107,6 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
   }
 
   private Set<RunnerAndConfigurationSettings> getSelectedConfigurations() {
-    // Set<RunnerAndConfigurationSettings> selectedItems = tableModel.getSelectedItems();
     return tableModel.getSelectedItems();
   }
 
@@ -130,27 +132,22 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
     List<EnvironmentVariable> configurationSettingsEnvVariables =
         configurationSettings.getEnvVariables();
 
-    serviceAccountEnvironmentVariables
-        .stream()
-        .forEach(
-            serviceAccountEnvironmentVariable -> {
-              boolean envVarExists =
-                  configurationSettingsEnvVariables
-                      .stream()
-                      .anyMatch(
-                          environmentVariable ->
-                              environmentVariable
-                                  .getName()
-                                  .equals(serviceAccountEnvironmentVariable.getName()));
-              // TODO: what should we do if the env vars already exist?
-              // 1) pop-up dialog
-              // 2) auto-update
-              // 3) nothing?
-              if (!envVarExists) {
-                configurationSettingsEnvVariables.add(serviceAccountEnvironmentVariable);
-              }
-            });
-
+    serviceAccountEnvironmentVariables.forEach(
+        serviceAccountEnvVar -> {
+          OptionalInt indexOpt =
+              IntStream.range(0, configurationSettingsEnvVariables.size())
+                  .filter(
+                      index ->
+                          serviceAccountEnvVar
+                              .getName()
+                              .equals(configurationSettingsEnvVariables.get(index).getName()))
+                  .findFirst();
+          if (indexOpt.isPresent()) {
+            configurationSettingsEnvVariables.set(indexOpt.getAsInt(), serviceAccountEnvVar);
+          } else {
+            configurationSettingsEnvVariables.add(serviceAccountEnvVar);
+          }
+        });
     configurationSettings.setEnvironmentVariables(configurationSettingsEnvVariables);
   }
 
