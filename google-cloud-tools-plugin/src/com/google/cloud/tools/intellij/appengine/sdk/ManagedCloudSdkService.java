@@ -263,7 +263,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
         try {
           CloudSdkServiceManager.getInstance().getSdkWriteLock().lockInterruptibly();
         } finally {
-          // make sure the indicator goes away in case this job error/cancel
+          // make sure the indicator goes away in case of this job error/cancel
           waitForSdkProcessesProgress.done();
         }
       }

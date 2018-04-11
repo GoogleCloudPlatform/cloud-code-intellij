@@ -52,6 +52,8 @@ import org.jetbrains.annotations.Nullable;
  * <p>Provides support for blocking / tracking {@link CloudSdkService#install()} process and other
  * SDK preconditions so that dependent deployment processes can be postponed until SDK is completely
  * ready.
+ *
+ * <p>Provides read/write SDK locking for prevent operations on SDK under write modifications.
  */
 public class CloudSdkServiceManager {
   private final Map<CloudSdkServiceType, CloudSdkService> supportedCloudSdkServices;
@@ -82,10 +84,18 @@ public class CloudSdkServiceManager {
     }
   }
 
+  /**
+   * Lock to be acquired on all SDK read (i.e. execute gcloud) operations. Can be held by multiple
+   * operations simultaneously.
+   */
   public Lock getSdkReadLock() {
     return sdkReadWriteOperationLock.readLock();
   }
 
+  /**
+   * Lock to be acquired on all SDK write (i.e. delete, replace, update SDK files) operations.
+   * Exclusive, can only be held when all read operations are complete.
+   */
   public Lock getSdkWriteLock() {
     return sdkReadWriteOperationLock.writeLock();
   }
