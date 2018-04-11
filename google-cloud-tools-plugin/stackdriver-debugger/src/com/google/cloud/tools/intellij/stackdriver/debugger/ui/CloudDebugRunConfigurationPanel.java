@@ -18,7 +18,7 @@ package com.google.cloud.tools.intellij.stackdriver.debugger.ui;
 
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.components.JBCheckBox;
@@ -41,11 +41,11 @@ public class CloudDebugRunConfigurationPanel {
     this.ideProject = ideProject;
 
     docsLink.setHyperlinkText(
-        GctBundle.message("clouddebug.runconfig.formoredetails"),
-        GctBundle.message("clouddebug.runconfig.documentation.url.text"),
+        StackdriverDebuggerBundle.message("clouddebug.runconfig.formoredetails"),
+        StackdriverDebuggerBundle.message("clouddebug.runconfig.documentation.url.text"),
         ".");
-    docsLink.setHyperlinkTarget(GctBundle.message("clouddebug.runconfig.documentation.url"));
-    description.setText(GctBundle.message("clouddebug.runconfig.description"));
+    docsLink.setHyperlinkTarget(StackdriverDebuggerBundle.message("clouddebug.runconfig.documentation.url"));
+    description.setText(StackdriverDebuggerBundle.message("clouddebug.runconfig.description"));
   }
 
   public JPanel getMainPanel() {

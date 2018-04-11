@@ -27,7 +27,7 @@ import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.google.common.base.Strings;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
@@ -178,7 +178,7 @@ class ProjectDebuggeeBinding {
                         if (debuggees == null
                             || debuggees.getDebuggees() == null
                             || debuggees.getDebuggees().isEmpty()) {
-                          disableTargetSelector(GctBundle.getString("clouddebug.nomodulesfound"));
+                          disableTargetSelector(StackdriverDebuggerBundle.getString("clouddebug.nomodulesfound"));
                         } else {
                           targetSelector.setEnabled(true);
                           Map<String, DebugTarget> perModuleCache = new HashMap<>();
@@ -245,16 +245,16 @@ class ProjectDebuggeeBinding {
     if (reason instanceof GoogleJsonResponseException) {
       return resolveJsonResponseToMessage((GoogleJsonResponseException) reason);
     } else {
-      return GctBundle.getString("clouddebug.debug.targets.error", reason.getLocalizedMessage());
+      return StackdriverDebuggerBundle.getString("clouddebug.debug.targets.error", reason.getLocalizedMessage());
     }
   }
 
   private static String resolveJsonResponseToMessage(GoogleJsonResponseException reason) {
     switch (reason.getStatusCode()) {
       case 403:
-        return GctBundle.message("clouddebug.debug.targets.accessdenied");
+        return StackdriverDebuggerBundle.message("clouddebug.debug.targets.accessdenied");
       default:
-        return GctBundle.getString(
+        return StackdriverDebuggerBundle.getString(
             "clouddebug.debug.targets.error", reason.getDetails().getMessage());
     }
   }

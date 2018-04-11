@@ -18,7 +18,7 @@ package com.google.cloud.tools.intellij.stackdriver.debugger;
 
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.intellij.execution.Executor;
 import com.intellij.execution.ProgramRunnerUtil;
 import com.intellij.execution.RunManager;
@@ -83,7 +83,7 @@ public class CloudDebugProcessWatcher implements CloudBreakpointListener {
             NotificationGroup notificationGroup =
                 NotificationGroup.balloonGroup("Cloud Debugger watcher");
             String message =
-                GctBundle.getString(
+                StackdriverDebuggerBundle.getString(
                     "clouddebug.balloonnotification.message", state.getProjectName());
             UsageTrackerProvider.getInstance()
                 .trackEvent(GctTracking.CLOUD_DEBUGGER_NOTIFY_BREAKPOINT_LIST_CHANGE)

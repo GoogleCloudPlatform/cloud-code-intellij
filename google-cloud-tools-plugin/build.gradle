@@ -68,6 +68,7 @@ dependencies {
     apt         'com.google.auto.value:auto-value:1.4.1'
 
     testCompile(project(':common-test-lib'))
+    testCompile project(':google-cloud-tools-plugin:stackdriver-debugger')
     testRuntime files('google-account/lib/google-gct-login-context-ij-pg.jar')
 }
 

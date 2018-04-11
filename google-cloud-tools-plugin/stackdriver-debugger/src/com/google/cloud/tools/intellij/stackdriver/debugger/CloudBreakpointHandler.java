@@ -23,7 +23,7 @@ import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcessStateController.SetBreakpointHandler;
 import com.google.cloud.tools.intellij.stackdriver.debugger.CloudLineBreakpointType.CloudLineBreakpoint;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.intellij.debugger.ui.breakpoints.BreakpointManager;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -401,7 +401,7 @@ public class CloudBreakpointHandler
                           // TODO(joaomartins): Why couldn't the breakpoint be set? Improve this
                           // message.
                           cloudIdeLineBreakpoint.setErrorMessage(
-                              GctBundle.getString("clouddebug.errorset"));
+                              StackdriverDebuggerBundle.getString("clouddebug.errorset"));
                           process.updateBreakpointPresentation(cloudIdeLineBreakpoint);
                         }
                         if (!Strings.isNullOrEmpty(id)) {

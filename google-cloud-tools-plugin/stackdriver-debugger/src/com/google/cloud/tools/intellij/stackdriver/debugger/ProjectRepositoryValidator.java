@@ -27,7 +27,7 @@ import com.google.api.services.clouddebugger.v2.model.GitSourceContext;
 import com.google.api.services.clouddebugger.v2.model.ListDebuggeesResponse;
 import com.google.api.services.clouddebugger.v2.model.SourceContext;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.intellij.dvcs.DvcsUtil;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.openapi.application.AccessToken;
@@ -145,7 +145,7 @@ public class ProjectRepositoryValidator {
                   // shouldn't be more than one repo but if there is, we'll prefer cloud repos
                   break;
                 } else if (sourceContext.getCloudWorkspace() != null) {
-                  repoType = GctBundle.getString("clouddebug.workspace");
+                  repoType = StackdriverDebuggerBundle.getString("clouddebug.workspace");
                 }
               }
             }
@@ -164,7 +164,7 @@ public class ProjectRepositoryValidator {
           /*target SHA*/ null,
           /*target repo*/ null,
           /* hasCloudRepository */ false,
-          /* repoType */ GctBundle.getString("clouddebug.unknown.repository.type"));
+          /* repoType */ StackdriverDebuggerBundle.getString("clouddebug.unknown.repository.type"));
     }
 
     GitRepository targetLocalRepo = null;
@@ -173,13 +173,13 @@ public class ProjectRepositoryValidator {
     // shouldn't be more than one repo but if there is, we pick cloud repos
     if (cloudRepo != null) {
       revisionId = cloudRepo.getRevisionId();
-      repoType = GctBundle.getString("clouddebug.cloud.repository");
+      repoType = StackdriverDebuggerBundle.getString("clouddebug.cloud.repository");
     } else if (gerritRepo != null) {
       revisionId = gerritRepo.getRevisionId();
-      repoType = GctBundle.getString("clouddebug.gerrit");
+      repoType = StackdriverDebuggerBundle.getString("clouddebug.gerrit");
     } else if (otherGitRepo != null) {
       revisionId = otherGitRepo.getRevisionId();
-      repoType = GctBundle.getString("clouddebug.nongoogle.git");
+      repoType = StackdriverDebuggerBundle.getString("clouddebug.nongoogle.git");
     }
 
     if (revisionId != null) {
@@ -289,8 +289,8 @@ public class ProjectRepositoryValidator {
           branchDisplayName = branchDisplayName.substring(0, 7) + "...";
         }
         if (Messages.showYesNoDialog(
-                GctBundle.getString("clouddebug.restorestash", branchDisplayName),
-                GctBundle.getString("clouddebug.restorechanges.title"),
+                StackdriverDebuggerBundle.getString("clouddebug.restorestash", branchDisplayName),
+                StackdriverDebuggerBundle.getString("clouddebug.restorechanges.title"),
                 Messages.getInformationIcon())
             == Messages.YES) {
           final GitBrancher brancher = ServiceManager.getService(project, GitBrancher.class);
@@ -335,7 +335,7 @@ public class ProjectRepositoryValidator {
                 .getOriginalBranchName()
                 .equals(repoState.getSourceRepository().getCurrentRevision()))) {
       Messages.showErrorDialog(
-          GctBundle.getString("clouddebug.erroroncheckout", repoState.getOriginalBranchName()),
+          StackdriverDebuggerBundle.getString("clouddebug.erroroncheckout", repoState.getOriginalBranchName()),
           "Error");
       return;
     }
@@ -384,7 +384,7 @@ public class ProjectRepositoryValidator {
       GitCommandResult res = result.get();
       if (conflict.get()) {
         Messages.showDialog(
-            GctBundle.getString("clouddebug.unstashmergeconflicts"),
+            StackdriverDebuggerBundle.getString("clouddebug.unstashmergeconflicts"),
             "Merge Conflicts",
             new String[] {"Ok"},
             0,
@@ -403,7 +403,7 @@ public class ProjectRepositoryValidator {
             .run(
                 new Task.Modal(
                     project,
-                    GctBundle.getString("clouddebug.removestashx", targetStash.get().getStash()),
+                    StackdriverDebuggerBundle.getString("clouddebug.removestashx", targetStash.get().getStash()),
                     false) {
                   @Override
                   public void run(@NotNull ProgressIndicator indicator) {

@@ -25,7 +25,7 @@ import com.google.api.services.clouddebugger.v2.model.ListBreakpointsResponse;
 import com.google.api.services.clouddebugger.v2.model.SetBreakpointResponse;
 import com.google.api.services.clouddebugger.v2.model.SourceLocation;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
@@ -96,8 +96,8 @@ public class CloudDebugProcessStateController {
       LOG.warn("no client available attempting to setBreakpoint");
       Messages.showErrorDialog(
           state.getProject(),
-          GctBundle.getString("clouddebug.bad.login.message"),
-          GctBundle.getString("clouddebug.message.title"));
+          StackdriverDebuggerBundle.getString("clouddebug.bad.login.message"),
+          StackdriverDebuggerBundle.getString("clouddebug.message.title"));
       return;
     }
     final String debuggeeId = state.getDebuggeeId();
@@ -164,13 +164,13 @@ public class CloudDebugProcessStateController {
       return;
     }
     if (state == null) {
-      handler.onError(GctBundle.getString("clouddebug.invalid.state"));
+      handler.onError(StackdriverDebuggerBundle.getString("clouddebug.invalid.state"));
       return;
     }
     final Debugger client = CloudDebuggerClient.getLongTimeoutClient(state);
     if (client == null) {
       LOG.warn("no client available attempting to resolveBreakpointAsync");
-      handler.onError(GctBundle.getString("clouddebug.bad.login.message"));
+      handler.onError(StackdriverDebuggerBundle.getString("clouddebug.bad.login.message"));
       return;
     }
     List<Breakpoint> currentList = state.getCurrentServerBreakpointList();
@@ -206,7 +206,7 @@ public class CloudDebugProcessStateController {
                   fullFinalBreakpoints.put(id, result);
                   handler.onSuccess(result);
                 } else {
-                  handler.onError(GctBundle.getString("clouddebug.no.response"));
+                  handler.onError(StackdriverDebuggerBundle.getString("clouddebug.no.response"));
                 }
               } catch (IOException ex) {
                 LOG.warn(
@@ -222,13 +222,13 @@ public class CloudDebugProcessStateController {
       @NotNull final Breakpoint serverBreakpoint, @NotNull final SetBreakpointHandler handler) {
 
     if (state == null) {
-      handler.onError(GctBundle.getString("clouddebug.invalid.state"));
+      handler.onError(StackdriverDebuggerBundle.getString("clouddebug.invalid.state"));
       return;
     }
     final Debugger client = CloudDebuggerClient.getLongTimeoutClient(state);
     if (client == null) {
       LOG.warn("no client available attempting to setBreakpoint");
-      handler.onError(GctBundle.getString("clouddebug.bad.login.message"));
+      handler.onError(StackdriverDebuggerBundle.getString("clouddebug.bad.login.message"));
       return;
     }
 
@@ -271,7 +271,7 @@ public class CloudDebugProcessStateController {
                   }
                   handler.onSuccess(addResponse.getBreakpoint().getId());
                 } else {
-                  handler.onError(GctBundle.getString("clouddebug.no.response"));
+                  handler.onError(StackdriverDebuggerBundle.getString("clouddebug.no.response"));
                 }
               } catch (IOException ex) {
                 LOG.error("exception setting a breakpoint", ex);

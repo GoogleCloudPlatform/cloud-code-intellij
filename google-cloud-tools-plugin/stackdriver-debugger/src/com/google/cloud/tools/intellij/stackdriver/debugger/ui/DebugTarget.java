@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.stackdriver.debugger.ui;
 
 import com.google.api.services.clouddebugger.v2.model.Debuggee;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.intellij.openapi.diagnostic.Logger;
@@ -63,12 +63,12 @@ class DebugTarget implements DebugTargetSelectorItem {
 
       // The backend does not send a module name for the default module, let's name it explicitly
       if (Strings.isNullOrEmpty(module)) {
-        module = GctBundle.getString("clouddebug.default.module.name");
+        module = StackdriverDebuggerBundle.getString("clouddebug.default.module.name");
       }
 
       // Build a description from the strings.
       if (!Strings.isNullOrEmpty(version)) {
-        description = GctBundle.getString("clouddebug.version.with.module.format", module, version);
+        description = StackdriverDebuggerBundle.getString("clouddebug.version.with.module.format", module, version);
       }
 
       // Record the minor version.  We only show the latest minor version.

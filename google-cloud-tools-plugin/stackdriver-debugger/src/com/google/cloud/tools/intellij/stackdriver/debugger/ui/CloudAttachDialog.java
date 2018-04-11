@@ -25,7 +25,7 @@ import com.google.cloud.tools.intellij.stackdriver.debugger.SyncResult;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.intellij.dvcs.DvcsUtil;
@@ -94,8 +94,8 @@ public class CloudAttachDialog extends DialogWrapper {
     this.project = project;
     init();
     initValidation();
-    setTitle(GctBundle.getString("clouddebug.attachtitle"));
-    setOKButtonText(GctBundle.getString("clouddebug.attach"));
+    setTitle(StackdriverDebuggerBundle.getString("clouddebug.attachtitle"));
+    setOKButtonText(StackdriverDebuggerBundle.getString("clouddebug.attach"));
 
     infoMessage.setVisible(true);
     syncStashCheckbox.setVisible(false);
@@ -118,7 +118,7 @@ public class CloudAttachDialog extends DialogWrapper {
     warningMessage.setFont(
         new Font(
             warningMessage.getFont().getName(), Font.PLAIN, warningHeader.getFont().getSize() - 1));
-    warningMessage.setText(GctBundle.getString("clouddebug.sourcedoesnotmatch"));
+    warningMessage.setText(StackdriverDebuggerBundle.getString("clouddebug.sourcedoesnotmatch"));
 
     infoMessage.setFont(
         new Font(
@@ -178,12 +178,12 @@ public class CloudAttachDialog extends DialogWrapper {
   protected ValidationInfo doValidate() {
     // These should not normally occur.
     if (!Services.getLoginService().isLoggedIn()) {
-      return new ValidationInfo(GctBundle.getString("clouddebug.nologin"));
+      return new ValidationInfo(StackdriverDebuggerBundle.getString("clouddebug.nologin"));
     }
 
     CloudProject selectedCloudProject = projectSelector.getSelectedProject();
     if (selectedCloudProject == null) {
-      return new ValidationInfo(GctBundle.getString("clouddebug.noprojectid"), projectSelector);
+      return new ValidationInfo(StackdriverDebuggerBundle.getString("clouddebug.noprojectid"), projectSelector);
     }
 
     // validation should run only after the query for debug targets has results
@@ -196,12 +196,12 @@ public class CloudAttachDialog extends DialogWrapper {
               ((ErrorHolder) targetSelector.getSelectedItem()).getErrorMessage(), projectSelector);
         } else {
           return new ValidationInfo(
-              GctBundle.getString("clouddebug.nomodulesfound"), projectSelector);
+              StackdriverDebuggerBundle.getString("clouddebug.nomodulesfound"), projectSelector);
         }
       } else if (wireup.isCdbQueried()) {
         // We went to CDB and detected no debuggees.
         return new ValidationInfo(
-            GctBundle.getString("clouddebug.debug.targets.accessdenied"), projectSelector);
+            StackdriverDebuggerBundle.getString("clouddebug.debug.targets.accessdenied"), projectSelector);
       }
     }
 
@@ -209,7 +209,7 @@ public class CloudAttachDialog extends DialogWrapper {
     // assumption: either an ErrorHolder or one or more DebugTargets are added to the selector when
     //             the result is available
     if (targetSelector.getSelectedItem() == null && targetSelector.getItemCount() > 0) {
-      return new ValidationInfo(GctBundle.getString("clouddebug.nomodulesfound"), targetSelector);
+      return new ValidationInfo(StackdriverDebuggerBundle.getString("clouddebug.nomodulesfound"), targetSelector);
     }
 
     return null;
@@ -287,20 +287,20 @@ public class CloudAttachDialog extends DialogWrapper {
       syncStashCheckbox.setVisible(true);
       assert syncResult.getTargetSyncSha() != null;
       syncStashCheckbox.setText(
-          GctBundle.getString(
+          StackdriverDebuggerBundle.getString(
               "clouddebug.stash.local.changes.and.sync",
               syncResult.getTargetSyncSha().substring(0, 7)));
       syncStashCheckbox.setSelected(true);
     } else if (syncResult.needsStash()) {
       setOkText(false);
       syncStashCheckbox.setVisible(true);
-      syncStashCheckbox.setText(GctBundle.getString("clouddebug.stashbuttontext"));
+      syncStashCheckbox.setText(StackdriverDebuggerBundle.getString("clouddebug.stashbuttontext"));
       syncStashCheckbox.setSelected(true);
     } else if (syncResult.needsSync() && syncResult.getTargetSyncSha() == null) {
       setOkText(true);
       warningHeader.setVisible(true);
       warningMessage.setVisible(true);
-      warningMessage.setText(GctBundle.getString("clouddebug.no.matching.sha"));
+      warningMessage.setText(StackdriverDebuggerBundle.getString("clouddebug.no.matching.sha"));
     } else if (syncResult.needsSync()) {
       setOkText(false);
       syncStashCheckbox.setVisible(true);
@@ -313,10 +313,10 @@ public class CloudAttachDialog extends DialogWrapper {
       warningMessage.setVisible(true);
       if (syncResult.getRepositoryType() != null) {
         warningMessage.setText(
-            GctBundle.getString(
+            StackdriverDebuggerBundle.getString(
                 "clouddebug.repositories.are.not.supported", syncResult.getRepositoryType()));
       } else {
-        warningMessage.setText(GctBundle.getString("clouddebug.no.remote.repository"));
+        warningMessage.setText(StackdriverDebuggerBundle.getString("clouddebug.no.remote.repository"));
       }
     } else {
       setOkText(false);
@@ -327,13 +327,13 @@ public class CloudAttachDialog extends DialogWrapper {
     if (showForcedWording) {
       setOKButtonText(
           isContinued() && targetMatchesCurrentState()
-              ? GctBundle.getString("clouddebug.continueanyway")
-              : GctBundle.getString("clouddebug.attach.anyway"));
+              ? StackdriverDebuggerBundle.getString("clouddebug.continueanyway")
+              : StackdriverDebuggerBundle.getString("clouddebug.attach.anyway"));
     } else {
       setOKButtonText(
           isContinued() && targetMatchesCurrentState()
-              ? GctBundle.getString("clouddebug.continuesession")
-              : GctBundle.getString("clouddebug.attach"));
+              ? StackdriverDebuggerBundle.getString("clouddebug.continuesession")
+              : StackdriverDebuggerBundle.getString("clouddebug.attach"));
     }
   }
 
@@ -342,7 +342,7 @@ public class CloudAttachDialog extends DialogWrapper {
     if (hasUnselectedBackgroundSessions) {
       warningHeader.setVisible(true);
       warningMessage.setVisible(true);
-      warningMessage.setText(GctBundle.getString("clouddebug.terminate.background"));
+      warningMessage.setText(StackdriverDebuggerBundle.getString("clouddebug.terminate.background"));
     }
   }
 

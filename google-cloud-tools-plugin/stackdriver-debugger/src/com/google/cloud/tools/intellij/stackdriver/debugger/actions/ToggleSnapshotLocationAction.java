@@ -21,7 +21,7 @@ import static com.intellij.openapi.actionSystem.CommonDataKeys.EDITOR;
 import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
 import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugRunConfiguration;
 import com.google.cloud.tools.intellij.stackdriver.debugger.CloudLineBreakpointType;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.impl.RunManagerImpl;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -46,8 +46,8 @@ public class ToggleSnapshotLocationAction extends AnAction {
   /** Initialize the action. */
   public ToggleSnapshotLocationAction() {
     super(
-        GctBundle.getString("clouddebug.snapshot.location"),
-        GctBundle.getString("clouddebug.adds.snapshot.location"),
+        StackdriverDebuggerBundle.getString("clouddebug.snapshot.location"),
+        StackdriverDebuggerBundle.getString("clouddebug.adds.snapshot.location"),
         GoogleCloudCoreIcons.CLOUD);
   }
 

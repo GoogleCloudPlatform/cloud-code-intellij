@@ -18,8 +18,8 @@ package com.google.cloud.tools.intellij.stackdriver.debugger;
 
 import com.google.api.client.util.Lists;
 import com.google.cloud.tools.intellij.stackdriver.debugger.ui.CloudAttachDialog;
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerIcons;
+import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.RunCanceledByUserException;
 import com.intellij.execution.RunManager;
@@ -172,9 +172,9 @@ public class CloudDebuggerRunner extends DefaultProgramRunner {
       int result =
           Messages.showOkCancelDialog(
               project,
-              GctBundle.getString("clouddebug.stop.and.create.new.session"),
-              GctBundle.getString("clouddebug.message.title"),
-              GoogleCloudToolsIcons.STACKDRIVER_DEBUGGER);
+              StackdriverDebuggerBundle.getString("clouddebug.stop.and.create.new.session"),
+              StackdriverDebuggerBundle.getString("clouddebug.message.title"),
+              StackdriverDebuggerIcons.STACKDRIVER_DEBUGGER);
       if (result == Messages.OK) {
         for (CloudDebugProcess cdb : activeDebugProcesses) {
           cdb.getProcessHandler().detachProcess();

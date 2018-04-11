@@ -24,7 +24,7 @@ import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger.Debuggees
 import com.google.api.services.clouddebugger.v2.model.Breakpoint;
 import com.google.api.services.clouddebugger.v2.model.ListBreakpointsResponse;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
@@ -153,7 +153,7 @@ public class CloudDebugGlobalPoller {
                 + "could be retrieved => stop listening");
         handleBreakpointQueryError(
             state,
-            GctBundle.message(
+            StackdriverDebuggerBundle.message(
                 "clouddebug.background.listener.access.error.message",
                 state.getProject().getName()));
         return;
@@ -209,17 +209,17 @@ public class CloudDebugGlobalPoller {
       if (jsonResponseException.getStatusCode() == HttpURLConnection.HTTP_FORBIDDEN
           || jsonResponseException.getStatusCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
         message =
-            GctBundle.message("clouddebug.background.listener.access.error.message", projectName);
+            StackdriverDebuggerBundle.message("clouddebug.background.listener.access.error.message", projectName);
       } else {
         message =
-            GctBundle.message(
+            StackdriverDebuggerBundle.message(
                 "clouddebug.background.listener.general.error.message",
                 projectName,
                 jsonResponseException.getDetails().getMessage());
       }
     } else {
       message =
-          GctBundle.message(
+          StackdriverDebuggerBundle.message(
               "clouddebug.background.listener.general.error.message",
               projectName,
               ex.getLocalizedMessage());
@@ -229,7 +229,7 @@ public class CloudDebugGlobalPoller {
 
   private void handleBreakpointQueryError(@NotNull CloudDebugProcessState state, String message) {
     state.setListenInBackground(false);
-    String title = GctBundle.message("clouddebug.background.listener.error.title");
+    String title = StackdriverDebuggerBundle.message("clouddebug.background.listener.error.title");
     Notification notification =
         new Notification(
             CLOUD_DEBUGGER_ERROR_NOTIFICATIONS_DISPLAY_GROUP,

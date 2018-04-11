@@ -21,8 +21,8 @@ import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.stackdriver.debugger.ui.BreakpointConfigurationPanel;
 import com.google.cloud.tools.intellij.stackdriver.debugger.ui.BreakpointErrorStatusPanel;
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerIcons;
+import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.intellij.debugger.engine.DebuggerUtils;
 import com.intellij.debugger.ui.breakpoints.Breakpoint;
 import com.intellij.debugger.ui.breakpoints.JavaBreakpointType;
@@ -70,7 +70,7 @@ public class CloudLineBreakpointType extends XLineBreakpointType<CloudLineBreakp
     implements JavaBreakpointType, Disposable {
 
   public CloudLineBreakpointType() {
-    super("cloud-snapshotlocation", GctBundle.getString("clouddebug.breakpoint.description"));
+    super("cloud-snapshotlocation", StackdriverDebuggerBundle.getString("clouddebug.breakpoint.description"));
   }
 
   public static CloudLineBreakpointType getInstance() {
@@ -206,7 +206,7 @@ public class CloudLineBreakpointType extends XLineBreakpointType<CloudLineBreakp
   @NotNull
   @Override
   public Icon getDisabledIcon() {
-    return GoogleCloudToolsIcons.CLOUD_BREAKPOINT_DISABLED;
+    return StackdriverDebuggerIcons.CLOUD_BREAKPOINT_DISABLED;
   }
 
   @Nullable
@@ -229,7 +229,7 @@ public class CloudLineBreakpointType extends XLineBreakpointType<CloudLineBreakp
   @NotNull
   @Override
   public Icon getEnabledIcon() {
-    return GoogleCloudToolsIcons.CLOUD_BREAKPOINT;
+    return StackdriverDebuggerIcons.CLOUD_BREAKPOINT;
   }
 
   @Override
@@ -264,7 +264,7 @@ public class CloudLineBreakpointType extends XLineBreakpointType<CloudLineBreakp
 
     @Override
     protected Icon getDisabledIcon(boolean isMuted) {
-      return GoogleCloudToolsIcons.CLOUD_BREAKPOINT_DISABLED;
+      return StackdriverDebuggerIcons.CLOUD_BREAKPOINT_DISABLED;
     }
 
     public String getErrorMessage() {
@@ -278,12 +278,12 @@ public class CloudLineBreakpointType extends XLineBreakpointType<CloudLineBreakp
     @Override
     protected Icon getSetIcon(boolean isMuted) {
       if (!Strings.isNullOrEmpty(errorMessage)) {
-        return GoogleCloudToolsIcons.CLOUD_BREAKPOINT_ERROR;
+        return StackdriverDebuggerIcons.CLOUD_BREAKPOINT_ERROR;
       }
       if (isVerified) {
-        return GoogleCloudToolsIcons.CLOUD_BREAKPOINT_CHECKED;
+        return StackdriverDebuggerIcons.CLOUD_BREAKPOINT_CHECKED;
       }
-      return GoogleCloudToolsIcons.CLOUD_BREAKPOINT;
+      return StackdriverDebuggerIcons.CLOUD_BREAKPOINT;
     }
 
     /** Get the watch expressions from the breakpoint. */

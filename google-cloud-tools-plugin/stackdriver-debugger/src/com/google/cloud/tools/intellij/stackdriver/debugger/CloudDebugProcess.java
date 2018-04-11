@@ -25,8 +25,8 @@ import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcessSta
 import com.google.cloud.tools.intellij.stackdriver.debugger.CloudLineBreakpointType.CloudLineBreakpoint;
 import com.google.cloud.tools.intellij.stackdriver.debugger.actions.CloudDebugHelpAction;
 import com.google.cloud.tools.intellij.stackdriver.debugger.ui.CloudDebugHistoricalSnapshots;
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerIcons;
+import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.intellij.debugger.actions.DebuggerActions;
 import com.intellij.debugger.ui.DebuggerContentInfo;
 import com.intellij.debugger.ui.breakpoints.BreakpointManager;
@@ -149,7 +149,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
                 timeline.getTabTitle(),
                 (ComponentWithActions) timeline,
                 timeline.getTabTitle(),
-                GoogleCloudToolsIcons.STACKDRIVER_DEBUGGER,
+                StackdriverDebuggerIcons.STACKDRIVER_DEBUGGER,
                 null);
         layout.addContent(snapshots, 0, PlaceInGrid.left, false);
 
@@ -250,7 +250,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
     currentSnapshot = null;
 
     new Task.Modal(
-        getXDebugSession().getProject(), GctBundle.getString("clouddebug.attachingtext"), false) {
+        getXDebugSession().getProject(), StackdriverDebuggerBundle.getString("clouddebug.attachingtext"), false) {
       @Override
       public void run(@NotNull ProgressIndicator indicator) {
         indicator.setIndeterminate(true);
@@ -360,7 +360,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
               new MySuspendContext(
                   new CloudExecutionStack(
                       getXDebugSession().getProject(),
-                      GctBundle.getString("clouddebug.stackat", df.format(snapshotTime)),
+                      StackdriverDebuggerBundle.getString("clouddebug.stackat", df.format(snapshotTime)),
                       target.getStackFrames(),
                       target.getVariableTable(),
                       target.getEvaluatedExpressions())));
@@ -461,7 +461,7 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
         leftToolbar.remove(child);
 
         // show our help if we have it.
-        String helpUrl = GctBundle.getString("clouddebug.helpurl");
+        String helpUrl = StackdriverDebuggerBundle.getString("clouddebug.helpurl");
         if (!"".equals(helpUrl)) {
           leftToolbar.add(new CloudDebugHelpAction(helpUrl));
         }
@@ -574,9 +574,9 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
 
     public SaveAndExitAction() {
       super(
-          GctBundle.getString("clouddebug.stopandcontinue"),
-          GctBundle.getString("clouddebug.exitdebug"),
-          GoogleCloudToolsIcons.CLOUD_DEBUG_SAVE_EXIT);
+          StackdriverDebuggerBundle.getString("clouddebug.stopandcontinue"),
+          StackdriverDebuggerBundle.getString("clouddebug.exitdebug"),
+          StackdriverDebuggerIcons.CLOUD_DEBUG_SAVE_EXIT);
     }
 
     @Override
@@ -584,10 +584,10 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
       int result =
           Messages.showOkCancelDialog(
               event.getProject(),
-              GctBundle.getString("clouddebug.continue.listening"),
-              GctBundle.getString("clouddebug.message.title"),
-              GctBundle.getString("clouddebug.continue"),
-              GctBundle.getString("clouddebug.stop.listening"),
+              StackdriverDebuggerBundle.getString("clouddebug.continue.listening"),
+              StackdriverDebuggerBundle.getString("clouddebug.message.title"),
+              StackdriverDebuggerBundle.getString("clouddebug.continue"),
+              StackdriverDebuggerBundle.getString("clouddebug.stop.listening"),
               Messages.getQuestionIcon());
       if (result == Messages.OK) { // continue
         processState.setListenInBackground(true);

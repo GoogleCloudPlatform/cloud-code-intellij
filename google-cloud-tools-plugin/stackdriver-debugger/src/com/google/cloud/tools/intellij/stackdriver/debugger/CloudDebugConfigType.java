@@ -16,8 +16,8 @@
 
 package com.google.cloud.tools.intellij.stackdriver.debugger;
 
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerIcons;
+import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.intellij.execution.BeforeRunTask;
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.ConfigurationType;
@@ -59,17 +59,17 @@ public class CloudDebugConfigType implements ConfigurationType {
 
   @Override
   public String getConfigurationTypeDescription() {
-    return GctBundle.getString("clouddebug.text");
+    return StackdriverDebuggerBundle.getString("clouddebug.text");
   }
 
   @Override
   public String getDisplayName() {
-    return GctBundle.getString("clouddebug.text");
+    return StackdriverDebuggerBundle.getString("clouddebug.text");
   }
 
   @Override
   public Icon getIcon() {
-    return GoogleCloudToolsIcons.STACKDRIVER_DEBUGGER;
+    return StackdriverDebuggerIcons.STACKDRIVER_DEBUGGER;
   }
 
   @NotNull

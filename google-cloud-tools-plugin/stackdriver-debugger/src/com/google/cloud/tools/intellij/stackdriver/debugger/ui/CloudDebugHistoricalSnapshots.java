@@ -25,8 +25,8 @@ import com.google.cloud.tools.intellij.stackdriver.debugger.CloudBreakpointListe
 import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcess;
 import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcessHandler;
 import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcessState;
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerIcons;
+import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.diagnostic.logging.AdditionalTabComponent;
 import com.intellij.openapi.actionSystem.ActionGroup;
@@ -152,7 +152,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
   @NotNull
   @Override
   public String getTabTitle() {
-    return GctBundle.getString("clouddebug.snapshots");
+    return StackdriverDebuggerBundle.getString("clouddebug.snapshots");
   }
 
   @Nullable
@@ -461,18 +461,18 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
 
     RemoveAllBreakpointsAction() {
       super(
-          GctBundle.getString("clouddebug.delete.all"),
-          GoogleCloudToolsIcons.CLOUD_DEBUG_DELETE_ALL_BREAKPOINTS);
+          StackdriverDebuggerBundle.getString("clouddebug.delete.all"),
+          StackdriverDebuggerIcons.CLOUD_DEBUG_DELETE_ALL_BREAKPOINTS);
     }
 
     @Override
     public void actionPerformed(AnActionEvent event) {
       int result =
           Messages.showOkCancelDialog(
-              GctBundle.getString("clouddebug.remove.all"),
-              GctBundle.getString("clouddebug.delete.snapshots"),
-              GctBundle.getString("clouddebug.buttondelete"),
-              GctBundle.getString("clouddebug.cancelbutton"),
+              StackdriverDebuggerBundle.getString("clouddebug.remove.all"),
+              StackdriverDebuggerBundle.getString("clouddebug.delete.snapshots"),
+              StackdriverDebuggerBundle.getString("clouddebug.buttondelete"),
+              StackdriverDebuggerBundle.getString("clouddebug.cancelbutton"),
               Messages.getQuestionIcon());
 
       if (result == Messages.OK) { // pressed remove all
@@ -486,8 +486,8 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
 
     public ReactivateBreakpointAction() {
       super(
-          GctBundle.getString("clouddebug.reactivatesnapshotlocation"),
-          GoogleCloudToolsIcons.CLOUD_DEBUG_REACTIVATE_BREAKPOINT);
+          StackdriverDebuggerBundle.getString("clouddebug.reactivatesnapshotlocation"),
+          StackdriverDebuggerIcons.CLOUD_DEBUG_REACTIVATE_BREAKPOINT);
     }
 
     @Override
@@ -512,7 +512,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
       setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
       setPreferredScrollableViewportSize(new Dimension(WINDOW_WIDTH_PX, WINDOW_HEIGHT_PX));
       setAutoCreateColumnsFromModel(false);
-      getEmptyText().setText(GctBundle.getString("clouddebug.nosnapshots"));
+      getEmptyText().setText(StackdriverDebuggerBundle.getString("clouddebug.nosnapshots"));
 
       addMouseListener(new SnapshotClicker());
       addMouseMotionListener(new CursorSwitcher());
@@ -652,7 +652,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
         BalloonBuilder builder =
             JBPopupFactory.getInstance()
                 .createHtmlTextBalloonBuilder(
-                    GctBundle.getString("clouddebug.new.snapshot.received"), MessageType.INFO, null)
+                    StackdriverDebuggerBundle.getString("clouddebug.new.snapshot.received"), MessageType.INFO, null)
                 .setFadeoutTime(3000)
                 .setDisposable(process.getXDebugSession().getProject());
         balloon = builder.createBalloon();

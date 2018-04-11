@@ -17,8 +17,8 @@
 package com.google.cloud.tools.intellij.stackdriver.debugger.ui;
 
 import com.google.api.services.clouddebugger.v2.model.Breakpoint;
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerIcons;
+import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -142,15 +142,15 @@ class SnapshotsModel extends AbstractTableModel {
       case 0:
         if (breakpoint.getStatus() != null
             && Boolean.TRUE.equals(breakpoint.getStatus().getIsError())) {
-          return GoogleCloudToolsIcons.CLOUD_BREAKPOINT_ERROR;
+          return StackdriverDebuggerIcons.CLOUD_BREAKPOINT_ERROR;
         }
         if (!Boolean.TRUE.equals(breakpoint.getIsFinalState())) {
-          return GoogleCloudToolsIcons.CLOUD_BREAKPOINT_CHECKED;
+          return StackdriverDebuggerIcons.CLOUD_BREAKPOINT_CHECKED;
         }
-        return GoogleCloudToolsIcons.CLOUD_BREAKPOINT_FINAL;
+        return StackdriverDebuggerIcons.CLOUD_BREAKPOINT_FINAL;
       case 1:
         if (!Boolean.TRUE.equals(breakpoint.getIsFinalState())) {
-          return GctBundle.getString("clouddebug.pendingstatus");
+          return StackdriverDebuggerBundle.getString("clouddebug.pendingstatus");
         }
         try {
           return ISODateTimeFormat.dateTime().parseDateTime(breakpoint.getFinalTime()).toDate();
@@ -167,7 +167,7 @@ class SnapshotsModel extends AbstractTableModel {
         return breakpoint.getCondition();
       case 4:
         if (snapshots.supportsMoreConfig(breakpoint)) {
-          return GctBundle.getString("clouddebug.moreHTML");
+          return StackdriverDebuggerBundle.getString("clouddebug.moreHTML");
         } else {
           return null;
         }
