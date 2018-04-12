@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 import com.google.api.client.util.Lists;
 import com.google.api.services.clouddebugger.v2.model.Breakpoint;
 import com.google.api.services.clouddebugger.v2.model.StatusMessage;
-import com.google.cloud.tools.intellij.debugger.CloudLineBreakpointType.CloudLineBreakpoint;
+import com.google.cloud.tools.intellij.stackdriver.debugger.CloudLineBreakpointType.CloudLineBreakpoint;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
 import com.google.cloud.tools.intellij.testing.TestUtils;

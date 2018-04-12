@@ -26,7 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.api.services.clouddebugger.v2.model.Breakpoint;
-import com.google.cloud.tools.intellij.debugger.CloudLineBreakpointType.CloudLineBreakpoint;
+import com.google.cloud.tools.intellij.stackdriver.debugger.CloudLineBreakpointType.CloudLineBreakpoint;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.util.Key;

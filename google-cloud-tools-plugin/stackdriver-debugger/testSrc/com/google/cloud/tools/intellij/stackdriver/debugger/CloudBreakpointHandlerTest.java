@@ -32,8 +32,8 @@ import static org.mockito.Mockito.when;
 
 import com.google.api.services.clouddebugger.v2.model.Breakpoint;
 import com.google.api.services.clouddebugger.v2.model.SourceLocation;
-import com.google.cloud.tools.intellij.debugger.CloudDebugProcessStateController.SetBreakpointHandler;
-import com.google.cloud.tools.intellij.debugger.CloudLineBreakpointType.CloudLineBreakpoint;
+import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcessStateController.SetBreakpointHandler;
+import com.google.cloud.tools.intellij.stackdriver.debugger.CloudLineBreakpointType.CloudLineBreakpoint;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.intellij.mock.MockProjectEx;
