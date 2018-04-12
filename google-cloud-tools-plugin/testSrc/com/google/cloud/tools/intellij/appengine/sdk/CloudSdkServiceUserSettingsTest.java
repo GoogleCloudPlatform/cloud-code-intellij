@@ -70,8 +70,8 @@ public class CloudSdkServiceUserSettingsTest {
   }
 
   @Test
-  public void unset_lastUpdateTime_returns_zero() {
-    assertThat(userSettings.getLastAutomaticUpdateTimestamp()).isEqualTo(0);
+  public void unset_lastUpdateTime_returns_empty() {
+    assertThat(userSettings.getLastAutomaticUpdateTimestamp().isPresent()).isFalse();
   }
 
   @Test
@@ -79,6 +79,7 @@ public class CloudSdkServiceUserSettingsTest {
     long timestamp = System.currentTimeMillis();
     userSettings.setLastAutomaticUpdateTimestamp(timestamp);
 
-    assertThat(userSettings.getLastAutomaticUpdateTimestamp()).isEqualTo(timestamp);
+    assertThat(userSettings.getLastAutomaticUpdateTimestamp().isPresent()).isTrue();
+    assertThat(userSettings.getLastAutomaticUpdateTimestamp().get()).isEqualTo(timestamp);
   }
 }

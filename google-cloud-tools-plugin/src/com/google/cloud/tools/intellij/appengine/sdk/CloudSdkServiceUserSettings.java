@@ -96,13 +96,11 @@ public class CloudSdkServiceUserSettings {
         DEFAULT_MANAGED_SDK_AUTOMATIC_UPDATES /* need to specify default to avoid removal */);
   }
 
-  long getLastAutomaticUpdateTimestamp() {
+  Optional<Long> getLastAutomaticUpdateTimestamp() {
     return Optional.ofNullable(
-            Longs.tryParse(
-                Strings.nullToEmpty(
-                    propertiesComponent.getValue(
-                        SDK_LAST_AUTOMATIC_UPDATE_TMESTAMP_PROPERTY_NAME))))
-        .orElse(0L);
+        Longs.tryParse(
+            Strings.nullToEmpty(
+                propertiesComponent.getValue(SDK_LAST_AUTOMATIC_UPDATE_TMESTAMP_PROPERTY_NAME))));
   }
 
   void setLastAutomaticUpdateTimestamp(long timestamp) {
