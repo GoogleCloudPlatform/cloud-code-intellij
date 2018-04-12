@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.cloud.executor;
 
 import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
 
 /** Executor of {@link AppEngineTask}'s. */
@@ -44,6 +45,7 @@ public class AppEngineExecutor implements CancellableRunnable {
     }
   }
 
+  @SuppressWarnings("FutureReturnValueIgnored")
   private void setProcess(Process process) {
     this.process = process;
     ThreadUtil.getInstance()
@@ -53,7 +55,9 @@ public class AppEngineExecutor implements CancellableRunnable {
                 CloudSdkServiceManager.getInstance().getSdkReadLock().lock();
                 process.waitFor();
               } catch (InterruptedException e) {
-                // unexpected interruption.
+                // unexpected interruption, nothing can be done.
+                Logger.getInstance(AppEngineExecutor.class)
+                    .warn("Waiting for gcloud process unexpectedly interrupted", e);
               } finally {
                 CloudSdkServiceManager.getInstance().getSdkReadLock().unlock();
               }
