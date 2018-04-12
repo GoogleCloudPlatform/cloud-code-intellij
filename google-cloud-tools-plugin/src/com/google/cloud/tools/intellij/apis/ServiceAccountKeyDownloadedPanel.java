@@ -17,9 +17,12 @@
 package com.google.cloud.tools.intellij.apis;
 
 import com.google.cloud.tools.intellij.ui.CopyToClipboardActionListener;
+import com.intellij.execution.util.EnvironmentVariable;
 import com.intellij.openapi.project.Project;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -37,6 +40,9 @@ public final class ServiceAccountKeyDownloadedPanel {
   private static final String CREDENTIAL_ENV_VAR_KEY = "GOOGLE_APPLICATION_CREDENTIALS";
   private static final String ENV_VAR_DISPLAY_FORMAT = "%s=%s";
 
+  private final String gcpProjectId;
+  private final String downloadPath;
+
   private JPanel commonPanel;
   private JLabel yourServiceAccountKeyLabel;
   private JLabel downloadPathLabel;
@@ -47,6 +53,8 @@ public final class ServiceAccountKeyDownloadedPanel {
 
   public ServiceAccountKeyDownloadedPanel(
       @Nullable Project project, @NotNull String gcpProjectId, @NotNull String downloadPath) {
+    this.gcpProjectId = gcpProjectId;
+    this.downloadPath = downloadPath;
     downloadPathLabel.setText(downloadPath);
 
     DefaultTableModel tableModel =
@@ -76,7 +84,11 @@ public final class ServiceAccountKeyDownloadedPanel {
   }
 
   @NotNull
-  public Map<String, String> getEnvironmentVariables() {
-    return envVarsMap;
+  public Set<EnvironmentVariable> getEnvironmentVariables() {
+    Set<EnvironmentVariable> environmentVariables = new HashSet<>();
+    environmentVariables.add(
+        new EnvironmentVariable(CLOUD_PROJECT_ENV_VAR_KEY, gcpProjectId, false));
+    environmentVariables.add(new EnvironmentVariable(CREDENTIAL_ENV_VAR_KEY, downloadPath, false));
+    return environmentVariables;
   }
 }
