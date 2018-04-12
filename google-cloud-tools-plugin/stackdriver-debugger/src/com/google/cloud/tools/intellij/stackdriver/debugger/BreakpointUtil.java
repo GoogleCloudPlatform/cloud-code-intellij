@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.stackdriver.debugger;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.v2.model.StatusMessage;
-import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import org.jetbrains.annotations.Nullable;
 
 /** Utility functions for cloud debug data. */

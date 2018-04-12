@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.stackdriver.debugger;
 
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
-import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.intellij.execution.Executor;
 import com.intellij.execution.ProgramRunnerUtil;
 import com.intellij.execution.RunManager;

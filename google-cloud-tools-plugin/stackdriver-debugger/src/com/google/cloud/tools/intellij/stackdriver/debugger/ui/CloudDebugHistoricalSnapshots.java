@@ -25,8 +25,8 @@ import com.google.cloud.tools.intellij.stackdriver.debugger.CloudBreakpointListe
 import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcess;
 import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcessHandler;
 import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcessState;
-import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerIcons;
 import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
+import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerIcons;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.diagnostic.logging.AdditionalTabComponent;
 import com.intellij.openapi.actionSystem.ActionGroup;
@@ -652,7 +652,9 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
         BalloonBuilder builder =
             JBPopupFactory.getInstance()
                 .createHtmlTextBalloonBuilder(
-                    StackdriverDebuggerBundle.getString("clouddebug.new.snapshot.received"), MessageType.INFO, null)
+                    StackdriverDebuggerBundle.getString("clouddebug.new.snapshot.received"),
+                    MessageType.INFO,
+                    null)
                 .setFadeoutTime(3000)
                 .setDisposable(process.getXDebugSession().getProject());
         balloon = builder.createBalloon();

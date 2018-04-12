@@ -17,8 +17,8 @@
 package com.google.cloud.tools.intellij.stackdriver.debugger.ui;
 
 import com.google.api.services.clouddebugger.v2.model.Breakpoint;
-import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerIcons;
 import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
+import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerIcons;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;

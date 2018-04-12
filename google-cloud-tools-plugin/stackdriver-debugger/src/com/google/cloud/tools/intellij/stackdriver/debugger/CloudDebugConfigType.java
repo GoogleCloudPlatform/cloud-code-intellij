@@ -16,8 +16,6 @@
 
 package com.google.cloud.tools.intellij.stackdriver.debugger;
 
-import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerIcons;
-import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.intellij.execution.BeforeRunTask;
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.ConfigurationType;

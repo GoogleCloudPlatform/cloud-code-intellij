@@ -25,7 +25,6 @@ import com.google.api.services.clouddebugger.v2.model.ListBreakpointsResponse;
 import com.google.api.services.clouddebugger.v2.model.SetBreakpointResponse;
 import com.google.api.services.clouddebugger.v2.model.SourceLocation;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
-import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;

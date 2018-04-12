@@ -20,13 +20,13 @@ import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger;
 import com.google.api.services.clouddebugger.v2.model.Debuggee;
 import com.google.api.services.clouddebugger.v2.model.ListDebuggeesResponse;
-import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcessState;
-import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebuggerClient;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
+import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcessState;
+import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebuggerClient;
 import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.google.common.base.Strings;
 import com.intellij.openapi.application.ApplicationManager;
@@ -178,7 +178,8 @@ class ProjectDebuggeeBinding {
                         if (debuggees == null
                             || debuggees.getDebuggees() == null
                             || debuggees.getDebuggees().isEmpty()) {
-                          disableTargetSelector(StackdriverDebuggerBundle.getString("clouddebug.nomodulesfound"));
+                          disableTargetSelector(
+                              StackdriverDebuggerBundle.getString("clouddebug.nomodulesfound"));
                         } else {
                           targetSelector.setEnabled(true);
                           Map<String, DebugTarget> perModuleCache = new HashMap<>();
@@ -245,7 +246,8 @@ class ProjectDebuggeeBinding {
     if (reason instanceof GoogleJsonResponseException) {
       return resolveJsonResponseToMessage((GoogleJsonResponseException) reason);
     } else {
-      return StackdriverDebuggerBundle.getString("clouddebug.debug.targets.error", reason.getLocalizedMessage());
+      return StackdriverDebuggerBundle.getString(
+          "clouddebug.debug.targets.error", reason.getLocalizedMessage());
     }
   }
 

@@ -18,5 +18,6 @@
     <name>Stackdriver Debugger Tests</name>
     <id>com.google.gct.core</id>
 
+    <xi:include href="/META-INF/google-cloud-core.xml" xpointer="xpointer(/idea-plugin/*)"/>
     <xi:include href="/META-INF/stackdriver-debugger.xml" xpointer="xpointer(/idea-plugin/*)"/>
 </idea-plugin>

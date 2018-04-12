@@ -27,7 +27,6 @@ import com.google.api.services.clouddebugger.v2.model.GitSourceContext;
 import com.google.api.services.clouddebugger.v2.model.ListDebuggeesResponse;
 import com.google.api.services.clouddebugger.v2.model.SourceContext;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
-import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.intellij.dvcs.DvcsUtil;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.openapi.application.AccessToken;
@@ -335,7 +334,8 @@ public class ProjectRepositoryValidator {
                 .getOriginalBranchName()
                 .equals(repoState.getSourceRepository().getCurrentRevision()))) {
       Messages.showErrorDialog(
-          StackdriverDebuggerBundle.getString("clouddebug.erroroncheckout", repoState.getOriginalBranchName()),
+          StackdriverDebuggerBundle.getString(
+              "clouddebug.erroroncheckout", repoState.getOriginalBranchName()),
           "Error");
       return;
     }
@@ -403,7 +403,8 @@ public class ProjectRepositoryValidator {
             .run(
                 new Task.Modal(
                     project,
-                    StackdriverDebuggerBundle.getString("clouddebug.removestashx", targetStash.get().getStash()),
+                    StackdriverDebuggerBundle.getString(
+                        "clouddebug.removestashx", targetStash.get().getStash()),
                     false) {
                   @Override
                   public void run(@NotNull ProgressIndicator indicator) {

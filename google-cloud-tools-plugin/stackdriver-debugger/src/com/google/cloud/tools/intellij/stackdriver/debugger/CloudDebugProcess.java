@@ -25,8 +25,6 @@ import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcessSta
 import com.google.cloud.tools.intellij.stackdriver.debugger.CloudLineBreakpointType.CloudLineBreakpoint;
 import com.google.cloud.tools.intellij.stackdriver.debugger.actions.CloudDebugHelpAction;
 import com.google.cloud.tools.intellij.stackdriver.debugger.ui.CloudDebugHistoricalSnapshots;
-import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerIcons;
-import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.intellij.debugger.actions.DebuggerActions;
 import com.intellij.debugger.ui.DebuggerContentInfo;
 import com.intellij.debugger.ui.breakpoints.BreakpointManager;
@@ -250,7 +248,9 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
     currentSnapshot = null;
 
     new Task.Modal(
-        getXDebugSession().getProject(), StackdriverDebuggerBundle.getString("clouddebug.attachingtext"), false) {
+        getXDebugSession().getProject(),
+        StackdriverDebuggerBundle.getString("clouddebug.attachingtext"),
+        false) {
       @Override
       public void run(@NotNull ProgressIndicator indicator) {
         indicator.setIndeterminate(true);
@@ -360,7 +360,8 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
               new MySuspendContext(
                   new CloudExecutionStack(
                       getXDebugSession().getProject(),
-                      StackdriverDebuggerBundle.getString("clouddebug.stackat", df.format(snapshotTime)),
+                      StackdriverDebuggerBundle.getString(
+                          "clouddebug.stackat", df.format(snapshotTime)),
                       target.getStackFrames(),
                       target.getVariableTable(),
                       target.getEvaluatedExpressions())));

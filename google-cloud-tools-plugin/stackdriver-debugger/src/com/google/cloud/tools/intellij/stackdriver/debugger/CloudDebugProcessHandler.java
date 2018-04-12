@@ -16,9 +16,9 @@
 
 package com.google.cloud.tools.intellij.stackdriver.debugger;
 
-import com.google.cloud.tools.intellij.stackdriver.debugger.ui.LogoutDebugProcessDetacher;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
+import com.google.cloud.tools.intellij.stackdriver.debugger.ui.LogoutDebugProcessDetacher;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.openapi.diagnostic.Logger;
 import java.io.OutputStream;

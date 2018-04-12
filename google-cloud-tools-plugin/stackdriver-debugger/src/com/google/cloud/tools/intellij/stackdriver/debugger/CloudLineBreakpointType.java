@@ -21,8 +21,6 @@ import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.stackdriver.debugger.ui.BreakpointConfigurationPanel;
 import com.google.cloud.tools.intellij.stackdriver.debugger.ui.BreakpointErrorStatusPanel;
-import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerIcons;
-import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.intellij.debugger.engine.DebuggerUtils;
 import com.intellij.debugger.ui.breakpoints.Breakpoint;
 import com.intellij.debugger.ui.breakpoints.JavaBreakpointType;
@@ -70,7 +68,9 @@ public class CloudLineBreakpointType extends XLineBreakpointType<CloudLineBreakp
     implements JavaBreakpointType, Disposable {
 
   public CloudLineBreakpointType() {
-    super("cloud-snapshotlocation", StackdriverDebuggerBundle.getString("clouddebug.breakpoint.description"));
+    super(
+        "cloud-snapshotlocation",
+        StackdriverDebuggerBundle.getString("clouddebug.breakpoint.description"));
   }
 
   public static CloudLineBreakpointType getInstance() {

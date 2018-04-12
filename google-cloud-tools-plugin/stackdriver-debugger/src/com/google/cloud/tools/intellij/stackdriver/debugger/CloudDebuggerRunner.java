@@ -18,8 +18,6 @@ package com.google.cloud.tools.intellij.stackdriver.debugger;
 
 import com.google.api.client.util.Lists;
 import com.google.cloud.tools.intellij.stackdriver.debugger.ui.CloudAttachDialog;
-import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerIcons;
-import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.RunCanceledByUserException;
 import com.intellij.execution.RunManager;

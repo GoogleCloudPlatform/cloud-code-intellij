@@ -19,7 +19,6 @@ package com.google.cloud.tools.intellij.stackdriver.debugger;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.v2.model.StackFrame;
 import com.google.api.services.clouddebugger.v2.model.Variable;
-import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.ColoredTextContainer;

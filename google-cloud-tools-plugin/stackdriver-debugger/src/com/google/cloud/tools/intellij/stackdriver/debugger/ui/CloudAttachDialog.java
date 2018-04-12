@@ -18,14 +18,14 @@ package com.google.cloud.tools.intellij.stackdriver.debugger.ui;
 
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
-import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcessState;
-import com.google.cloud.tools.intellij.stackdriver.debugger.ProjectRepositoryState;
-import com.google.cloud.tools.intellij.stackdriver.debugger.ProjectRepositoryValidator;
-import com.google.cloud.tools.intellij.stackdriver.debugger.SyncResult;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
+import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcessState;
+import com.google.cloud.tools.intellij.stackdriver.debugger.ProjectRepositoryState;
+import com.google.cloud.tools.intellij.stackdriver.debugger.ProjectRepositoryValidator;
 import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
+import com.google.cloud.tools.intellij.stackdriver.debugger.SyncResult;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.intellij.dvcs.DvcsUtil;
@@ -183,7 +183,8 @@ public class CloudAttachDialog extends DialogWrapper {
 
     CloudProject selectedCloudProject = projectSelector.getSelectedProject();
     if (selectedCloudProject == null) {
-      return new ValidationInfo(StackdriverDebuggerBundle.getString("clouddebug.noprojectid"), projectSelector);
+      return new ValidationInfo(
+          StackdriverDebuggerBundle.getString("clouddebug.noprojectid"), projectSelector);
     }
 
     // validation should run only after the query for debug targets has results
@@ -201,7 +202,8 @@ public class CloudAttachDialog extends DialogWrapper {
       } else if (wireup.isCdbQueried()) {
         // We went to CDB and detected no debuggees.
         return new ValidationInfo(
-            StackdriverDebuggerBundle.getString("clouddebug.debug.targets.accessdenied"), projectSelector);
+            StackdriverDebuggerBundle.getString("clouddebug.debug.targets.accessdenied"),
+            projectSelector);
       }
     }
 
@@ -209,7 +211,8 @@ public class CloudAttachDialog extends DialogWrapper {
     // assumption: either an ErrorHolder or one or more DebugTargets are added to the selector when
     //             the result is available
     if (targetSelector.getSelectedItem() == null && targetSelector.getItemCount() > 0) {
-      return new ValidationInfo(StackdriverDebuggerBundle.getString("clouddebug.nomodulesfound"), targetSelector);
+      return new ValidationInfo(
+          StackdriverDebuggerBundle.getString("clouddebug.nomodulesfound"), targetSelector);
     }
 
     return null;
@@ -316,7 +319,8 @@ public class CloudAttachDialog extends DialogWrapper {
             StackdriverDebuggerBundle.getString(
                 "clouddebug.repositories.are.not.supported", syncResult.getRepositoryType()));
       } else {
-        warningMessage.setText(StackdriverDebuggerBundle.getString("clouddebug.no.remote.repository"));
+        warningMessage.setText(
+            StackdriverDebuggerBundle.getString("clouddebug.no.remote.repository"));
       }
     } else {
       setOkText(false);
@@ -342,7 +346,8 @@ public class CloudAttachDialog extends DialogWrapper {
     if (hasUnselectedBackgroundSessions) {
       warningHeader.setVisible(true);
       warningMessage.setVisible(true);
-      warningMessage.setText(StackdriverDebuggerBundle.getString("clouddebug.terminate.background"));
+      warningMessage.setText(
+          StackdriverDebuggerBundle.getString("clouddebug.terminate.background"));
     }
   }
 

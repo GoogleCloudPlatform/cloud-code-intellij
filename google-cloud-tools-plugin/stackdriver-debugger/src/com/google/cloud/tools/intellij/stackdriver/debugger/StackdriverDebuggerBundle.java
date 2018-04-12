@@ -24,8 +24,7 @@ import org.jetbrains.annotations.PropertyKey;
 
 public class StackdriverDebuggerBundle {
 
-  @NonNls
-  private static final String BUNDLE_NAME = "messages.StackdriverDebuggerBundle";
+  @NonNls private static final String BUNDLE_NAME = "messages.StackdriverDebuggerBundle";
 
   private StackdriverDebuggerBundle() {
     // not for construction.

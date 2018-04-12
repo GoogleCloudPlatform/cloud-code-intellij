@@ -44,7 +44,8 @@ public class CloudDebugRunConfigurationPanel {
         StackdriverDebuggerBundle.message("clouddebug.runconfig.formoredetails"),
         StackdriverDebuggerBundle.message("clouddebug.runconfig.documentation.url.text"),
         ".");
-    docsLink.setHyperlinkTarget(StackdriverDebuggerBundle.message("clouddebug.runconfig.documentation.url"));
+    docsLink.setHyperlinkTarget(
+        StackdriverDebuggerBundle.message("clouddebug.runconfig.documentation.url"));
     description.setText(StackdriverDebuggerBundle.message("clouddebug.runconfig.description"));
   }
 

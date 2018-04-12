@@ -21,14 +21,14 @@ import static org.mockito.Mockito.when;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.services.clouddebugger.v2.model.Debuggee;
-import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcessState;
-import com.google.cloud.tools.intellij.stackdriver.debugger.ProjectRepositoryValidator;
-import com.google.cloud.tools.intellij.stackdriver.debugger.SyncResult;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
+import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcessState;
+import com.google.cloud.tools.intellij.stackdriver.debugger.ProjectRepositoryValidator;
+import com.google.cloud.tools.intellij.stackdriver.debugger.SyncResult;
 import com.google.cloud.tools.intellij.testing.TestUtils;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.intellij.openapi.project.Project;

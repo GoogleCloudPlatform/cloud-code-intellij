@@ -68,7 +68,9 @@ class DebugTarget implements DebugTargetSelectorItem {
 
       // Build a description from the strings.
       if (!Strings.isNullOrEmpty(version)) {
-        description = StackdriverDebuggerBundle.getString("clouddebug.version.with.module.format", module, version);
+        description =
+            StackdriverDebuggerBundle.getString(
+                "clouddebug.version.with.module.format", module, version);
       }
 
       // Record the minor version.  We only show the latest minor version.

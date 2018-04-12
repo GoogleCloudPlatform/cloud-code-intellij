@@ -24,7 +24,6 @@ import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger.Debuggees
 import com.google.api.services.clouddebugger.v2.model.Breakpoint;
 import com.google.api.services.clouddebugger.v2.model.ListBreakpointsResponse;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
-import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
@@ -209,7 +208,8 @@ public class CloudDebugGlobalPoller {
       if (jsonResponseException.getStatusCode() == HttpURLConnection.HTTP_FORBIDDEN
           || jsonResponseException.getStatusCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
         message =
-            StackdriverDebuggerBundle.message("clouddebug.background.listener.access.error.message", projectName);
+            StackdriverDebuggerBundle.message(
+                "clouddebug.background.listener.access.error.message", projectName);
       } else {
         message =
             StackdriverDebuggerBundle.message(
