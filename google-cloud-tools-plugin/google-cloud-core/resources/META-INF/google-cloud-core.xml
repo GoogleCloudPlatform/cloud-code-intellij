@@ -37,6 +37,12 @@
                              provider="com.google.cloud.tools.intellij.analytics.UsageTrackerConfigurableProvider"/>
 
     <applicationService
+            serviceInterface="com.google.cloud.tools.intellij.login.PluginFlagsService"
+            serviceImplementation="com.google.cloud.tools.intellij.login.PropertiesFilePluginFlagsService"/>
+    <applicationService
+            serviceInterface="com.google.cloud.tools.intellij.analytics.UsageTrackingManagementService"
+            serviceImplementation="com.google.cloud.tools.intellij.analytics.DefaultUsageTrackingManagementService"/>
+    <applicationService
             serviceInterface="com.google.cloud.tools.intellij.analytics.UsageTrackerProvider"
             serviceImplementation="com.google.cloud.tools.intellij.analytics.KeyedExtensionUsageTrackerProvider"/>
     <applicationService

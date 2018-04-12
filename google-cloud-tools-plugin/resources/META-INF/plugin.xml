@@ -361,6 +361,8 @@
   </change-notes>
 
   <xi:include href="/META-INF/google-cloud-core.xml" xpointer="xpointer(/idea-plugin/*)"/>
+  <xi:include href="/META-INF/google-cloud-storage.xml" xpointer="xpointer(/idea-plugin/*)"/>
+
   <depends optional="true" config-file="javaee-integration.xml">com.intellij.javaee</depends>
   <depends optional="true" config-file="gwt-integration.xml">com.intellij.gwt</depends>
   <depends optional="true" config-file="google-app-engine-maven-support.xml">org.jetbrains.idea.maven</depends>
@@ -536,12 +538,6 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <applicationService serviceImplementation="com.google.cloud.tools.intellij.util.SystemEnvironmentProvider" />
-  </extensions>
-
-  <extensions defaultExtensionNs="com.intellij">
-    <toolWindow id="Google Cloud Storage" anchor="right"
-                factoryClass="com.google.cloud.tools.intellij.gcs.GcsToolWindowFactory"/>
-    <fileEditorProvider implementation="com.google.cloud.tools.intellij.gcs.GcsBucketEditorProvider"/>
   </extensions>
 
   <actions>

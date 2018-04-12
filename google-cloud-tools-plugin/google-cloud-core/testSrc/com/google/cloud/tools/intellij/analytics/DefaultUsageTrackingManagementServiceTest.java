@@ -22,7 +22,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
-import com.google.cloud.tools.intellij.login.PluginFlags;
+import com.google.cloud.tools.intellij.login.PluginFlagsService;
 import com.intellij.ide.util.PropertiesComponent;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,18 +30,18 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-/** Tests for {@link UsageTrackerManager}. */
+/** Tests for {@link DefaultUsageTrackingManagementService}. */
 @RunWith(MockitoJUnitRunner.class)
-public class UsageTrackerManagerTest {
+public class DefaultUsageTrackingManagementServiceTest {
 
   @Mock private PropertiesComponent mockComponent;
-  @Mock private PluginFlags mockFlags;
+  @Mock private PluginFlagsService mockFlags;
 
-  private UsageTrackerManager manager;
+  private DefaultUsageTrackingManagementService manager;
 
   @Before
   public void setUp() {
-    manager = new UsageTrackerManager(mockComponent, mockFlags);
+    manager = new DefaultUsageTrackingManagementService(mockComponent, mockFlags);
   }
 
   @Test
@@ -51,13 +51,15 @@ public class UsageTrackerManagerTest {
 
   @Test
   public void testHasUserRecordedTrackingPreference_prefSetToTrue() {
-    when(mockComponent.getValue(UsageTrackerManager.USAGE_TRACKER_KEY)).thenReturn("true");
+    when(mockComponent.getValue(DefaultUsageTrackingManagementService.USAGE_TRACKER_KEY))
+        .thenReturn("true");
     assertTrue(manager.hasUserRecordedTrackingPreference());
   }
 
   @Test
   public void testHasUserRecordedTrackingPreference_prefSetToFalse() {
-    when(mockComponent.getValue(UsageTrackerManager.USAGE_TRACKER_KEY)).thenReturn("false");
+    when(mockComponent.getValue(DefaultUsageTrackingManagementService.USAGE_TRACKER_KEY))
+        .thenReturn("false");
 
     assertTrue(manager.hasUserRecordedTrackingPreference());
   }
@@ -71,7 +73,7 @@ public class UsageTrackerManagerTest {
   @Test
   public void testGetAnalyticsProperty_placeHolderShouldResultInNull() {
     when(mockFlags.getAnalyticsId())
-        .thenReturn(UsageTrackerManager.USAGE_TRACKER_PROPERTY_PLACEHOLDER);
+        .thenReturn(DefaultUsageTrackingManagementService.USAGE_TRACKER_PROPERTY_PLACEHOLDER);
     assertNull(manager.getAnalyticsProperty());
   }
 }

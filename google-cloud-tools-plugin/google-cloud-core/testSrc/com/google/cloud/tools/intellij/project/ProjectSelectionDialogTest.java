@@ -79,7 +79,6 @@ public class ProjectSelectionDialogTest {
     doNothing().when(projectSelectionDialog).installTableSpeedSearch(any());
     doNothing().when(projectSelectionDialog).setLoading(anyBoolean());
 
-    projectSelectionDialog.createUIComponents();
     projectSelectionDialog.loadAllProjects();
 
     testUiProject = CloudProject.create(TEST_PROJECT_NAME, TEST_PROJECT_ID, TEST_USER_EMAIL);

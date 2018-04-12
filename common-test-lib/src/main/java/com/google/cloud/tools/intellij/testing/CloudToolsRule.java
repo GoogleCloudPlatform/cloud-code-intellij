@@ -96,12 +96,12 @@ public final class CloudToolsRule implements TestRule {
 
   /** Sets up utilities before the test runs. */
   private void setUp(Description description) throws Exception {
-    MockitoAnnotations.initMocks(testInstance);
     testFixture =
         IdeaTestFixtureFactory.getFixtureFactory()
             .createFixtureBuilder(description.getMethodName())
             .getFixture();
     testFixture.setUp();
+    MockitoAnnotations.initMocks(testInstance);
 
     populateTestFixture();
     replaceServices();

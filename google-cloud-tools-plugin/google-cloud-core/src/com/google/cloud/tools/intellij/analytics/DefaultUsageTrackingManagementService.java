@@ -17,77 +17,57 @@
 package com.google.cloud.tools.intellij.analytics;
 
 import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
-import com.google.cloud.tools.intellij.login.PluginFlags;
-import com.google.cloud.tools.intellij.login.PropertiesFilePluginFlags;
+import com.google.cloud.tools.intellij.login.PluginFlagsService;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.util.PlatformUtils;
 import org.jetbrains.annotations.Nullable;
 
 /** Stores the user's choice to opt in/out of sending usage metrics via the Google Usage Tracker. */
-// TODO: Refactor to an IntelliJ service
-public final class UsageTrackerManager {
+public final class DefaultUsageTrackingManagementService implements UsageTrackingManagementService {
   @VisibleForTesting
   static final String USAGE_TRACKER_KEY = "GOOGLE_CLOUD_TOOLS_USAGE_TRACKER_OPT_IN";
 
   @VisibleForTesting
   static final String USAGE_TRACKER_PROPERTY_PLACEHOLDER = "${usageTrackerProperty}";
 
-  private static UsageTrackerManager instance;
   private PropertiesComponent datastore;
-  private PluginFlags flags;
-  private static final Object factoryLock = new Object();
+  private PluginFlagsService flags;
 
-  private UsageTrackerManager() {
+  public DefaultUsageTrackingManagementService() {
     datastore = PropertiesComponent.getInstance();
-    flags = new PropertiesFilePluginFlags();
+    flags = PluginFlagsService.getInstance();
   }
 
   @VisibleForTesting
-  UsageTrackerManager(PropertiesComponent propertiesComponent, PluginFlags flags) {
+  DefaultUsageTrackingManagementService(
+      PropertiesComponent propertiesComponent, PluginFlagsService flags) {
     this.datastore = propertiesComponent;
     this.flags = flags;
   }
 
-  /** Return an instance of this manager. */
-  public static UsageTrackerManager getInstance() {
-    synchronized (factoryLock) {
-      if (instance == null) {
-        instance = new UsageTrackerManager();
-      }
-      return instance;
-    }
-  }
-
+  @Override
   public void setTrackingPreference(boolean optIn) {
     datastore.setValue(USAGE_TRACKER_KEY, String.valueOf(optIn));
   }
 
+  @Override
   public boolean hasUserOptedIn() {
     return datastore.getBoolean(USAGE_TRACKER_KEY, false);
   }
 
-  /**
-   * Returns {@code true} if the user has opted in or out of usage tracking, and {@code false} if
-   * the user has yet to indicate a tracking preference.
-   */
+  @Override
   public boolean hasUserRecordedTrackingPreference() {
     return datastore.getValue(USAGE_TRACKER_KEY) != null;
   }
 
-  /**
-   * Indicates whether usage tracking is configured for this plugin's release and platform. This is
-   * independent of whether the user is opted in to usage tracking.
-   *
-   * <p>{@code isUsageTrackingAvailable()} and {@link #hasUserOptedIn()} both need to return {@code
-   * true} for tracking to be enabled. Call {@link #isTrackingEnabled()} to determine whether to do
-   * user tracking.
-   */
+  @Override
   public boolean isUsageTrackingAvailable() {
     return PlatformUtils.isIntelliJ() && (getAnalyticsProperty() != null);
   }
 
+  @Override
   @Nullable
-  protected String getAnalyticsProperty() {
+  public String getAnalyticsProperty() {
     String analyticsId = flags.getAnalyticsId();
     if (!USAGE_TRACKER_PROPERTY_PLACEHOLDER.equals(analyticsId)) {
       return analyticsId;
@@ -95,6 +75,7 @@ public final class UsageTrackerManager {
     return null;
   }
 
+  @Override
   public boolean isTrackingEnabled() {
     return isUsageTrackingAvailable() && hasUserOptedIn();
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.gcs;
 
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.icons.AllIcons.Actions;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
@@ -58,8 +57,8 @@ final class GcsToolWindowPanel extends SimpleToolWindowPanel {
   private final class RefreshAction extends DumbAwareAction {
     RefreshAction() {
       super(
-          GctBundle.message("gcs.panel.toolbar.refresh.hover.text"),
-          GctBundle.message("gcs.panel.toolbar.refresh.hover.description"),
+          GoogleCloudStorageMessageBundle.message("gcs.panel.toolbar.refresh.hover.text"),
+          GoogleCloudStorageMessageBundle.message("gcs.panel.toolbar.refresh.hover.description"),
           Actions.Refresh);
     }
 

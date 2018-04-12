@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.gcs;
 
 import com.google.cloud.storage.Bucket;
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.intellij.openapi.fileEditor.FileEditorProvider;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -158,7 +157,7 @@ class GcsBucketVirtualFile extends VirtualFile {
     @Nullable
     @Override
     public Icon getIcon() {
-      return GoogleCloudToolsIcons.CLOUD_STORAGE_BUCKET;
+      return GoogleCloudStorageIcons.CLOUD_STORAGE_BUCKET;
     }
 
     @Override
