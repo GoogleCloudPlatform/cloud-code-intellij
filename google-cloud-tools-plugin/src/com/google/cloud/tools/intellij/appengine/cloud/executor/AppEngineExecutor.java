@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud.executor;
 
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager;
+import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
 
 /** Executor of {@link AppEngineTask}'s. */
@@ -44,6 +46,18 @@ public class AppEngineExecutor implements CancellableRunnable {
 
   private void setProcess(Process process) {
     this.process = process;
+    ThreadUtil.getInstance()
+        .executeInBackground(
+            () -> {
+              try {
+                CloudSdkServiceManager.getInstance().getSdkReadLock().lock();
+                process.waitFor();
+              } catch (InterruptedException e) {
+                // unexpected interruption.
+              } finally {
+                CloudSdkServiceManager.getInstance().getSdkReadLock().unlock();
+              }
+            });
   }
 
   public Process getProcess() {
