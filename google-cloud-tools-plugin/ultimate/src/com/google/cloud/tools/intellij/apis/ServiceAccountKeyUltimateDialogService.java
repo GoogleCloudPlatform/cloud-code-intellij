@@ -22,7 +22,6 @@ import org.jetbrains.annotations.Nullable;
 
 /** Application service that provides a handle to the IU's Service Account Key Created dialog */
 public class ServiceAccountKeyUltimateDialogService extends ServiceAccountKeyDialogService {
-
   @Override
   public DialogWrapper getDialog(
       @Nullable Project project, String gcpProjectId, String downloadPath) {

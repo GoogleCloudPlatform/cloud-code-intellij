@@ -30,16 +30,14 @@ import org.jetbrains.annotations.Nullable;
  * credential environment variables for local run.
  */
 public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
-  private final Project project;
   private final String gcpProjectId;
   private final String downloadPath;
   private JPanel panel;
-  private ServiceAccountKeyDownloadedPanel keyDownloadedPanel;
+  private ServiceAccountKeyDownloadedPanel commonPanel;
 
   ServiceAccountKeyDisplayDialog(
       @Nullable Project project, String gcpProjectId, String downloadPath) {
     super(project);
-    this.project = project;
     this.gcpProjectId = gcpProjectId;
     this.downloadPath = downloadPath;
     init();
@@ -53,7 +51,7 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
   }
 
   private void createUIComponents() {
-    keyDownloadedPanel = new ServiceAccountKeyDownloadedPanel(project, gcpProjectId, downloadPath);
+    commonPanel = new ServiceAccountKeyDownloadedPanel(gcpProjectId, downloadPath);
   }
 
   @NotNull

@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.apis;
 
 import com.google.cloud.tools.intellij.ui.CopyToClipboardActionListener;
 import com.intellij.execution.util.EnvironmentVariable;
-import com.intellij.openapi.project.Project;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.JButton;
@@ -27,7 +26,6 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Panel confirming the download of the service account JSON key with information on how to set the
@@ -48,8 +46,7 @@ public final class ServiceAccountKeyDownloadedPanel {
   private JTable envVarTable;
   private JButton copyToClipboardButton;
 
-  public ServiceAccountKeyDownloadedPanel(
-      @Nullable Project project, @NotNull String gcpProjectId, @NotNull String downloadPath) {
+  public ServiceAccountKeyDownloadedPanel(@NotNull String gcpProjectId, @NotNull String downloadPath) {
     this.gcpProjectId = gcpProjectId;
     this.downloadPath = downloadPath;
     downloadPathLabel.setText(downloadPath);

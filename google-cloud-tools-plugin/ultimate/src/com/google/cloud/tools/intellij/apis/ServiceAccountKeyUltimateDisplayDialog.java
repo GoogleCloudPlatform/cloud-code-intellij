@@ -114,7 +114,7 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
   }
 
   private void createUIComponents() {
-    commonPanel = new ServiceAccountKeyDownloadedPanel(project, gcpProjectId, downloadPath);
+    commonPanel = new ServiceAccountKeyDownloadedPanel(gcpProjectId, downloadPath);
     List<RunnerAndConfigurationSettings> configurationSettingsList =
         getAppEngineStandardConfigurationSettingsList();
     tableModel =
@@ -149,15 +149,18 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
    */
   private void addEnvironmentVariablesToConfiguration(
       String executorId, RunnerAndConfigurationSettings configuration) {
-
     ProgramRunner runner = ProgramRunnerUtil.getRunner(executorId, configuration);
     if (runner == null) {
-      LOG.error("Error updating run configuration with Google CLoud Library environment variables");
+      LOG.error("Error updating " + configuration.getName() + " with Google Cloud Library environment variables");
       return;
     }
 
     RunnerSpecificLocalConfigurationBit configurationSettings =
         (RunnerSpecificLocalConfigurationBit) configuration.getConfigurationSettings(runner);
+    if(configurationSettings == null) {
+      LOG.error("Error updating " + configuration.getName() + " with Google Cloud Library environment variables");
+      return;
+    }
 
     Set<EnvironmentVariable> serviceAccountEnvironmentVariables =
         commonPanel.getEnvironmentVariables();
