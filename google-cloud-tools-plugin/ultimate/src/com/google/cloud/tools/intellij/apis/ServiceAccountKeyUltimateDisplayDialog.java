@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.apis;
 
 import com.google.cloud.tools.intellij.appengine.server.run.AppEngineServerConfigurationType;
 import com.google.cloud.tools.intellij.ui.BooleanTableModel;
+import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.CommonBundle;
 import com.intellij.execution.ProgramRunnerUtil;
 import com.intellij.execution.RunManager;
@@ -84,6 +85,7 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
     this.gcpProjectId = gcpProjectId;
     this.downloadPath = downloadPath;
     init();
+    setTitle(GctBundle.message("cloud.apis.service.account.key.downloaded.title"));
     table.setTableHeader(null);
 
     if (tableModel.getRowCount() == 0){
