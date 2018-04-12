@@ -15,9 +15,7 @@
   -->
 
 <idea-plugin>
-    <depends>com.intellij.modules.xdebugger</depends>
     <depends>Git4Idea</depends>
-    <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.vcs</depends>
     <depends>com.intellij.modules.xdebugger</depends>
 
