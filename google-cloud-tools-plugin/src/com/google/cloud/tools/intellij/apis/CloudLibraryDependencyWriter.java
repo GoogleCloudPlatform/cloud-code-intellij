@@ -191,7 +191,7 @@ final class CloudLibraryDependencyWriter {
   }
 
   /** Writes the google-cloud-java BOM to the user's pom.xml. */
-  private static void writeNewBom(MavenDomProjectModel model, String bomVersion) {
+  static void writeNewBom(MavenDomProjectModel model, String bomVersion) {
     MavenDomDependency bomDependency =
         model.getDependencyManagement().getDependencies().addDependency();
     bomDependency.getGroupId().setStringValue(CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_GROUP);

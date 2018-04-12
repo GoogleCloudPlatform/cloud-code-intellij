@@ -26,7 +26,6 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.impl.source.xml.XmlTextImpl;
 import com.intellij.psi.xml.XmlTag;
-import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.xml.DomFileElement;
 import com.intellij.util.xml.GenericDomValue;
 import com.intellij.util.xml.highlighting.DomElementAnnotationHolder;
@@ -44,14 +43,10 @@ import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel;
  *
  * <p>Provides a quick-fix to strip out the version tag from the dependency.
  */
-public class DependencyVersionWithBomInspection
-    extends DomElementsInspection<MavenDomProjectModel> {
+public class CloudDependencyVersionWithBomInspection extends CloudBomInspection {
 
-  private static final Logger logger = Logger.getInstance(AddCloudLibrariesAction.class);
-
-  public DependencyVersionWithBomInspection() {
-    super(MavenDomProjectModel.class);
-  }
+  private static final Logger logger =
+      Logger.getInstance(CloudDependencyVersionWithBomInspection.class);
 
   @Nullable
   @Override
@@ -117,40 +112,10 @@ public class DependencyVersionWithBomInspection
   }
 
   /**
-   * Checks the supplied {@link MavenDomDependency} to see if it is contained in the known set of
-   * managed Google {@link CloudLibrary cloudLibraries}.
-   *
-   * @param dependency the maven dependency we are checking
-   * @param cloudLibraries the set of {@link CloudLibrary cloudLibraries} configured in the project
-   * @return {@code true} if the maven dependency is a google cloud library, and {@code false}
-   *     otherwise
-   */
-  private boolean isCloudLibraryDependency(
-      MavenDomDependency dependency, Set<CloudLibrary> cloudLibraries) {
-    return cloudLibraries
-        .stream()
-        .anyMatch(
-            library ->
-                CloudLibraryUtils.getFirstJavaClientMavenCoordinates(library)
-                    .map(
-                        coords ->
-                            domValueEquals(dependency.getGroupId(), coords.getGroupId())
-                                && domValueEquals(
-                                    dependency.getArtifactId(), coords.getArtifactId()))
-                    .orElse(false));
-  }
-
-  private boolean domValueEquals(GenericDomValue domValue, @Nullable String value) {
-    return domValue != null
-        && domValue.getStringValue() != null
-        && domValue.getStringValue().equals(value);
-  }
-
-  /**
    * A {@link LocalQuickFix} that will delete the {@link XmlTag} contained within the {@link
    * ProblemDescriptor}.
    */
-  private static class StripDependencyVersionQuickFix implements LocalQuickFix {
+  private class StripDependencyVersionQuickFix implements LocalQuickFix {
     @Nls
     @NotNull
     @Override
@@ -170,11 +135,7 @@ public class DependencyVersionWithBomInspection
 
       XmlTag versionTag = xmlElement.getParentTag();
       if (versionTag != null) {
-        try {
-          versionTag.delete();
-        } catch (IncorrectOperationException ioe) {
-          logger.warn("Failed to delete version tag for DependencyVersionWithBom quickfix");
-        }
+        stripVersion(versionTag);
       } else {
         logger.warn("Could not locate version tag to delete for DependencyVersionWithBom quickfix");
       }
