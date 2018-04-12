@@ -22,6 +22,9 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.PropertyKey;
 
+/**
+ * Labels and messages for the Stackdriver Debugger module.
+ */
 public class StackdriverDebuggerBundle {
 
   @NonNls private static final String BUNDLE_NAME = "messages.StackdriverDebuggerBundle";
