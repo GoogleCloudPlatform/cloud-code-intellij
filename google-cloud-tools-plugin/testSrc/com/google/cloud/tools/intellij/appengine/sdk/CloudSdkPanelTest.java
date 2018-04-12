@@ -47,6 +47,7 @@ public class CloudSdkPanelTest {
   @Mock @TestService private PluginInfoService pluginInfoService;
 
   @Mock private CloudSdkService mockCloudSdkService;
+  @Mock @TestService private ManagedCloudSdkUpdateService managedCloudSdkUpdateService;
   @Mock @TestService private CloudSdkServiceManager mockCloudSdkServiceManager;
   @Mock @TestService private CloudSdkValidator cloudSdkValidator;
 
@@ -281,6 +282,30 @@ public class CloudSdkPanelTest {
             });
   }
 
+  @Test
+  public void automaticUpdate_enabled_callsUpdater_activate() {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              // use non-spy panel as spy messes up with UI event thread field updates.
+              CloudSdkPanel sdkPanel = new CloudSdkPanel();
+              CloudSdkServiceUserSettings.getInstance()
+                  .setUserSelectedSdkServiceType(CloudSdkServiceType.MANAGED_SDK);
+              CloudSdkServiceUserSettings.getInstance().setEnableAutomaticUpdates(false);
+              sdkPanel.reset();
+
+              sdkPanel.getEnableAutomaticUpdatesCheckbox().doClick();
+
+              try {
+                sdkPanel.apply();
+              } catch (ConfigurationException e) {
+                throw new AssertionError(e);
+              }
+
+              verify(managedCloudSdkUpdateService).activate();
+            });
+  }
+
   private void setValidateCloudSdkResponse(CloudSdkValidationResult... results) {
     Set<CloudSdkValidationResult> validationResults = new HashSet<>();
     Collections.addAll(validationResults, results);
@@ -293,7 +318,7 @@ public class CloudSdkPanelTest {
       String customSdkPath) {
     CloudSdkServiceUserSettings userSettings = CloudSdkServiceUserSettings.getInstance();
     assertThat(cloudSdkServiceType).isEqualTo(userSettings.getUserSelectedSdkServiceType());
-    assertThat(enableAutomaticUpdates).isEqualTo(userSettings.getEnableAutomaticUpdates());
+    assertThat(enableAutomaticUpdates).isEqualTo(userSettings.isAutomaticUpdateEnabled());
     assertThat(customSdkPath).isEqualTo(userSettings.getCustomSdkPath());
   }
 
@@ -316,7 +341,7 @@ public class CloudSdkPanelTest {
     }
 
     assertThat(sdkPanel.getEnableAutomaticUpdatesCheckbox().isSelected())
-        .isEqualTo(userSettings.getEnableAutomaticUpdates());
+        .isEqualTo(userSettings.isAutomaticUpdateEnabled());
 
     assertThat(sdkPanel.getCloudSdkDirectoryText())
         .isEqualTo(Strings.nullToEmpty(userSettings.getCustomSdkPath()));

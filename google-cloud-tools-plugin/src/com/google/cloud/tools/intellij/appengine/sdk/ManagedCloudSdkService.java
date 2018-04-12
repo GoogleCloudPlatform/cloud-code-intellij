@@ -64,6 +64,9 @@ public class ManagedCloudSdkService implements CloudSdkService {
     // TODO track event that custom SDK is activated and used.
 
     initManagedSdk();
+    if (isInstallSupported()) {
+      ManagedCloudSdkUpdateService.getInstance().activate();
+    }
   }
 
   @Nullable
@@ -94,6 +97,15 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
   public boolean update() {
     return executeManagedSdkJob(ManagedSdkJobType.UPDATE, this::updateManagedSdk);
+  }
+
+  public boolean isUpToDate() {
+    try {
+      return managedCloudSdk.isUpToDate();
+    } catch (Exception e) {
+      // we ignore the exception and just assume SDK is either not up-to-date or in invalid state.
+      return false;
+    }
   }
 
   @Override
@@ -220,7 +232,8 @@ public class ManagedCloudSdkService implements CloudSdkService {
   }
 
   private ManagedSdkJobResult updateManagedSdk() throws Exception {
-    if (!safeCheckSdkStatus(() -> managedCloudSdk.isUpToDate())) {
+    if (safeCheckSdkStatus(() -> managedCloudSdk.isInstalled())
+        && !safeCheckSdkStatus(() -> managedCloudSdk.isUpToDate())) {
       ConsoleListener sdkUpdateListener = logger::debug;
       progressListener =
           ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
@@ -292,6 +305,10 @@ public class ManagedCloudSdkService implements CloudSdkService {
           "Managed Google Cloud SDK successfully installed/updated at: " + getSdkHomePath());
 
       updateStatus(SdkStatus.READY);
+
+      if (result == ManagedSdkJobResult.PROCESSED) {
+        ManagedCloudSdkUpdateService.getInstance().notifySdkUpdate();
+      }
 
       ManagedCloudSdkServiceUiPresenter.getInstance().notifyManagedSdkJobSuccess(jobType, result);
     }

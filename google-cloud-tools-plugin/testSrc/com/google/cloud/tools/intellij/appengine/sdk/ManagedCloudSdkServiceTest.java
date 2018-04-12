@@ -32,6 +32,7 @@ import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.appengine.sdk.ManagedCloudSdkService.ManagedSdkJobResult;
 import com.google.cloud.tools.intellij.appengine.sdk.ManagedCloudSdkService.ManagedSdkJobType;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.cloud.tools.intellij.testing.log.TestInMemoryLogger;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.managedcloudsdk.ManagedCloudSdk;
@@ -45,6 +46,8 @@ import com.google.cloud.tools.managedcloudsdk.components.SdkComponentInstaller;
 import com.google.cloud.tools.managedcloudsdk.components.SdkUpdater;
 import com.google.cloud.tools.managedcloudsdk.install.SdkInstaller;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.testFramework.ThreadTracker;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -75,8 +78,14 @@ public class ManagedCloudSdkServiceTest {
 
   @Mock private ProgressListener mockProgressListener;
 
+  @TestService @Mock private ManagedCloudSdkUpdateService mockUpdater;
+
   @Before
   public void setUp() throws UnsupportedOsException {
+    // add timer thread to one not to be checked for 'leaks'
+    ThreadTracker.longRunningThreadCreated(
+        ApplicationManager.getApplication(), ManagedCloudSdkUpdateService.SDK_UPDATER_THREAD_NAME);
+
     doReturn(mockManagedCloudSdk).when(sdkService).createManagedSdk();
     // TODO(ivanporty) remove once test logging system is done via CloudToolsRule
     sdkService.setLogger(new TestInMemoryLogger());
@@ -381,8 +390,8 @@ public class ManagedCloudSdkServiceTest {
     emulateMockSdkUpdateProcess();
     SdkUpdater mockUpdater = mockManagedCloudSdk.newUpdater();
     doThrow(new CommandExitException(-1, "")).when(mockUpdater).update(any(), any());
-    // update breaks SDK
-    when(mockManagedCloudSdk.isInstalled()).thenReturn(false);
+    // initially SDK is installed, then update breaks SDK
+    when(mockManagedCloudSdk.isInstalled()).thenReturn(true).thenReturn(false);
 
     sdkService.addStatusUpdateListener(mockStatusUpdateListener);
     sdkService.update();

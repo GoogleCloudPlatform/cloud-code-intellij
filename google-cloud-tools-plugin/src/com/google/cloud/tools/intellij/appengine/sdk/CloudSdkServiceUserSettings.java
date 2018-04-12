@@ -20,8 +20,10 @@ import com.google.cloud.tools.intellij.GctFeature;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
+import com.google.common.primitives.Longs;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.components.ServiceManager;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 
 /** Stores user settings for {@link CloudSdkService}, including choice of implementation. */
@@ -35,6 +37,8 @@ public class CloudSdkServiceUserSettings {
   private static final String CUSTOM_CLOUD_SDK_PATH_PROPERTY_NAME = "GCT_CLOUD_SDK_HOME_PATH";
   private static final String SDK_AUTOMATIC_UPDATES_PROPERTY_NAME =
       "GCT_CLOUD_SDK_AUTOMATIC_UPDATES";
+  private static final String SDK_LAST_AUTOMATIC_UPDATE_TMESTAMP_PROPERTY_NAME =
+      "GCT_CLOUD_SDK_LAST_AUTOMATIC_UPDATE_TMESTAMP";
 
   private PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
 
@@ -50,6 +54,7 @@ public class CloudSdkServiceUserSettings {
     getInstance().propertiesComponent.unsetValue(SDK_TYPE_PROPERTY_NAME);
     getInstance().propertiesComponent.unsetValue(CUSTOM_CLOUD_SDK_PATH_PROPERTY_NAME);
     getInstance().propertiesComponent.unsetValue(SDK_AUTOMATIC_UPDATES_PROPERTY_NAME);
+    getInstance().propertiesComponent.unsetValue(SDK_LAST_AUTOMATIC_UPDATE_TMESTAMP_PROPERTY_NAME);
   }
 
   @NotNull
@@ -79,7 +84,7 @@ public class CloudSdkServiceUserSettings {
     propertiesComponent.setValue(SDK_TYPE_PROPERTY_NAME, cloudSdkServiceType.name());
   }
 
-  boolean getEnableAutomaticUpdates() {
+  boolean isAutomaticUpdateEnabled() {
     return propertiesComponent.getBoolean(
         SDK_AUTOMATIC_UPDATES_PROPERTY_NAME, DEFAULT_MANAGED_SDK_AUTOMATIC_UPDATES);
   }
@@ -89,6 +94,20 @@ public class CloudSdkServiceUserSettings {
         SDK_AUTOMATIC_UPDATES_PROPERTY_NAME,
         enableAutomaticUpdates,
         DEFAULT_MANAGED_SDK_AUTOMATIC_UPDATES /* need to specify default to avoid removal */);
+  }
+
+  Optional<Long> getLastAutomaticUpdateTimestamp() {
+    return Optional.ofNullable(
+        Longs.tryParse(
+            Strings.nullToEmpty(
+                propertiesComponent.getValue(SDK_LAST_AUTOMATIC_UPDATE_TMESTAMP_PROPERTY_NAME))));
+  }
+
+  void setLastAutomaticUpdateTimestamp(long timestamp) {
+    propertiesComponent.setValue(
+        SDK_LAST_AUTOMATIC_UPDATE_TMESTAMP_PROPERTY_NAME,
+        Long.toString(timestamp),
+        null /* null default not to remove property value. */);
   }
 
   @VisibleForTesting
