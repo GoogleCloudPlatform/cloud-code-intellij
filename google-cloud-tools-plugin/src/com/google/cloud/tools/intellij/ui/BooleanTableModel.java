@@ -43,11 +43,16 @@ public class BooleanTableModel<T> implements TableModel {
   private final List<TableModelListener> listeners = new ArrayList<>();
   private final int T_COL = 0;
   private final int BOOLEAN_COL = 1;
+  private final Class<T> type;
 
   public BooleanTableModel(
-      @NotNull List<T> items, @Nullable Comparator comparator, boolean initialConfiguration) {
+      @NotNull List<T> items,
+      Class<T> type,
+      @Nullable Comparator comparator,
+      boolean initialConfiguration) {
     map = new TreeMap<>(comparator);
     map.putAll(Maps.toMap(items, item -> initialConfiguration));
+    this.type = type;
   }
 
   /** Returns the set of selected items. */
@@ -81,7 +86,7 @@ public class BooleanTableModel<T> implements TableModel {
   @Override
   public Class<?> getColumnClass(int columnIndex) {
     if (columnIndex == T_COL) {
-      return map.keySet().getClass();
+      return type;
     }
     return Boolean.class;
   }

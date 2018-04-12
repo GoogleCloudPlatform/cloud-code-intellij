@@ -66,7 +66,8 @@ import org.jetbrains.annotations.Nullable;
 // TODO: Add tests
 public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
 
-  private static final Logger LOG = Logger.getInstance(ServiceAccountKeyUltimateDisplayDialog.class);
+  private static final Logger LOG =
+      Logger.getInstance(ServiceAccountKeyUltimateDisplayDialog.class);
 
   private final Project project;
   private final String gcpProjectId;
@@ -88,7 +89,7 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
     setTitle(GctBundle.message("cloud.apis.service.account.key.downloaded.title"));
     table.setTableHeader(null);
 
-    if (tableModel.getRowCount() == 0){
+    if (tableModel.getRowCount() == 0) {
       label.setVisible(false);
       scrollPane.setVisible(false);
       table.setVisible(false);
@@ -114,11 +115,14 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
 
   private void createUIComponents() {
     commonPanel = new ServiceAccountKeyDownloadedPanel(project, gcpProjectId, downloadPath);
-    List<RunnerAndConfigurationSettings> configurationSettingsList = getAppEngineStandardConfigurationSettingsList();
+    List<RunnerAndConfigurationSettings> configurationSettingsList =
+        getAppEngineStandardConfigurationSettingsList();
     tableModel =
         new BooleanTableModel<>(
             configurationSettingsList,
-            Comparator.comparing(RunnerAndConfigurationSettings::getName), true);
+            RunnerAndConfigurationSettings.class,
+            Comparator.comparing(RunnerAndConfigurationSettings::getName),
+            true);
     table = new ServerTable(tableModel);
   }
 
@@ -131,10 +135,12 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
     return tableModel.getSelectedItems();
   }
 
-  private void addEnvironmentVariablesToConfiguration(Set<RunnerAndConfigurationSettings> configurations) {
+  private void addEnvironmentVariablesToConfiguration(
+      Set<RunnerAndConfigurationSettings> configurations) {
     String executorId = DefaultRunExecutor.getRunExecutorInstance().getId();
     configurations.forEach(
-        configurationSettings -> addEnvironmentVariablesToConfiguration(executorId, configurationSettings));
+        configurationSettings ->
+            addEnvironmentVariablesToConfiguration(executorId, configurationSettings));
   }
 
   /**
@@ -145,7 +151,7 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
       String executorId, RunnerAndConfigurationSettings configuration) {
 
     ProgramRunner runner = ProgramRunnerUtil.getRunner(executorId, configuration);
-    if (runner == null){
+    if (runner == null) {
       LOG.error("Error updating run configuration with Google CLoud Library environment variables");
       return;
     }
