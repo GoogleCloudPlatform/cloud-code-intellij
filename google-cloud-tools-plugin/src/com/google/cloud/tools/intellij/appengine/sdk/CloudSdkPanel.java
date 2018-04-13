@@ -291,16 +291,6 @@ public class CloudSdkPanel {
     checkForUpdatesHyperlink = new HyperlinkLabel();
     checkForUpdatesHyperlink.setHyperlinkText(
         GctBundle.getString("cloudsdk.check.for.updates.action"));
-    checkForUpdatesHyperlink.setVisible(false);
-    // only make it visible if managed SDK is active, not currently installing or updating, and not
-    // up-to-date.
-    CloudSdkService cloudSdkService = CloudSdkService.getInstance();
-    if (cloudSdkService instanceof ManagedCloudSdkService
-        && cloudSdkService.getStatus() == SdkStatus.READY) {
-      if (!((ManagedCloudSdkService) cloudSdkService).isUpToDate()) {
-        checkForUpdatesHyperlink.setVisible(true);
-      }
-    }
   }
 
   private void initEvents() {
@@ -338,7 +328,7 @@ public class CloudSdkPanel {
               ((ManagedCloudSdkService) cloudSdkService).update();
               // do update call once and disable for visual feedback,
               // since the following calls will essentially do nothing until update is complete.
-              checkForUpdatesHyperlink.setEnabled(false);
+              checkForUpdatesHyperlink.setVisible(false);
             }
           }
         });
@@ -364,7 +354,19 @@ public class CloudSdkPanel {
   private void setManagedSdkUiAvailable(boolean available) {
     if (ServiceManager.getService(PluginInfoService.class).shouldEnable(GctFeature.MANAGED_SDK)) {
       enableAutomaticUpdatesCheckbox.setEnabled(available);
-      checkForUpdatesHyperlink.setVisible(available);
+      // only make it visible if managed SDK is active, not currently installing or updating, and
+      // not
+      // up-to-date.
+      CloudSdkService cloudSdkService = CloudSdkService.getInstance();
+      if (cloudSdkService instanceof ManagedCloudSdkService
+          && available
+          && cloudSdkService.getStatus() == SdkStatus.READY) {
+        if (!((ManagedCloudSdkService) cloudSdkService).isUpToDate()) {
+          checkForUpdatesHyperlink.setVisible(true);
+        }
+      } else {
+        checkForUpdatesHyperlink.setVisible(false);
+      }
     }
   }
 
