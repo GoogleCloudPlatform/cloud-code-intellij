@@ -20,8 +20,8 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.cloud.tools.intellij.debugger.CloudDebugProcessState;
-import com.google.cloud.tools.intellij.debugger.CloudDebugProcessStateCollector;
+import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcessState;
+import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcessStateCollector;
 import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
 import java.util.Collections;
 import org.junit.Before;

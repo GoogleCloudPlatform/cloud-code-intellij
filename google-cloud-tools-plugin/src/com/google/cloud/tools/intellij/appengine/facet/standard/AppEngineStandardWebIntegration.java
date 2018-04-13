@@ -18,8 +18,8 @@ package com.google.cloud.tools.intellij.appengine.facet.standard;
 
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineServerConfiguration;
-import com.google.cloud.tools.intellij.debugger.CloudDebugConfigType;
-import com.google.cloud.tools.intellij.debugger.CloudDebugRunConfiguration;
+import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugConfigType;
+import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugRunConfiguration;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configuration.ConfigurationFactoryEx;

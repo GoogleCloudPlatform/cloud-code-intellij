@@ -362,6 +362,7 @@
 
   <xi:include href="/META-INF/google-cloud-core.xml" xpointer="xpointer(/idea-plugin/*)"/>
   <xi:include href="/META-INF/google-cloud-storage.xml" xpointer="xpointer(/idea-plugin/*)"/>
+  <xi:include href="/META-INF/stackdriver-debugger.xml" xpointer="xpointer(/idea-plugin/*)"/>
 
   <depends optional="true" config-file="javaee-integration.xml">com.intellij.javaee</depends>
   <depends optional="true" config-file="gwt-integration.xml">com.intellij.gwt</depends>
@@ -369,7 +370,6 @@
   <depends>com.intellij.modules.lang</depends>
   <depends>com.intellij.modules.vcs</depends>
   <depends>com.intellij.modules.xml</depends>
-  <depends>com.intellij.modules.xdebugger</depends>
   <depends>org.jetbrains.plugins.gradle</depends>
   <depends>org.jetbrains.plugins.yaml</depends>
   <depends>Git4Idea</depends>
@@ -401,12 +401,6 @@
 
     <dom.fileDescription
             implementation="com.google.cloud.tools.intellij.appengine.descriptor.dom.AppEngineStandardWebFileDescriptor"/>
-
-    <configurationType
-            implementation="com.google.cloud.tools.intellij.debugger.CloudDebugConfigType"/>
-    <programRunner implementation="com.google.cloud.tools.intellij.debugger.CloudDebuggerRunner"/>
-    <xdebugger.breakpointType implementation="com.google.cloud.tools.intellij.debugger.CloudLineBreakpointType"/>
-    <projectService serviceImplementation="com.google.cloud.tools.intellij.debugger.CloudDebugProcessStateSerializer"/>
 
     <applicationService serviceInterface="com.google.cloud.tools.intellij.service.ApplicationPluginInfoService"
                         serviceImplementation="com.google.cloud.tools.intellij.service.DefaultApplicationPluginInfoService"/>
@@ -532,16 +526,10 @@
   </extensions>
 
   <extensions defaultExtensionNs="com.intellij">
-    <applicationService serviceImplementation="com.google.cloud.tools.intellij.debugger.CloudDebugProcessStateCollector" />
-  </extensions>
-
-  <extensions defaultExtensionNs="com.intellij">
     <applicationService serviceImplementation="com.google.cloud.tools.intellij.util.SystemEnvironmentProvider" />
   </extensions>
 
   <actions>
-    <action id="AddSnapshotLocation" class="com.google.cloud.tools.intellij.debugger.actions.ToggleSnapshotLocationAction"/>
-
     <action id="GoogleCloudTools.UploadSourceToGCP"
             class="com.google.cloud.tools.intellij.csr.SetupCloudRepositoryAction">
       <add-to-group group-id="Vcs.Import"/>
@@ -554,7 +542,7 @@
       </group>
       <action id="GoogleCloudTools.AppEngineDeploy" class="com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeployToolsMenuAction"/>
       <separator/>
-      <action id="GoogleCloudTools.CloudDebugger" class="com.google.cloud.tools.intellij.debugger.CloudDebuggerToolsMenuAction"/>
+      <action id="GoogleCloudTools.CloudDebugger" class="com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebuggerToolsMenuAction"/>
       <separator/>
       <reference ref="GoogleCloudTools.UploadSourceToGCP"/>
       <separator/>
@@ -567,19 +555,6 @@
       <add-to-group group-id="ToolsMenu" anchor="last"/>
     </group>
 
-    <group id="EditorGutterCloudDebuggerMenu">
-      <separator/>
-      <reference ref="AddSnapshotLocation"/>
-      <add-to-group group-id="EditorGutterPopupMenu" anchor="last"/>
-    </group>
-
-    <group id="GoogleCloudTools.BreakpointWatchContextMenu">
-      <reference ref="XDebugger.NewWatch"/>
-      <reference ref="XDebugger.EditWatch"/>
-      <reference ref="XDebugger.CopyWatch"/>
-      <reference ref="XDebugger.RemoveWatch"/>
-      <reference ref="XDebugger.RemoveAllWatches"/>
-    </group>
   </actions>
 
 </idea-plugin>

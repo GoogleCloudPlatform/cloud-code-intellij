@@ -35,9 +35,7 @@ public class PropertiesTest {
       in = new FileInputStream(f);
       Properties p = new Properties();
       p.load(new InputStreamReader(in, "UTF-8"));
-      Assert.assertEquals(
-          "Do you want to checkout branch {0} and restore the saved stash?",
-          p.getProperty("clouddebug.restorestash"));
+      Assert.assertEquals("Google Cloud Tools", p.getProperty("cloud.tools.group.menu.text"));
     } finally {
       if (in != null) {
         in.close();
