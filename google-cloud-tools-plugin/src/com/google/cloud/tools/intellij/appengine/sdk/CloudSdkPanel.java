@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.cloud.tools.intellij.GctFeature;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -290,6 +291,16 @@ public class CloudSdkPanel {
     checkForUpdatesHyperlink = new HyperlinkLabel();
     checkForUpdatesHyperlink.setHyperlinkText(
         GctBundle.getString("cloudsdk.check.for.updates.action"));
+    checkForUpdatesHyperlink.setVisible(false);
+    // only make it visible if managed SDK is active, not currently installing or updating, and not
+    // up-to-date.
+    CloudSdkService cloudSdkService = CloudSdkService.getInstance();
+    if (cloudSdkService instanceof ManagedCloudSdkService
+        && cloudSdkService.getStatus() == SdkStatus.READY) {
+      if (!((ManagedCloudSdkService) cloudSdkService).isUpToDate()) {
+        checkForUpdatesHyperlink.setVisible(true);
+      }
+    }
   }
 
   private void initEvents() {
@@ -322,7 +333,13 @@ public class CloudSdkPanel {
         new HyperlinkAdapter() {
           @Override
           protected void hyperlinkActivated(HyperlinkEvent e) {
-            // TODO(ivanporty) will call ManagedSdk#update if it's installed and active.
+            CloudSdkService cloudSdkService = CloudSdkService.getInstance();
+            if (cloudSdkService instanceof ManagedCloudSdkService) {
+              ((ManagedCloudSdkService) cloudSdkService).update();
+              // do update call once and disable for visual feedback,
+              // since the following calls will essentially do nothing until update is complete.
+              checkForUpdatesHyperlink.setEnabled(false);
+            }
           }
         });
 
