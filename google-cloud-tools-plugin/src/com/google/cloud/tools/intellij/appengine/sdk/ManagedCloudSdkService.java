@@ -63,8 +63,6 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
   @Override
   public void activate() {
-    // TODO track event that custom SDK is activated and used.
-
     initManagedSdk();
     if (isInstallSupported()) {
       ManagedCloudSdkUpdateService.getInstance().activate();
