@@ -188,6 +188,11 @@ public class CloudSdkPanel {
   }
 
   @VisibleForTesting
+  public HyperlinkLabel getCheckForUpdatesHyperlink() {
+    return checkForUpdatesHyperlink;
+  }
+
+  @VisibleForTesting
   JRadioButton getCustomRadioButton() {
     return customRadioButton;
   }
