@@ -24,6 +24,7 @@ import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeploy;
 import com.google.cloud.tools.intellij.appengine.cloud.AppEngineHelper;
 import com.google.cloud.tools.intellij.appengine.cloud.standard.AppEngineStandardStage;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceUserSettings;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.diagnostic.Logger;
@@ -61,6 +62,9 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
     UsageTrackerProvider.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_DEPLOY)
         .addMetadata(GctTracking.METADATA_LABEL_KEY, isFlexCompat ? "flex-compat" : "standard")
+        .addMetadata(
+            GctTracking.METADATA_SDK_KEY,
+            CloudSdkServiceUserSettings.getInstance().getUserSelectedSdkServiceType().name())
         .ping();
 
     Path stagingDirectory;
