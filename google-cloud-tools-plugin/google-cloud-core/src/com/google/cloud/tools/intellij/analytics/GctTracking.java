@@ -38,8 +38,6 @@ public class GctTracking {
       "appengine.generate.file.appyaml.click";
   public static final String APP_ENGINE_GENERATE_FILE_DOCKERFILE =
       "appengine.generate.file.dockerfile.click";
-  public static final String PROJECT_SELECTION_CREATE_NEW_PROJECT =
-      "project.selection.create.new.project";
 
   public static final String VCS_CHECKOUT = "vcs.checkout";
   public static final String VCS_UPLOAD = "vcs.upload";
