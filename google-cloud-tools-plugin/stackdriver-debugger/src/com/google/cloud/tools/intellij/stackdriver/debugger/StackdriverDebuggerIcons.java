@@ -20,9 +20,7 @@ import com.intellij.openapi.util.IconLoader;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
-/**
- * Icons for the Stackdriver Debugger module.
- */
+/** Icons for the Stackdriver Debugger module. */
 public class StackdriverDebuggerIcons {
   public static final Icon CLOUD_BREAKPOINT_FINAL = load("/icons/cloudsnapshotfinal.png");
   public static final Icon CLOUD_BREAKPOINT = load("/icons/cloudbreakpoint.png");
