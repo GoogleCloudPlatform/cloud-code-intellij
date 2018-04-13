@@ -48,7 +48,7 @@ public class CloudSdkPanelTest {
 
   @Mock @TestService private PluginInfoService pluginInfoService;
 
-  @Mock private CloudSdkService mockCloudSdkService;
+  @Mock private ManagedCloudSdkService mockCloudSdkService;
   @Mock @TestService private ManagedCloudSdkUpdateService managedCloudSdkUpdateService;
   @Mock @TestService private CloudSdkServiceManager mockCloudSdkServiceManager;
   @Mock @TestService private CloudSdkValidator cloudSdkValidator;
