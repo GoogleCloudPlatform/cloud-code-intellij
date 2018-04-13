@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
+import com.google.cloud.tools.intellij.analytics.GctTracking;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.managedcloudsdk.ConsoleListener;
@@ -61,8 +63,6 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
   @Override
   public void activate() {
-    // TODO track event that custom SDK is activated and used.
-
     initManagedSdk();
     if (isInstallSupported()) {
       ManagedCloudSdkUpdateService.getInstance().activate();
@@ -308,6 +308,17 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
       if (result == ManagedSdkJobResult.PROCESSED) {
         ManagedCloudSdkUpdateService.getInstance().notifySdkUpdate();
+
+        String trackingEventAction;
+        switch (jobType) {
+          case UPDATE:
+            trackingEventAction = GctTracking.MANAGED_SDK_SUCCESSFUL_UPDATE;
+            break;
+          default:
+            trackingEventAction = GctTracking.MANAGED_SDK_SUCCESSFUL_INSTALL;
+            break;
+        }
+        UsageTrackerProvider.getInstance().trackEvent(trackingEventAction).ping();
       }
 
       ManagedCloudSdkServiceUiPresenter.getInstance().notifyManagedSdkJobSuccess(jobType, result);
@@ -330,9 +341,17 @@ public class ManagedCloudSdkService implements CloudSdkService {
       switch (jobType) {
         case INSTALL:
           updateStatus(SdkStatus.NOT_AVAILABLE);
+
+          UsageTrackerProvider.getInstance()
+              .trackEvent(GctTracking.MANAGED_SDK_FAILED_INSTALL)
+              .ping();
           break;
         case UPDATE:
           checkSdkStatusAfterFailedUpdate();
+
+          UsageTrackerProvider.getInstance()
+              .trackEvent(GctTracking.MANAGED_SDK_FAILED_UPDATE)
+              .ping();
           break;
       }
 
