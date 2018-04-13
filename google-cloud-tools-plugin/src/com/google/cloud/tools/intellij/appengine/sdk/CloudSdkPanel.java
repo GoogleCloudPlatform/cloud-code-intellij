@@ -359,14 +359,16 @@ public class CloudSdkPanel {
   private void setManagedSdkUiAvailable(boolean available) {
     if (ServiceManager.getService(PluginInfoService.class).shouldEnable(GctFeature.MANAGED_SDK)) {
       enableAutomaticUpdatesCheckbox.setEnabled(available);
+
       // only make it visible if managed SDK is active, not currently installing or updating, and
-      // not
-      // up-to-date.
-      CloudSdkService cloudSdkService = CloudSdkService.getInstance();
-      if (cloudSdkService instanceof ManagedCloudSdkService
-          && available
-          && cloudSdkService.getStatus() == SdkStatus.READY) {
-        if (!((ManagedCloudSdkService) cloudSdkService).isUpToDate()) {
+      // not up-to-date.
+      if (available
+          && CloudSdkServiceUserSettings.getInstance().getUserSelectedSdkServiceType()
+              == CloudSdkServiceType.MANAGED_SDK) {
+        ManagedCloudSdkService managedCloudSdkService =
+            (ManagedCloudSdkService) CloudSdkService.getInstance();
+        if (managedCloudSdkService.getStatus() == SdkStatus.READY
+            && !managedCloudSdkService.isUpToDate()) {
           checkForUpdatesHyperlink.setVisible(true);
         }
       } else {
