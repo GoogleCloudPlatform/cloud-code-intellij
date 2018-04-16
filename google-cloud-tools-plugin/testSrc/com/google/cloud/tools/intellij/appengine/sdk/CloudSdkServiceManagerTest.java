@@ -131,7 +131,7 @@ public class CloudSdkServiceManagerTest {
                 verify(cloudSdkServiceManager)
                     .showCloudSdkNotification(
                         GctBundle.message("appengine.deployment.error.sdk.invalid"),
-                        NotificationType.ERROR));
+                        NotificationType.WARNING));
   }
 
   @Test
@@ -147,7 +147,24 @@ public class CloudSdkServiceManagerTest {
         .invokeAndWait(
             () ->
                 verify(cloudSdkServiceManager)
-                    .showCloudSdkNotification("invalid SDK after waiting", NotificationType.ERROR));
+                    .showCloudSdkNotification(
+                        "invalid SDK after waiting", NotificationType.WARNING));
+  }
+
+  @Test
+  public void waitFor_when_sdkInstallNotSupported_showsFatalErrorNotification()
+      throws InterruptedException {
+    mockSdkStatusChange(SdkStatus.NOT_AVAILABLE, SdkStatus.NOT_AVAILABLE);
+    when(mockSdkService.isInstallSupported()).thenReturn(false);
+
+    cloudSdkServiceManager.blockUntilSdkReady(mockProject, "", mockStatusHandler);
+
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () ->
+                verify(cloudSdkServiceManager)
+                    .showCloudSdkNotification(
+                        GctBundle.message("managedsdk.not.available"), NotificationType.ERROR));
   }
 
   private void mockSdkStatusChange(SdkStatus fromStatus, SdkStatus toStatus) {
