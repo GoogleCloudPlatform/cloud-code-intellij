@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.apis;
 
+import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
 import com.google.cloud.tools.intellij.appengine.server.run.AppEngineServerConfigurationType;
 import com.google.cloud.tools.intellij.ui.BooleanTableModel;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -63,7 +64,6 @@ import org.jetbrains.annotations.Nullable;
  * variables for local run and (3) allows the user to select App Engine Standard run configurations
  * to automatically update with these environment variables.
  */
-// TODO: Add tests
 public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
 
   private static final Logger LOG =
@@ -79,12 +79,43 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
   private JScrollPane scrollPane;
   private BooleanTableModel tableModel;
 
+  @VisibleForTesting public static List<RunnerAndConfigurationSettings> configurationSettingsList;
+
   public ServiceAccountKeyUltimateDisplayDialog(
       @Nullable Project project, @NotNull String gcpProjectId, @NotNull String downloadPath) {
     super(project);
     this.project = project;
     this.gcpProjectId = gcpProjectId;
     this.downloadPath = downloadPath;
+    init();
+    setTitle(GctBundle.message("cloud.apis.service.account.key.downloaded.title"));
+    table.setTableHeader(null);
+
+    if (tableModel.getRowCount() == 0) {
+      label.setVisible(false);
+      scrollPane.setVisible(false);
+      table.setVisible(false);
+    }
+  }
+
+  public ServiceAccountKeyUltimateDisplayDialog(
+      @Nullable Project project,
+      @NotNull String gcpProjectId,
+      @NotNull String downloadPath,
+      @NotNull List<RunnerAndConfigurationSettings> configurationSettingsList) {
+    super(project);
+    this.project = project;
+    this.gcpProjectId = gcpProjectId;
+    this.downloadPath = downloadPath;
+    this.configurationSettingsList = configurationSettingsList;
+
+    tableModel =
+        new BooleanTableModel<>(
+            configurationSettingsList,
+            RunnerAndConfigurationSettings.class,
+            Comparator.comparing(RunnerAndConfigurationSettings::getName),
+            true);
+
     init();
     setTitle(GctBundle.message("cloud.apis.service.account.key.downloaded.title"));
     table.setTableHeader(null);
@@ -115,18 +146,25 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
 
   private void createUIComponents() {
     commonPanel = new ServiceAccountKeyDownloadedPanel(gcpProjectId, downloadPath);
-    List<RunnerAndConfigurationSettings> configurationSettingsList =
-        getAppEngineStandardConfigurationSettingsList();
-    tableModel =
-        new BooleanTableModel<>(
-            configurationSettingsList,
-            RunnerAndConfigurationSettings.class,
-            Comparator.comparing(RunnerAndConfigurationSettings::getName),
-            true);
+
+    if (tableModel == null) {
+      List<RunnerAndConfigurationSettings> configurationSettingsList =
+          getAppEngineStandardConfigurationSettingsList();
+      tableModel =
+          new BooleanTableModel<>(
+              configurationSettingsList,
+              RunnerAndConfigurationSettings.class,
+              Comparator.comparing(RunnerAndConfigurationSettings::getName),
+              true);
+    }
     table = new ServerTable(tableModel);
   }
 
   private List<RunnerAndConfigurationSettings> getAppEngineStandardConfigurationSettingsList() {
+    if (configurationSettingsList != null) {
+      return configurationSettingsList;
+    }
+
     return RunManager.getInstance(project)
         .getConfigurationSettingsList(AppEngineServerConfigurationType.getInstance());
   }
@@ -135,7 +173,8 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
     return tableModel.getSelectedItems();
   }
 
-  private void addEnvironmentVariablesToConfiguration(
+  @VisibleForTesting
+  public void addEnvironmentVariablesToConfiguration(
       Set<RunnerAndConfigurationSettings> configurations) {
     String executorId = DefaultRunExecutor.getRunExecutorInstance().getId();
     configurations.forEach(
@@ -151,14 +190,20 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
       String executorId, RunnerAndConfigurationSettings configuration) {
     ProgramRunner runner = ProgramRunnerUtil.getRunner(executorId, configuration);
     if (runner == null) {
-      LOG.error("Error updating " + configuration.getName() + " with Google Cloud Library environment variables");
+      LOG.error(
+          "Error updating "
+              + configuration.getName()
+              + " with Google Cloud Library environment variables");
       return;
     }
 
     RunnerSpecificLocalConfigurationBit configurationSettings =
         (RunnerSpecificLocalConfigurationBit) configuration.getConfigurationSettings(runner);
-    if(configurationSettings == null) {
-      LOG.error("Error updating " + configuration.getName() + " with Google Cloud Library environment variables");
+    if (configurationSettings == null) {
+      LOG.error(
+          "Error updating "
+              + configuration.getName()
+              + " with Google Cloud Library environment variables");
       return;
     }
 
@@ -184,6 +229,16 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
           }
         });
     configurationSettings.setEnvironmentVariables(configurationSettingsEnvVariables);
+  }
+
+  @VisibleForTesting
+  public JTable getTable() {
+    return table;
+  }
+
+  @VisibleForTesting
+  public ServiceAccountKeyDownloadedPanel getServiceAccountKeyDownloadedPanel() {
+    return commonPanel;
   }
 
   /** Adds the Cloud Library environment variables to the selected App Engine run configurations. */

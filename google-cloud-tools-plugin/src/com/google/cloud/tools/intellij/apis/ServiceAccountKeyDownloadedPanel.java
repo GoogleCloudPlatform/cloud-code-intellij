@@ -46,7 +46,8 @@ public final class ServiceAccountKeyDownloadedPanel {
   private JTable envVarTable;
   private JButton copyToClipboardButton;
 
-  public ServiceAccountKeyDownloadedPanel(@NotNull String gcpProjectId, @NotNull String downloadPath) {
+  public ServiceAccountKeyDownloadedPanel(
+      @NotNull String gcpProjectId, @NotNull String downloadPath) {
     this.gcpProjectId = gcpProjectId;
     this.downloadPath = downloadPath;
     downloadPathLabel.setText(downloadPath);
