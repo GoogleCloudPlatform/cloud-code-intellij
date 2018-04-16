@@ -121,7 +121,7 @@ public class CloudSdkServiceManagerTest {
   public void installingSdk_then_invalidSdk_showsErrorNotification() {
     mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.INVALID);
     when(mockStatusHandler.getErrorMessage(SdkStatus.INVALID))
-        .thenReturn(GctBundle.message("appengine.deployment.error.sdk.invalid"));
+        .thenReturn(GctBundle.message("appengine.deployment.error.sdk.not.available"));
 
     cloudSdkServiceManager.runWhenSdkReady(mockProject, mockRunnable, "", mockStatusHandler);
 
@@ -130,7 +130,7 @@ public class CloudSdkServiceManagerTest {
             () ->
                 verify(cloudSdkServiceManager)
                     .showCloudSdkNotification(
-                        GctBundle.message("appengine.deployment.error.sdk.invalid"),
+                        GctBundle.message("appengine.deployment.error.sdk.not.available"),
                         NotificationType.WARNING));
   }
 
