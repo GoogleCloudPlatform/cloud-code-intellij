@@ -394,18 +394,9 @@
     <applicationService serviceInterface="com.google.cloud.tools.intellij.service.ApplicationPluginInfoService"
                         serviceImplementation="com.google.cloud.tools.intellij.service.DefaultApplicationPluginInfoService"/>
 
-    <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager"/>
-    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService"
-                        serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.DefaultCloudSdkService"/>
-    <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator"/>
-    <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.java.sdk.ManagedCloudSdkUpdateService"/>
-    <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceManager"/>
-    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService"
-                        serviceImplementation="com.google.cloud.tools.intellij.appengine.java.sdk.DefaultCloudSdkService"/>
-    <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkValidator"/>
-    <applicationService serviceImplementation="com.google.cloud.tools.intellij.csr.CloudRepositoryService"/>
     <applicationService serviceImplementation="com.google.cloud.tools.intellij.apis.CloudLibrariesService"/>
     <applicationService serviceImplementation="com.google.cloud.tools.intellij.apis.CloudApiMavenService"/>
+    <applicationService serviceImplementation="com.google.cloud.tools.intellij.csr.CloudRepositoryService"/>
 
     <localInspection language="XML" shortName="DependencyVersionWithBom" bundle="messages.CloudToolsBundle"
                      hasStaticDescription="true" key="cloud.libraries.version.with.bom.inspection.display.name"

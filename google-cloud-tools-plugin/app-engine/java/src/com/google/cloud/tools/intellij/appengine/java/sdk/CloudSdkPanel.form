@@ -13,7 +13,7 @@
           <grid row="0" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text resource-bundle="messages/CloudToolsBundle" key="cloudsdk.managedsdk.selection"/>
+          <text resource-bundle="messages/AppEngineBundle" key="cloudsdk.managedsdk.selection"/>
         </properties>
       </component>
       <component id="d1784" class="javax.swing.JRadioButton" binding="customRadioButton">
@@ -21,7 +21,7 @@
           <grid row="2" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text resource-bundle="messages/CloudToolsBundle" key="cloudsdk.customsdk.selection"/>
+          <text resource-bundle="messages/AppEngineBundle" key="cloudsdk.customsdk.selection"/>
         </properties>
       </component>
       <component id="a5b5c" class="com.intellij.openapi.ui.TextFieldWithBrowseButton" binding="cloudSdkDirectoryField">
@@ -73,7 +73,7 @@
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text resource-bundle="messages/CloudToolsBundle" key="cloudsdk.automatic.updates.checkbox"/>
+              <text resource-bundle="messages/AppEngineBundle" key="cloudsdk.automatic.updates.checkbox"/>
             </properties>
           </component>
           <component id="80dfd" class="com.intellij.ui.HyperlinkLabel" binding="checkForUpdatesHyperlink" custom-create="true">

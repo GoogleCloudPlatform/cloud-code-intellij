@@ -43,14 +43,14 @@
           <grid row="2" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="true"/>
         </constraints>
         <properties/>
-        <border type="etched" title-resource-bundle="messages/CloudToolsBundle" title-key="appengine.deployment.flex.config.panel.title"/>
+        <border type="etched" title-resource-bundle="messages/AppEngineBundle" title-key="appengine.deployment.flex.config.panel.title"/>
         <children>
           <component id="80761" class="javax.swing.JLabel">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text resource-bundle="messages/CloudToolsBundle" key="appengine.deployment.flex.appyaml.label"/>
+              <text resource-bundle="messages/AppEngineBundle" key="appengine.deployment.flex.appyaml.label"/>
             </properties>
           </component>
           <component id="a4e42" class="javax.swing.JButton" binding="editAppYamlButton">
@@ -61,7 +61,7 @@
               <actionCommand value=""/>
               <focusPainted value="false"/>
               <label value="edit"/>
-              <text resource-bundle="messages/CloudToolsBundle" key="appengine.flex.deployment.appyaml.edit.button.text"/>
+              <text resource-bundle="messages/AppEngineBundle" key="appengine.flex.deployment.appyaml.edit.button.text"/>
             </properties>
           </component>
           <hspacer id="35c9">
@@ -84,7 +84,7 @@
                   <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text resource-bundle="messages/CloudToolsBundle" key="appengine.deployment.flexible.nogaesupport"/>
+                  <text resource-bundle="messages/AppEngineBundle" key="appengine.deployment.flexible.nogaesupport"/>
                   <visible value="true"/>
                 </properties>
               </component>
@@ -123,7 +123,7 @@
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text resource-bundle="messages/CloudToolsBundle" key="appengine.flex.deployment.docker.directory.label"/>
+                  <text resource-bundle="messages/AppEngineBundle" key="appengine.flex.deployment.docker.directory.label"/>
                 </properties>
               </component>
               <component id="f69e6" class="com.intellij.ui.HyperlinkLabel" binding="dockerfileDirectoryPathLink">
@@ -156,8 +156,8 @@
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text resource-bundle="messages/CloudToolsBundle" key="appengine.flex.deployment.staged.artifact.name.label"/>
-                  <toolTipText resource-bundle="messages/CloudToolsBundle" key="appengine.flex.deployment.staged.artifact.name.tooltip"/>
+                  <text resource-bundle="messages/AppEngineBundle" key="appengine.flex.deployment.staged.artifact.name.label"/>
+                  <toolTipText resource-bundle="messages/AppEngineBundle" key="appengine.flex.deployment.staged.artifact.name.tooltip"/>
                 </properties>
               </component>
               <component id="5fb72" class="com.intellij.ui.components.JBTextField" binding="stagedArtifactNameTextField">

@@ -29,6 +29,7 @@
 
         <dom.fileDescription
                 implementation="com.google.cloud.tools.intellij.appengine.java.descriptor.dom.AppEngineStandardWebFileDescriptor"/>
+
         <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardWebIntegration"
                             serviceImplementation="com.google.cloud.tools.intellij.appengine.java.facet.standard.impl.AppEngineStandardCommunityWebIntegration"/>
         <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService"
@@ -40,6 +41,11 @@
                             serviceImplementation="com.google.cloud.tools.intellij.appengine.java.sdk.DefaultCloudSdkVersionNotifier"/>
         <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.java.application.AppEngineAdminService"
                             serviceImplementation="com.google.cloud.tools.intellij.appengine.java.application.GoogleApiClientAppEngineAdminService"/>
+        <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.java.sdk.ManagedCloudSdkUpdateService"/>
+        <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceManager"/>
+        <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService"
+                            serviceImplementation="com.google.cloud.tools.intellij.appengine.java.sdk.DefaultCloudSdkService"/>
+        <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkValidator"/>
 
         <!-- App Engine Cloud and Deployment Sources Configuration-->
         <remoteServer.type

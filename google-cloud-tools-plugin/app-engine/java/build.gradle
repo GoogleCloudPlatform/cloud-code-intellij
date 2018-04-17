@@ -20,7 +20,7 @@ sourceSets.test.java.srcDirs = ['testSrc']
 sourceSets.test.resources.srcDirs = ['testResources', 'testData']
 
 intellij {
-    plugins 'gradle', 'maven', 'yaml', 'git4idea'
+    plugins 'Groovy', 'gradle', 'maven', 'yaml', 'git4idea', 'properties'
 }
 
 dependencies {
