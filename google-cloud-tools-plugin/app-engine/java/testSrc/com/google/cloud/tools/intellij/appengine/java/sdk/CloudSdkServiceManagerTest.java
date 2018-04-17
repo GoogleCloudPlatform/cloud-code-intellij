@@ -24,12 +24,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService.SdkStatusUpdateListener;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceManager.CloudSdkStatusHandler;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
@@ -137,7 +137,7 @@ public class CloudSdkServiceManagerTest {
   public void installingSdk_then_invalidSdk_showsErrorNotification() {
     mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.INVALID);
     when(mockStatusHandler.getErrorMessage(SdkStatus.INVALID))
-        .thenReturn(GctBundle.message("appengine.deployment.error.sdk.invalid"));
+        .thenReturn(AppEngineMessageBundle.message("appengine.deployment.error.sdk.invalid"));
 
     cloudSdkServiceManager.runWhenSdkReady(mockProject, mockRunnable, "", mockStatusHandler);
 
@@ -146,7 +146,7 @@ public class CloudSdkServiceManagerTest {
             () ->
                 verify(cloudSdkServiceManager)
                     .showCloudSdkNotification(
-                        GctBundle.message("appengine.deployment.error.sdk.invalid"),
+                        AppEngineMessageBundle.message("appengine.deployment.error.sdk.invalid"),
                         NotificationType.ERROR));
   }
 

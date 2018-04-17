@@ -16,9 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.java.facet.flexible;
 
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.facet.AddAppEngineFrameworkSupportAction;
 import com.google.cloud.tools.intellij.appengine.java.facet.AddAppEngineFrameworkSupportActionTest;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -46,11 +46,13 @@ public class AddAppEngineFlexibleFrameworkSupportToolsMenuActionTest
         ActionManager.getInstance().getAction("AddAppEngineFrameworkSupport.Flexible");
     assertNotNull(action);
     Presentation presentation = action.getTemplatePresentation();
-    assertEquals(GctBundle.message("appengine.flexible.facet.name.title"), presentation.getText());
     assertEquals(
-        GctBundle.message(
+        AppEngineMessageBundle.message("appengine.flexible.facet.name.title"),
+        presentation.getText());
+    assertEquals(
+        AppEngineMessageBundle.message(
             "appengine.add.framework.support.tools.menu.description",
-            GctBundle.message("appengine.flexible.facet.name")),
+            AppEngineMessageBundle.message("appengine.flexible.facet.name")),
         presentation.getDescription());
   }
 

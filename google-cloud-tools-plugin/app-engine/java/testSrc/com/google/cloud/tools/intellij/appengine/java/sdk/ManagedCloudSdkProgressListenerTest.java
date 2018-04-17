@@ -18,8 +18,8 @@ package com.google.cloud.tools.intellij.appengine.java.sdk;
 
 import static org.mockito.Mockito.verify;
 
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.managedcloudsdk.ProgressListener;
 import com.intellij.openapi.progress.impl.BackgroundableProcessIndicator;
 import org.junit.Before;
@@ -56,7 +56,7 @@ public class ManagedCloudSdkProgressListenerTest {
     progressListener.update(5);
 
     verify(mockProgressIndicator)
-        .setText(GctBundle.message("managedsdk.progress.message", message));
+        .setText(AppEngineMessageBundle.message("managedsdk.progress.message", message));
     verify(mockProgressIndicator).setFraction(0.5);
   }
 
@@ -66,7 +66,7 @@ public class ManagedCloudSdkProgressListenerTest {
     progressListener.start(message, ProgressListener.UNKNOWN);
 
     verify(mockProgressIndicator)
-        .setText(GctBundle.message("managedsdk.progress.message", message));
+        .setText(AppEngineMessageBundle.message("managedsdk.progress.message", message));
     verify(mockProgressIndicator).setIndeterminate(true);
   }
 
@@ -78,7 +78,7 @@ public class ManagedCloudSdkProgressListenerTest {
     childListener.update(5);
 
     verify(mockProgressIndicator)
-        .setText(GctBundle.message("managedsdk.progress.message", "child"));
+        .setText(AppEngineMessageBundle.message("managedsdk.progress.message", "child"));
     verify(mockProgressIndicator).setFraction(5d / 10d * 20d / 100d);
   }
 }

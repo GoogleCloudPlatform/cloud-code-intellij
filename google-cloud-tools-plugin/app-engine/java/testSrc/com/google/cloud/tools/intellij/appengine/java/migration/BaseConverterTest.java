@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.java.migration;
 
-import com.intellij.appengine.AppEngineCodeInsightTestCase;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineCodeInsightTestCase;
 import com.intellij.conversion.ProjectConversionTestUtil;
 import com.intellij.conversion.impl.ProjectConversionUtil;
 import com.intellij.openapi.util.io.FileUtil;

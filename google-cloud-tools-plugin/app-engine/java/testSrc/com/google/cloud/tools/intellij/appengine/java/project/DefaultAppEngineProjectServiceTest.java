@@ -16,13 +16,13 @@
 
 package com.google.cloud.tools.intellij.appengine.java.project;
 
+import com.google.cloud.tools.intellij.appengine.java.AppEngineCodeInsightTestCase;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.java.cloud.flexible.AppEngineFlexibleDeploymentArtifactType;
 import com.google.cloud.tools.intellij.appengine.java.cloud.standard.AppEngineStandardRuntime;
 import com.google.cloud.tools.intellij.appengine.java.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService.FlexibleRuntime;
-import com.intellij.appengine.AppEngineCodeInsightTestCase;
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.application.WriteAction;

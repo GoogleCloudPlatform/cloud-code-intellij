@@ -16,9 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.java.facet.standard;
 
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.facet.AddAppEngineFrameworkSupportAction;
 import com.google.cloud.tools.intellij.appengine.java.facet.AddAppEngineFrameworkSupportActionTest;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -46,11 +46,13 @@ public class AddAppEngineStandardFrameworkSupportToolsMenuActionTest
         ActionManager.getInstance().getAction("AddAppEngineFrameworkSupport.Standard");
     assertNotNull(action);
     Presentation presentation = action.getTemplatePresentation();
-    assertEquals(GctBundle.message("appengine.standard.facet.name.title"), presentation.getText());
     assertEquals(
-        GctBundle.message(
+        AppEngineMessageBundle.message("appengine.standard.facet.name.title"),
+        presentation.getText());
+    assertEquals(
+        AppEngineMessageBundle.message(
             "appengine.add.framework.support.tools.menu.description",
-            GctBundle.message("appengine.standard.facet.name")),
+            AppEngineMessageBundle.message("appengine.standard.facet.name")),
         presentation.getDescription());
   }
 

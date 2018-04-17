@@ -20,13 +20,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Rule;
@@ -70,7 +70,8 @@ public final class AppEngineDeploymentConfigurationPanelTest {
     configurationPanel.resetEditorFrom(deploymentConfiguration);
 
     verify(infoPanel)
-        .setMessage(GctBundle.getString("appengine.infopanel.no.region"), true /* isError*/);
+        .setMessage(
+            AppEngineMessageBundle.getString("appengine.infopanel.no.region"), true /* isError*/);
   }
 
   @Test
