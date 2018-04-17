@@ -44,16 +44,15 @@ import com.intellij.javaee.run.localRun.ScriptHelper;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 
-// TODO: rename tests
 /** Tests for {@link ServiceAccountKeyUltimateDisplayDialog}. */
 public class ServiceAccountKeyUltimateDisplayDialogTest {
 
@@ -68,46 +67,43 @@ public class ServiceAccountKeyUltimateDisplayDialogTest {
   private ServiceAccountKeyUltimateDisplayDialog dialog;
 
   @Test
-  public void whenNoConfigurationExists_configurationTableIsHidden() {
+  public void configurationTable_whenConfigurationsDoNotExist_Hidden() {
     launchDialog(new ArrayList<>());
-
     assertFalse(dialog.getTable().isVisible());
   }
 
   @Test
-  public void whenConfigurationsExists_configurationTableIsVisible() {
+  public void configurationTable_whenConfigurationsExist_Visible() {
     when(mockRunnerAndConfigurationSettings.getName()).thenReturn("name");
-    List<RunnerAndConfigurationSettings> configurationSettingsList = new ArrayList<>();
-    configurationSettingsList.add(mockRunnerAndConfigurationSettings);
-
-    launchDialog(configurationSettingsList);
+    launchDialog(Arrays.asList(mockRunnerAndConfigurationSettings));
 
     assertTrue(dialog.getTable().isVisible());
   }
 
   @Test
-  public void apply_whenEnvVarsDoNotExist_addEnvVarsToConfiguration() {
+  public void addEnvironmentVariablesToConfiguration_whenEnvVarsDoNotExistInConfig_add() {
     RunnerSpecificLocalConfigurationBit runnerSpecificLocalConfigurationBit =
         new RunnerSpecificLocalConfigurationBit(new TestConfigurationInfoProvider());
     runnerSpecificLocalConfigurationBit.setEnvironmentVariables(new ArrayList<>());
     setUpInitialConfiguration(runnerSpecificLocalConfigurationBit);
+    launchDialog(Arrays.asList(mockRunnerAndConfigurationSettings));
+    dialog.addEnvironmentVariablesToConfiguration(
+        new HashSet<>(Arrays.asList(mockRunnerAndConfigurationSettings)));
 
-    List<RunnerAndConfigurationSettings> configurationSettingsList = new ArrayList<>();
-    configurationSettingsList.add(mockRunnerAndConfigurationSettings);
-    launchDialog(configurationSettingsList);
-    dialog.addEnvironmentVariablesToConfiguration(new HashSet<>(configurationSettingsList));
     List<EnvironmentVariable> actualEnvVars = runnerSpecificLocalConfigurationBit.getEnvVariables();
     assertNotNull(actualEnvVars);
     assertEquals(2, actualEnvVars.size());
-
-    Set<EnvironmentVariable> expectedEnvVars =
-        dialog.getServiceAccountKeyDownloadedPanel().getEnvironmentVariables();
-    expectedEnvVars.forEach(
-        expectedEnvVar -> assertTrue(containsEnvironmentVariable(actualEnvVars, expectedEnvVar)));
+    assertTrue(
+        containsEnvironmentVariable(
+            actualEnvVars, new EnvironmentVariable("GOOGLE_CLOUD_PROJECT", "gcpProjectId", false)));
+    assertTrue(
+        containsEnvironmentVariable(
+            actualEnvVars,
+            new EnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "downloadPath", false)));
   }
 
   @Test
-  public void apply_whenEnvVarsExist_updateEnvVarsInConfiguration() {
+  public void addEnvironmentVariablesToConfiguration_whenEnvVarsExistInConfig_update() {
     RunnerSpecificLocalConfigurationBit runnerSpecificLocalConfigurationBit =
         new RunnerSpecificLocalConfigurationBit(new TestConfigurationInfoProvider());
     List<EnvironmentVariable> oldEnvVariables = new ArrayList<>();
@@ -117,20 +113,20 @@ public class ServiceAccountKeyUltimateDisplayDialogTest {
     oldEnvVariables.add(new EnvironmentVariable("fakeName", "fakeValue", false));
     runnerSpecificLocalConfigurationBit.setEnvironmentVariables(oldEnvVariables);
     setUpInitialConfiguration(runnerSpecificLocalConfigurationBit);
-
-    List<RunnerAndConfigurationSettings> configurationSettingsList = new ArrayList<>();
-    configurationSettingsList.add(mockRunnerAndConfigurationSettings);
-    launchDialog(configurationSettingsList);
-    dialog.addEnvironmentVariablesToConfiguration(new HashSet<>(configurationSettingsList));
+    launchDialog(Arrays.asList(mockRunnerAndConfigurationSettings));
+    dialog.addEnvironmentVariablesToConfiguration(
+        new HashSet<>(Arrays.asList(mockRunnerAndConfigurationSettings)));
 
     List<EnvironmentVariable> actualEnvVars = runnerSpecificLocalConfigurationBit.getEnvVariables();
     assertNotNull(actualEnvVars);
     assertEquals(3, actualEnvVars.size());
-
-    Set<EnvironmentVariable> expectedEnvVars =
-        dialog.getServiceAccountKeyDownloadedPanel().getEnvironmentVariables();
-    expectedEnvVars.forEach(
-        expectedEnvVar -> assertTrue(containsEnvironmentVariable(actualEnvVars, expectedEnvVar)));
+    assertTrue(
+        containsEnvironmentVariable(
+            actualEnvVars, new EnvironmentVariable("GOOGLE_CLOUD_PROJECT", "gcpProjectId", false)));
+    assertTrue(
+        containsEnvironmentVariable(
+            actualEnvVars,
+            new EnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "downloadPath", false)));
   }
 
   private void setUpInitialConfiguration(

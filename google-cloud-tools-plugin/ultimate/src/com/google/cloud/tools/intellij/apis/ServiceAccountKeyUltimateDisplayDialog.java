@@ -236,11 +236,6 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
     return table;
   }
 
-  @VisibleForTesting
-  public ServiceAccountKeyDownloadedPanel getServiceAccountKeyDownloadedPanel() {
-    return commonPanel;
-  }
-
   /** Adds the Cloud Library environment variables to the selected App Engine run configurations. */
   private class ApplyAction extends DialogWrapperAction {
     private ApplyAction() {
