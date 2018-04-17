@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.java.ultimate.server.integration;
 
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineIcons;
 import com.intellij.javaee.appServerIntegrations.AppServerIntegration;
 import com.intellij.javaee.appServerIntegrations.ApplicationServerHelper;
 import com.intellij.javaee.appServerIntegrations.ApplicationServerPersistentDataEditor;
@@ -39,7 +39,7 @@ public class AppEngineServerIntegration extends AppServerIntegration {
 
   @Override
   public Icon getIcon() {
-    return GoogleCloudToolsIcons.APP_ENGINE;
+    return AppEngineIcons.APP_ENGINE;
   }
 
   @Override

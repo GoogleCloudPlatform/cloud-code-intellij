@@ -16,9 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.java.ultimate.server.instance;
 
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineArtifactDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.java.util.AppEngineUtil;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.collect.Lists;
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.openapi.options.ConfigurationException;
@@ -71,7 +71,7 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
     appEngineSettingsPanel.setBorder(
         PlainSmallWithoutIndent.createTitledBorder(
             null /* border */,
-            GctBundle.message("appengine.run.settings.title.label"),
+            AppEngineMessageBundle.message("appengine.run.settings.title.label"),
             0 /* titleJustification */,
             0 /* titlePosition */,
             null /* titleFont */,

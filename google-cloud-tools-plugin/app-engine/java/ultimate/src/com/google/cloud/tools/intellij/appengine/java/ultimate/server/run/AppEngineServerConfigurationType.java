@@ -16,11 +16,11 @@
 
 package com.google.cloud.tools.intellij.appengine.java.ultimate.server.run;
 
+import com.google.cloud.tools.intellij.appengine.java.AppEngineIcons;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineAssetProvider;
 import com.google.cloud.tools.intellij.appengine.java.ultimate.server.instance.AppEngineServerModel;
 import com.google.cloud.tools.intellij.appengine.java.ultimate.server.integration.AppEngineServerIntegration;
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.ConfigurationTypeUtil;
 import com.intellij.execution.configurations.RunConfiguration;
@@ -53,7 +53,7 @@ public class AppEngineServerConfigurationType extends J2EEConfigurationType {
 
   @Override
   public String getDisplayName() {
-    return GctBundle.getString("appengine.run.server.name");
+    return AppEngineMessageBundle.getString("appengine.run.server.name");
   }
 
   @Override
@@ -64,7 +64,7 @@ public class AppEngineServerConfigurationType extends J2EEConfigurationType {
   @Nullable
   @Override
   public Icon getIcon() {
-    return GoogleCloudToolsIcons.APP_ENGINE;
+    return AppEngineIcons.APP_ENGINE;
   }
 
   @Override

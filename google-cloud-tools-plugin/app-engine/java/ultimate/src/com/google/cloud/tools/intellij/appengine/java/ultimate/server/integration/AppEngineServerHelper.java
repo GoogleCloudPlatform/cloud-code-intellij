@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.java.ultimate.server.integration;
 
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.intellij.javaee.appServerIntegrations.ApplicationServerHelper;
 import com.intellij.javaee.appServerIntegrations.ApplicationServerInfo;
 import com.intellij.javaee.appServerIntegrations.ApplicationServerPersistentData;
@@ -31,7 +31,7 @@ public class AppEngineServerHelper implements ApplicationServerHelper {
   public ApplicationServerInfo getApplicationServerInfo(
       ApplicationServerPersistentData persistentData) {
     return new ApplicationServerInfo(
-        new File[] {}, GctBundle.getString("appengine.run.server.name"));
+        new File[] {}, AppEngineMessageBundle.getString("appengine.run.server.name"));
   }
 
   @Override

@@ -17,9 +17,9 @@
 package com.google.cloud.tools.intellij.appengine.java.ultimate.server.run;
 
 import com.google.cloud.tools.intellij.CloudToolsRunConfigurationAction;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineIcons;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
@@ -36,9 +36,9 @@ public class AppEngineStandardLocalRunToolsMenuAction extends CloudToolsRunConfi
   public AppEngineStandardLocalRunToolsMenuAction() {
     super(
         AppEngineServerConfigurationType.getInstance(),
-        GctBundle.message("appengine.tools.menu.run.server.text"),
-        GctBundle.message("appengine.tools.menu.run.server.description"),
-        GoogleCloudToolsIcons.APP_ENGINE);
+        AppEngineMessageBundle.message("appengine.tools.menu.run.server.text"),
+        AppEngineMessageBundle.message("appengine.tools.menu.run.server.description"),
+        AppEngineIcons.APP_ENGINE);
   }
 
   @Override
@@ -64,14 +64,14 @@ public class AppEngineStandardLocalRunToolsMenuAction extends CloudToolsRunConfi
   private void notifyNotAppEngineStandardProject(@NotNull Project project) {
     NotificationGroup notification =
         new NotificationGroup(
-            GctBundle.message("appengine.tools.menu.run.server.error.title"),
+            AppEngineMessageBundle.message("appengine.tools.menu.run.server.error.title"),
             NotificationDisplayType.BALLOON,
             true);
 
     notification
         .createNotification(
-            GctBundle.message("appengine.tools.menu.run.server.error.title"),
-            GctBundle.message("appengine.tools.menu.run.server.error.message"),
+            AppEngineMessageBundle.message("appengine.tools.menu.run.server.error.title"),
+            AppEngineMessageBundle.message("appengine.tools.menu.run.server.error.message"),
             NotificationType.ERROR,
             null /*listener*/)
         .notify(project);

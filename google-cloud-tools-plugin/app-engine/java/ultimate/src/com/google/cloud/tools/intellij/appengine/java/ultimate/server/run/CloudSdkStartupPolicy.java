@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.java.ultimate.server.run;
 
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.cloud.executor.AppEngineExecutor;
 import com.google.cloud.tools.intellij.appengine.java.cloud.executor.AppEngineStandardRunTask;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService;
@@ -23,7 +24,6 @@ import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService.SdkSta
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceManager;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceManager.CloudSdkStatusHandler;
 import com.google.cloud.tools.intellij.appengine.java.ultimate.server.instance.AppEngineServerModel;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.collect.Maps;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.process.OSProcessHandler;
@@ -60,7 +60,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
         return new ExecutableObject() {
           @Override
           public String getDisplayString() {
-            return GctBundle.getString("appengine.run.startupscript.name");
+            return AppEngineMessageBundle.getString("appengine.run.startupscript.name");
           }
 
           @Override
@@ -72,7 +72,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
               CloudSdkServiceManager.getInstance()
                   .blockUntilSdkReady(
                       commonModel.getProject(),
-                      GctBundle.getString("appengine.run.startupscript"),
+                      AppEngineMessageBundle.getString("appengine.run.startupscript"),
                       new CloudSdkStatusHandler() {
                         @Override
                         public void log(String s) {
@@ -92,7 +92,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
                           switch (sdkStatus) {
                             case INVALID:
                             case NOT_AVAILABLE:
-                              return GctBundle.message(
+                              return AppEngineMessageBundle.message(
                                   "appengine.run.server.sdk.misconfigured.message");
                             default:
                               return "";
@@ -102,7 +102,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
             } catch (InterruptedException e) {
               // should not happen, but would be an error.
               throw new ExecutionException(
-                  GctBundle.message("appengine.run.server.sdk.misconfigured.message"));
+                  AppEngineMessageBundle.message("appengine.run.server.sdk.misconfigured.message"));
             }
             // wait complete, check the final status here manually.
             SdkStatus sdkStatus = CloudSdkService.getInstance().getStatus();
@@ -110,11 +110,11 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
               case INVALID:
               case NOT_AVAILABLE:
                 throw new ExecutionException(
-                    GctBundle.message("appengine.run.server.sdk.misconfigured.message"));
+                    AppEngineMessageBundle.message("appengine.run.server.sdk.misconfigured.message"));
               case INSTALLING:
                 // cannot continue still installing.
                 throw new ExecutionException(
-                    GctBundle.message("appengine.run.server.sdk.installing.message"));
+                    AppEngineMessageBundle.message("appengine.run.server.sdk.installing.message"));
               case READY:
                 // continue to start local dev server process.
                 break;
@@ -122,7 +122,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
 
             Sdk javaSdk = ProjectRootManager.getInstance(commonModel.getProject()).getProjectSdk();
             if (javaSdk == null || javaSdk.getHomePath() == null) {
-              throw new ExecutionException(GctBundle.message("appengine.run.server.nosdk"));
+              throw new ExecutionException(AppEngineMessageBundle.message("appengine.run.server.nosdk"));
             }
 
             AppEngineServerModel runConfiguration;
@@ -158,7 +158,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
             Process devappserverProcess = executor.getProcess();
             startupProcessHandler =
                 new OSProcessHandler(
-                    devappserverProcess, GctBundle.getString("appengine.run.startupscript"));
+                    devappserverProcess, AppEngineMessageBundle.getString("appengine.run.startupscript"));
             return startupProcessHandler;
           }
         };

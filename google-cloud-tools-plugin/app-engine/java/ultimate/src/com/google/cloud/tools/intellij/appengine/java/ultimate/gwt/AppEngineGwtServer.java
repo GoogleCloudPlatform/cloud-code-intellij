@@ -16,9 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.java.ultimate.gwt;
 
+import com.google.cloud.tools.intellij.appengine.java.AppEngineIcons;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkInternals;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.ui.GoogleCloudToolsIcons;
 import com.intellij.execution.configurations.JavaParameters;
 import com.intellij.execution.configurations.ParametersList;
 import com.intellij.gwt.facet.GwtFacet;
@@ -39,7 +39,7 @@ public class AppEngineGwtServer extends GwtDevModeServer {
 
   @Override
   public Icon getIcon() {
-    return GoogleCloudToolsIcons.APP_ENGINE;
+    return AppEngineIcons.APP_ENGINE;
   }
 
   @Override

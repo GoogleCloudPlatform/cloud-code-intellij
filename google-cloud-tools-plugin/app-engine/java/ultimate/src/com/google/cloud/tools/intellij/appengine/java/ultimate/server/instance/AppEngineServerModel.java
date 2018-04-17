@@ -17,10 +17,10 @@
 package com.google.cloud.tools.intellij.appengine.java.ultimate.server.instance;
 
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkValidator;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
@@ -70,7 +70,7 @@ public class AppEngineServerModel
   @Override
   public J2EEServerInstance createServerInstance() throws ExecutionException {
     if (ProjectRootManager.getInstance(commonModel.getProject()).getProjectSdk() == null) {
-      throw new ExecutionException(GctBundle.getString("appengine.run.server.nosdk"));
+      throw new ExecutionException(AppEngineMessageBundle.getString("appengine.run.server.nosdk"));
     }
 
     return new AppEngineServerInstance(commonModel);
@@ -125,7 +125,7 @@ public class AppEngineServerModel
   public void checkConfiguration() throws RuntimeConfigurationException {
     if (artifactPointer == null || artifactPointer.getArtifact() == null) {
       throw new RuntimeConfigurationError(
-          GctBundle.message("appengine.run.server.artifact.missing"));
+          AppEngineMessageBundle.message("appengine.run.server.artifact.missing"));
     }
 
     // do not check SDK if it supports dynamic install - the deployment runner will block itself
@@ -135,12 +135,12 @@ public class AppEngineServerModel
     if (sdkStatus != SdkStatus.READY && !cloudSdkService.isInstallSupported()) {
       if (!CloudSdkValidator.getInstance().isValidCloudSdk()) {
         throw new RuntimeConfigurationError(
-            GctBundle.message("appengine.run.server.sdk.misconfigured.panel.message"));
+            AppEngineMessageBundle.message("appengine.run.server.sdk.misconfigured.panel.message"));
       }
     }
 
     if (ProjectRootManager.getInstance(commonModel.getProject()).getProjectSdk() == null) {
-      throw new RuntimeConfigurationError(GctBundle.getString("appengine.run.server.nosdk"));
+      throw new RuntimeConfigurationError(AppEngineMessageBundle.getString("appengine.run.server.nosdk"));
     }
   }
 
