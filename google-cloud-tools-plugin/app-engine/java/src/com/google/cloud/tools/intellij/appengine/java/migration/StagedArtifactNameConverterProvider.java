@@ -19,8 +19,8 @@ package com.google.cloud.tools.intellij.appengine.java.migration;
 import static com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeploymentConfiguration.ENVIRONMENT_ATTRIBUTE;
 import static com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeploymentConfiguration.STAGED_ARTIFACT_NAME_LEGACY;
 
-import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
+import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineEnvironment;
 import com.google.common.base.Strings;
 import com.intellij.conversion.CannotConvertException;
 import com.intellij.conversion.ConversionContext;

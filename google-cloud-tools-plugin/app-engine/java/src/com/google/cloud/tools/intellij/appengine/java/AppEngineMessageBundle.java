@@ -23,8 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.PropertyKey;
 
 public class AppEngineMessageBundle {
-  @NonNls
-  private static final String BUNDLE_NAME = "messages.AppEngineBundle";
+  @NonNls private static final String BUNDLE_NAME = "messages.AppEngineBundle";
 
   private AppEngineMessageBundle() {
     // not for construction.

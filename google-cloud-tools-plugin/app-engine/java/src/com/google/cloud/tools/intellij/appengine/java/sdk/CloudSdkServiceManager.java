@@ -18,9 +18,9 @@ package com.google.cloud.tools.intellij.appengine.java.sdk;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
-import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
 import com.intellij.notification.Notification;
@@ -252,7 +252,8 @@ public class CloudSdkServiceManager {
               notificationType);
       // add a link to SDK settings for a quick fix.
       invalidSdkWarning.addAction(
-          new AnAction(AppEngineMessageBundle.message("appengine.deployment.error.sdk.settings.action")) {
+          new AnAction(
+              AppEngineMessageBundle.message("appengine.deployment.error.sdk.settings.action")) {
             @Override
             public void actionPerformed(AnActionEvent e) {
               ShowSettingsUtil.getInstance().showSettingsDialog(null, CloudSdkConfigurable.class);

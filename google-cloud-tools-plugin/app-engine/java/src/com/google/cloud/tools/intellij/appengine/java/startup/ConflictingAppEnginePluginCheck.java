@@ -66,7 +66,8 @@ public class ConflictingAppEnginePluginCheck {
     String errorMessage =
         new StringBuilder()
             .append("<p>")
-            .append(AppEngineMessageBundle.message("plugin.conflict.error.detail", plugin.getName()))
+            .append(
+                AppEngineMessageBundle.message("plugin.conflict.error.detail", plugin.getName()))
             .append("</p>")
             .append("<br />")
             .append("<p>")

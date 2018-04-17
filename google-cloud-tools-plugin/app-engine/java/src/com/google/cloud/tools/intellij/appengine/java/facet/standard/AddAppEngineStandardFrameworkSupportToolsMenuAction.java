@@ -16,8 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.java.facet.standard;
 
-import com.google.cloud.tools.intellij.appengine.java.facet.AddAppEngineFrameworkSupportAction;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
+import com.google.cloud.tools.intellij.appengine.java.facet.AddAppEngineFrameworkSupportAction;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleConfigurable;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModelImpl;

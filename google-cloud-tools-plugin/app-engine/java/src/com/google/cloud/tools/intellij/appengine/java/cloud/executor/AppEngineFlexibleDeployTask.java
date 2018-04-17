@@ -19,10 +19,10 @@ package com.google.cloud.tools.intellij.appengine.java.cloud.executor;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeploy;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineHelper;
 import com.google.cloud.tools.intellij.appengine.java.cloud.flexible.AppEngineFlexibleStage;
-import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceUserSettings;
 import com.intellij.openapi.diagnostic.Logger;
 import java.io.IOException;
@@ -65,14 +65,16 @@ public class AppEngineFlexibleDeployTask extends AppEngineTask {
       deploy
           .getCallback()
           .errorOccurred(
-              AppEngineMessageBundle.message("appengine.deployment.error.creating.staging.directory"));
+              AppEngineMessageBundle.message(
+                  "appengine.deployment.error.creating.staging.directory"));
       logger.warn(ioe);
       return;
     }
 
     try {
       if (!flexibleStage.stage(stagingDirectory)) {
-        String message = AppEngineMessageBundle.message("appengine.deployment.exception.during.staging");
+        String message =
+            AppEngineMessageBundle.message("appengine.deployment.exception.during.staging");
         deploy.getCallback().errorOccurred(message);
         logger.warn(message);
         return;
@@ -80,7 +82,8 @@ public class AppEngineFlexibleDeployTask extends AppEngineTask {
     } catch (IOException e) {
       deploy
           .getCallback()
-          .errorOccurred(AppEngineMessageBundle.message("appengine.deployment.exception.during.staging"));
+          .errorOccurred(
+              AppEngineMessageBundle.message("appengine.deployment.exception.during.staging"));
       logger.error(e);
       return;
     }
@@ -90,7 +93,8 @@ public class AppEngineFlexibleDeployTask extends AppEngineTask {
           == null) {
         deploy
             .getCallback()
-            .errorOccurred(AppEngineMessageBundle.message("appengine.staging.credentials.error.message"));
+            .errorOccurred(
+                AppEngineMessageBundle.message("appengine.staging.credentials.error.message"));
         return;
       }
 

@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.java.facet.flexible;
 
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.cloud.flexible.AppEngineFlexibleDeploymentArtifactType;
 import com.google.cloud.tools.intellij.appengine.java.cloud.flexible.DockerfileArtifactTypePanel;
 import com.google.cloud.tools.intellij.appengine.java.cloud.flexible.FileConfirmationDialog;
@@ -26,7 +27,6 @@ import com.google.cloud.tools.intellij.appengine.java.cloud.flexible.SelectConfi
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.java.project.MalformedYamlFileException;
-import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.facet.Facet;
 import com.intellij.facet.ui.FacetEditorTab;
@@ -193,14 +193,16 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private boolean validateAppYaml() {
     if (!isValidConfigurationFile(appYamlField.getText())) {
       toggleInvalidAppYamlState(
-          AppEngineMessageBundle.getString("appengine.flex.facet.config.appyaml.error.before.text"));
+          AppEngineMessageBundle.getString(
+              "appengine.flex.facet.config.appyaml.error.before.text"));
       return false;
     } else {
       try {
         toggleValidAppYamlState(getRuntimeText());
       } catch (MalformedYamlFileException myf) {
         toggleInvalidAppYamlState(
-            AppEngineMessageBundle.getString("appengine.flex.facet.config.appyaml.malformed.error"));
+            AppEngineMessageBundle.getString(
+                "appengine.flex.facet.config.appyaml.malformed.error"));
         return false;
       }
     }
@@ -224,7 +226,9 @@ public class FlexibleFacetEditor extends FacetEditorTab {
   private void toggleInvalidAppYamlState(String message) {
     appYamlErrorPanel.setVisible(true);
     appYamlErrorMessage.setHyperlinkText(
-        message, AppEngineMessageBundle.message("appengine.flex.facet.config.appyaml.generate.link.text"), "");
+        message,
+        AppEngineMessageBundle.message("appengine.flex.facet.config.appyaml.generate.link.text"),
+        "");
     runtimePanel.setVisible(false);
     dockerfilePanel.setVisible(false);
   }
@@ -291,7 +295,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
           new SelectConfigDestinationFolderDialog(
               module.getProject(),
               appYamlDirectoryPath,
-              AppEngineMessageBundle.message("appengine.flex.config.appyaml.destination.chooser.title"));
+              AppEngineMessageBundle.message(
+                  "appengine.flex.config.appyaml.destination.chooser.title"));
 
       if (dialog.showAndGet()) {
         Path destinationFolderPath = dialog.getDestinationFolder();
@@ -339,7 +344,8 @@ public class FlexibleFacetEditor extends FacetEditorTab {
           new SelectDockerfileDestinationFolderDialog(
               module.getProject(),
               dockerfileDirectoryPath,
-              AppEngineMessageBundle.message("appengine.flex.config.dockerfile.destination.chooser.title"));
+              AppEngineMessageBundle.message(
+                  "appengine.flex.config.dockerfile.destination.chooser.title"));
 
       if (dialog.showAndGet()) {
         Path destinationFolderPath = dialog.getDestinationFolder();

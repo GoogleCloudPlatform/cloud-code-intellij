@@ -21,11 +21,14 @@ import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 
 /** The result of a failed validation of a CloudSdk installation. */
 public enum CloudSdkValidationResult {
-  CLOUD_SDK_NOT_FOUND(AppEngineMessageBundle.message("appengine.cloudsdk.location.invalid.message"), true),
+  CLOUD_SDK_NOT_FOUND(
+      AppEngineMessageBundle.message("appengine.cloudsdk.location.invalid.message"), true),
   CLOUD_SDK_VERSION_NOT_SUPPORTED(
-      AppEngineMessageBundle.message("appengine.cloudsdk.version.support.message", CloudSdk.MINIMUM_VERSION),
+      AppEngineMessageBundle.message(
+          "appengine.cloudsdk.version.support.message", CloudSdk.MINIMUM_VERSION),
       false),
-  MALFORMED_PATH(AppEngineMessageBundle.message("appengine.cloudsdk.location.badchars.message"), true),
+  MALFORMED_PATH(
+      AppEngineMessageBundle.message("appengine.cloudsdk.location.badchars.message"), true),
   NO_APP_ENGINE_COMPONENT(
       AppEngineMessageBundle.message("appengine.cloudsdk.java.components.missing")
           + "\n"

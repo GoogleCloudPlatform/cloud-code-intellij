@@ -16,12 +16,12 @@
 
 package com.google.cloud.tools.intellij.appengine.java.cloud;
 
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.cloud.flexible.UserSpecifiedPathDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceManager;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceManager.CloudSdkStatusHandler;
 import com.google.cloud.tools.intellij.login.Services;
-import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -64,7 +64,8 @@ public class AppEngineRuntimeInstance
 
     Services.getLoginService().logInIfNot();
     if (!Services.getLoginService().isLoggedIn()) {
-      callback.errorOccurred(AppEngineMessageBundle.message("appengine.deployment.error.not.logged.in"));
+      callback.errorOccurred(
+          AppEngineMessageBundle.message("appengine.deployment.error.not.logged.in"));
       return;
     }
 
@@ -111,12 +112,14 @@ public class AppEngineRuntimeInstance
                         public String getErrorMessage(SdkStatus sdkStatus) {
                           switch (sdkStatus) {
                             case INVALID:
-                              return AppEngineMessageBundle.message("appengine.deployment.error.sdk.invalid");
+                              return AppEngineMessageBundle.message(
+                                  "appengine.deployment.error.sdk.invalid");
                             case NOT_AVAILABLE:
                               return AppEngineMessageBundle.message(
                                   "appengine.deployment.error.sdk.not.available");
                             default:
-                              return AppEngineMessageBundle.message("appengine.deployment.error.sdk.retry");
+                              return AppEngineMessageBundle.message(
+                                  "appengine.deployment.error.sdk.retry");
                           }
                         }
                       });

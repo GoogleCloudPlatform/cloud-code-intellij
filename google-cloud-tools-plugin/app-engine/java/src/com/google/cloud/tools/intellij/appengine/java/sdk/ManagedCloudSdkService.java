@@ -155,7 +155,8 @@ public class ManagedCloudSdkService implements CloudSdkService {
       updateStatus(SdkStatus.NOT_AVAILABLE);
       ManagedCloudSdkServiceUiPresenter.getInstance()
           .notifyManagedSdkJobFailure(
-              ManagedSdkJobType.INSTALL, AppEngineMessageBundle.message("managedsdk.unsupported.os"));
+              ManagedSdkJobType.INSTALL,
+              AppEngineMessageBundle.message("managedsdk.unsupported.os"));
     }
   }
 

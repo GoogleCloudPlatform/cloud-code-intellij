@@ -108,8 +108,10 @@ public class AppEngineStop {
                 @Override
                 public void run() {
                   Messages.showMessageDialog(
-                      AppEngineMessageBundle.message("appengine.stop.modules.version.success.dialog.message"),
-                      AppEngineMessageBundle.message("appengine.stop.modules.version.success.dialog.title"),
+                      AppEngineMessageBundle.message(
+                          "appengine.stop.modules.version.success.dialog.message"),
+                      AppEngineMessageBundle.message(
+                          "appengine.stop.modules.version.success.dialog.title"),
                       General.Information);
                 }
               });

@@ -46,7 +46,8 @@ public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
   public AddAppEngineFrameworkSupportAction(@NotNull String nameInTitle, @NotNull String name) {
     super(
         nameInTitle,
-        AppEngineMessageBundle.message("appengine.add.framework.support.tools.menu.description", name),
+        AppEngineMessageBundle.message(
+            "appengine.add.framework.support.tools.menu.description", name),
         null /* icon */);
     FRAMEWORK_NAME = name;
   }
@@ -74,7 +75,8 @@ public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
     if (suitableModules.isEmpty()) {
       Messages.showErrorDialog(
           project,
-          AppEngineMessageBundle.message("appengine.add.framework.support.no.modules.message", FRAMEWORK_NAME),
+          AppEngineMessageBundle.message(
+              "appengine.add.framework.support.no.modules.message", FRAMEWORK_NAME),
           AppEngineMessageBundle.message(
               "appengine.add.framework.support.no.modules.title", frameworkNameInTitle));
       return;
@@ -84,7 +86,8 @@ public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
         new ChooseModulesDialog(
             project,
             suitableModules,
-            AppEngineMessageBundle.message("appengine.add.framework.support.choose.module.dialog.title"),
+            AppEngineMessageBundle.message(
+                "appengine.add.framework.support.choose.module.dialog.title"),
             AppEngineMessageBundle.message(
                 "appengine.add.framework.support.choose.module.dialog.description",
                 FRAMEWORK_NAME));
@@ -111,7 +114,8 @@ public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
     Module module = elements.get(0);
     AddAppEngineFrameworkSupportDialog frameworkSupportDialog =
         new AddAppEngineFrameworkSupportDialog(
-            AppEngineMessageBundle.message("appengine.add.framework.support.dialog.title", frameworkNameInTitle),
+            AppEngineMessageBundle.message(
+                "appengine.add.framework.support.dialog.title", frameworkNameInTitle),
             project,
             module,
             getModuleConfigurable(module));

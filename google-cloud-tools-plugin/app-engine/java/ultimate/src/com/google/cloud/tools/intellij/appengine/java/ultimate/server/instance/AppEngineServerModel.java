@@ -140,7 +140,8 @@ public class AppEngineServerModel
     }
 
     if (ProjectRootManager.getInstance(commonModel.getProject()).getProjectSdk() == null) {
-      throw new RuntimeConfigurationError(AppEngineMessageBundle.getString("appengine.run.server.nosdk"));
+      throw new RuntimeConfigurationError(
+          AppEngineMessageBundle.getString("appengine.run.server.nosdk"));
     }
   }
 

@@ -55,18 +55,25 @@ public class FileConfirmationDialog extends DialogWrapper {
 
     switch (dialogType) {
       case CONFIRM_OVERWRITE:
-        setTitle(AppEngineMessageBundle.message("appengine.flex.config.destination.overwrite.title"));
-        warningLabel.setText(AppEngineMessageBundle.message("appengine.flex.config.destination.overwrite"));
+        setTitle(
+            AppEngineMessageBundle.message("appengine.flex.config.destination.overwrite.title"));
+        warningLabel.setText(
+            AppEngineMessageBundle.message("appengine.flex.config.destination.overwrite"));
         break;
 
       case CONFIRM_CREATE_DIR:
-        setTitle(AppEngineMessageBundle.message("appengine.flex.config.destination.create.dir.title"));
-        warningLabel.setText(AppEngineMessageBundle.message("appengine.flex.config.destination.create.dir"));
+        setTitle(
+            AppEngineMessageBundle.message("appengine.flex.config.destination.create.dir.title"));
+        warningLabel.setText(
+            AppEngineMessageBundle.message("appengine.flex.config.destination.create.dir"));
         break;
 
       case NOT_DIRECTORY_ERROR:
-        setTitle(AppEngineMessageBundle.message("appengine.flex.config.destination.not.directory.title"));
-        warningLabel.setText(AppEngineMessageBundle.message("appengine.flex.config.destination.not.directory"));
+        setTitle(
+            AppEngineMessageBundle.message(
+                "appengine.flex.config.destination.not.directory.title"));
+        warningLabel.setText(
+            AppEngineMessageBundle.message("appengine.flex.config.destination.not.directory"));
         break;
 
       default:

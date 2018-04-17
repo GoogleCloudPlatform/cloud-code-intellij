@@ -23,6 +23,7 @@ import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListen
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.cloud.executor.AppEngineExecutor;
 import com.google.cloud.tools.intellij.appengine.java.cloud.executor.AppEngineFlexibleDeployTask;
 import com.google.cloud.tools.intellij.appengine.java.cloud.executor.AppEngineStandardDeployTask;
@@ -37,7 +38,6 @@ import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
-import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
@@ -103,13 +103,15 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       DeploymentOperationCallback callback) {
 
     if (!(source instanceof AppEngineDeployable)) {
-      callback.errorOccurred(AppEngineMessageBundle.message("appengine.deployment.invalid.source.error"));
+      callback.errorOccurred(
+          AppEngineMessageBundle.message("appengine.deployment.invalid.source.error"));
       return Optional.empty();
     }
 
     if (source.getFile() == null || !source.getFile().exists()) {
       callback.errorOccurred(
-          AppEngineMessageBundle.message("appengine.deployment.source.not.found.error", source.getFilePath()));
+          AppEngineMessageBundle.message(
+              "appengine.deployment.source.not.found.error", source.getFilePath()));
       return Optional.empty();
     }
 
@@ -168,11 +170,15 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
                 loggingHandler, Paths.get(source.getFilePath()), deploymentConfiguration, deploy));
       } catch (MalformedYamlFileException myf) {
         callback.errorOccurred(
-            AppEngineMessageBundle.message("appengine.appyaml.malformed") + "\n" + myf.getMessage());
+            AppEngineMessageBundle.message("appengine.appyaml.malformed")
+                + "\n"
+                + myf.getMessage());
         return Optional.empty();
       } catch (InvalidPathException ipe) {
         callback.errorOccurred(
-            AppEngineMessageBundle.message("appengine.invalid.file.path") + "\n" + ipe.getMessage());
+            AppEngineMessageBundle.message("appengine.invalid.file.path")
+                + "\n"
+                + ipe.getMessage());
         return Optional.empty();
       }
     } else {
@@ -225,7 +231,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       ProcessOutputLineListener outputListener,
       ProcessExitListener exitListener) {
     if (credentialsPath == null) {
-      loggingHandler.print(AppEngineMessageBundle.message("appengine.action.credential.not.found") + "\n");
+      loggingHandler.print(
+          AppEngineMessageBundle.message("appengine.action.credential.not.found") + "\n");
       throw new AppEngineException("Failed to create application default credentials.");
     }
 

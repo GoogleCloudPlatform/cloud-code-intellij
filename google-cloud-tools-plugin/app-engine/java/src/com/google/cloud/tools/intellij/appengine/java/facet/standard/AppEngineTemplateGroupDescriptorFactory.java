@@ -16,8 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.java.facet.standard;
 
-import com.google.cloud.tools.intellij.appengine.java.file.DockerFileTemplateType;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineIcons;
+import com.google.cloud.tools.intellij.appengine.java.file.DockerFileTemplateType;
 import com.intellij.ide.fileTemplates.FileTemplateDescriptor;
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptor;
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptorFactory;

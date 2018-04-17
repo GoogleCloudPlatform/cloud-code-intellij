@@ -17,13 +17,13 @@
 package com.google.cloud.tools.intellij.appengine.java.cloud;
 
 import com.google.cloud.tools.intellij.GctFeature;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkConfigurable;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkPanel;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceUserSettings;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.ui.FontUtils;
-import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.options.Configurable;
@@ -62,7 +62,8 @@ public class AppEngineCloudConfigurable extends RemoteServerConfigurable impleme
       messageBuilder.append("<p/>");
     }
     messageBuilder.append(
-        AppEngineMessageBundle.message("appengine.more.info", MORE_INFO_URI_OPEN_TAG, MORE_INFO_URI_CLOSE_TAG));
+        AppEngineMessageBundle.message(
+            "appengine.more.info", MORE_INFO_URI_OPEN_TAG, MORE_INFO_URI_CLOSE_TAG));
 
     appEngineMoreInfoLabel.setText(messageBuilder.toString());
     appEngineMoreInfoLabel.addHyperlinkListener(

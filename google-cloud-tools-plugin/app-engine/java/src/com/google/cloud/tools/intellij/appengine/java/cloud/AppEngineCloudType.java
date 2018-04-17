@@ -16,9 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.java.cloud;
 
-import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineIcons;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
+import com.google.cloud.tools.intellij.login.Services;
 import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.RemoteServerConfigurable;
 import com.intellij.remoteServer.ServerType;
@@ -88,7 +88,8 @@ public class AppEngineCloudType extends ServerType<AppEngineServerConfiguration>
       Services.getLoginService().logInIfNot();
 
       if (!Services.getLoginService().isLoggedIn()) {
-        callback.errorOccurred(AppEngineMessageBundle.message("appengine.deployment.error.not.logged.in"));
+        callback.errorOccurred(
+            AppEngineMessageBundle.message("appengine.deployment.error.not.logged.in"));
         return;
       }
 

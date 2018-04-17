@@ -16,9 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.java.cloud;
 
-import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineIcons;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
+import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;

@@ -110,7 +110,8 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
               case INVALID:
               case NOT_AVAILABLE:
                 throw new ExecutionException(
-                    AppEngineMessageBundle.message("appengine.run.server.sdk.misconfigured.message"));
+                    AppEngineMessageBundle.message(
+                        "appengine.run.server.sdk.misconfigured.message"));
               case INSTALLING:
                 // cannot continue still installing.
                 throw new ExecutionException(
@@ -122,7 +123,8 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
 
             Sdk javaSdk = ProjectRootManager.getInstance(commonModel.getProject()).getProjectSdk();
             if (javaSdk == null || javaSdk.getHomePath() == null) {
-              throw new ExecutionException(AppEngineMessageBundle.message("appengine.run.server.nosdk"));
+              throw new ExecutionException(
+                  AppEngineMessageBundle.message("appengine.run.server.nosdk"));
             }
 
             AppEngineServerModel runConfiguration;
@@ -158,7 +160,8 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
             Process devappserverProcess = executor.getProcess();
             startupProcessHandler =
                 new OSProcessHandler(
-                    devappserverProcess, AppEngineMessageBundle.getString("appengine.run.startupscript"));
+                    devappserverProcess,
+                    AppEngineMessageBundle.getString("appengine.run.startupscript"));
             return startupProcessHandler;
           }
         };

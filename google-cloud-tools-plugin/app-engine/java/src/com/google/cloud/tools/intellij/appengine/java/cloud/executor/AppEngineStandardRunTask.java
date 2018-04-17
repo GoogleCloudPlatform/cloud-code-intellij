@@ -23,9 +23,8 @@ import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkVersionNotifier;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceUserSettings;
-
+import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkVersionNotifier;
 import com.google.common.base.Strings;
 import com.intellij.openapi.projectRoots.Sdk;
 import java.nio.file.Paths;

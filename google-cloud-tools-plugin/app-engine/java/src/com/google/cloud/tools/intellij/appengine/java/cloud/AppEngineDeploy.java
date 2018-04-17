@@ -22,10 +22,10 @@ import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineDeployment;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.facet.flexible.AppEngineFlexibleFacet;
 import com.google.cloud.tools.intellij.appengine.java.facet.flexible.FlexibleFacetEditor;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkVersionNotifier;
-import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
@@ -100,7 +100,8 @@ public class AppEngineDeploy {
           AppEngineFlexibleFacet.getFacetByModuleName(moduleName, helper.getProject());
       if (flexFacet == null) {
         // This should not happen since staging already verified the file
-        callback.errorOccurred(AppEngineMessageBundle.message("appengine.deployment.error.appyaml.notfound"));
+        callback.errorOccurred(
+            AppEngineMessageBundle.message("appengine.deployment.error.appyaml.notfound"));
         return;
       } else {
         appYamlName =

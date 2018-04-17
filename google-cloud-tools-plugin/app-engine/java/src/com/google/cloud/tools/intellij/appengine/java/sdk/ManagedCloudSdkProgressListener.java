@@ -94,7 +94,8 @@ class ManagedCloudSdkProgressListener implements ProgressListener {
   }
 
   private void setProgressText(String message) {
-    progressIndicator.setText(AppEngineMessageBundle.message("managedsdk.progress.message", message));
+    progressIndicator.setText(
+        AppEngineMessageBundle.message("managedsdk.progress.message", message));
   }
 
   @VisibleForTesting

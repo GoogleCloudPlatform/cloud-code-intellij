@@ -24,7 +24,8 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 public class AddAppEngineFrameworkSupportMenuGroupAction extends DefaultActionGroup {
 
   public AddAppEngineFrameworkSupportMenuGroupAction() {
-    getTemplatePresentation().setText(AppEngineMessageBundle.message("appengine.add.facet.group.menu.text"));
+    getTemplatePresentation()
+        .setText(AppEngineMessageBundle.message("appengine.add.facet.group.menu.text"));
     getTemplatePresentation().setIcon(AppEngineIcons.APP_ENGINE);
   }
 }

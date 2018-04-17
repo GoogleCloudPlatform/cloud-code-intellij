@@ -19,8 +19,8 @@ package com.google.cloud.tools.intellij.appengine.java.cloud.executor;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
-import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineStop;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
+import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineStop;
 import com.intellij.openapi.diagnostic.Logger;
 
 /** Runnable that executes task responsible for stopping an App Engine application. */
@@ -46,13 +46,15 @@ public class AppEngineStopTask extends AppEngineTask {
       if (stop.getHelper().stageCredentials(stop.getDeploymentConfiguration().getGoogleUsername())
           == null) {
         stop.getCallback()
-            .errorOccurred(AppEngineMessageBundle.message("appengine.staging.credentials.error.message"));
+            .errorOccurred(
+                AppEngineMessageBundle.message("appengine.staging.credentials.error.message"));
         return;
       }
 
       stop.stop(module, version, startListener);
     } catch (RuntimeException re) {
-      stop.getCallback().errorOccurred(AppEngineMessageBundle.message("appengine.stop.modules.version.error"));
+      stop.getCallback()
+          .errorOccurred(AppEngineMessageBundle.message("appengine.stop.modules.version.error"));
       logger.error(re);
     }
   }

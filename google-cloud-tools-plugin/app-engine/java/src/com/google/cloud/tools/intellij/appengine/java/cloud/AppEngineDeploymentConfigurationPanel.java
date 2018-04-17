@@ -16,12 +16,12 @@
 
 package com.google.cloud.tools.intellij.appengine.java.cloud;
 
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
-import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.intellij.openapi.project.Project;
@@ -74,7 +74,8 @@ public final class AppEngineDeploymentConfigurationPanel {
         AppEngineMessageBundle.getString("appengine.promote.info.label.link"),
         "");
     promoteInfoLabel.addHyperlinkListener(new BrowserOpeningHyperLinkListener());
-    promoteInfoLabel.setHyperlinkTarget(AppEngineMessageBundle.getString("appengine.promoteinfo.url"));
+    promoteInfoLabel.setHyperlinkTarget(
+        AppEngineMessageBundle.getString("appengine.promoteinfo.url"));
 
     promoteCheckbox.addItemListener(
         event -> {

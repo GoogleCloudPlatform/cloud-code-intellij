@@ -21,12 +21,11 @@ import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeploy;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineHelper;
 import com.google.cloud.tools.intellij.appengine.java.cloud.standard.AppEngineStandardStage;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceUserSettings;
-import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.diagnostic.Logger;
 import java.io.IOException;
@@ -80,7 +79,8 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
       deploy
           .getCallback()
           .errorOccurred(
-              AppEngineMessageBundle.message("appengine.deployment.error.creating.staging.directory"));
+              AppEngineMessageBundle.message(
+                  "appengine.deployment.error.creating.staging.directory"));
       logger.error(ioe);
       return;
     }
@@ -90,7 +90,8 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
           == null) {
         deploy
             .getCallback()
-            .errorOccurred(AppEngineMessageBundle.message("appengine.staging.credentials.error.message"));
+            .errorOccurred(
+                AppEngineMessageBundle.message("appengine.staging.credentials.error.message"));
         return;
       }
 
@@ -101,7 +102,8 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
           .errorOccurred(
               AppEngineMessageBundle.message("appengine.cloudsdk.java.components.missing")
                   + "\n"
-                  + AppEngineMessageBundle.message("appengine.cloudsdk.java.components.howtoinstall"));
+                  + AppEngineMessageBundle.message(
+                      "appengine.cloudsdk.java.components.howtoinstall"));
       logger.warn(ex);
     } catch (RuntimeException re) {
       deploy
@@ -134,7 +136,8 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
         deploy
             .getCallback()
             .errorOccurred(
-                AppEngineMessageBundle.message("appengine.deployment.error.during.staging", exitCode));
+                AppEngineMessageBundle.message(
+                    "appengine.deployment.error.during.staging", exitCode));
         logger.warn(
             "App engine standard staging process exited with an error. Exit Code:" + exitCode);
       }

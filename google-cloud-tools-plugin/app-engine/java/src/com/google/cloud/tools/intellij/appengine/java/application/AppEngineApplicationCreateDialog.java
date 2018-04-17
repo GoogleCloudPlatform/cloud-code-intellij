@@ -20,9 +20,9 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.services.appengine.v1.model.Location;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.ui.FontUtils;
-import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.progress.ProgressManager;
@@ -140,7 +140,8 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
 
     } catch (IOException e) {
       trackApplicationCreateFailure();
-      setStatusMessage(AppEngineMessageBundle.message("appengine.application.create.error.transient"), true);
+      setStatusMessage(
+          AppEngineMessageBundle.message("appengine.application.create.error.transient"), true);
 
     } catch (GoogleApiException e) {
       trackApplicationCreateFailure();
@@ -194,7 +195,8 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
                     AppEngineAdminService.getInstance().getAllAppEngineLocations(userCredential);
               } catch (IOException | GoogleApiException e) {
                 setStatusMessageAsync(
-                    AppEngineMessageBundle.message("appengine.application.region.list.fetch.error"));
+                    AppEngineMessageBundle.message(
+                        "appengine.application.region.list.fetch.error"));
                 enable();
                 return;
               }

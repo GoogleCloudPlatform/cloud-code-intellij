@@ -29,7 +29,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.GctFeature;
-import com.google.cloud.tools.intellij.appengine.java.sdk.ManagedCloudSdkUpdateService;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
@@ -48,7 +47,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Spy;
 
-/** Tests for {@link ManagedCloudSdkUpdateService}. */
+/**
+ * Tests for {@link
+ * com.google.cloud.tools.intellij.appengine.java.sdk.ManagedCloudSdkUpdateService}.
+ */
 public class ManagedCloudSdkUpdateServiceTest {
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
 

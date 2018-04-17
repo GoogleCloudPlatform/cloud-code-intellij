@@ -18,8 +18,8 @@ package com.google.cloud.tools.intellij.appengine.java.facet.standard;
 
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
-import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
+import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
 import com.google.common.collect.Sets;
 import com.intellij.facet.Facet;
 import com.intellij.facet.ui.FacetEditorContext;

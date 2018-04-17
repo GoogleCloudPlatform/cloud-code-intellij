@@ -16,13 +16,13 @@
 
 package com.google.cloud.tools.intellij.appengine.java.cloud.flexible;
 
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.java.facet.flexible.AppEngineFlexibleFacet;
 import com.google.cloud.tools.intellij.appengine.java.facet.flexible.AppEngineFlexibleFacetConfiguration;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.java.project.MalformedYamlFileException;
-import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.common.base.Strings;
 import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.runtime.log.LoggingHandler;
@@ -144,11 +144,11 @@ public class AppEngineFlexibleStage {
   }
 
   /**
-   * Returns the message associated with the given key, as described by {@link AppEngineMessageBundle}, appended
-   * by a newline.
+   * Returns the message associated with the given key, as described by {@link
+   * AppEngineMessageBundle}, appended by a newline.
    *
-   * @param messageKey the key of the message (as described by {@link AppEngineMessageBundle#message}) to show in
-   *     the error
+   * @param messageKey the key of the message (as described by {@link
+   *     AppEngineMessageBundle#message}) to show in the error
    * @param params the optional parameters to add to the message
    */
   private static String getMessage(String messageKey, @NotNull Object... params) {

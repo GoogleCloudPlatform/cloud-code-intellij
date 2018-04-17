@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.java.cloud.flexible;
 
 import static com.google.cloud.tools.intellij.appengine.java.cloud.flexible.AppEngineFlexibleDeploymentArtifactType.UNKNOWN;
 
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineApplicationInfoPanel;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeployable;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeploymentConfiguration;
@@ -29,7 +30,6 @@ import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectSe
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService.FlexibleRuntime;
 import com.google.cloud.tools.intellij.appengine.java.project.MalformedYamlFileException;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
-import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.module.ModuleManager;

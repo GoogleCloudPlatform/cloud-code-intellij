@@ -30,8 +30,8 @@ public abstract class AppEngineTask {
 
   /**
    * Gets invoked when the task gets cancelled by {@link
-   * com.google.cloud.tools.intellij.appengine.java.cloud.executor.AppEngineExecutor}. Intentionally left
-   * empty - it is up to implementors to decide if they need extra action on cancellation.
+   * com.google.cloud.tools.intellij.appengine.java.cloud.executor.AppEngineExecutor}. Intentionally
+   * left empty - it is up to implementors to decide if they need extra action on cancellation.
    */
   void onCancel() {}
 }

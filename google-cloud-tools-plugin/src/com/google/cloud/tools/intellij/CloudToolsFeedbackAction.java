@@ -72,7 +72,7 @@ public class CloudToolsFeedbackAction extends DumbAwareAction {
         MessageFormat.format(
             BODY_TEMPLATE,
             pluginVersion,
-            cloudSdkVersion == null ? "No Cloud SDK Service Installed": cloudSdkVersion,
+            cloudSdkVersion == null ? "No Cloud SDK Service Installed" : cloudSdkVersion,
             System.getProperty("os.name"),
             System.getProperty("os.version"));
 
@@ -85,8 +85,7 @@ public class CloudToolsFeedbackAction extends DumbAwareAction {
       if (cloudSdkService == null) {
         return null;
       }
-      CloudSdk sdk =
-          new CloudSdk.Builder().sdkPath(cloudSdkService.getSdkHomePath()).build();
+      CloudSdk sdk = new CloudSdk.Builder().sdkPath(cloudSdkService.getSdkHomePath()).build();
       return sdk.getVersion().toString();
     } catch (AppEngineException aee) {
       return "";

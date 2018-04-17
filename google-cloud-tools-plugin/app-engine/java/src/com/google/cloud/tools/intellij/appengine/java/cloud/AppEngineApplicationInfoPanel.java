@@ -18,10 +18,10 @@ package com.google.cloud.tools.intellij.appengine.java.cloud;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.services.appengine.v1.model.Application;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.application.AppEngineAdminService;
 import com.google.cloud.tools.intellij.appengine.java.application.AppEngineApplicationCreateDialog;
 import com.google.cloud.tools.intellij.appengine.java.application.GoogleApiException;
-import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
@@ -76,7 +76,9 @@ public class AppEngineApplicationInfoPanel extends JPanel {
               }
 
               if (projectId == null || credential == null) {
-                setMessage(AppEngineMessageBundle.getString("appengine.infopanel.no.region"), true /* isError*/);
+                setMessage(
+                    AppEngineMessageBundle.getString("appengine.infopanel.no.region"),
+                    true /* isError*/);
                 return;
               }
 
@@ -91,7 +93,9 @@ public class AppEngineApplicationInfoPanel extends JPanel {
                   setCreateApplicationMessage(projectId, credential);
                 }
               } catch (IOException | GoogleApiException e) {
-                setMessage(AppEngineMessageBundle.message("appengine.application.region.fetch.error"), true);
+                setMessage(
+                    AppEngineMessageBundle.message("appengine.application.region.fetch.error"),
+                    true);
               }
             });
   }
@@ -132,9 +136,11 @@ public class AppEngineApplicationInfoPanel extends JPanel {
   }
 
   private void setCreateApplicationMessage(String projectId, Credential credential) {
-    String beforeLinkText = AppEngineMessageBundle.getString("appengine.application.not.exist") + " ";
+    String beforeLinkText =
+        AppEngineMessageBundle.getString("appengine.application.not.exist") + " ";
     String linkText = AppEngineMessageBundle.getString("appengine.application.create.linkText");
-    String afterLinkText = " " + AppEngineMessageBundle.getString("appengine.application.create.afterLinkText");
+    String afterLinkText =
+        " " + AppEngineMessageBundle.getString("appengine.application.create.afterLinkText");
     setMessage(
         () -> {
           messageText.addHyperlinkListener(

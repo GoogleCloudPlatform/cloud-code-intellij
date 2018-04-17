@@ -17,9 +17,9 @@
 package com.google.cloud.tools.intellij.appengine.java.sdk;
 
 import com.google.cloud.tools.intellij.GctFeature;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
-import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.intellij.icons.AllIcons.RunConfigurations;
