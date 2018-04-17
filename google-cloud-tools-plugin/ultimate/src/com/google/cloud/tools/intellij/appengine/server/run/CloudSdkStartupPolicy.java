@@ -76,6 +76,8 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
                       new CloudSdkStatusHandler() {
                         @Override
                         public void log(String s) {
+                          // TODO(ivanporty) figure out possibility of printing messages into
+                          // external process console
                           logger.info("Cloud SDK precondition check reported: " + s);
                         }
 
