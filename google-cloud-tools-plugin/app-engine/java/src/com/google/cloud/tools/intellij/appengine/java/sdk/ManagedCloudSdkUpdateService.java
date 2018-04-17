@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.sdk;
+package com.google.cloud.tools.intellij.appengine.java.sdk;
 
 import com.google.cloud.tools.intellij.GctFeature;
 import com.google.cloud.tools.intellij.service.PluginInfoService;

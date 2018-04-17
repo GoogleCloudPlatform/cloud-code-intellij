@@ -90,9 +90,9 @@ public class ManagedCloudSdkServiceUiPresenter {
       @NotNull ActionListener cancelListener, @NotNull ActionListener disableListener) {
     Notification notification =
         showNotification(
-            GctBundle.message("managedsdk.update.notification"), NotificationType.INFORMATION);
+            AppEngineMessageBundle.message("managedsdk.update.notification"), NotificationType.INFORMATION);
     notification.addAction(
-        new AnAction(GctBundle.message("managedsdk.update.notification.cancel")) {
+        new AnAction(AppEngineMessageBundle.message("managedsdk.update.notification.cancel")) {
           @Override
           public void actionPerformed(AnActionEvent e) {
             cancelListener.actionPerformed(new ActionEvent(notification, 0, ""));
@@ -100,7 +100,7 @@ public class ManagedCloudSdkServiceUiPresenter {
           }
         });
     notification.addAction(
-        new AnAction(GctBundle.message("managedsdk.update.notification.disable")) {
+        new AnAction(AppEngineMessageBundle.message("managedsdk.update.notification.disable")) {
           @Override
           public void actionPerformed(AnActionEvent e) {
             disableListener.actionPerformed(new ActionEvent(notification, 0, ""));

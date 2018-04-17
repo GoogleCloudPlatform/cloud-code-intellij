@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * <p>Enum elements marked {@link Deprecated} are fully released and no longer hidden behind a flag.
  */
-public enum 4GctFeature implements Feature {
+public enum GctFeature implements Feature {
 
   /**
    * Deprecating but not removing this feature as it serves as a useful sample and it's kinda nice

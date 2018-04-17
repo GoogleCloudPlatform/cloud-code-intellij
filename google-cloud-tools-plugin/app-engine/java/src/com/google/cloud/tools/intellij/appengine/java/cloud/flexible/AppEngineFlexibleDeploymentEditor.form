@@ -99,7 +99,7 @@
               </component>
             </children>
           </grid>
-          <nested-form id="3413a" form-file="com/google/cloud/tools/intellij/appengine/facet/flexible/AppEngineFlexibleRuntimePanel.form" binding="runtimePanel">
+          <nested-form id="3413a" form-file="com/google/cloud/tools/intellij/appengine/java/facet/flexible/AppEngineFlexibleRuntimePanel.form" binding="runtimePanel">
             <constraints>
               <grid row="2" column="1" row-span="1" col-span="5" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>

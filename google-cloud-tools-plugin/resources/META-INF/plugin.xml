@@ -398,7 +398,7 @@
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService"
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.DefaultCloudSdkService"/>
     <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator"/>
-    <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.ManagedCloudSdkUpdateService"/>
+    <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.java.sdk.ManagedCloudSdkUpdateService"/>
     <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceManager"/>
     <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService"
                         serviceImplementation="com.google.cloud.tools.intellij.appengine.java.sdk.DefaultCloudSdkService"/>
