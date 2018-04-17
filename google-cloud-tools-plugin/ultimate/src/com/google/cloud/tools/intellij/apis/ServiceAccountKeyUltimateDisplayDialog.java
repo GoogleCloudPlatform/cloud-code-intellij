@@ -98,6 +98,8 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
     }
   }
 
+  // TODO: use? createUIComponents gets called before configurationSettingsList is set
+  @VisibleForTesting
   public ServiceAccountKeyUltimateDisplayDialog(
       @Nullable Project project,
       @NotNull String gcpProjectId,
