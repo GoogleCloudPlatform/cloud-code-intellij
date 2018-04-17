@@ -21,7 +21,13 @@ import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
 
-/** Executor of {@link AppEngineTask}'s. */
+/**
+ * Executor of {@link AppEngineTask}s, including deployments and local server runs.
+ *
+ * <p>Once executor starts the {@link AppEngineTask} and receives the gcloud {@link Process}, it
+ * will obtain Cloud SDK read lock until the process is finished to protect Cloud SDK from
+ * intermediate modifications. See {@link CloudSdkServiceManager}.
+ */
 public class AppEngineExecutor implements CancellableRunnable {
 
   private Process process;
@@ -33,7 +39,15 @@ public class AppEngineExecutor implements CancellableRunnable {
 
   @Override
   public void run() {
-    task.execute(this::setProcess);
+    task.execute(
+        process -> {
+          AppEngineExecutor.this.process = process;
+          waitForProcessFinish(process);
+        });
+  }
+
+  public Process getProcess() {
+    return process;
   }
 
   @Override
@@ -45,9 +59,12 @@ public class AppEngineExecutor implements CancellableRunnable {
     }
   }
 
+  /**
+   * Waits for the given process to finish, in a separate background thread, holding {@link
+   * CloudSdkServiceManager#getSdkReadLock()} lock.
+   */
   @SuppressWarnings("FutureReturnValueIgnored")
-  private void setProcess(Process process) {
-    this.process = process;
+  private void waitForProcessFinish(Process process) {
     ThreadUtil.getInstance()
         .executeInBackground(
             () -> {
@@ -62,9 +79,5 @@ public class AppEngineExecutor implements CancellableRunnable {
                 CloudSdkServiceManager.getInstance().getSdkReadLock().unlock();
               }
             });
-  }
-
-  public Process getProcess() {
-    return process;
   }
 }
