@@ -255,9 +255,19 @@ public class CloudSdkServiceManager {
         break;
       case NOT_AVAILABLE:
       case INVALID:
-        String message = sdkLogging.getErrorMessage(postInstallSdkStatus);
+        String message;
+        NotificationType notificationType;
+        boolean fatalSdkError = !CloudSdkService.getInstance().isInstallSupported();
+        if (fatalSdkError) {
+          message = GctBundle.message("managedsdk.not.available");
+          notificationType = NotificationType.ERROR;
+        } else {
+          message = sdkLogging.getErrorMessage(postInstallSdkStatus);
+          notificationType = NotificationType.WARNING;
+        }
+
         sdkLogging.onError(message);
-        showCloudSdkNotification(message, NotificationType.ERROR);
+        showCloudSdkNotification(message, notificationType);
         break;
       default:
         // do nothing, no error, not ready.
@@ -270,19 +280,24 @@ public class CloudSdkServiceManager {
       Notification invalidSdkWarning =
           new Notification(
               new PropertiesFileFlagReader().getFlagString("notifications.plugin.groupdisplayid"),
-              GctBundle.message("settings.menu.item.cloud.sdk.text"),
+              GctBundle.message("cloudsdk.notification.title"),
               notificationMessage,
               notificationType);
-      // add a link to SDK settings for a quick fix.
-      invalidSdkWarning.addAction(
-          new AnAction(GctBundle.message("appengine.deployment.error.sdk.settings.action")) {
-            @Override
-            public void actionPerformed(AnActionEvent e) {
-              ShowSettingsUtil.getInstance().showSettingsDialog(null, CloudSdkConfigurable.class);
-              // expire if action has been called to avoid error hanging out forever.
-              invalidSdkWarning.expire();
-            }
-          });
+      // add a link to SDK settings for a quick fix if this is a fatal error.
+      if (notificationType == NotificationType.ERROR) {
+        invalidSdkWarning.addAction(
+            new AnAction(GctBundle.message("appengine.deployment.error.sdk.settings.action")) {
+              @Override
+              public void actionPerformed(AnActionEvent e) {
+                ShowSettingsUtil.getInstance()
+                    .showSettingsDialog(
+                        null /* IDE-wide settings, no project needed. */,
+                        CloudSdkConfigurable.class);
+                // expire if action has been called to avoid error hanging out forever.
+                invalidSdkWarning.expire();
+              }
+            });
+      }
 
       Notifications.Bus.notify(invalidSdkWarning);
     }

@@ -58,7 +58,7 @@ public class CloudSdkServiceUserSettings {
   }
 
   @NotNull
-  CloudSdkServiceType getUserSelectedSdkServiceType() {
+  public CloudSdkServiceType getUserSelectedSdkServiceType() {
     String sdkTypeName = propertiesComponent.getValue(SDK_TYPE_PROPERTY_NAME);
     CloudSdkServiceType sdkType;
     try {

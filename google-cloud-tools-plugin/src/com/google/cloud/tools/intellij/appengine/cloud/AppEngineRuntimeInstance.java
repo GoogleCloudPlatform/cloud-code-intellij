@@ -111,7 +111,6 @@ public class AppEngineRuntimeInstance
                         public String getErrorMessage(SdkStatus sdkStatus) {
                           switch (sdkStatus) {
                             case INVALID:
-                              return GctBundle.message("appengine.deployment.error.sdk.invalid");
                             case NOT_AVAILABLE:
                               return GctBundle.message(
                                   "appengine.deployment.error.sdk.not.available");

@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.javaee.supportProvider;
 
-import com.google.cloud.tools.intellij.debugger.CloudDebugProcessWatcher;
+import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcessWatcher;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportProviderTestCase;
 import com.intellij.javaee.appServerIntegrations.ApplicationServer;
 import com.intellij.javaee.serverInstances.ApplicationServersManager;
