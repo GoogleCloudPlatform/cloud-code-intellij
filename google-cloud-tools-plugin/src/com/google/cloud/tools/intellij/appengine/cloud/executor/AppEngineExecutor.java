@@ -41,8 +41,8 @@ public class AppEngineExecutor implements CancellableRunnable {
   public void run() {
     task.execute(
         process -> {
-          AppEngineExecutor.this.process = process;
-          waitForProcessFinish(process);
+          this.process = process;
+          holdCloudSdkReadLock(process);
         });
   }
 
@@ -64,7 +64,7 @@ public class AppEngineExecutor implements CancellableRunnable {
    * CloudSdkServiceManager#getSdkReadLock()} lock.
    */
   @SuppressWarnings("FutureReturnValueIgnored")
-  private void waitForProcessFinish(Process process) {
+  private void holdCloudSdkReadLock(Process process) {
     ThreadUtil.getInstance()
         .executeInBackground(
             () -> {
