@@ -53,7 +53,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -401,6 +403,75 @@ public class ManagedCloudSdkServiceTest {
 
     assertThat(statusCaptor.getAllValues())
         .isEqualTo(Arrays.asList(SdkStatus.INSTALLING, SdkStatus.NOT_AVAILABLE));
+  }
+
+  @Test
+  public void install_blocks_whenSDKReadOperations_running() throws Exception {
+    emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
+    SdkInstaller mockInstaller = mock(SdkInstaller.class);
+    when(mockManagedCloudSdk.newInstaller()).thenReturn(mockInstaller);
+
+    try {
+      CloudSdkServiceManager.getInstance().getSdkReadLock().lock();
+      // signal when install is about to start write operation.
+      CountDownLatch waitForInstallToStart = new CountDownLatch(1);
+      doAnswer(
+              invocationOnMock -> {
+                waitForInstallToStart.countDown();
+                return false;
+              })
+          .when(mockManagedCloudSdk)
+          .isInstalled();
+
+      Runnable installProcess = () -> sdkService.install();
+      Thread installProcessThread = new Thread(installProcess, "test-install-blocking-thread");
+      installProcessThread.start();
+      // do timed wait in case of test issues not to cause it to hang.
+      waitForInstallToStart.await(100, TimeUnit.MILLISECONDS);
+      installProcessThread.interrupt();
+      // finalize install()
+      installProcessThread.join();
+
+      // since the write block was not available at the install, install() should never be called.
+      verifyNoMoreInteractions(mockInstaller);
+    } finally {
+      CloudSdkServiceManager.getInstance().getSdkReadLock().unlock();
+    }
+  }
+
+  @Test
+  public void update_blocks_whenSDKReadOperations_running() throws Exception {
+    makeMockSdkInstalled(MOCK_SDK_PATH);
+    SdkUpdater mockUpdater = mock(SdkUpdater.class);
+    when(mockManagedCloudSdk.newUpdater()).thenReturn(mockUpdater);
+
+    try {
+      CloudSdkServiceManager.getInstance().getSdkReadLock().lock();
+      // signal when update is about to start write operation.
+      CountDownLatch waitForUpdateToStart = new CountDownLatch(1);
+      doAnswer(
+              invocationOnMock -> {
+                waitForUpdateToStart.countDown();
+                return false;
+              })
+          .when(mockManagedCloudSdk)
+          .isUpToDate();
+
+      Runnable updateProcess = () -> sdkService.update();
+      Thread updateProcessThread = new Thread(updateProcess, "test-update-blocking-thread");
+      updateProcessThread.start();
+      // do timed wait in case of test issues not to cause it to hang.
+      waitForUpdateToStart.await(100, TimeUnit.MILLISECONDS);
+      updateProcessThread.interrupt();
+      // finalize update()
+      updateProcessThread.join();
+
+      // since the write block was not available at the update time, update() should never be
+      // called.
+      verifyNoMoreInteractions(mockUpdater);
+    } finally {
+      CloudSdkServiceManager.getInstance().getSdkReadLock().unlock();
+    }
   }
 
   /** Mocks managed SDK as if installed and having App Engine Component. */

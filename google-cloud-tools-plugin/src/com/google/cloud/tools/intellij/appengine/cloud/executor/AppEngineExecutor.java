@@ -16,9 +16,18 @@
 
 package com.google.cloud.tools.intellij.appengine.cloud.executor;
 
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager;
+import com.google.cloud.tools.intellij.util.ThreadUtil;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
 
-/** Executor of {@link AppEngineTask}'s. */
+/**
+ * Executor of {@link AppEngineTask}s, including deployments and local server runs.
+ *
+ * <p>Once executor starts the {@link AppEngineTask} and receives the gcloud {@link Process}, it
+ * will obtain Cloud SDK read lock until the process is finished to protect Cloud SDK from
+ * intermediate modifications. See {@link CloudSdkServiceManager}.
+ */
 public class AppEngineExecutor implements CancellableRunnable {
 
   private Process process;
@@ -30,7 +39,15 @@ public class AppEngineExecutor implements CancellableRunnable {
 
   @Override
   public void run() {
-    task.execute(this::setProcess);
+    task.execute(
+        process -> {
+          this.process = process;
+          holdCloudSdkReadLock(process);
+        });
+  }
+
+  public Process getProcess() {
+    return process;
   }
 
   @Override
@@ -42,11 +59,25 @@ public class AppEngineExecutor implements CancellableRunnable {
     }
   }
 
-  private void setProcess(Process process) {
-    this.process = process;
-  }
-
-  public Process getProcess() {
-    return process;
+  /**
+   * Waits for the given process to finish, in a separate background thread, holding {@link
+   * CloudSdkServiceManager#getSdkReadLock()} lock.
+   */
+  @SuppressWarnings("FutureReturnValueIgnored")
+  private void holdCloudSdkReadLock(Process process) {
+    ThreadUtil.getInstance()
+        .executeInBackground(
+            () -> {
+              try {
+                CloudSdkServiceManager.getInstance().getSdkReadLock().lock();
+                process.waitFor();
+              } catch (InterruptedException e) {
+                // unexpected interruption, nothing can be done.
+                Logger.getInstance(AppEngineExecutor.class)
+                    .warn("Waiting for gcloud process unexpectedly interrupted", e);
+              } finally {
+                CloudSdkServiceManager.getInstance().getSdkReadLock().unlock();
+              }
+            });
   }
 }
