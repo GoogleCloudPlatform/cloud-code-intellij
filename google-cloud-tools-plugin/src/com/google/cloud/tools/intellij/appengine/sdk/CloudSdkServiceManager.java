@@ -266,7 +266,10 @@ public class CloudSdkServiceManager {
             new AnAction(GctBundle.message("appengine.deployment.error.sdk.settings.action")) {
               @Override
               public void actionPerformed(AnActionEvent e) {
-                ShowSettingsUtil.getInstance().showSettingsDialog(null, CloudSdkConfigurable.class);
+                ShowSettingsUtil.getInstance()
+                    .showSettingsDialog(
+                        null /* IDE-wide settings, no project needed. */,
+                        CloudSdkConfigurable.class);
                 // expire if action has been called to avoid error hanging out forever.
                 invalidSdkWarning.expire();
               }
