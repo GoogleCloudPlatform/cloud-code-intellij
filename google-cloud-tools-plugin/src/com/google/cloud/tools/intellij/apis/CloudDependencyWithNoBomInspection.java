@@ -24,7 +24,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.xml.XmlTag;
-import com.intellij.util.xml.DomFileElement;
 import com.intellij.util.xml.highlighting.DomElementAnnotationHolder;
 import com.intellij.util.xml.highlighting.DomElementsInspection;
 import java.util.Optional;
@@ -33,6 +32,7 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.dom.MavenDomUtil;
+import org.jetbrains.idea.maven.dom.model.MavenDomDependency;
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
@@ -54,36 +54,26 @@ public class CloudDependencyWithNoBomInspection extends CloudBomInspection {
     return GctBundle.message("cloud.libraries.with.no.bom.inspection.description");
   }
 
+  /** Only apply the inspection if there is no BOM defined. */
   @Override
-  public void checkFileElement(
-      DomFileElement<MavenDomProjectModel> domFileElement, DomElementAnnotationHolder holder) {
-
-    checkDependencyWithNoBom(domFileElement.getRootElement(), holder);
+  boolean shouldApplyInspection(Module module) {
+    return !CloudLibraryProjectState.getInstance(module.getProject())
+        .getCloudLibraryBomVersion(module)
+        .isPresent();
   }
 
-  private void checkDependencyWithNoBom(
-      MavenDomProjectModel projectModel, DomElementAnnotationHolder holder) {
-    Module module = projectModel.getModule();
-
-    if (module == null) {
-      return;
-    }
-
-    if (CloudLibraryProjectState.getInstance(module.getProject())
-        .getCloudLibraryBomVersion(module)
-        .isPresent()) {
-      return;
-    }
-
-    checkCloudDependencies(
-        projectModel,
-        module,
-        dependency ->
-            holder.createProblem(
-                dependency,
-                HighlightSeverity.GENERIC_SERVER_ERROR_OR_WARNING,
-                GctBundle.message("cloud.libraries.with.no.bom.inspection.problem.description"),
-                new AddBomAndStripVersionQuickFix(module)));
+  /**
+   * Display an inspection warning if there is a google-cloud dependency with no BOM and provides a
+   * quick fix to add the BOM and strip the version if present.
+   */
+  @Override
+  void inspectAndFix(
+      MavenDomDependency dependency, Module module, DomElementAnnotationHolder holder) {
+    holder.createProblem(
+        dependency,
+        HighlightSeverity.GENERIC_SERVER_ERROR_OR_WARNING,
+        GctBundle.message("cloud.libraries.with.no.bom.inspection.problem.description"),
+        new AddBomAndStripVersionQuickFix(module));
   }
 
   /**

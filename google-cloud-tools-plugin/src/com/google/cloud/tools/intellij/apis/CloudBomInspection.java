@@ -21,10 +21,11 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.IncorrectOperationException;
+import com.intellij.util.xml.DomFileElement;
 import com.intellij.util.xml.GenericDomValue;
+import com.intellij.util.xml.highlighting.DomElementAnnotationHolder;
 import com.intellij.util.xml.highlighting.DomElementsInspection;
 import java.util.Set;
-import java.util.function.Consumer;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.dom.model.MavenDomDependency;
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel;
@@ -42,19 +43,26 @@ abstract class CloudBomInspection extends DomElementsInspection<MavenDomProjectM
   }
 
   /**
-   * Iterates through the google cloud dependencies in the supplied {@link MavenDomProjectModel} and
-   * applies the given {@link Consumer} on the dependency to create the inspection warning and
-   * quickfix.
-   *
    * @param projectModel the DOM model of the given pom.xml
    * @param module the current module
    * @param inspectionAndQuickFix a consumer callback that applies the inspection warning and
    *     quickfix
    */
-  void checkCloudDependencies(
-      MavenDomProjectModel projectModel,
-      Module module,
-      Consumer<MavenDomDependency> inspectionAndQuickFix) {
+
+  /**
+   * Iterates through the google cloud dependencies in the supplied {@link MavenDomProjectModel} and
+   * applies the inspection warning and quickfix if applicable.
+   */
+  @Override
+  public void checkFileElement(
+      DomFileElement<MavenDomProjectModel> domFileElement, DomElementAnnotationHolder holder) {
+    MavenDomProjectModel projectModel = domFileElement.getRootElement();
+    Module module = projectModel.getModule();
+
+    if (module == null) {
+      return;
+    }
+
     Set<CloudLibrary> cloudLibraries =
         CloudLibraryProjectState.getInstance(module.getProject()).getCloudLibraries(module);
 
@@ -62,16 +70,34 @@ abstract class CloudBomInspection extends DomElementsInspection<MavenDomProjectM
       return;
     }
 
-    projectModel
-        .getDependencies()
-        .getDependencies()
-        .forEach(
-            dependency -> {
-              if (isCloudLibraryDependency(dependency, cloudLibraries)) {
-                inspectionAndQuickFix.accept(dependency);
-              }
-            });
+    if (shouldApplyInspection(module)) {
+      projectModel
+          .getDependencies()
+          .getDependencies()
+          .forEach(
+              dependency -> {
+                if (isCloudLibraryDependency(dependency, cloudLibraries)) {
+                  inspectAndFix(dependency, module, holder);
+                }
+              });
+    }
   }
+
+  /**
+   * Inspections should implement this to indicate if the given BOM inspection is applicable for the
+   * supplied {@link Module}.
+   */
+  abstract boolean shouldApplyInspection(Module module);
+
+  /**
+   * Inspections should implement this to provide the inspection and quickfix.
+   *
+   * @param dependency the dependency on which the inspection and quickfix should be applied
+   * @param module the module of the current pom.xml
+   * @param holder the holder of the inspection warning and quickfix
+   */
+  abstract void inspectAndFix(
+      MavenDomDependency dependency, Module module, DomElementAnnotationHolder holder);
 
   /** Deletes the supplied version {@link XmlTag}. */
   void stripVersion(XmlTag versionTag) {

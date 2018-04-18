@@ -52,46 +52,28 @@ public class CloudDependencyVersionWithBomInspection extends CloudBomInspection 
     return GctBundle.getString("cloud.libraries.version.with.bom.inspection.description");
   }
 
+  /** Only apply the inspection if there is a BOM defined. */
   @Override
-  public void checkFileElement(
-      DomFileElement<MavenDomProjectModel> domFileElement, DomElementAnnotationHolder holder) {
-    MavenDomProjectModel projectModel = domFileElement.getRootElement();
-
-    checkDependencyVersionWithBom(projectModel, holder);
+  boolean shouldApplyInspection(Module module) {
+    return CloudLibraryProjectState.getInstance(module.getProject())
+        .getCloudLibraryBomVersion(module)
+        .isPresent();
   }
 
   /**
-   * Locates google-cloud-java dependencies that have a version tag defined when a BOM is also
-   * imported in the pom.xml. Displays an inspection warning and suggests a quickfix to delete the
-   * version from the dependency.
+   * Displays an inspection warning and suggests a quickfix to delete the version from the google
+   * cloud dependency if it has a version defined.
    */
-  private void checkDependencyVersionWithBom(
-      MavenDomProjectModel projectModel, DomElementAnnotationHolder holder) {
-    Module module = projectModel.getModule();
-
-    if (module == null) {
-      return;
+  @Override
+  void inspectAndFix(
+      MavenDomDependency dependency, Module module, DomElementAnnotationHolder holder) {
+    if (hasVersion(dependency)) {
+      holder.createProblem(
+          dependency.getVersion(),
+          HighlightSeverity.GENERIC_SERVER_ERROR_OR_WARNING,
+          GctBundle.message("cloud.libraries.version.with.bom.inspection.problem.description"),
+          new StripDependencyVersionQuickFix());
     }
-
-    if (!CloudLibraryProjectState.getInstance(module.getProject())
-        .getCloudLibraryBomVersion(module)
-        .isPresent()) {
-      return;
-    }
-
-    checkCloudDependencies(
-        projectModel,
-        module,
-        dependency -> {
-          if (hasVersion(dependency)) {
-            holder.createProblem(
-                dependency.getVersion(),
-                HighlightSeverity.GENERIC_SERVER_ERROR_OR_WARNING,
-                GctBundle.message(
-                    "cloud.libraries.version.with.bom.inspection.problem.description"),
-                new StripDependencyVersionQuickFix());
-          }
-        });
   }
 
   /** Checks to see if the {@link MavenDomDependency} has a version defined. */
