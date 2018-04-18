@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.sdk;
 
 import com.google.cloud.tools.intellij.GctFeature;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.GctBundle;
@@ -31,21 +32,19 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.DocumentAdapter;
-import com.intellij.ui.HyperlinkAdapter;
-import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.UserActivityWatcher;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextPane;
 import javax.swing.event.DocumentEvent;
-import javax.swing.event.HyperlinkEvent;
 import org.jetbrains.annotations.NotNull;
 
 /** Reusable panel for configuring the path to the Cloud SDK from various contexts. */
@@ -59,8 +58,8 @@ public class CloudSdkPanel {
   private JRadioButton managedRadioButton;
   private JRadioButton customRadioButton;
   private JCheckBox enableAutomaticUpdatesCheckbox;
-  private HyperlinkLabel checkForUpdatesHyperlink;
   private JPanel managedSdkComponentsPanel;
+  private JButton updateNowButton;
 
   private static final String CLOUD_SDK_DOWNLOAD_LINK =
       "https://cloud.google.com/sdk/docs/"
@@ -191,6 +190,11 @@ public class CloudSdkPanel {
     return customRadioButton;
   }
 
+  @VisibleForTesting
+  public JButton getUpdateNowButton() {
+    return updateNowButton;
+  }
+
   public boolean isModified() {
     return settingsModified;
   }
@@ -286,12 +290,6 @@ public class CloudSdkPanel {
     }
   }
 
-  private void createUIComponents() {
-    checkForUpdatesHyperlink = new HyperlinkLabel();
-    checkForUpdatesHyperlink.setHyperlinkText(
-        GctBundle.getString("cloudsdk.check.for.updates.action"));
-  }
-
   private void initEvents() {
     // track all changes in UI to report settings changes.
     UserActivityWatcher activityWatcher = new UserActivityWatcher();
@@ -318,11 +316,14 @@ public class CloudSdkPanel {
           selectedCloudSdkServiceType = CloudSdkServiceType.CUSTOM_SDK;
         });
 
-    checkForUpdatesHyperlink.addHyperlinkListener(
-        new HyperlinkAdapter() {
-          @Override
-          protected void hyperlinkActivated(HyperlinkEvent e) {
-            // TODO(ivanporty) will call ManagedSdk#update if it's installed and active.
+    updateNowButton.addActionListener(
+        (e) -> {
+          CloudSdkService cloudSdkService = CloudSdkService.getInstance();
+          if (cloudSdkService instanceof ManagedCloudSdkService) {
+            ((ManagedCloudSdkService) cloudSdkService).update();
+            // do update call once and disable for visual feedback,
+            // since the following calls will essentially do nothing until update is complete.
+            updateNowButton.setEnabled(false);
           }
         });
 
@@ -347,7 +348,20 @@ public class CloudSdkPanel {
   private void setManagedSdkUiAvailable(boolean available) {
     if (ServiceManager.getService(PluginInfoService.class).shouldEnable(GctFeature.MANAGED_SDK)) {
       enableAutomaticUpdatesCheckbox.setEnabled(available);
-      checkForUpdatesHyperlink.setVisible(available);
+
+      // only make it visible if managed SDK is active, not currently installing or updating, and
+      // not up-to-date.
+      if (available
+          && CloudSdkServiceUserSettings.getInstance().getUserSelectedSdkServiceType()
+              == CloudSdkServiceType.MANAGED_SDK) {
+        ManagedCloudSdkService managedCloudSdkService =
+            (ManagedCloudSdkService) CloudSdkService.getInstance();
+        updateNowButton.setVisible(
+            managedCloudSdkService.getStatus() == SdkStatus.READY
+                && !managedCloudSdkService.isUpToDate());
+      } else {
+        updateNowButton.setVisible(false);
+      }
     }
   }
 
