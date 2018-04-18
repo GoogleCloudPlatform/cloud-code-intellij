@@ -129,7 +129,7 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
               Comparator.comparing(RunnerAndConfigurationSettings::getName),
               true);
     }
-    runConfigurationTable = new ServerTable(runConfigurationTableModel);
+    runConfigurationTable = new RunConfigurationTable(runConfigurationTableModel);
   }
 
   private List<RunnerAndConfigurationSettings> getAppEngineStandardConfigurationSettingsList() {
@@ -221,9 +221,9 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
   }
 
   /** The custom {@link JBTable} for the table of existing Google App Engine run configurations. */
-  private static final class ServerTable extends JBTable {
+  private static final class RunConfigurationTable extends JBTable {
 
-    ServerTable(BooleanTableModel<RunnerAndConfigurationSettings> tableModel) {
+    RunConfigurationTable(BooleanTableModel<RunnerAndConfigurationSettings> tableModel) {
       super(tableModel);
       setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
       setDefaultRenderer(
