@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.apis;
 
+import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
@@ -51,7 +52,7 @@ public class CloudDependencyWithNoBomInspection extends CloudBomInspection {
   @Nullable
   @Override
   public String getStaticDescription() {
-    return "Inspection that checks for a Google Cloud Dependency definition with no Google Cloud BOM";
+    return GctBundle.message("cloud.libraries.with.no.bom.inspection.description");
   }
 
   @Override
@@ -91,7 +92,7 @@ public class CloudDependencyWithNoBomInspection extends CloudBomInspection {
                 holder.createProblem(
                     dependency,
                     HighlightSeverity.GENERIC_SERVER_ERROR_OR_WARNING,
-                    "It is recommended to import the google-cloud-java BOM when using Google Cloud dependencies",
+                    GctBundle.message("cloud.libraries.with.no.bom.inspection.problem.description"),
                     new AddBomAndStripVersionQuickFix(module));
               }
             });
@@ -113,7 +114,7 @@ public class CloudDependencyWithNoBomInspection extends CloudBomInspection {
     @NotNull
     @Override
     public String getFamilyName() {
-      return "No google-cloud-bom found: add BOM";
+      return GctBundle.message("cloud.libraries.with.no.bom.quickfix.title");
     }
 
     @Override
