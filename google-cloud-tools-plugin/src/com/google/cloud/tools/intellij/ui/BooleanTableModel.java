@@ -25,8 +25,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,11 +37,11 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <T> the type of the item in the first column.
  */
-public class BooleanTableModel<T> implements TableModel {
+public class BooleanTableModel<T> extends AbstractTableModel {
 
   private final SortedMap<T, Boolean> map;
   private final List<TableModelListener> listeners = new ArrayList<>();
-  private final int T_COL = 0;
+  private final int VALUE_COL = 0;
   private final int BOOLEAN_COL = 1;
   private final Class<T> type;
 
@@ -85,7 +85,7 @@ public class BooleanTableModel<T> implements TableModel {
 
   @Override
   public Class<?> getColumnClass(int columnIndex) {
-    if (columnIndex == T_COL) {
+    if (columnIndex == VALUE_COL) {
       return type;
     }
     return Boolean.class;
@@ -98,7 +98,7 @@ public class BooleanTableModel<T> implements TableModel {
 
   @Override
   public Object getValueAt(int rowIndex, int columnIndex) {
-    if (columnIndex == T_COL) {
+    if (columnIndex == VALUE_COL) {
       return map.keySet().toArray()[rowIndex];
     }
     return map.values().toArray()[rowIndex];
@@ -106,24 +106,12 @@ public class BooleanTableModel<T> implements TableModel {
 
   @Override
   public void setValueAt(Object value, int rowIndex, int columnIndex) {
-    if (columnIndex == T_COL) {
+    if (columnIndex == VALUE_COL) {
       throw new UnsupportedOperationException("The first column is immutable.");
     }
 
     T key = (T) map.keySet().toArray()[rowIndex];
     map.put(key, (Boolean) value);
-
-    TableModelEvent event = new TableModelEvent(this, rowIndex);
-    listeners.forEach(listener -> listener.tableChanged(event));
-  }
-
-  @Override
-  public void addTableModelListener(TableModelListener l) {
-    listeners.add(l);
-  }
-
-  @Override
-  public void removeTableModelListener(TableModelListener l) {
-    listeners.remove(l);
+    fireTableCellUpdated(rowIndex, columnIndex);
   }
 }
