@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.login;
 
-import com.google.cloud.tools.intellij.debugger.CloudDebugProcessStateCollector;
+import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcessStateCollector;
 import com.google.cloud.tools.intellij.util.GctBundle;
 
 public class IntelliJGoogleLoginMessageExtender implements GoogleLoginMessageExtender {

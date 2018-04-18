@@ -33,9 +33,7 @@ import org.jetbrains.annotations.Nullable;
 public class DefaultCloudSdkService implements CloudSdkService {
 
   @Override
-  public void activate() {
-    // TODO track event that custom SDK is activated and used.
-  }
+  public void activate() {}
 
   @Nullable
   @Override
