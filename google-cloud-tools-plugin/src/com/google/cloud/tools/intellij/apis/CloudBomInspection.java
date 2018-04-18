@@ -91,7 +91,7 @@ abstract class CloudBomInspection extends DomElementsInspection<MavenDomProjectM
    * @return {@code true} if the maven dependency is a google cloud library, and {@code false}
    *     otherwise
    */
-  boolean isCloudLibraryDependency(
+  private boolean isCloudLibraryDependency(
       MavenDomDependency dependency, Set<CloudLibrary> cloudLibraries) {
     return cloudLibraries
         .stream()
