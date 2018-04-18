@@ -155,8 +155,8 @@ public class CloudDependencyWithNoBomInspection extends CloudBomInspection {
           }
         } else {
           logger.warn(
-              "Error adding bom when applying DependencyWithNoBom quickfix due to missing Maven Dom "
-                  + "Model");
+              "Error adding bom when applying DependencyWithNoBom quickfix due to missing Maven "
+                  + "Dom Model");
         }
       } else {
         logger.warn(
