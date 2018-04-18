@@ -63,7 +63,7 @@ public class CloudDependencyWithNoBomInspection extends CloudBomInspection {
   }
 
   /**
-   * Display an inspection warning if there is a google-cloud dependency with no BOM and provides a
+   * Displays an inspection warning if there is a google-cloud dependency with no BOM and provides a
    * quick fix to add the BOM and strip the version if present.
    */
   @Override

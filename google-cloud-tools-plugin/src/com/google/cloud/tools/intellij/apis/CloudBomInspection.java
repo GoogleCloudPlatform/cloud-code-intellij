@@ -43,7 +43,7 @@ abstract class CloudBomInspection extends DomElementsInspection<MavenDomProjectM
   }
 
   /**
-   * Iterates through the google cloud dependencies in the supplied {@link MavenDomProjectModel} and
+   * Iterates through the google-cloud dependencies in the supplied {@link MavenDomProjectModel} and
    * applies the inspection warning and quickfix if applicable.
    */
   @Override
