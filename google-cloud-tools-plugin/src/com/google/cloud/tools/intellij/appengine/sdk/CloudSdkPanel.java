@@ -356,10 +356,9 @@ public class CloudSdkPanel {
               == CloudSdkServiceType.MANAGED_SDK) {
         ManagedCloudSdkService managedCloudSdkService =
             (ManagedCloudSdkService) CloudSdkService.getInstance();
-        if (managedCloudSdkService.getStatus() == SdkStatus.READY
-            && !managedCloudSdkService.isUpToDate()) {
-          updateNowButton.setVisible(true);
-        }
+        updateNowButton.setVisible(
+            managedCloudSdkService.getStatus() == SdkStatus.READY
+                && !managedCloudSdkService.isUpToDate());
       } else {
         updateNowButton.setVisible(false);
       }
