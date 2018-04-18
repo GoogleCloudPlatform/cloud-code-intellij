@@ -75,10 +75,10 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
   private final String downloadPath;
   private JPanel mainPanel;
   private ServiceAccountKeyDownloadedPanel commonPanel;
-  private JTable table;
-  private JLabel label;
+  private JTable runConfigurationTable;
+  private JLabel runConfigurationUpdateLabel;
   private JScrollPane scrollPane;
-  private BooleanTableModel tableModel;
+  private BooleanTableModel<RunnerAndConfigurationSettings> runConfigurationTableModel;
 
   @VisibleForTesting public static List<RunnerAndConfigurationSettings> configurationSettingsList;
 
@@ -90,43 +90,12 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
     this.downloadPath = downloadPath;
     init();
     setTitle(GctBundle.message("cloud.apis.service.account.key.downloaded.title"));
-    table.setTableHeader(null);
+    runConfigurationTable.setTableHeader(null);
 
-    if (tableModel.getRowCount() == 0) {
-      label.setVisible(false);
+    if (runConfigurationTableModel.getRowCount() == 0) {
+      runConfigurationUpdateLabel.setVisible(false);
       scrollPane.setVisible(false);
-      table.setVisible(false);
-    }
-  }
-
-  // TODO: use? createUIComponents gets called before configurationSettingsList is set
-  @VisibleForTesting
-  public ServiceAccountKeyUltimateDisplayDialog(
-      @Nullable Project project,
-      @NotNull CloudProject cloudProject,
-      @NotNull String downloadPath,
-      @NotNull List<RunnerAndConfigurationSettings> configurationSettingsList) {
-    super(project);
-    this.project = project;
-    this.cloudProject = cloudProject;
-    this.downloadPath = downloadPath;
-    this.configurationSettingsList = configurationSettingsList;
-
-    tableModel =
-        new BooleanTableModel<>(
-            configurationSettingsList,
-            RunnerAndConfigurationSettings.class,
-            Comparator.comparing(RunnerAndConfigurationSettings::getName),
-            true);
-
-    init();
-    setTitle(GctBundle.message("cloud.apis.service.account.key.downloaded.title"));
-    table.setTableHeader(null);
-
-    if (tableModel.getRowCount() == 0) {
-      label.setVisible(false);
-      scrollPane.setVisible(false);
-      table.setVisible(false);
+      runConfigurationTable.setVisible(false);
     }
   }
 
@@ -141,7 +110,7 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
   protected Action[] createActions() {
     List<Action> actions = new ArrayList<>();
     actions.add(getOKAction());
-    if (tableModel.getRowCount() > 0) {
+    if (runConfigurationTableModel.getRowCount() > 0) {
       actions.add(new ApplyAction());
     }
     return actions.toArray(new Action[0]);
@@ -149,18 +118,18 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
 
   private void createUIComponents() {
     commonPanel = new ServiceAccountKeyDownloadedPanel(cloudProject.projectId(), downloadPath);
+    List<RunnerAndConfigurationSettings> configurationSettingsList =
+        getAppEngineStandardConfigurationSettingsList();
 
-    if (tableModel == null) {
-      List<RunnerAndConfigurationSettings> configurationSettingsList =
-          getAppEngineStandardConfigurationSettingsList();
-      tableModel =
+    if (runConfigurationTableModel == null) {
+      runConfigurationTableModel =
           new BooleanTableModel<>(
               configurationSettingsList,
               RunnerAndConfigurationSettings.class,
               Comparator.comparing(RunnerAndConfigurationSettings::getName),
               true);
     }
-    table = new ServerTable(tableModel);
+    runConfigurationTable = new ServerTable(runConfigurationTableModel);
   }
 
   private List<RunnerAndConfigurationSettings> getAppEngineStandardConfigurationSettingsList() {
@@ -173,7 +142,7 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
   }
 
   private Set<RunnerAndConfigurationSettings> getSelectedConfigurations() {
-    return tableModel.getSelectedItems();
+    return runConfigurationTableModel.getSelectedItems();
   }
 
   @VisibleForTesting
@@ -193,20 +162,20 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
       String executorId, RunnerAndConfigurationSettings configuration) {
     ProgramRunner runner = ProgramRunnerUtil.getRunner(executorId, configuration);
     if (runner == null) {
-      LOG.error(
-          "Error updating "
-              + configuration.getName()
-              + " with Google Cloud Library environment variables");
+      setErrorText(
+          GctBundle.message(
+              "cloud.apis.service.account.key.dialog.update.configuration.error",
+              configuration.getName()));
       return;
     }
 
     RunnerSpecificLocalConfigurationBit configurationSettings =
         (RunnerSpecificLocalConfigurationBit) configuration.getConfigurationSettings(runner);
     if (configurationSettings == null) {
-      LOG.error(
-          "Error updating "
-              + configuration.getName()
-              + " with Google Cloud Library environment variables");
+      setErrorText(
+          GctBundle.message(
+              "cloud.apis.service.account.key.dialog.update.configuration.error",
+              configuration.getName()));
       return;
     }
 
@@ -235,8 +204,8 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
   }
 
   @VisibleForTesting
-  public JTable getTable() {
-    return table;
+  public JTable getRunConfigurationTable() {
+    return runConfigurationTable;
   }
 
   /** Adds the Cloud Library environment variables to the selected App Engine run configurations. */
@@ -261,7 +230,7 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
           RunnerAndConfigurationSettings.class, new RunnerAndConfigurationSettingsRenderer());
       setDefaultRenderer(Boolean.class, new BooleanTableCellRenderer());
       setDefaultEditor(Boolean.class, new BooleanTableCellEditor());
-      TableUtil.setupCheckboxColumn(getColumnModel().getColumn(tableModel.getBooleanColumn()));
+      TableUtil.setupCheckboxColumn(this, tableModel.getBooleanColumn());
     }
 
     /** See {@link com.intellij.ide.plugins.PluginTable#paint(Graphics)} for reasoning. */

@@ -69,7 +69,7 @@ public class ServiceAccountKeyUltimateDisplayDialogTest {
   @Test
   public void configurationTable_whenConfigurationsDoNotExist_Hidden() {
     launchDialog(new ArrayList<>());
-    assertFalse(dialog.getTable().isVisible());
+    assertFalse(dialog.getRunConfigurationTable().isVisible());
   }
 
   @Test
@@ -77,7 +77,7 @@ public class ServiceAccountKeyUltimateDisplayDialogTest {
     when(mockRunnerAndConfigurationSettings.getName()).thenReturn("name");
     launchDialog(Arrays.asList(mockRunnerAndConfigurationSettings));
 
-    assertTrue(dialog.getTable().isVisible());
+    assertTrue(dialog.getRunConfigurationTable().isVisible());
   }
 
   @Test
