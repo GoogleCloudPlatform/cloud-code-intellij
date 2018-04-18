@@ -29,10 +29,8 @@ import com.google.cloud.tools.intellij.appengine.java.facet.standard.MavenReposi
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkInternals;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceManager;
-import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceUserSettings;
 import com.google.cloud.tools.intellij.appengine.java.ultimate.artifacts.ArtifactsTestUtil;
 import com.google.cloud.tools.intellij.appengine.java.ultimate.server.run.AppEngineServerConfigurationType;
-import com.intellij.appengine.AppEngineCodeInsightTestCase;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.facet.FacetManager;
@@ -149,8 +147,6 @@ public class AppEngineStandardSupportProviderTest extends JavaeeFrameworkSupport
     if (libraryPanel != null && configurable instanceof AppEngineSupportConfigurable) {
       ((AppEngineSupportConfigurable) configurable).setAppEngineStandardLibraryPanel(libraryPanel);
     }
-    CloudSdkServiceUserSettings.getInstance()
-        .setCustomSdkPath(AppEngineCodeInsightTestCase.getSdkPath());
   }
 
   @NotNull

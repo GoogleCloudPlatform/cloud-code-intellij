@@ -366,10 +366,8 @@
   <xi:include href="/META-INF/stackdriver-debugger.xml" xpointer="xpointer(/idea-plugin/*)"/>
 
   <depends>com.intellij.modules.lang</depends>
+  <depends>com.intellij.modules.java</depends>
   <depends>com.intellij.modules.vcs</depends>
-  <depends>com.intellij.modules.xml</depends>
-  <depends>org.jetbrains.plugins.gradle</depends>
-  <depends>org.jetbrains.plugins.yaml</depends>
   <depends>Git4Idea</depends>
   <depends>org.jetbrains.idea.maven</depends>
 
@@ -423,25 +421,22 @@
       <add-to-group group-id="Vcs.Import"/>
     </action>
 
-    <group id="GoogleCloudTools" class="com.google.cloud.tools.intellij.CloudToolsMenuGroupAction" popup="true">
-      <group id="AddAppEngineFrameworkSupport" class="com.google.cloud.tools.intellij.appengine.java.facet.AddAppEngineFrameworkSupportMenuGroupAction" popup="true">
-        <action id="AddAppEngineFrameworkSupport.Standard" class="com.google.cloud.tools.intellij.appengine.java.facet.standard.AddAppEngineStandardFrameworkSupportToolsMenuAction"/>
-        <action id="AddAppEngineFrameworkSupport.Flexible" class="com.google.cloud.tools.intellij.appengine.java.facet.flexible.AddAppEngineFlexibleFrameworkSupportToolsMenuAction"/>
-      </group>
-      <action id="GoogleCloudTools.AppEngineDeploy" class="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeployToolsMenuAction"/>
-      <separator/>
-      <action id="GoogleCloudTools.CloudDebugger" class="com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebuggerToolsMenuAction"/>
-      <separator/>
-      <reference ref="GoogleCloudTools.UploadSourceToGCP"/>
-      <separator/>
-      <action id="GoogleCloudTools.CloudStorage" class="com.google.cloud.tools.intellij.gcs.GcsToolWindowAction"/>
-      <separator/>
-      <action id="GoogleCloudTools.AddCloudLibraries" class="com.google.cloud.tools.intellij.apis.AddCloudLibrariesAction"/>
-      <separator/>
-      <action id="GoogleCloudTools.Feedback" class="com.google.cloud.tools.intellij.CloudToolsFeedbackAction"/>
+    <action id="GoogleCloudTools.CloudDebugger" class="com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebuggerToolsMenuAction">
+      <add-to-group group-id="GoogleCloudTools"/>
+    </action>
+    <reference ref="GoogleCloudTools.UploadSourceToGCP">
+      <add-to-group group-id="GoogleCloudTools"/>
+    </reference>
+    <action id="GoogleCloudTools.CloudStorage" class="com.google.cloud.tools.intellij.gcs.GcsToolWindowAction">
+      <add-to-group group-id="GoogleCloudTools"/>
+    </action>
+    <action id="GoogleCloudTools.AddCloudLibraries" class="com.google.cloud.tools.intellij.apis.AddCloudLibrariesAction">
+      <add-to-group group-id="GoogleCloudTools"/>
+    </action>
 
-      <add-to-group group-id="ToolsMenu" anchor="last"/>
-    </group>
+    <action id="GoogleCloudTools.Feedback" class="com.google.cloud.tools.intellij.CloudToolsFeedbackAction">
+      <add-to-group group-id="GoogleCloudTools"/>
+    </action>
 
   </actions>
 

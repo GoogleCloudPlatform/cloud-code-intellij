@@ -19,5 +19,4 @@
   <extensions defaultExtensionNs="org.jetbrains.idea.maven">
     <importer implementation="com.google.cloud.tools.intellij.appengine.java.maven.AppEngineFacetImporter"/>
   </extensions>
-
 </idea-plugin>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij;
 
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 
 /**
@@ -26,7 +25,8 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 public class CloudToolsMenuGroupAction extends DefaultActionGroup {
 
   public CloudToolsMenuGroupAction() {
-    getTemplatePresentation().setText(GctBundle.message("cloud.tools.group.menu.text"));
+    getTemplatePresentation()
+        .setText(GoogleCloudCoreMessageBundle.message("cloud.tools.group.menu.text"));
     getTemplatePresentation().setIcon(GoogleCloudCoreIcons.CLOUD);
   }
 }
