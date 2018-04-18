@@ -70,17 +70,32 @@ public class ServiceAccountKeyUltimateDisplayDialogTest {
   private ServiceAccountKeyUltimateDisplayDialog dialog;
 
   @Test
-  public void configurationTable_whenConfigurationsDoNotExist_Hidden() {
+  public void runConfigurationTable_whenConfigurationsDoNotExist_Hidden() {
     launchDialog(new ArrayList<>());
     assertFalse(dialog.getRunConfigurationTable().isVisible());
   }
 
   @Test
-  public void configurationTable_whenConfigurationsExist_Visible() {
+  public void runConfigurationTable_whenConfigurationsExist_Visible() {
     when(mockRunnerAndConfigurationSettings.getName()).thenReturn("name");
     launchDialog(Arrays.asList(mockRunnerAndConfigurationSettings));
 
     assertTrue(dialog.getRunConfigurationTable().isVisible());
+  }
+
+  @Test
+  public void runConfigurationTable_verifyValues() {
+    RunnerSpecificLocalConfigurationBit runnerSpecificLocalConfigurationBit =
+        new RunnerSpecificLocalConfigurationBit(new TestConfigurationInfoProvider());
+    runnerSpecificLocalConfigurationBit.setEnvironmentVariables(new ArrayList<>());
+    setUpInitialConfiguration(runnerSpecificLocalConfigurationBit);
+    launchDialog(Arrays.asList(mockRunnerAndConfigurationSettings));
+
+    JTable runConfigurationTable = dialog.getRunConfigurationTable();
+    assertEquals(1, runConfigurationTable.getRowCount());
+    assertEquals(2, runConfigurationTable.getColumnCount());
+    assertEquals(mockRunnerAndConfigurationSettings, runConfigurationTable.getModel().getValueAt(0, 0));
+    assertEquals(true, runConfigurationTable.getModel().getValueAt(0, 1));
   }
 
   @Test
@@ -130,21 +145,6 @@ public class ServiceAccountKeyUltimateDisplayDialogTest {
         containsEnvironmentVariable(
             actualEnvVars,
             new EnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "downloadPath", false)));
-  }
-
-  @Test
-  public void runConfigurationTable_verifyValues() {
-    RunnerSpecificLocalConfigurationBit runnerSpecificLocalConfigurationBit =
-        new RunnerSpecificLocalConfigurationBit(new TestConfigurationInfoProvider());
-    runnerSpecificLocalConfigurationBit.setEnvironmentVariables(new ArrayList<>());
-    setUpInitialConfiguration(runnerSpecificLocalConfigurationBit);
-    launchDialog(Arrays.asList(mockRunnerAndConfigurationSettings));
-
-    JTable runConfigurationTable = dialog.getRunConfigurationTable();
-    assertEquals(1, runConfigurationTable.getRowCount());
-    assertEquals(2, runConfigurationTable.getColumnCount());
-    assertEquals(mockRunnerAndConfigurationSettings, runConfigurationTable.getModel().getValueAt(0, 0));
-    assertEquals(true, runConfigurationTable.getModel().getValueAt(0, 1));
   }
 
   private void setUpInitialConfiguration(
