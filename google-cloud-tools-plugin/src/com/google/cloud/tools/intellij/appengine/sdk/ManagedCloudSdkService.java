@@ -34,6 +34,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.util.ThrowableRunnable;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.concurrent.Callable;
@@ -206,7 +207,8 @@ public class ManagedCloudSdkService implements CloudSdkService {
       progressListener =
           ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
 
-      managedCloudSdk.newInstaller().install(progressListener, sdkConsoleListener);
+      executeWithSdkWriteLock(
+          () -> managedCloudSdk.newInstaller().install(progressListener, sdkConsoleListener));
 
       return ManagedSdkJobResult.PROCESSED;
     }
@@ -220,10 +222,12 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
       progressListener =
           ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
-      managedCloudSdk
-          .newComponentInstaller()
-          .installComponent(
-              SdkComponent.APP_ENGINE_JAVA, progressListener, appEngineConsoleListener);
+      executeWithSdkWriteLock(
+          () ->
+              managedCloudSdk
+                  .newComponentInstaller()
+                  .installComponent(
+                      SdkComponent.APP_ENGINE_JAVA, progressListener, appEngineConsoleListener));
 
       return ManagedSdkJobResult.PROCESSED;
     } else {
@@ -238,11 +242,35 @@ public class ManagedCloudSdkService implements CloudSdkService {
       progressListener =
           ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
 
-      managedCloudSdk.newUpdater().update(progressListener, sdkUpdateListener);
+      executeWithSdkWriteLock(
+          () -> managedCloudSdk.newUpdater().update(progressListener, sdkUpdateListener));
 
       return ManagedSdkJobResult.PROCESSED;
     } else {
       return ManagedSdkJobResult.UP_TO_DATE;
+    }
+  }
+
+  private void executeWithSdkWriteLock(ThrowableRunnable<Exception> runWithLock) throws Exception {
+    try {
+      // if write lock is not available, show a progress to a user that all SDK processes must be
+      // finished in order to update SDK.
+      if (!CloudSdkServiceManager.getInstance().getSdkWriteLock().tryLock()) {
+        ProgressListener waitForSdkProcessesProgress =
+            ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
+        waitForSdkProcessesProgress.start(
+            GctBundle.message("managedsdk.progress.wait.for.processes"), ProgressListener.UNKNOWN);
+        try {
+          CloudSdkServiceManager.getInstance().getSdkWriteLock().lockInterruptibly();
+        } finally {
+          // make sure the indicator goes away in case of this job error/cancel
+          waitForSdkProcessesProgress.done();
+        }
+      }
+
+      runWithLock.run();
+    } finally {
+      CloudSdkServiceManager.getInstance().getSdkWriteLock().unlock();
     }
   }
 
