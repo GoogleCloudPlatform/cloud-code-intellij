@@ -31,11 +31,11 @@ import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel;
  * Base {@link DomElementsInspection} for inspecting google-cloud-java BOM related issues in the
  * project's pom.xml.
  */
-class CloudBomInspection extends DomElementsInspection<MavenDomProjectModel> {
+abstract class CloudBomInspection extends DomElementsInspection<MavenDomProjectModel> {
 
   private static final Logger logger = Logger.getInstance(CloudBomInspection.class);
 
-  public CloudBomInspection() {
+  CloudBomInspection() {
     super(MavenDomProjectModel.class);
   }
 
