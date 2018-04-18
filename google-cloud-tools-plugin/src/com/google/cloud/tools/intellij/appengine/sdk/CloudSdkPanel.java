@@ -32,21 +32,19 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.DocumentAdapter;
-import com.intellij.ui.HyperlinkAdapter;
-import com.intellij.ui.HyperlinkLabel;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.UserActivityWatcher;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextPane;
 import javax.swing.event.DocumentEvent;
-import javax.swing.event.HyperlinkEvent;
 import org.jetbrains.annotations.NotNull;
 
 /** Reusable panel for configuring the path to the Cloud SDK from various contexts. */
@@ -60,8 +58,8 @@ public class CloudSdkPanel {
   private JRadioButton managedRadioButton;
   private JRadioButton customRadioButton;
   private JCheckBox enableAutomaticUpdatesCheckbox;
-  private HyperlinkLabel checkForUpdatesHyperlink;
   private JPanel managedSdkComponentsPanel;
+  private JButton updateNowButton;
 
   private static final String CLOUD_SDK_DOWNLOAD_LINK =
       "https://cloud.google.com/sdk/docs/"
@@ -188,13 +186,13 @@ public class CloudSdkPanel {
   }
 
   @VisibleForTesting
-  public HyperlinkLabel getCheckForUpdatesHyperlink() {
-    return checkForUpdatesHyperlink;
+  JRadioButton getCustomRadioButton() {
+    return customRadioButton;
   }
 
   @VisibleForTesting
-  JRadioButton getCustomRadioButton() {
-    return customRadioButton;
+  public JButton getUpdateNowButton() {
+    return updateNowButton;
   }
 
   public boolean isModified() {
@@ -292,12 +290,6 @@ public class CloudSdkPanel {
     }
   }
 
-  private void createUIComponents() {
-    checkForUpdatesHyperlink = new HyperlinkLabel();
-    checkForUpdatesHyperlink.setHyperlinkText(
-        GctBundle.getString("cloudsdk.check.for.updates.action"));
-  }
-
   private void initEvents() {
     // track all changes in UI to report settings changes.
     UserActivityWatcher activityWatcher = new UserActivityWatcher();
@@ -324,17 +316,14 @@ public class CloudSdkPanel {
           selectedCloudSdkServiceType = CloudSdkServiceType.CUSTOM_SDK;
         });
 
-    checkForUpdatesHyperlink.addHyperlinkListener(
-        new HyperlinkAdapter() {
-          @Override
-          protected void hyperlinkActivated(HyperlinkEvent e) {
-            CloudSdkService cloudSdkService = CloudSdkService.getInstance();
-            if (cloudSdkService instanceof ManagedCloudSdkService) {
-              ((ManagedCloudSdkService) cloudSdkService).update();
-              // do update call once and disable for visual feedback,
-              // since the following calls will essentially do nothing until update is complete.
-              checkForUpdatesHyperlink.setVisible(false);
-            }
+    updateNowButton.addActionListener(
+        (e) -> {
+          CloudSdkService cloudSdkService = CloudSdkService.getInstance();
+          if (cloudSdkService instanceof ManagedCloudSdkService) {
+            ((ManagedCloudSdkService) cloudSdkService).update();
+            // do update call once and disable for visual feedback,
+            // since the following calls will essentially do nothing until update is complete.
+            updateNowButton.setEnabled(false);
           }
         });
 
@@ -369,10 +358,10 @@ public class CloudSdkPanel {
             (ManagedCloudSdkService) CloudSdkService.getInstance();
         if (managedCloudSdkService.getStatus() == SdkStatus.READY
             && !managedCloudSdkService.isUpToDate()) {
-          checkForUpdatesHyperlink.setVisible(true);
+          updateNowButton.setVisible(true);
         }
       } else {
-        checkForUpdatesHyperlink.setVisible(false);
+        updateNowButton.setVisible(false);
       }
     }
   }

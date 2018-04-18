@@ -321,7 +321,7 @@ public class CloudSdkPanelTest {
                   .setUserSelectedSdkServiceType(CloudSdkServiceType.MANAGED_SDK);
               sdkPanel.reset();
 
-              assertThat(sdkPanel.getCheckForUpdatesHyperlink().isVisible()).isFalse();
+              assertThat(sdkPanel.getUpdateNowButton().isVisible()).isFalse();
             });
   }
 
@@ -341,7 +341,7 @@ public class CloudSdkPanelTest {
                   .setUserSelectedSdkServiceType(CloudSdkServiceType.MANAGED_SDK);
               sdkPanel.reset();
 
-              assertThat(sdkPanel.getCheckForUpdatesHyperlink().isVisible()).isFalse();
+              assertThat(sdkPanel.getUpdateNowButton().isVisible()).isFalse();
             });
   }
 
@@ -361,7 +361,7 @@ public class CloudSdkPanelTest {
                   .setUserSelectedSdkServiceType(CloudSdkServiceType.MANAGED_SDK);
               sdkPanel.reset();
 
-              assertThat(sdkPanel.getCheckForUpdatesHyperlink().isVisible()).isTrue();
+              assertThat(sdkPanel.getUpdateNowButton().isVisible()).isTrue();
             });
   }
 
