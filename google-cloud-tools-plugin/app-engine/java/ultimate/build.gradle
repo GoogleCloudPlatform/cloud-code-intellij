@@ -47,5 +47,3 @@ dependencies {
     testCompile project(':google-cloud-tools-plugin:google-cloud-core')
     testCompile project(':common-test-lib')
 }
-
-
