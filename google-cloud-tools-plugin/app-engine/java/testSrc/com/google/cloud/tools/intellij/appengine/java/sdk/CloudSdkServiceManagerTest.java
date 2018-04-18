@@ -137,7 +137,7 @@ public class CloudSdkServiceManagerTest {
   public void installingSdk_then_invalidSdk_showsErrorNotification() {
     mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.INVALID);
     when(mockStatusHandler.getErrorMessage(SdkStatus.INVALID))
-        .thenReturn(AppEngineMessageBundle.message("appengine.deployment.error.sdk.invalid"));
+        .thenReturn(AppEngineMessageBundle.message("appengine.deployment.error.sdk.not.available"));
 
     cloudSdkServiceManager.runWhenSdkReady(mockProject, mockRunnable, "", mockStatusHandler);
 
@@ -146,8 +146,8 @@ public class CloudSdkServiceManagerTest {
             () ->
                 verify(cloudSdkServiceManager)
                     .showCloudSdkNotification(
-                        AppEngineMessageBundle.message("appengine.deployment.error.sdk.invalid"),
-                        NotificationType.ERROR));
+                        AppEngineMessageBundle.message("appengine.deployment.error.sdk.not.available"),
+                        NotificationType.WARNING));
   }
 
   @Test
@@ -163,7 +163,24 @@ public class CloudSdkServiceManagerTest {
         .invokeAndWait(
             () ->
                 verify(cloudSdkServiceManager)
-                    .showCloudSdkNotification("invalid SDK after waiting", NotificationType.ERROR));
+                    .showCloudSdkNotification(
+                        "invalid SDK after waiting", NotificationType.WARNING));
+  }
+
+  @Test
+  public void waitFor_when_sdkInstallNotSupported_showsFatalErrorNotification()
+      throws InterruptedException {
+    mockSdkStatusChange(SdkStatus.NOT_AVAILABLE, SdkStatus.NOT_AVAILABLE);
+    when(mockSdkService.isInstallSupported()).thenReturn(false);
+
+    cloudSdkServiceManager.blockUntilSdkReady(mockProject, "", mockStatusHandler);
+
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () ->
+                verify(cloudSdkServiceManager)
+                    .showCloudSdkNotification(
+                        AppEngineMessageBundle.message("managedsdk.not.available"), NotificationType.ERROR));
   }
 
   private void mockSdkStatusChange(SdkStatus fromStatus, SdkStatus toStatus) {

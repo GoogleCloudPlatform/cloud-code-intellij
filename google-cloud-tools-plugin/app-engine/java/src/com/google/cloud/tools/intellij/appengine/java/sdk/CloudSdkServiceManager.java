@@ -40,6 +40,9 @@ import com.intellij.openapi.wm.WindowManager;
 import com.intellij.openapi.wm.ex.StatusBarEx;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,9 +52,13 @@ import org.jetbrains.annotations.Nullable;
  * <p>Provides support for blocking / tracking {@link CloudSdkService#install()} process and other
  * SDK preconditions so that dependent deployment processes can be postponed until SDK is completely
  * ready.
+ *
+ * <p>Provides read/write SDK locking for prevent operations on SDK under write modifications.
  */
 public class CloudSdkServiceManager {
   private final Map<CloudSdkServiceType, CloudSdkService> supportedCloudSdkServices;
+
+  private final ReadWriteLock sdkReadWriteOperationLock = new ReentrantReadWriteLock();
 
   public static CloudSdkServiceManager getInstance() {
     return ServiceManager.getService(CloudSdkServiceManager.class);
@@ -75,6 +82,22 @@ public class CloudSdkServiceManager {
     } else {
       throw new UnsupportedCloudSdkTypeException(newServiceType.name());
     }
+  }
+
+  /**
+   * Lock to be acquired on all SDK read (i.e. execute gcloud) operations. Can be held by multiple
+   * operations simultaneously.
+   */
+  public Lock getSdkReadLock() {
+    return sdkReadWriteOperationLock.readLock();
+  }
+
+  /**
+   * Lock to be acquired on all SDK write (i.e. delete, replace, update SDK files) operations.
+   * Exclusive, can only be held when all read operations are complete.
+   */
+  public Lock getSdkWriteLock() {
+    return sdkReadWriteOperationLock.writeLock();
   }
 
   /**
@@ -232,9 +255,19 @@ public class CloudSdkServiceManager {
         break;
       case NOT_AVAILABLE:
       case INVALID:
-        String message = sdkLogging.getErrorMessage(postInstallSdkStatus);
+        String message;
+        NotificationType notificationType;
+        boolean fatalSdkError = !CloudSdkService.getInstance().isInstallSupported();
+        if (fatalSdkError) {
+          message = AppEngineMessageBundle.message("managedsdk.not.available");
+          notificationType = NotificationType.ERROR;
+        } else {
+          message = sdkLogging.getErrorMessage(postInstallSdkStatus);
+          notificationType = NotificationType.WARNING;
+        }
+
         sdkLogging.onError(message);
-        showCloudSdkNotification(message, NotificationType.ERROR);
+        showCloudSdkNotification(message, notificationType);
         break;
       default:
         // do nothing, no error, not ready.
@@ -247,20 +280,24 @@ public class CloudSdkServiceManager {
       Notification invalidSdkWarning =
           new Notification(
               new PropertiesFileFlagReader().getFlagString("notifications.plugin.groupdisplayid"),
-              AppEngineMessageBundle.message("settings.menu.item.cloud.sdk.text"),
+              AppEngineMessageBundle.message("cloudsdk.notification.title"),
               notificationMessage,
               notificationType);
-      // add a link to SDK settings for a quick fix.
-      invalidSdkWarning.addAction(
-          new AnAction(
-              AppEngineMessageBundle.message("appengine.deployment.error.sdk.settings.action")) {
-            @Override
-            public void actionPerformed(AnActionEvent e) {
-              ShowSettingsUtil.getInstance().showSettingsDialog(null, CloudSdkConfigurable.class);
-              // expire if action has been called to avoid error hanging out forever.
-              invalidSdkWarning.expire();
-            }
-          });
+      // add a link to SDK settings for a quick fix if this is a fatal error.
+      if (notificationType == NotificationType.ERROR) {
+        invalidSdkWarning.addAction(
+            new AnAction(AppEngineMessageBundle.message("appengine.deployment.error.sdk.settings.action")) {
+              @Override
+              public void actionPerformed(AnActionEvent e) {
+                ShowSettingsUtil.getInstance()
+                    .showSettingsDialog(
+                        null /* IDE-wide settings, no project needed. */,
+                        CloudSdkConfigurable.class);
+                // expire if action has been called to avoid error hanging out forever.
+                invalidSdkWarning.expire();
+              }
+            });
+      }
 
       Notifications.Bus.notify(invalidSdkWarning);
     }

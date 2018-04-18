@@ -82,7 +82,7 @@ class ManagedCloudSdkProgressListener implements ProgressListener {
 
   @Override
   public void done() {
-    if (!progressIndicator.isFinished(task)) {
+    if (progressIndicator != null && !progressIndicator.isFinished(task)) {
       progressIndicator.finish(task);
       progressIndicator.dispose();
     }
