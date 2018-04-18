@@ -282,7 +282,7 @@ final class GoogleCloudApiSelectorPanel {
   // TODO (eshaul): make async with loader icons
   private void populateBomVersions() {
     List<String> availableBomVersions =
-        Lists.newArrayList(CloudApiMavenService.getInstance().getBomVersions());
+        Lists.newArrayList(CloudApiMavenService.getInstance().getAllBomVersions());
 
     Optional<String> configuredBomVersion =
         CloudLibraryProjectState.getInstance(project)

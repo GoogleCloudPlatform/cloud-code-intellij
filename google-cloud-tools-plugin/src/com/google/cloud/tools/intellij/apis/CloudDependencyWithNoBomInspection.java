@@ -27,6 +27,7 @@ import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.xml.DomFileElement;
 import com.intellij.util.xml.highlighting.DomElementAnnotationHolder;
 import com.intellij.util.xml.highlighting.DomElementsInspection;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.Nls;
@@ -142,8 +143,16 @@ public class CloudDependencyWithNoBomInspection extends CloudBomInspection {
         MavenDomProjectModel model =
             MavenDomUtil.getMavenDomProjectModel(project, mavenProject.getFile());
         if (model != null) {
-          // TODO fetch the latest BOM version
-          CloudLibraryDependencyWriter.writeNewBom(model, "0.0.0.9");
+          Optional<String> latestBomVersion =
+              CloudApiMavenService.getInstance().getLatestBomVersion();
+
+          if (latestBomVersion.isPresent()) {
+            CloudLibraryDependencyWriter.writeNewBom(model, latestBomVersion.get());
+          } else {
+            logger.warn(
+                "Error adding bom when applying DependencyWithNoBom quickfix since latest BOM "
+                    + "could not be fetched from Maven Central");
+          }
         } else {
           logger.warn(
               "Error adding bom when applying DependencyWithNoBom quickfix due to missing Maven Dom "

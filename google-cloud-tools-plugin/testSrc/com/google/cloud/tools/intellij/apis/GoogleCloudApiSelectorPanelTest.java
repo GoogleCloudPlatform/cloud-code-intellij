@@ -279,7 +279,7 @@ public final class GoogleCloudApiSelectorPanelTest {
     // TODO (eshaul): remove once feature is released
     when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
 
-    when(mavenService.getBomVersions()).thenReturn(ImmutableList.of("v0", "v1", "v2"));
+    when(mavenService.getAllBomVersions()).thenReturn(ImmutableList.of("v0", "v1", "v2"));
 
     GoogleCloudApiSelectorPanel panel =
         new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
@@ -305,7 +305,7 @@ public final class GoogleCloudApiSelectorPanelTest {
       versions.add("v" + i);
     }
 
-    when(mavenService.getBomVersions()).thenReturn(versions);
+    when(mavenService.getAllBomVersions()).thenReturn(versions);
 
     GoogleCloudApiSelectorPanel panel =
         new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
@@ -318,7 +318,7 @@ public final class GoogleCloudApiSelectorPanelTest {
     // TODO (eshaul): remove once feature is released
     when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
 
-    when(mavenService.getBomVersions()).thenReturn(ImmutableList.of());
+    when(mavenService.getAllBomVersions()).thenReturn(ImmutableList.of());
 
     GoogleCloudApiSelectorPanel panel =
         new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
@@ -419,7 +419,7 @@ public final class GoogleCloudApiSelectorPanelTest {
     // TODO (eshaul): remove once feature is released
     when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
 
-    when(mavenService.getBomVersions()).thenReturn(ImmutableList.of("v1", "v2", "v3"));
+    when(mavenService.getAllBomVersions()).thenReturn(ImmutableList.of("v1", "v2", "v3"));
 
     try {
       ApplicationManager.getApplication()
@@ -459,7 +459,7 @@ public final class GoogleCloudApiSelectorPanelTest {
     // TODO (eshaul): remove once feature is released
     when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
 
-    when(mavenService.getBomVersions()).thenReturn(ImmutableList.of("v0", "v1", "v2"));
+    when(mavenService.getAllBomVersions()).thenReturn(ImmutableList.of("v0", "v1", "v2"));
 
     try {
       ApplicationManager.getApplication()
@@ -498,7 +498,7 @@ public final class GoogleCloudApiSelectorPanelTest {
     // TODO (eshaul): remove once feature is released
     when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
 
-    when(mavenService.getBomVersions()).thenReturn(ImmutableList.of());
+    when(mavenService.getAllBomVersions()).thenReturn(ImmutableList.of());
 
     try {
       ApplicationManager.getApplication()
