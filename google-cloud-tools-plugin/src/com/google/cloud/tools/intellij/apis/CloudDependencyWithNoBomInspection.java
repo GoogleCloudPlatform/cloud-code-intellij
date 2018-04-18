@@ -128,7 +128,11 @@ public class CloudDependencyWithNoBomInspection extends CloudBomInspection {
         return;
       }
 
-      addBom(project);
+      if (!CloudLibraryProjectState.getInstance(module.getProject())
+          .getCloudLibraryBomVersion(module)
+          .isPresent()) {
+        addBom(project);
+      }
 
       // Strip out the version tag if present
       Stream.of(xmlElement.getChildren())
@@ -150,6 +154,9 @@ public class CloudDependencyWithNoBomInspection extends CloudBomInspection {
 
           if (latestBomVersion.isPresent()) {
             CloudLibraryDependencyWriter.writeNewBom(model, latestBomVersion.get());
+
+            // Need to resync the BOM state so that the BOM won't be added multiple times
+            CloudLibraryProjectState.getInstance(project).syncCloudLibrariesBom();
           } else {
             logger.warn(
                 "Error adding bom when applying DependencyWithNoBom quickfix since latest BOM "
