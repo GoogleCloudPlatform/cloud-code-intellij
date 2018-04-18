@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.apis;
 
+import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -30,15 +31,15 @@ import org.jetbrains.annotations.Nullable;
  * credential environment variables for local run.
  */
 public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
-  private final String gcpProjectId;
+  private final CloudProject cloudProject;
   private final String downloadPath;
   private JPanel panel;
   private ServiceAccountKeyDownloadedPanel commonPanel;
 
   ServiceAccountKeyDisplayDialog(
-      @Nullable Project project, String gcpProjectId, String downloadPath) {
+      @Nullable Project project, CloudProject cloudProject, String downloadPath) {
     super(project);
-    this.gcpProjectId = gcpProjectId;
+    this.cloudProject = cloudProject;
     this.downloadPath = downloadPath;
     init();
     setTitle(GctBundle.message("cloud.apis.service.account.key.downloaded.title"));
@@ -51,7 +52,7 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
   }
 
   private void createUIComponents() {
-    commonPanel = new ServiceAccountKeyDownloadedPanel(gcpProjectId, downloadPath);
+    commonPanel = new ServiceAccountKeyDownloadedPanel(cloudProject.projectId(), downloadPath);
   }
 
   @NotNull

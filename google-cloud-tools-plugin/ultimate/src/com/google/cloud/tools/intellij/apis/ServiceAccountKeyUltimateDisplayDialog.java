@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.apis;
 
 import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
 import com.google.cloud.tools.intellij.appengine.server.run.AppEngineServerConfigurationType;
+import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.ui.BooleanTableModel;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.CommonBundle;
@@ -70,7 +71,7 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
       Logger.getInstance(ServiceAccountKeyUltimateDisplayDialog.class);
 
   private final Project project;
-  private final String gcpProjectId;
+  private final CloudProject cloudProject;
   private final String downloadPath;
   private JPanel mainPanel;
   private ServiceAccountKeyDownloadedPanel commonPanel;
@@ -82,10 +83,10 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
   @VisibleForTesting public static List<RunnerAndConfigurationSettings> configurationSettingsList;
 
   public ServiceAccountKeyUltimateDisplayDialog(
-      @Nullable Project project, @NotNull String gcpProjectId, @NotNull String downloadPath) {
+      @Nullable Project project, @NotNull CloudProject cloudProject, @NotNull String downloadPath) {
     super(project);
     this.project = project;
-    this.gcpProjectId = gcpProjectId;
+    this.cloudProject = cloudProject;
     this.downloadPath = downloadPath;
     init();
     setTitle(GctBundle.message("cloud.apis.service.account.key.downloaded.title"));
@@ -102,12 +103,12 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
   @VisibleForTesting
   public ServiceAccountKeyUltimateDisplayDialog(
       @Nullable Project project,
-      @NotNull String gcpProjectId,
+      @NotNull CloudProject cloudProject,
       @NotNull String downloadPath,
       @NotNull List<RunnerAndConfigurationSettings> configurationSettingsList) {
     super(project);
     this.project = project;
-    this.gcpProjectId = gcpProjectId;
+    this.cloudProject = cloudProject;
     this.downloadPath = downloadPath;
     this.configurationSettingsList = configurationSettingsList;
 
@@ -147,7 +148,7 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
   }
 
   private void createUIComponents() {
-    commonPanel = new ServiceAccountKeyDownloadedPanel(gcpProjectId, downloadPath);
+    commonPanel = new ServiceAccountKeyDownloadedPanel(cloudProject.projectId(), downloadPath);
 
     if (tableModel == null) {
       List<RunnerAndConfigurationSettings> configurationSettingsList =

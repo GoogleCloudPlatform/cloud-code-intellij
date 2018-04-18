@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.apis;
 
+import com.google.cloud.tools.intellij.project.CloudProject;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 public class ServiceAccountKeyUltimateDialogService extends ServiceAccountKeyDialogService {
   @Override
   public DialogWrapper getDialog(
-      @Nullable Project project, String gcpProjectId, String downloadPath) {
-    return new ServiceAccountKeyUltimateDisplayDialog(project, gcpProjectId, downloadPath);
+      @Nullable Project project, CloudProject cloudProject, String downloadPath) {
+    return new ServiceAccountKeyUltimateDisplayDialog(project, cloudProject, downloadPath);
   }
 }

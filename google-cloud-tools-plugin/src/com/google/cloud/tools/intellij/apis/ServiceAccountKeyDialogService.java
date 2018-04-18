@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.apis;
 
+import com.google.cloud.tools.intellij.project.CloudProject;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 /** Application service that provides the handle to the IC's Service Account Key Created dialog */
 public class ServiceAccountKeyDialogService {
   public DialogWrapper getDialog(
-      @Nullable Project project, String gcpProjectId, String downloadPath) {
-    return new ServiceAccountKeyDisplayDialog(project, gcpProjectId, downloadPath);
+      @Nullable Project project, CloudProject cloudProject, String downloadPath) {
+    return new ServiceAccountKeyDisplayDialog(project, cloudProject, downloadPath);
   }
 }
