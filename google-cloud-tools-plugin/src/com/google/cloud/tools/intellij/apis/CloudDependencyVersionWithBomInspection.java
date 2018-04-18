@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.apis;
 
 import com.google.cloud.tools.intellij.util.GctBundle;
-import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.lang.annotation.HighlightSeverity;
@@ -30,7 +29,6 @@ import com.intellij.util.xml.DomFileElement;
 import com.intellij.util.xml.GenericDomValue;
 import com.intellij.util.xml.highlighting.DomElementAnnotationHolder;
 import com.intellij.util.xml.highlighting.DomElementsInspection;
-import java.util.Set;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -75,33 +73,25 @@ public class CloudDependencyVersionWithBomInspection extends CloudBomInspection 
       return;
     }
 
-    Set<CloudLibrary> cloudLibraries =
-        CloudLibraryProjectState.getInstance(module.getProject()).getCloudLibraries(module);
-
-    if (cloudLibraries.isEmpty()) {
-      return;
-    }
-
     if (!CloudLibraryProjectState.getInstance(module.getProject())
         .getCloudLibraryBomVersion(module)
         .isPresent()) {
       return;
     }
 
-    projectModel
-        .getDependencies()
-        .getDependencies()
-        .forEach(
-            dependency -> {
-              if (hasVersion(dependency) && isCloudLibraryDependency(dependency, cloudLibraries)) {
-                holder.createProblem(
-                    dependency.getVersion(),
-                    HighlightSeverity.GENERIC_SERVER_ERROR_OR_WARNING,
-                    GctBundle.message(
-                        "cloud.libraries.version.with.bom.inspection.problem.description"),
-                    new StripDependencyVersionQuickFix());
-              }
-            });
+    checkCloudDependencies(
+        projectModel,
+        module,
+        dependency -> {
+          if (hasVersion(dependency)) {
+            holder.createProblem(
+                dependency.getVersion(),
+                HighlightSeverity.GENERIC_SERVER_ERROR_OR_WARNING,
+                GctBundle.message(
+                    "cloud.libraries.version.with.bom.inspection.problem.description"),
+                new StripDependencyVersionQuickFix());
+          }
+        });
   }
 
   /** Checks to see if the {@link MavenDomDependency} has a version defined. */

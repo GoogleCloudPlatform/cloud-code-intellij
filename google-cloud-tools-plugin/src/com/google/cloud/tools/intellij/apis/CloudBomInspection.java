@@ -18,11 +18,13 @@ package com.google.cloud.tools.intellij.apis;
 
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.Module;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.xml.GenericDomValue;
 import com.intellij.util.xml.highlighting.DomElementsInspection;
 import java.util.Set;
+import java.util.function.Consumer;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.dom.model.MavenDomDependency;
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel;
@@ -37,6 +39,38 @@ abstract class CloudBomInspection extends DomElementsInspection<MavenDomProjectM
 
   CloudBomInspection() {
     super(MavenDomProjectModel.class);
+  }
+
+  /**
+   * Iterates through the google cloud dependencies in the supplied {@link MavenDomProjectModel} and
+   * applies the given {@link Consumer} on the dependency to create the inspection warning and
+   * quickfix.
+   *
+   * @param projectModel the DOM model of the given pom.xml
+   * @param module the current module
+   * @param inspectionAndQuickFix a consumer callback that applies the inspection warning and
+   *     quickfix
+   */
+  void checkCloudDependencies(
+      MavenDomProjectModel projectModel,
+      Module module,
+      Consumer<MavenDomDependency> inspectionAndQuickFix) {
+    Set<CloudLibrary> cloudLibraries =
+        CloudLibraryProjectState.getInstance(module.getProject()).getCloudLibraries(module);
+
+    if (cloudLibraries.isEmpty()) {
+      return;
+    }
+
+    projectModel
+        .getDependencies()
+        .getDependencies()
+        .forEach(
+            dependency -> {
+              if (isCloudLibraryDependency(dependency, cloudLibraries)) {
+                inspectionAndQuickFix.accept(dependency);
+              }
+            });
   }
 
   /** Deletes the supplied version {@link XmlTag}. */
