@@ -38,6 +38,7 @@ import org.jetbrains.idea.maven.dom.MavenDomUtil;
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
+
 /**
  * A {@link DomElementsInspection} that detects missing import of the google-cloud-java BOM when
  * there are google-cloud-java dependencies in the pom.xml.
