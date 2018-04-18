@@ -83,7 +83,7 @@ abstract class CloudBomInspection extends DomElementsInspection<MavenDomProjectM
   abstract boolean shouldApplyInspection(Module module);
 
   /**
-   * Inspections should implement this to provide the inspection and quickfix.
+   * Inspections should implement this to apply the BOM inspection and quickfix.
    *
    * @param dependency the dependency on which the inspection and quickfix should be applied
    * @param module the module of the current pom.xml
