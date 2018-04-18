@@ -23,6 +23,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.google.cloud.tools.intellij.testing.TestService;
@@ -47,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import javax.swing.JTable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Rule;
@@ -59,6 +61,7 @@ public class ServiceAccountKeyUltimateDisplayDialogTest {
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
   @TestFixture private IdeaProjectTestFixture testFixture;
   @Mock @TestService private RunnerRegistry mockRunnerRegistry;
+  @Mock private CloudProject mockCloudProject;
   @Mock private RunnerAndConfigurationSettings mockRunnerAndConfigurationSettings;
   @Mock private RunConfiguration mockRunConfiguration;
   @Mock private JavaPatchableProgramRunner mockProgramRunner;
@@ -129,6 +132,21 @@ public class ServiceAccountKeyUltimateDisplayDialogTest {
             new EnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "downloadPath", false)));
   }
 
+  @Test
+  public void runConfigurationTable_verifyValues() {
+    RunnerSpecificLocalConfigurationBit runnerSpecificLocalConfigurationBit =
+        new RunnerSpecificLocalConfigurationBit(new TestConfigurationInfoProvider());
+    runnerSpecificLocalConfigurationBit.setEnvironmentVariables(new ArrayList<>());
+    setUpInitialConfiguration(runnerSpecificLocalConfigurationBit);
+    launchDialog(Arrays.asList(mockRunnerAndConfigurationSettings));
+
+    JTable runConfigurationTable = dialog.getRunConfigurationTable();
+    assertEquals(1, runConfigurationTable.getRowCount());
+    assertEquals(2, runConfigurationTable.getColumnCount());
+    assertEquals(mockRunnerAndConfigurationSettings, runConfigurationTable.getModel().getValueAt(0, 0));
+    assertEquals(true, runConfigurationTable.getModel().getValueAt(0, 1));
+  }
+
   private void setUpInitialConfiguration(
       RunnerSpecificLocalConfigurationBit runnerSpecificLocalConfigurationBit) {
     when(mockRunnerAndConfigurationSettings.getName()).thenReturn("name");
@@ -163,12 +181,13 @@ public class ServiceAccountKeyUltimateDisplayDialogTest {
     // TODO: setting configurationSettingsList via a 2nd constructor was causing createUIComponents
     // to be called before assignment of the configurationSettingsList
     dialog.configurationSettingsList = configurationSettingsList;
+    when(mockCloudProject.projectId()).thenReturn("gcpProjectId");
     ApplicationManager.getApplication()
         .invokeAndWait(
             () ->
                 dialog =
                     new ServiceAccountKeyUltimateDisplayDialog(
-                        testFixture.getProject(), "gcpProjectId", "downloadPath"));
+                        testFixture.getProject(), mockCloudProject, "downloadPath"));
   }
 
   private class TestConfigurationInfoProvider implements ConfigurationInfoProvider {

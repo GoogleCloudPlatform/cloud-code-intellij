@@ -223,7 +223,7 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
   /** The custom {@link JBTable} for the table of existing Google App Engine run configurations. */
   private static final class ServerTable extends JBTable {
 
-    ServerTable(BooleanTableModel tableModel) {
+    ServerTable(BooleanTableModel<RunnerAndConfigurationSettings> tableModel) {
       super(tableModel);
       setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
       setDefaultRenderer(
