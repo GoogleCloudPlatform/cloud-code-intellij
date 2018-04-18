@@ -51,6 +51,7 @@ import java.util.List;
 import javax.swing.JTable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -68,6 +69,30 @@ public class ServiceAccountKeyUltimateDisplayDialogTest {
   @Mock private CommonStrategy mockCommonStrategy;
   @Mock private ScriptHelper mockScriptHelper;
   private ServiceAccountKeyUltimateDisplayDialog dialog;
+  private RunnerSpecificLocalConfigurationBit runnerSpecificLocalConfigurationBit;
+
+  @Before
+  public void setUp() {
+    runnerSpecificLocalConfigurationBit =
+        new RunnerSpecificLocalConfigurationBit(new TestConfigurationInfoProvider());
+    runnerSpecificLocalConfigurationBit.setEnvironmentVariables(new ArrayList<>());
+
+    when(mockRunnerAndConfigurationSettings.getName()).thenReturn("name");
+    when(mockRunnerAndConfigurationSettings.getConfiguration()).thenReturn(mockRunConfiguration);
+
+    when(mockRunnerAndConfigurationSettings.getConfigurationSettings(mockProgramRunner))
+        .thenReturn(runnerSpecificLocalConfigurationBit);
+    when(mockRunnerRegistry.getRunner(any(String.class), any(RunProfile.class)))
+        .thenReturn(mockProgramRunner);
+
+    TestConfigurationInfoProvider configurationInfoProvider = new TestConfigurationInfoProvider();
+    when(mockCommonStrategy.createStartupHelper(configurationInfoProvider))
+        .thenReturn(mockScriptHelper);
+    when(mockCommonStrategy.createShutdownHelper(configurationInfoProvider))
+        .thenReturn(mockScriptHelper);
+    when(mockCommonStrategy.getSettingsBean())
+        .thenReturn(new JavaeeRunConfigurationCommonSettingsBean());
+  }
 
   @Test
   public void runConfigurationTable_whenConfigurationsDoNotExist_Hidden() {
@@ -77,18 +102,12 @@ public class ServiceAccountKeyUltimateDisplayDialogTest {
 
   @Test
   public void runConfigurationTable_whenConfigurationsExist_Visible() {
-    when(mockRunnerAndConfigurationSettings.getName()).thenReturn("name");
     launchDialog(Arrays.asList(mockRunnerAndConfigurationSettings));
-
     assertTrue(dialog.getRunConfigurationTable().isVisible());
   }
 
   @Test
   public void runConfigurationTable_verifyValues() {
-    RunnerSpecificLocalConfigurationBit runnerSpecificLocalConfigurationBit =
-        new RunnerSpecificLocalConfigurationBit(new TestConfigurationInfoProvider());
-    runnerSpecificLocalConfigurationBit.setEnvironmentVariables(new ArrayList<>());
-    setUpInitialConfiguration(runnerSpecificLocalConfigurationBit);
     launchDialog(Arrays.asList(mockRunnerAndConfigurationSettings));
 
     JTable runConfigurationTable = dialog.getRunConfigurationTable();
@@ -100,10 +119,6 @@ public class ServiceAccountKeyUltimateDisplayDialogTest {
 
   @Test
   public void addEnvironmentVariablesToConfiguration_whenEnvVarsDoNotExistInConfig_add() {
-    RunnerSpecificLocalConfigurationBit runnerSpecificLocalConfigurationBit =
-        new RunnerSpecificLocalConfigurationBit(new TestConfigurationInfoProvider());
-    runnerSpecificLocalConfigurationBit.setEnvironmentVariables(new ArrayList<>());
-    setUpInitialConfiguration(runnerSpecificLocalConfigurationBit);
     launchDialog(Arrays.asList(mockRunnerAndConfigurationSettings));
     dialog.addEnvironmentVariablesToConfiguration(
         new HashSet<>(Arrays.asList(mockRunnerAndConfigurationSettings)));
@@ -122,15 +137,13 @@ public class ServiceAccountKeyUltimateDisplayDialogTest {
 
   @Test
   public void addEnvironmentVariablesToConfiguration_whenEnvVarsExistInConfig_update() {
-    RunnerSpecificLocalConfigurationBit runnerSpecificLocalConfigurationBit =
-        new RunnerSpecificLocalConfigurationBit(new TestConfigurationInfoProvider());
     List<EnvironmentVariable> oldEnvVariables = new ArrayList<>();
     oldEnvVariables.add(new EnvironmentVariable("GOOGLE_CLOUD_PROJECT", "oldCloudProject", false));
     oldEnvVariables.add(
         new EnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "oldCredentialPath", false));
     oldEnvVariables.add(new EnvironmentVariable("fakeName", "fakeValue", false));
     runnerSpecificLocalConfigurationBit.setEnvironmentVariables(oldEnvVariables);
-    setUpInitialConfiguration(runnerSpecificLocalConfigurationBit);
+
     launchDialog(Arrays.asList(mockRunnerAndConfigurationSettings));
     dialog.addEnvironmentVariablesToConfiguration(
         new HashSet<>(Arrays.asList(mockRunnerAndConfigurationSettings)));
@@ -147,25 +160,6 @@ public class ServiceAccountKeyUltimateDisplayDialogTest {
             new EnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "downloadPath", false)));
   }
 
-  private void setUpInitialConfiguration(
-      RunnerSpecificLocalConfigurationBit runnerSpecificLocalConfigurationBit) {
-    when(mockRunnerAndConfigurationSettings.getName()).thenReturn("name");
-    when(mockRunnerAndConfigurationSettings.getConfiguration()).thenReturn(mockRunConfiguration);
-
-    when(mockRunnerAndConfigurationSettings.getConfigurationSettings(mockProgramRunner))
-        .thenReturn(runnerSpecificLocalConfigurationBit);
-    when(mockRunnerRegistry.getRunner(any(String.class), any(RunProfile.class)))
-        .thenReturn(mockProgramRunner);
-
-    TestConfigurationInfoProvider configurationInfoProvider = new TestConfigurationInfoProvider();
-    when(mockCommonStrategy.createStartupHelper(configurationInfoProvider))
-        .thenReturn(mockScriptHelper);
-    when(mockCommonStrategy.createShutdownHelper(configurationInfoProvider))
-        .thenReturn(mockScriptHelper);
-    when(mockCommonStrategy.getSettingsBean())
-        .thenReturn(new JavaeeRunConfigurationCommonSettingsBean());
-  }
-
   private boolean containsEnvironmentVariable(
       final List<EnvironmentVariable> environmentVariableList,
       final EnvironmentVariable environmentVariable) {
@@ -178,8 +172,6 @@ public class ServiceAccountKeyUltimateDisplayDialogTest {
   }
 
   private void launchDialog(List<RunnerAndConfigurationSettings> configurationSettingsList) {
-    // TODO: setting configurationSettingsList via a 2nd constructor was causing createUIComponents
-    // to be called before assignment of the configurationSettingsList
     dialog.configurationSettingsList = configurationSettingsList;
     when(mockCloudProject.projectId()).thenReturn("gcpProjectId");
     ApplicationManager.getApplication()
