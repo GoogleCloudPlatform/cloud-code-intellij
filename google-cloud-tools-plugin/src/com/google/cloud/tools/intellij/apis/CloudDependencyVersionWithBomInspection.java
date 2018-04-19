@@ -25,7 +25,6 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.impl.source.xml.XmlTextImpl;
 import com.intellij.psi.xml.XmlTag;
-import com.intellij.util.xml.DomFileElement;
 import com.intellij.util.xml.GenericDomValue;
 import com.intellij.util.xml.highlighting.DomElementAnnotationHolder;
 import com.intellij.util.xml.highlighting.DomElementsInspection;
@@ -33,7 +32,6 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.dom.model.MavenDomDependency;
-import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel;
 
 /**
  * A {@link DomElementsInspection} that detects google-cloud-java dependencies in pom.xml files that
