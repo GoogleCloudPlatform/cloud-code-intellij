@@ -75,25 +75,35 @@ public class CloudApiMavenService {
   }
 
   /**
-   * Returns the available Google Cloud Java client library BOM versions from Maven Central.
+   * Returns all the available Google Cloud Java client library BOM versions from Maven Central.
    *
    * @return returns the versions of the BOMs
    */
-  List<String> getBomVersions() {
-    Artifact artifact =
-        new DefaultArtifact(toBomCoordinates(GOOGLE_CLOUD_JAVA_BOM_ALL_VERSIONS_CONSTRAINT));
-
-    VersionRangeRequest rangeRequest = new VersionRangeRequest();
-    rangeRequest.setArtifact(artifact);
-    rangeRequest.addRepository(MAVEN_CENTRAL_REPOSITORY);
-
+  List<String> getAllBomVersions() {
     try {
-      VersionRangeResult result = SYSTEM.resolveVersionRange(SESSION, rangeRequest);
-
-      return result.getVersions().stream().map(Version::toString).collect(Collectors.toList());
-    } catch (VersionRangeResolutionException e) {
-      logger.warn("Error fetching available BOM versions from Maven Central", e);
+      return executeBomVersionRangeRequest()
+          .getVersions()
+          .stream()
+          .map(Version::toString)
+          .collect(Collectors.toList());
+    } catch (VersionRangeResolutionException ex) {
+      logger.warn("Error fetching all available BOM versions from Maven Central", ex);
       return ImmutableList.of();
+    }
+  }
+
+  /**
+   * Returns the latest Google Cloud Java client library BOM version from Maven Central.
+   *
+   * @return returns the latest version of the BOM
+   */
+  Optional<String> getLatestBomVersion() {
+    try {
+      Version highestVersion = executeBomVersionRangeRequest().getHighestVersion();
+      return highestVersion == null ? Optional.empty() : Optional.of(highestVersion.toString());
+    } catch (VersionRangeResolutionException ex) {
+      logger.warn("Error fetching latest BOM versions from Maven Central", ex);
+      return Optional.empty();
     }
   }
 
@@ -140,6 +150,18 @@ public class CloudApiMavenService {
       logger.warn(message);
       throw new LibraryVersionFromBomException(message, e);
     }
+  }
+
+  private VersionRangeResult executeBomVersionRangeRequest()
+      throws VersionRangeResolutionException {
+    Artifact artifact =
+        new DefaultArtifact(toBomCoordinates(GOOGLE_CLOUD_JAVA_BOM_ALL_VERSIONS_CONSTRAINT));
+
+    VersionRangeRequest rangeRequest = new VersionRangeRequest();
+    rangeRequest.setArtifact(artifact);
+    rangeRequest.addRepository(MAVEN_CENTRAL_REPOSITORY);
+
+    return SYSTEM.resolveVersionRange(SESSION, rangeRequest);
   }
 
   private static String toFormattedMavenCoordinates(String groupName, String artifactName) {
