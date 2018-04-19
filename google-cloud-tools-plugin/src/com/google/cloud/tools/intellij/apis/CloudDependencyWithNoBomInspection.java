@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.apis;
 
+import com.google.cloud.tools.intellij.analytics.GctTracking;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
@@ -134,6 +136,10 @@ public class CloudDependencyWithNoBomInspection extends CloudBomInspection {
 
             // Need to resync the BOM state so that the BOM won't be added multiple times
             CloudLibraryProjectState.getInstance(project).syncCloudLibrariesBom();
+
+            UsageTrackerProvider.getInstance()
+                .trackEvent(GctTracking.CLIENT_LIBRARY_WITHOUT_BOM_QUICKFIX)
+                .ping();
           } else {
             logger.warn(
                 "Error adding bom when applying DependencyWithNoBom quickfix since latest BOM "

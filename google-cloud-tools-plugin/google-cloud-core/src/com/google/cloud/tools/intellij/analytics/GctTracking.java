@@ -77,6 +77,8 @@ public class GctTracking {
   public static final String METADATA_BUILD_SYSTEM_KEY = "build";
   public static final String METADATA_SDK_KEY = "sdk";
   public static final String METADATA_BUILD_SYSTEM_MAVEN = "maven";
+  public static final String METADATA_OLD_BOM_VERSION = "old.bom.version";
+  public static final String METADATA_NEW_BOM_VERSION = "new.bom.version";
 
   public static final String ACCOUNT_PLUGIN_DETECTED = "account.plugin.detected";
   public static final String ACCOUNT_PLUGIN_UNINSTALLED = "account.plugin.uninstalled";
@@ -87,6 +89,12 @@ public class GctTracking {
 
   public static final String CLIENT_LIBRARY_ADD_LIBRARY = "client.library.add.library";
   public static final String CLIENT_LIBRARY_ENABLE_API = "client.library.enable.api";
+  public static final String CLIENT_LIBRARY_NEW_BOM = "client.library.new.bom.write";
+  public static final String CLIENT_LIBRARY_UPDATE_BOM = "client.library.new.bom.write";
+  public static final String CLIENT_LIBRARY_VERSION_WITH_BOM_QUICKFIX =
+      "client.library.version.with.bom.quickfix";
+  public static final String CLIENT_LIBRARY_WITHOUT_BOM_QUICKFIX =
+      "client.library.without.bom.quickfix";
 
   public static final String MANAGED_SDK_SUCCESSFUL_INSTALL = "managed.sdk.successful.install";
   public static final String MANAGED_SDK_FAILED_INSTALL = "managed.sdk.failed.install";
