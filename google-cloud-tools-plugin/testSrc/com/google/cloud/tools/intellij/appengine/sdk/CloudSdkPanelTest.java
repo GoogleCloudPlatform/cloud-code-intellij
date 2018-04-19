@@ -309,7 +309,7 @@ public class CloudSdkPanelTest {
   }
 
   @Test
-  public void updateNow_notVisible_whenSdkNotReady() {
+  public void updateNow_notEnabled_whenSdkNotReady() {
     when(mockCloudSdkService.getStatus()).thenReturn(SdkStatus.INSTALLING);
 
     ApplicationManager.getApplication()
@@ -321,12 +321,12 @@ public class CloudSdkPanelTest {
                   .setUserSelectedSdkServiceType(CloudSdkServiceType.MANAGED_SDK);
               sdkPanel.reset();
 
-              assertThat(sdkPanel.getUpdateNowButton().isVisible()).isFalse();
+              assertThat(sdkPanel.getUpdateNowButton().isEnabled()).isFalse();
             });
   }
 
   @Test
-  public void updateNow_notVisible_whenSdkUpToDate() {
+  public void updateNow_notEnabled_whenSdkUpToDate() {
     ManagedCloudSdkService managedCloudSdkService = mock(ManagedCloudSdkService.class);
     when(mockCloudSdkServiceManager.getCloudSdkService()).thenReturn(managedCloudSdkService);
     when(managedCloudSdkService.getStatus()).thenReturn(SdkStatus.READY);
@@ -341,12 +341,12 @@ public class CloudSdkPanelTest {
                   .setUserSelectedSdkServiceType(CloudSdkServiceType.MANAGED_SDK);
               sdkPanel.reset();
 
-              assertThat(sdkPanel.getUpdateNowButton().isVisible()).isFalse();
+              assertThat(sdkPanel.getUpdateNowButton().isEnabled()).isFalse();
             });
   }
 
   @Test
-  public void updateNow_visible_whenSdkReadyToUpdate() {
+  public void updateNow_enabled_whenSdkReadyToUpdate() {
     ManagedCloudSdkService managedCloudSdkService = mock(ManagedCloudSdkService.class);
     when(mockCloudSdkServiceManager.getCloudSdkService()).thenReturn(managedCloudSdkService);
     when(managedCloudSdkService.getStatus()).thenReturn(SdkStatus.READY);
@@ -361,7 +361,7 @@ public class CloudSdkPanelTest {
                   .setUserSelectedSdkServiceType(CloudSdkServiceType.MANAGED_SDK);
               sdkPanel.reset();
 
-              assertThat(sdkPanel.getUpdateNowButton().isVisible()).isTrue();
+              assertThat(sdkPanel.getUpdateNowButton().isEnabled()).isTrue();
             });
   }
 
