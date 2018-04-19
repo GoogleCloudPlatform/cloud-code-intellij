@@ -124,7 +124,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
 
             Sdk javaSdk = ProjectRootManager.getInstance(commonModel.getProject()).getProjectSdk();
             if (javaSdk == null || javaSdk.getHomePath() == null) {
-              throw new ExecutionException(GctBundle.message("appengine.run.server.nosdk"));
+              throw new ExecutionException(GctBundle.message("appengine.run.server.nojdk"));
             }
 
             AppEngineServerModel runConfiguration;
