@@ -70,7 +70,7 @@ public class AppEngineServerModel
   @Override
   public J2EEServerInstance createServerInstance() throws ExecutionException {
     if (ProjectRootManager.getInstance(commonModel.getProject()).getProjectSdk() == null) {
-      throw new ExecutionException(AppEngineMessageBundle.getString("appengine.run.server.nosdk"));
+      throw new ExecutionException(AppEngineMessageBundle.getString("appengine.run.server.nojdk"));
     }
 
     return new AppEngineServerInstance(commonModel);
@@ -141,7 +141,7 @@ public class AppEngineServerModel
 
     if (ProjectRootManager.getInstance(commonModel.getProject()).getProjectSdk() == null) {
       throw new RuntimeConfigurationError(
-          AppEngineMessageBundle.getString("appengine.run.server.nosdk"));
+          AppEngineMessageBundle.getString("appengine.run.server.nojdk"));
     }
   }
 

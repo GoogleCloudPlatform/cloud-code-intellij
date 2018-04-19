@@ -162,7 +162,17 @@ final class CloudLibraryDependencyWriter {
       cloudLibraryProjectState
           .loadCloudLibraryBom(module)
           .map(MavenDomDependency::getVersion)
-          .ifPresent(version -> version.setStringValue(bomVersion));
+          .ifPresent(
+              oldBomVersionDom -> {
+                oldBomVersionDom.setStringValue(bomVersion);
+
+                UsageTrackerProvider.getInstance()
+                    .trackEvent(GctTracking.CLIENT_LIBRARY_UPDATE_BOM_MAVEN)
+                    .addMetadata(
+                        GctTracking.METADATA_OLD_BOM_VERSION, oldBomVersionDom.getStringValue())
+                    .addMetadata(GctTracking.METADATA_NEW_BOM_VERSION, bomVersion)
+                    .ping();
+              });
     }
   }
 
@@ -184,14 +194,14 @@ final class CloudLibraryDependencyWriter {
     }
 
     UsageTrackerProvider.getInstance()
-        .trackEvent(GctTracking.CLIENT_LIBRARY_ADD_LIBRARY)
+        .trackEvent(GctTracking.CLIENT_LIBRARY_ADD_LIBRARY_MAVEN)
         .addMetadata(GctTracking.METADATA_BUILD_SYSTEM_KEY, GctTracking.METADATA_BUILD_SYSTEM_MAVEN)
         .addMetadata(GctTracking.METADATA_LABEL_KEY, mavenId.getDisplayString())
         .ping();
   }
 
   /** Writes the google-cloud-java BOM to the user's pom.xml. */
-  private static void writeNewBom(MavenDomProjectModel model, String bomVersion) {
+  static void writeNewBom(MavenDomProjectModel model, String bomVersion) {
     MavenDomDependency bomDependency =
         model.getDependencyManagement().getDependencies().addDependency();
     bomDependency.getGroupId().setStringValue(CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_GROUP);
@@ -201,6 +211,11 @@ final class CloudLibraryDependencyWriter {
     bomDependency.getVersion().setStringValue(bomVersion);
     bomDependency.getType().setStringValue(CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_TYPE);
     bomDependency.getScope().setStringValue(CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_SCOPE);
+
+    UsageTrackerProvider.getInstance()
+        .trackEvent(GctTracking.CLIENT_LIBRARY_NEW_BOM_MAVEN)
+        .addMetadata(GctTracking.METADATA_NEW_BOM_VERSION, bomVersion)
+        .ping();
   }
 
   /**

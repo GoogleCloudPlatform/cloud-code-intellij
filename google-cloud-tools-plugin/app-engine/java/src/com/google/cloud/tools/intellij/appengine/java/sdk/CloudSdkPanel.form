@@ -87,7 +87,7 @@
             </constraints>
             <properties>
               <text resource-bundle="messages/AppEngineBundle" key="cloudsdk.check.for.updates.action"/>
-              <visible value="false"/>
+              <visible value="true"/>
             </properties>
           </component>
         </children>
