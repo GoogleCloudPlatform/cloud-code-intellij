@@ -209,7 +209,12 @@ public class CloudLibraryProjectState implements ProjectComponent {
                       MavenDomUtil.getMavenDomProjectModel(project, mavenProject.getFile());
 
                   return model != null
-                      ? model.getDependencies().getDependencies()
+                      ? model
+                          .getDependencies()
+                          .getDependencies()
+                          .stream()
+                          .map(dependency -> (MavenDomDependency) dependency.createStableCopy())
+                          .collect(Collectors.toList())
                       : ImmutableList.of();
                 });
   }

@@ -38,8 +38,6 @@ public class GctTracking {
       "appengine.generate.file.appyaml.click";
   public static final String APP_ENGINE_GENERATE_FILE_DOCKERFILE =
       "appengine.generate.file.dockerfile.click";
-  public static final String PROJECT_SELECTION_CREATE_NEW_PROJECT =
-      "project.selection.create.new.project";
 
   public static final String VCS_CHECKOUT = "vcs.checkout";
   public static final String VCS_UPLOAD = "vcs.upload";
@@ -77,6 +75,7 @@ public class GctTracking {
   public static final String METADATA_LABEL_KEY = "label";
   public static final String METADATA_MESSAGE_KEY = "message";
   public static final String METADATA_BUILD_SYSTEM_KEY = "build";
+  public static final String METADATA_SDK_KEY = "sdk";
   public static final String METADATA_BUILD_SYSTEM_MAVEN = "maven";
 
   public static final String ACCOUNT_PLUGIN_DETECTED = "account.plugin.detected";
@@ -88,4 +87,9 @@ public class GctTracking {
 
   public static final String CLIENT_LIBRARY_ADD_LIBRARY = "client.library.add.library";
   public static final String CLIENT_LIBRARY_ENABLE_API = "client.library.enable.api";
+
+  public static final String MANAGED_SDK_SUCCESSFUL_INSTALL = "managed.sdk.successful.install";
+  public static final String MANAGED_SDK_FAILED_INSTALL = "managed.sdk.failed.install";
+  public static final String MANAGED_SDK_SUCCESSFUL_UPDATE = "managed.sdk.successful.update";
+  public static final String MANAGED_SDK_FAILED_UPDATE = "managed.sdk.failed.update";
 }

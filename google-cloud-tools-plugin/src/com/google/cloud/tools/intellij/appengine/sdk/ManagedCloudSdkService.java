@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.sdk;
 
+import com.google.cloud.tools.intellij.analytics.GctTracking;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.managedcloudsdk.ConsoleListener;
@@ -32,6 +34,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.util.ThrowableRunnable;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.concurrent.Callable;
@@ -61,9 +64,10 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
   @Override
   public void activate() {
-    // TODO track event that custom SDK is activated and used.
-
     initManagedSdk();
+    if (isInstallSupported()) {
+      ManagedCloudSdkUpdateService.getInstance().activate();
+    }
   }
 
   @Nullable
@@ -94,6 +98,15 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
   public boolean update() {
     return executeManagedSdkJob(ManagedSdkJobType.UPDATE, this::updateManagedSdk);
+  }
+
+  public boolean isUpToDate() {
+    try {
+      return managedCloudSdk.isUpToDate();
+    } catch (Exception e) {
+      // we ignore the exception and just assume SDK is either not up-to-date or in invalid state.
+      return false;
+    }
   }
 
   @Override
@@ -194,7 +207,8 @@ public class ManagedCloudSdkService implements CloudSdkService {
       progressListener =
           ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
 
-      managedCloudSdk.newInstaller().install(progressListener, sdkConsoleListener);
+      executeWithSdkWriteLock(
+          () -> managedCloudSdk.newInstaller().install(progressListener, sdkConsoleListener));
 
       return ManagedSdkJobResult.PROCESSED;
     }
@@ -208,10 +222,12 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
       progressListener =
           ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
-      managedCloudSdk
-          .newComponentInstaller()
-          .installComponent(
-              SdkComponent.APP_ENGINE_JAVA, progressListener, appEngineConsoleListener);
+      executeWithSdkWriteLock(
+          () ->
+              managedCloudSdk
+                  .newComponentInstaller()
+                  .installComponent(
+                      SdkComponent.APP_ENGINE_JAVA, progressListener, appEngineConsoleListener));
 
       return ManagedSdkJobResult.PROCESSED;
     } else {
@@ -220,16 +236,41 @@ public class ManagedCloudSdkService implements CloudSdkService {
   }
 
   private ManagedSdkJobResult updateManagedSdk() throws Exception {
-    if (!safeCheckSdkStatus(() -> managedCloudSdk.isUpToDate())) {
+    if (safeCheckSdkStatus(() -> managedCloudSdk.isInstalled())
+        && !safeCheckSdkStatus(() -> managedCloudSdk.isUpToDate())) {
       ConsoleListener sdkUpdateListener = logger::debug;
       progressListener =
           ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
 
-      managedCloudSdk.newUpdater().update(progressListener, sdkUpdateListener);
+      executeWithSdkWriteLock(
+          () -> managedCloudSdk.newUpdater().update(progressListener, sdkUpdateListener));
 
       return ManagedSdkJobResult.PROCESSED;
     } else {
       return ManagedSdkJobResult.UP_TO_DATE;
+    }
+  }
+
+  private void executeWithSdkWriteLock(ThrowableRunnable<Exception> runWithLock) throws Exception {
+    try {
+      // if write lock is not available, show a progress to a user that all SDK processes must be
+      // finished in order to update SDK.
+      if (!CloudSdkServiceManager.getInstance().getSdkWriteLock().tryLock()) {
+        ProgressListener waitForSdkProcessesProgress =
+            ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
+        waitForSdkProcessesProgress.start(
+            GctBundle.message("managedsdk.progress.wait.for.processes"), ProgressListener.UNKNOWN);
+        try {
+          CloudSdkServiceManager.getInstance().getSdkWriteLock().lockInterruptibly();
+        } finally {
+          // make sure the indicator goes away in case of this job error/cancel
+          waitForSdkProcessesProgress.done();
+        }
+      }
+
+      runWithLock.run();
+    } finally {
+      CloudSdkServiceManager.getInstance().getSdkWriteLock().unlock();
     }
   }
 
@@ -293,6 +334,21 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
       updateStatus(SdkStatus.READY);
 
+      if (result == ManagedSdkJobResult.PROCESSED) {
+        ManagedCloudSdkUpdateService.getInstance().notifySdkUpdate();
+
+        String trackingEventAction;
+        switch (jobType) {
+          case UPDATE:
+            trackingEventAction = GctTracking.MANAGED_SDK_SUCCESSFUL_UPDATE;
+            break;
+          default:
+            trackingEventAction = GctTracking.MANAGED_SDK_SUCCESSFUL_INSTALL;
+            break;
+        }
+        UsageTrackerProvider.getInstance().trackEvent(trackingEventAction).ping();
+      }
+
       ManagedCloudSdkServiceUiPresenter.getInstance().notifyManagedSdkJobSuccess(jobType, result);
     }
 
@@ -313,9 +369,17 @@ public class ManagedCloudSdkService implements CloudSdkService {
       switch (jobType) {
         case INSTALL:
           updateStatus(SdkStatus.NOT_AVAILABLE);
+
+          UsageTrackerProvider.getInstance()
+              .trackEvent(GctTracking.MANAGED_SDK_FAILED_INSTALL)
+              .ping();
           break;
         case UPDATE:
           checkSdkStatusAfterFailedUpdate();
+
+          UsageTrackerProvider.getInstance()
+              .trackEvent(GctTracking.MANAGED_SDK_FAILED_UPDATE)
+              .ping();
           break;
       }
 

@@ -27,6 +27,11 @@ import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Helper class for {@link ManagedCloudSdkService}, provides UI notifications and progress updates.
@@ -74,11 +79,43 @@ public class ManagedCloudSdkServiceUiPresenter {
     showNotification(message, NotificationType.WARNING);
   }
 
+  /**
+   * Shows notification when Cloud SDK update is about to be started.
+   *
+   * @param cancelListener Callback if user cancels this update.
+   * @param disableListener Callback if user cancels and disables automatic updates.
+   * @return Notification.
+   */
+  public Notification notifyManagedSdkUpdate(
+      @NotNull ActionListener cancelListener, @NotNull ActionListener disableListener) {
+    Notification notification =
+        showNotification(
+            GctBundle.message("managedsdk.update.notification"), NotificationType.INFORMATION);
+    notification.addAction(
+        new AnAction(GctBundle.message("managedsdk.update.notification.cancel")) {
+          @Override
+          public void actionPerformed(AnActionEvent e) {
+            cancelListener.actionPerformed(new ActionEvent(notification, 0, ""));
+            notification.expire();
+          }
+        });
+    notification.addAction(
+        new AnAction(GctBundle.message("managedsdk.update.notification.disable")) {
+          @Override
+          public void actionPerformed(AnActionEvent e) {
+            disableListener.actionPerformed(new ActionEvent(notification, 0, ""));
+            notification.expire();
+          }
+        });
+
+    return notification;
+  }
+
   public ProgressListener createProgressListener(ManagedCloudSdkService managedCloudSdkService) {
     return new ManagedCloudSdkProgressListener(managedCloudSdkService);
   }
 
-  private void showNotification(String message, NotificationType notificationType) {
+  private Notification showNotification(String message, NotificationType notificationType) {
     Notification notification =
         NOTIFICATION_GROUP.createNotification(
             GctBundle.message("managedsdk.notifications.title"),
@@ -86,5 +123,7 @@ public class ManagedCloudSdkServiceUiPresenter {
             message,
             notificationType);
     notification.notify(null);
+
+    return notification;
   }
 }

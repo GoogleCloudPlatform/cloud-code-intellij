@@ -19,12 +19,14 @@ package com.google.cloud.tools.intellij.appengine.sdk;
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 import com.google.cloud.tools.intellij.GctFeature;
+import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
@@ -46,7 +48,8 @@ public class CloudSdkPanelTest {
 
   @Mock @TestService private PluginInfoService pluginInfoService;
 
-  @Mock private CloudSdkService mockCloudSdkService;
+  @Mock private ManagedCloudSdkService mockCloudSdkService;
+  @Mock @TestService private ManagedCloudSdkUpdateService managedCloudSdkUpdateService;
   @Mock @TestService private CloudSdkServiceManager mockCloudSdkServiceManager;
   @Mock @TestService private CloudSdkValidator cloudSdkValidator;
 
@@ -281,6 +284,87 @@ public class CloudSdkPanelTest {
             });
   }
 
+  @Test
+  public void automaticUpdate_enabled_callsUpdater_activate() {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              // use non-spy panel as spy messes up with UI event thread field updates.
+              CloudSdkPanel sdkPanel = new CloudSdkPanel();
+              CloudSdkServiceUserSettings.getInstance()
+                  .setUserSelectedSdkServiceType(CloudSdkServiceType.MANAGED_SDK);
+              CloudSdkServiceUserSettings.getInstance().setEnableAutomaticUpdates(false);
+              sdkPanel.reset();
+
+              sdkPanel.getEnableAutomaticUpdatesCheckbox().doClick();
+
+              try {
+                sdkPanel.apply();
+              } catch (ConfigurationException e) {
+                throw new AssertionError(e);
+              }
+
+              verify(managedCloudSdkUpdateService).activate();
+            });
+  }
+
+  @Test
+  public void updateNow_notVisible_whenSdkNotReady() {
+    when(mockCloudSdkService.getStatus()).thenReturn(SdkStatus.INSTALLING);
+
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              // use non-spy panel as spy messes up with UI event thread field updates.
+              CloudSdkPanel sdkPanel = new CloudSdkPanel();
+              CloudSdkServiceUserSettings.getInstance()
+                  .setUserSelectedSdkServiceType(CloudSdkServiceType.MANAGED_SDK);
+              sdkPanel.reset();
+
+              assertThat(sdkPanel.getUpdateNowButton().isVisible()).isFalse();
+            });
+  }
+
+  @Test
+  public void updateNow_notVisible_whenSdkUpToDate() {
+    ManagedCloudSdkService managedCloudSdkService = mock(ManagedCloudSdkService.class);
+    when(mockCloudSdkServiceManager.getCloudSdkService()).thenReturn(managedCloudSdkService);
+    when(managedCloudSdkService.getStatus()).thenReturn(SdkStatus.READY);
+    when(managedCloudSdkService.isUpToDate()).thenReturn(true);
+
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              // use non-spy panel as spy messes up with UI event thread field updates.
+              CloudSdkPanel sdkPanel = new CloudSdkPanel();
+              CloudSdkServiceUserSettings.getInstance()
+                  .setUserSelectedSdkServiceType(CloudSdkServiceType.MANAGED_SDK);
+              sdkPanel.reset();
+
+              assertThat(sdkPanel.getUpdateNowButton().isVisible()).isFalse();
+            });
+  }
+
+  @Test
+  public void updateNow_visible_whenSdkReadyToUpdate() {
+    ManagedCloudSdkService managedCloudSdkService = mock(ManagedCloudSdkService.class);
+    when(mockCloudSdkServiceManager.getCloudSdkService()).thenReturn(managedCloudSdkService);
+    when(managedCloudSdkService.getStatus()).thenReturn(SdkStatus.READY);
+    when(managedCloudSdkService.isUpToDate()).thenReturn(false);
+
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              // use non-spy panel as spy messes up with UI event thread field updates.
+              CloudSdkPanel sdkPanel = new CloudSdkPanel();
+              CloudSdkServiceUserSettings.getInstance()
+                  .setUserSelectedSdkServiceType(CloudSdkServiceType.MANAGED_SDK);
+              sdkPanel.reset();
+
+              assertThat(sdkPanel.getUpdateNowButton().isVisible()).isTrue();
+            });
+  }
+
   private void setValidateCloudSdkResponse(CloudSdkValidationResult... results) {
     Set<CloudSdkValidationResult> validationResults = new HashSet<>();
     Collections.addAll(validationResults, results);
@@ -293,7 +377,7 @@ public class CloudSdkPanelTest {
       String customSdkPath) {
     CloudSdkServiceUserSettings userSettings = CloudSdkServiceUserSettings.getInstance();
     assertThat(cloudSdkServiceType).isEqualTo(userSettings.getUserSelectedSdkServiceType());
-    assertThat(enableAutomaticUpdates).isEqualTo(userSettings.getEnableAutomaticUpdates());
+    assertThat(enableAutomaticUpdates).isEqualTo(userSettings.isAutomaticUpdateEnabled());
     assertThat(customSdkPath).isEqualTo(userSettings.getCustomSdkPath());
   }
 
@@ -316,7 +400,7 @@ public class CloudSdkPanelTest {
     }
 
     assertThat(sdkPanel.getEnableAutomaticUpdatesCheckbox().isSelected())
-        .isEqualTo(userSettings.getEnableAutomaticUpdates());
+        .isEqualTo(userSettings.isAutomaticUpdateEnabled());
 
     assertThat(sdkPanel.getCloudSdkDirectoryText())
         .isEqualTo(Strings.nullToEmpty(userSettings.getCustomSdkPath()));
