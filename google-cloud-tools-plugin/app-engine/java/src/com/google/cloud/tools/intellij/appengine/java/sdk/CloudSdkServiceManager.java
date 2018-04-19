@@ -286,7 +286,8 @@ public class CloudSdkServiceManager {
       // add a link to SDK settings for a quick fix if this is a fatal error.
       if (notificationType == NotificationType.ERROR) {
         invalidSdkWarning.addAction(
-            new AnAction(AppEngineMessageBundle.message("appengine.deployment.error.sdk.settings.action")) {
+            new AnAction(
+                AppEngineMessageBundle.message("appengine.deployment.error.sdk.settings.action")) {
               @Override
               public void actionPerformed(AnActionEvent e) {
                 ShowSettingsUtil.getInstance()

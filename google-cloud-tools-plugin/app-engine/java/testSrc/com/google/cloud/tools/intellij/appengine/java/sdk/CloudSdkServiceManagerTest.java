@@ -146,7 +146,8 @@ public class CloudSdkServiceManagerTest {
             () ->
                 verify(cloudSdkServiceManager)
                     .showCloudSdkNotification(
-                        AppEngineMessageBundle.message("appengine.deployment.error.sdk.not.available"),
+                        AppEngineMessageBundle.message(
+                            "appengine.deployment.error.sdk.not.available"),
                         NotificationType.WARNING));
   }
 
@@ -180,7 +181,8 @@ public class CloudSdkServiceManagerTest {
             () ->
                 verify(cloudSdkServiceManager)
                     .showCloudSdkNotification(
-                        AppEngineMessageBundle.message("managedsdk.not.available"), NotificationType.ERROR));
+                        AppEngineMessageBundle.message("managedsdk.not.available"),
+                        NotificationType.ERROR));
   }
 
   private void mockSdkStatusChange(SdkStatus fromStatus, SdkStatus toStatus) {

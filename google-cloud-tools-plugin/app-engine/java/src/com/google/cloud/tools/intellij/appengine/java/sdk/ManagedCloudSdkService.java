@@ -260,7 +260,8 @@ public class ManagedCloudSdkService implements CloudSdkService {
         ProgressListener waitForSdkProcessesProgress =
             ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
         waitForSdkProcessesProgress.start(
-            AppEngineMessageBundle.message("managedsdk.progress.wait.for.processes"), ProgressListener.UNKNOWN);
+            AppEngineMessageBundle.message("managedsdk.progress.wait.for.processes"),
+            ProgressListener.UNKNOWN);
         try {
           CloudSdkServiceManager.getInstance().getSdkWriteLock().lockInterruptibly();
         } finally {
