@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.apis;
 
+import com.google.cloud.tools.intellij.analytics.GctTracking;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
@@ -106,6 +108,10 @@ public class CloudDependencyVersionWithBomInspection extends CloudBomInspection 
       XmlTag versionTag = xmlElement.getParentTag();
       if (versionTag != null) {
         stripVersion(versionTag);
+
+        UsageTrackerProvider.getInstance()
+            .trackEvent(GctTracking.CLIENT_LIBRARY_VERSION_WITH_BOM_MAVEN_QUICKFIX)
+            .ping();
       } else {
         logger.warn("Could not locate version tag to delete for DependencyVersionWithBom quickfix");
       }
