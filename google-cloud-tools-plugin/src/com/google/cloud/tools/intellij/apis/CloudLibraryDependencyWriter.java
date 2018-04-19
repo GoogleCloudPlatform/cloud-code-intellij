@@ -167,7 +167,7 @@ final class CloudLibraryDependencyWriter {
                 oldBomVersionDom.setStringValue(bomVersion);
 
                 UsageTrackerProvider.getInstance()
-                    .trackEvent(GctTracking.CLIENT_LIBRARY_UPDATE_BOM)
+                    .trackEvent(GctTracking.CLIENT_LIBRARY_UPDATE_BOM_MAVEN)
                     .addMetadata(
                         GctTracking.METADATA_OLD_BOM_VERSION, oldBomVersionDom.getStringValue())
                     .addMetadata(GctTracking.METADATA_NEW_BOM_VERSION, bomVersion)
@@ -194,7 +194,7 @@ final class CloudLibraryDependencyWriter {
     }
 
     UsageTrackerProvider.getInstance()
-        .trackEvent(GctTracking.CLIENT_LIBRARY_ADD_LIBRARY)
+        .trackEvent(GctTracking.CLIENT_LIBRARY_ADD_LIBRARY_MAVEN)
         .addMetadata(GctTracking.METADATA_BUILD_SYSTEM_KEY, GctTracking.METADATA_BUILD_SYSTEM_MAVEN)
         .addMetadata(GctTracking.METADATA_LABEL_KEY, mavenId.getDisplayString())
         .ping();
@@ -213,7 +213,7 @@ final class CloudLibraryDependencyWriter {
     bomDependency.getScope().setStringValue(CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_SCOPE);
 
     UsageTrackerProvider.getInstance()
-        .trackEvent(GctTracking.CLIENT_LIBRARY_NEW_BOM)
+        .trackEvent(GctTracking.CLIENT_LIBRARY_NEW_BOM_MAVEN)
         .addMetadata(GctTracking.METADATA_NEW_BOM_VERSION, bomVersion)
         .ping();
   }

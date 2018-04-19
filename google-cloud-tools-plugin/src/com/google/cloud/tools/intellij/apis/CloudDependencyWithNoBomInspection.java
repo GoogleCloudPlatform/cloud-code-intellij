@@ -138,7 +138,7 @@ public class CloudDependencyWithNoBomInspection extends CloudBomInspection {
             CloudLibraryProjectState.getInstance(project).syncCloudLibrariesBom();
 
             UsageTrackerProvider.getInstance()
-                .trackEvent(GctTracking.CLIENT_LIBRARY_WITHOUT_BOM_QUICKFIX)
+                .trackEvent(GctTracking.CLIENT_LIBRARY_WITHOUT_BOM_MAVEN_QUICKFIX)
                 .ping();
           } else {
             logger.warn(

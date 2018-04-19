@@ -110,7 +110,7 @@ public class CloudDependencyVersionWithBomInspection extends CloudBomInspection 
         stripVersion(versionTag);
 
         UsageTrackerProvider.getInstance()
-            .trackEvent(GctTracking.CLIENT_LIBRARY_VERSION_WITH_BOM_QUICKFIX)
+            .trackEvent(GctTracking.CLIENT_LIBRARY_VERSION_WITH_BOM_MAVEN_QUICKFIX)
             .ping();
       } else {
         logger.warn("Could not locate version tag to delete for DependencyVersionWithBom quickfix");
