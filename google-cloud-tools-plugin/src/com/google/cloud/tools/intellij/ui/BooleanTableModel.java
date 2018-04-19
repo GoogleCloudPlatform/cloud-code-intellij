@@ -18,14 +18,12 @@ package com.google.cloud.tools.intellij.ui;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 import org.jetbrains.annotations.NotNull;
@@ -40,7 +38,6 @@ import org.jetbrains.annotations.Nullable;
 public class BooleanTableModel<T> extends AbstractTableModel {
 
   private final SortedMap<T, Boolean> map;
-  private final List<TableModelListener> listeners = new ArrayList<>();
   private final int VALUE_COL = 0;
   private final int BOOLEAN_COL = 1;
   private final Class<T> type;

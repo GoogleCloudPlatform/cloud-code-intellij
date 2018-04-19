@@ -29,7 +29,6 @@ import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.execution.runners.ProgramRunner;
 import com.intellij.execution.util.EnvironmentVariable;
 import com.intellij.javaee.run.configuration.RunnerSpecificLocalConfigurationBit;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.BooleanTableCellEditor;
@@ -66,9 +65,6 @@ import org.jetbrains.annotations.Nullable;
  * to automatically update with these environment variables.
  */
 public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
-
-  private static final Logger LOG =
-      Logger.getInstance(ServiceAccountKeyUltimateDisplayDialog.class);
 
   private final Project project;
   private final CloudProject cloudProject;

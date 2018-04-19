@@ -424,8 +424,7 @@
     <applicationService serviceImplementation="com.google.cloud.tools.intellij.csr.CloudRepositoryService"/>
     <applicationService serviceImplementation="com.google.cloud.tools.intellij.apis.CloudLibrariesService"/>
     <applicationService serviceImplementation="com.google.cloud.tools.intellij.apis.CloudApiMavenService"/>
-    <applicationService serviceInterface="com.google.cloud.tools.intellij.apis.ServiceAccountKeyDialogService"
-                            serviceImplementation="com.google.cloud.tools.intellij.apis.ServiceAccountKeyDialogService"/>
+    <applicationService serviceImplementation="com.google.cloud.tools.intellij.apis.ServiceAccountKeyDialogService"/>
 
     <!-- App Engine Cloud and Deployment Sources Configuration-->
     <remoteServer.type
