@@ -16,7 +16,7 @@
 
 sourceSets.main.resources.srcDirs = ['resources']
 sourceSets.main.java.srcDirs = ['src']
-sourceSets.test.java.srcDirs = ['testSrc']
+sourceSets.test.java.srcDirs = ['testSrc', 'testResources']
 
 intellij {
     type 'IU'
@@ -43,7 +43,6 @@ dependencies {
     testCompile 'org.yaml:snakeyaml:1.18'
 
     testCompile project(':google-cloud-tools-plugin:stackdriver-debugger')
-    testCompile project(path: ':google-cloud-tools-plugin', configuration: 'tests')
     testCompile project(':google-cloud-tools-plugin:google-cloud-core')
     testCompile project(':common-test-lib')
 }
