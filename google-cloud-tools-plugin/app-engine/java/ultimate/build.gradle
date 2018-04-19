@@ -44,5 +44,7 @@ dependencies {
 
     testCompile project(':google-cloud-tools-plugin:stackdriver-debugger')
     testCompile project(':google-cloud-tools-plugin:google-cloud-core')
+//    testCompile project(path: ':google-cloud-tools-plugin:appengine:java', configuration: 'tests')
+    testCompile project(':google-cloud-tools-plugin:app-engine:java').sourceSets.test.output
     testCompile project(':common-test-lib')
 }
