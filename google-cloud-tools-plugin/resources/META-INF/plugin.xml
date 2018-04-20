@@ -108,25 +108,21 @@
 
     <group id="GoogleCloudTools.misc">
       <separator/>
-      <action id="GoogleCloudTools.CloudDebugger" class="com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebuggerToolsMenuAction">
-        <add-to-group group-id="GoogleCloudTools"/>
-      </action>
+      <action id="GoogleCloudTools.CloudDebugger"
+              class="com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebuggerToolsMenuAction"/>
       <separator/>
-      <reference ref="GoogleCloudTools.UploadSourceToGCP">
-        <add-to-group group-id="GoogleCloudTools"/>
-      </reference>
+      <reference ref="GoogleCloudTools.UploadSourceToGCP"/>
       <separator/>
-      <action id="GoogleCloudTools.CloudStorage" class="com.google.cloud.tools.intellij.gcs.GcsToolWindowAction">
-        <add-to-group group-id="GoogleCloudTools"/>
-      </action>
+      <action id="GoogleCloudTools.CloudStorage"
+              class="com.google.cloud.tools.intellij.gcs.GcsToolWindowAction"/>
       <separator/>
-      <action id="GoogleCloudTools.AddCloudLibraries" class="com.google.cloud.tools.intellij.apis.AddCloudLibrariesAction">
-        <add-to-group group-id="GoogleCloudTools"/>
-      </action>
+      <action id="GoogleCloudTools.AddCloudLibraries"
+              class="com.google.cloud.tools.intellij.apis.AddCloudLibrariesAction"/>
       <separator/>
-      <action id="GoogleCloudTools.Feedback" class="com.google.cloud.tools.intellij.CloudToolsFeedbackAction">
-        <add-to-group group-id="GoogleCloudTools"/>
-      </action>
+      <action id="GoogleCloudTools.Feedback"
+              class="com.google.cloud.tools.intellij.CloudToolsFeedbackAction"/>
+      <separator/>
+      <add-to-group group-id="GoogleCloudTools" anchor="last"/>
     </group>
 
   </actions>
