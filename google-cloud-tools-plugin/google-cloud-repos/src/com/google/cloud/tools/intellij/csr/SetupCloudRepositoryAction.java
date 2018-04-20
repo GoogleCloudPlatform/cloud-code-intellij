@@ -22,7 +22,6 @@ import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.util.CloudReposMessageBundle;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
 import com.intellij.ide.util.PropertiesComponent;
@@ -82,8 +81,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

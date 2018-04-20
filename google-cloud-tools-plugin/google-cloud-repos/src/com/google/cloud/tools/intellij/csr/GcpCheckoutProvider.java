@@ -19,7 +19,6 @@ package com.google.cloud.tools.intellij.csr;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
-import com.google.cloud.tools.intellij.util.CloudReposMessageBundle;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.notification.NotificationListener.UrlOpeningListener;
 import com.intellij.openapi.diagnostic.Logger;

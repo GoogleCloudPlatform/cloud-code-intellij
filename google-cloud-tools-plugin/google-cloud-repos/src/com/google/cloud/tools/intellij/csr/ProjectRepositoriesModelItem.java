@@ -20,7 +20,6 @@ import com.google.api.services.source.model.Repo;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.ResourceEmptyModelItem;
 import com.google.cloud.tools.intellij.resources.ResourceErrorModelItem;
-import com.google.cloud.tools.intellij.util.CloudReposMessageBundle;
 import com.intellij.openapi.components.ServiceManager;
 import java.util.List;
 import javax.swing.tree.DefaultMutableTreeNode;

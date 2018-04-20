@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.util;
+package com.google.cloud.tools.intellij.csr;
 
 import com.intellij.CommonBundle;
 import java.util.ResourceBundle;
