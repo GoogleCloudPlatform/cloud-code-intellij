@@ -195,10 +195,10 @@ public class CloudApiMavenService {
   }
 
   private static DefaultRepositorySystemSession newRepositorySystemSession(
-      RepositorySystem system) {
+      RepositorySystem repositorySystem) {
     DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
     session.setLocalRepositoryManager(
-        system.newLocalRepositoryManager(
+        repositorySystem.newLocalRepositoryManager(
             session, new LocalRepository(JarRepositoryManager.getLocalRepositoryPath())));
 
     return session;
