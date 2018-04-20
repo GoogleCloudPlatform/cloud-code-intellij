@@ -41,15 +41,12 @@
 
   <xi:include href="/META-INF/google-cloud-core.xml" xpointer="xpointer(/idea-plugin/*)"/>
   <xi:include href="/META-INF/google-cloud-storage.xml" xpointer="xpointer(/idea-plugin/*)"/>
+  <xi:include href="/META-INF/app-engine-java.xml" xpointer="xpointer(/idea-plugin/*)"/>
   <xi:include href="/META-INF/stackdriver-debugger.xml" xpointer="xpointer(/idea-plugin/*)"/>
 
-  <depends optional="true" config-file="javaee-integration.xml">com.intellij.javaee</depends>
-  <depends optional="true" config-file="gwt-integration.xml">com.intellij.gwt</depends>
   <depends>com.intellij.modules.lang</depends>
+  <depends>com.intellij.modules.java</depends>
   <depends>com.intellij.modules.vcs</depends>
-  <depends>com.intellij.modules.xml</depends>
-  <depends>org.jetbrains.plugins.gradle</depends>
-  <depends>org.jetbrains.plugins.yaml</depends>
   <depends>Git4Idea</depends>
   <depends>org.jetbrains.idea.maven</depends>
 
@@ -65,138 +62,29 @@
     </component>
   </project-components>
 
-  <extensionPoints>
-    <extensionPoint name="forbiddenCodeHandler" interface="com.google.cloud.tools.intellij.appengine.inspections.AppEngineForbiddenCodeHandler"/>
-  </extensionPoints>
 
   <extensions defaultExtensionNs="com.intellij">
-    <applicationConfigurable parentId="google.settings" instance="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkConfigurable"/>
-
-    <implicitUsageProvider implementation="com.google.cloud.tools.intellij.appengine.validation.EndpointImplicitUsageProvider"/>
-
-    <checkoutProvider implementation="com.google.cloud.tools.intellij.csr.GcpCheckoutProvider"/>
+     <checkoutProvider implementation="com.google.cloud.tools.intellij.csr.GcpCheckoutProvider"/>
     <vcsPopupProvider implementation="com.google.cloud.tools.intellij.csr.GcpQuickListContentProvider"/>
 
-    <dom.fileDescription
-            implementation="com.google.cloud.tools.intellij.appengine.descriptor.dom.AppEngineStandardWebFileDescriptor"/>
 
     <applicationService serviceInterface="com.google.cloud.tools.intellij.service.ApplicationPluginInfoService"
                         serviceImplementation="com.google.cloud.tools.intellij.service.DefaultApplicationPluginInfoService"/>
 
-    <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager"/>
-    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService"
-                        serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.DefaultCloudSdkService"/>
-    <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator"/>
-    <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.ManagedCloudSdkUpdateService"/>
-
-    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardWebIntegration"
-                        serviceImplementation="com.google.cloud.tools.intellij.appengine.facet.standard.impl.AppEngineStandardCommunityWebIntegration"/>
-    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService"
-                        serviceImplementation="com.google.cloud.tools.intellij.appengine.project.DefaultAppEngineProjectService"/>
-    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider"
-                        serviceImplementation="com.google.cloud.tools.intellij.appengine.project.DefaultAppEngineAssetProvider"/>
-    <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.facet.standard.MavenRepositoryLibraryDownloader"/>
-    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkVersionNotifier"
-                        serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.DefaultCloudSdkVersionNotifier"/>
-    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.application.AppEngineAdminService"
-                        serviceImplementation="com.google.cloud.tools.intellij.appengine.application.GoogleApiClientAppEngineAdminService"/>
-    <applicationService serviceImplementation="com.google.cloud.tools.intellij.csr.CloudRepositoryService"/>
     <applicationService serviceImplementation="com.google.cloud.tools.intellij.apis.CloudLibrariesService"/>
     <applicationService serviceImplementation="com.google.cloud.tools.intellij.apis.CloudApiMavenService"/>
-
-    <!-- App Engine Cloud and Deployment Sources Configuration-->
-    <remoteServer.type
-            implementation="com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType"/>
-    <remoteServer.deploymentSource.type
-            implementation="com.google.cloud.tools.intellij.appengine.cloud.flexible.UserSpecifiedPathDeploymentSourceType"/>
-    <remoteServer.deploymentSource.type
-            implementation="com.google.cloud.tools.intellij.appengine.cloud.MavenBuildDeploymentSourceType"/>
-    <remoteServer.deploymentSource.type
-            implementation="com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeploymentSourceType"/>
-
-    <framework.type implementation="com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFrameworkType"/>
-    <framework.type implementation="com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFrameworkType"/>
-    <fileTemplateGroup implementation="com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineTemplateGroupDescriptorFactory"/>
-    <facetType implementation="com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType"/>
-    <facetType implementation="com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType"/>
-    <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineStandardFacetConverterProvider"/>
-    <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineConverterProvider"/>
-    <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.StagedArtifactNameConverterProvider"/>
-    <framework.detector implementation="com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFrameworkDetector"/>
-    <framework.detector implementation="com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFrameworkDetector"/>
-
-    <xml.schemaProvider implementation="com.google.cloud.tools.intellij.appengine.descriptor.AppEngineWebSchemaProvider"/>
-
-    <fileTypeFactory implementation="com.google.cloud.tools.intellij.appengine.file.DockerFileTemplateTypeFactory"/>
+    <applicationService serviceImplementation="com.google.cloud.tools.intellij.csr.CloudRepositoryService"/>
 
     <localInspection language="XML" shortName="DependencyVersionWithBom" bundle="messages.CloudToolsBundle"
                      hasStaticDescription="true" key="cloud.libraries.version.with.bom.inspection.display.name"
                      groupKey="cloud.libraries.bom.inspection.group.name"  enabledByDefault="true" level="WARNING"
                      implementationClass="com.google.cloud.tools.intellij.apis.CloudDependencyVersionWithBomInspection"/>
 
-    <localInspection language="XML" shortName="DependencyWithNoBom" bundle="messages.CloudToolsBundle"
-                     hasStaticDescription="true" key="cloud.libraries.with.no.bom.inspection.display.name"
-                     groupKey="cloud.libraries.bom.inspection.group.name"  enabledByDefault="true" level="WARNING"
-                     implementationClass="com.google.cloud.tools.intellij.apis.CloudDependencyWithNoBomInspection"/>
+  <localInspection language="XML" shortName="DependencyWithNoBom" bundle="messages.CloudToolsBundle"
+                   hasStaticDescription="true" key="cloud.libraries.with.no.bom.inspection.display.name"
+                   groupKey="cloud.libraries.bom.inspection.group.name"  enabledByDefault="true" level="WARNING"
+                   implementationClass="com.google.cloud.tools.intellij.apis.CloudDependencyWithNoBomInspection"/>
 
-    <localInspection language="JAVA" shortName="GoogleAppEngineForbiddenCode" displayName="Forbidden code in App Engine applications"
-                     groupName="Google App Engine" enabledByDefault="true" level="ERROR"
-                     implementationClass="com.google.cloud.tools.intellij.appengine.inspections.AppEngineForbiddenCodeInspection"/>
-
-    <localInspection language="JAVA" shortName="ApiName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="api.name.name" groupKey="inspections.group.name" enabledByDefault="true" level="ERROR"
-                     implementationClass="com.google.cloud.tools.intellij.appengine.validation.ApiNameInspection"/>
-
-    <localInspection language="JAVA" shortName="ApiNamespace" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="api.namespace.name" groupKey="inspections.group.name" enabledByDefault="true" level="ERROR"
-                     implementationClass="com.google.cloud.tools.intellij.appengine.validation.ApiNamespaceInspection"/>
-
-    <localInspection language="JAVA" shortName="ApiParameter" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="api.parameter.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.ApiParameterInspection"/>
-
-    <localInspection language="JAVA" shortName="Constructor" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="constructor.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.ConstructorInspection"/>
-
-    <localInspection language="JAVA" shortName="FullJavaName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="backend.name.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.FullJavaNameInspection"/>
-
-    <localInspection language="JAVA" shortName="FullMethodName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="full.method.name.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.FullMethodNameInspection"/>
-
-    <localInspection language="JAVA" shortName="InvalidParameterAnnotations" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="invalid.parameter.annotations.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.InvalidParameterAnnotationsInspection"/>
-
-    <localInspection language="JAVA" shortName="MethodName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="method.name.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.MethodNameInspection"/>
-
-    <localInspection language="JAVA" shortName="MethodParameterType" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="method.parameter.type.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.MethodParameterTypeInspection"/>
-
-    <localInspection language="JAVA" shortName="MethodReturnType" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="method.return.type.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.MethodReturnTypeInspection"/>
-
-    <localInspection language="JAVA" shortName="NamedResource" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="named.resource.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.NamedResourceInspection"/>
-
-    <localInspection language="JAVA" shortName="ResourceParameter" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="resource.parameter.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.ResourceParameterInspection"/>
-
-    <localInspection language="JAVA" shortName="RestSignature" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="unique.rest.signature.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.RestSignatureInspection"/>
-
-    <postStartupActivity implementation="com.google.cloud.tools.intellij.startup.AppEngineStandardUnsupportedJavaVersionCheck"/>
-    <postStartupActivity implementation="com.google.cloud.tools.intellij.startup.CloudSdkVersionStartupCheck"/>
   </extensions>
 
   <extensions defaultExtensionNs="Git4Idea">
@@ -218,24 +106,23 @@
       <add-to-group group-id="Vcs.Import"/>
     </action>
 
-    <group id="GoogleCloudTools" class="com.google.cloud.tools.intellij.CloudToolsMenuGroupAction" popup="true">
-      <group id="AddAppEngineFrameworkSupport" class="com.google.cloud.tools.intellij.appengine.facet.AddAppEngineFrameworkSupportMenuGroupAction" popup="true">
-        <action id="AddAppEngineFrameworkSupport.Standard" class="com.google.cloud.tools.intellij.appengine.facet.standard.AddAppEngineStandardFrameworkSupportToolsMenuAction"/>
-        <action id="AddAppEngineFrameworkSupport.Flexible" class="com.google.cloud.tools.intellij.appengine.facet.flexible.AddAppEngineFlexibleFrameworkSupportToolsMenuAction"/>
-      </group>
-      <action id="GoogleCloudTools.AppEngineDeploy" class="com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeployToolsMenuAction"/>
+    <group id="GoogleCloudTools.misc">
       <separator/>
-      <action id="GoogleCloudTools.CloudDebugger" class="com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebuggerToolsMenuAction"/>
+      <action id="GoogleCloudTools.CloudDebugger"
+              class="com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebuggerToolsMenuAction"/>
       <separator/>
       <reference ref="GoogleCloudTools.UploadSourceToGCP"/>
       <separator/>
-      <action id="GoogleCloudTools.CloudStorage" class="com.google.cloud.tools.intellij.gcs.GcsToolWindowAction"/>
+      <action id="GoogleCloudTools.CloudStorage"
+              class="com.google.cloud.tools.intellij.gcs.GcsToolWindowAction"/>
       <separator/>
-      <action id="GoogleCloudTools.AddCloudLibraries" class="com.google.cloud.tools.intellij.apis.AddCloudLibrariesAction"/>
+      <action id="GoogleCloudTools.AddCloudLibraries"
+              class="com.google.cloud.tools.intellij.apis.AddCloudLibrariesAction"/>
       <separator/>
-      <action id="GoogleCloudTools.Feedback" class="com.google.cloud.tools.intellij.CloudToolsFeedbackAction"/>
-
-      <add-to-group group-id="ToolsMenu" anchor="last"/>
+      <action id="GoogleCloudTools.Feedback"
+              class="com.google.cloud.tools.intellij.CloudToolsFeedbackAction"/>
+      <separator/>
+      <add-to-group group-id="GoogleCloudTools" anchor="last"/>
     </group>
 
   </actions>

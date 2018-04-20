@@ -17,9 +17,9 @@
 package com.google.cloud.tools.intellij.apis;
 
 import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
-import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacet;
-import com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType;
-import com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService;
+import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacet;
+import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacetType;
+import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;

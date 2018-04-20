@@ -13,6 +13,8 @@
       <entry name="!?*.clj" />
     </wildcardResourcePatterns>
     <bytecodeTargetLevel>
+      <module name="app-engine_main" target="1.8" />
+      <module name="app-engine_test" target="1.8" />
       <module name="common-lib_main" target="1.8" />
       <module name="common-lib_test" target="1.8" />
       <module name="common-test-lib_main" target="1.8" />
@@ -23,10 +25,16 @@
       <module name="google-cloud-core_test" target="1.8" />
       <module name="google-cloud-storage_main" target="1.8" />
       <module name="google-cloud-storage_test" target="1.8" />
+      <module name="google-cloud-tools-plugin-ultimate_main" target="1.8" />
+      <module name="google-cloud-tools-plugin-ultimate_test" target="1.8" />
       <module name="google-cloud-tools-plugin_main" target="1.8" />
       <module name="google-cloud-tools-plugin_test" target="1.8" />
       <module name="stackdriver-debugger_main" target="1.8" />
       <module name="stackdriver-debugger_test" target="1.8" />
+      <module name="java-ultimate_main" target="1.8" />
+      <module name="java-ultimate_test" target="1.8" />
+      <module name="java_main" target="1.8" />
+      <module name="java_test" target="1.8" />
       <module name="ultimate_main" target="1.8" />
       <module name="ultimate_test" target="1.8" />
     </bytecodeTargetLevel>
