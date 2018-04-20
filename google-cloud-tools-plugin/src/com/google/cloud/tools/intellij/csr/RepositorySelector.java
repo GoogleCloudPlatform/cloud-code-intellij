@@ -23,7 +23,7 @@ import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.resources.ResourceLoadingModelItem;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBox;
 import com.google.cloud.tools.intellij.ui.CustomizableComboBoxPopup;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.CloudReposMessageBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
@@ -81,7 +81,7 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
 
     getTextField()
         .getEmptyText()
-        .setText(GctBundle.message("cloud.repository.selector.placeholder.text"));
+        .setText(CloudReposMessageBundle.message("cloud.repository.selector.placeholder.text"));
   }
 
   @Nullable
@@ -205,7 +205,8 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
       setPreferredSize(new Dimension(RepositorySelector.this.getTextField().getWidth(), HEIGHT));
       JLabel warning = new JBLabel();
       warning.setFont(new Font(getFont().getFontName(), Font.ITALIC, getFont().getSize()));
-      warning.setText(GctBundle.message("cloud.repository.selector.missing.project.error"));
+      warning.setText(
+          CloudReposMessageBundle.message("cloud.repository.selector.missing.project.error"));
       add(warning);
     }
   }
@@ -264,7 +265,8 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
 
       if (canCreateRepository) {
         JButton newRepositoryButton = new JButton();
-        newRepositoryButton.setText(GctBundle.message("cloud.repository.selector.create.button"));
+        newRepositoryButton.setText(
+            CloudReposMessageBundle.message("cloud.repository.selector.create.button"));
         newRepositoryButton.addActionListener(
             event -> {
               try {
@@ -276,7 +278,8 @@ public class RepositorySelector extends CustomizableComboBox implements Customiz
                                 cloudProject.projectId(),
                                 cloudProject.googleUsername())));
               } catch (IOException e) {
-                logger.error(GctBundle.message("cloud.repository.selector.create.url.error"));
+                logger.error(
+                    CloudReposMessageBundle.message("cloud.repository.selector.create.url.error"));
               }
             });
 

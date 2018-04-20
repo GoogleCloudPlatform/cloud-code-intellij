@@ -13,7 +13,7 @@
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text resource-bundle="messages/CloudToolsBundle" key="cloud.repository.dialog.project.label"/>
+          <text resource-bundle="messages/CloudReposBundle" key="cloud.repository.dialog.project.label"/>
         </properties>
       </component>
       <vspacer id="86a0f">
@@ -31,7 +31,7 @@
           <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text resource-bundle="messages/CloudToolsBundle" key="cloud.repository.clone.parent.dir"/>
+          <text resource-bundle="messages/CloudReposBundle" key="cloud.repository.clone.parent.dir"/>
         </properties>
       </component>
       <component id="876a6" class="com.intellij.openapi.ui.TextFieldWithBrowseButton" binding="parentDirectory">
@@ -46,7 +46,7 @@
         </constraints>
         <properties>
           <labelFor value="4e988"/>
-          <text resource-bundle="messages/CloudToolsBundle" key="cloud.repository.clone.dir.name"/>
+          <text resource-bundle="messages/CloudReposBundle" key="cloud.repository.clone.dir.name"/>
         </properties>
       </component>
       <component id="4e988" class="javax.swing.JTextField" binding="directoryName">
@@ -63,7 +63,7 @@
         </constraints>
         <properties>
           <labelFor value="4e988"/>
-          <text resource-bundle="messages/CloudToolsBundle" key="cloud.repository.dialog.repository.label"/>
+          <text resource-bundle="messages/CloudReposBundle" key="cloud.repository.dialog.repository.label"/>
         </properties>
       </component>
       <component id="eae97" class="com.google.cloud.tools.intellij.csr.RepositorySelector" binding="repositorySelector" custom-create="true">

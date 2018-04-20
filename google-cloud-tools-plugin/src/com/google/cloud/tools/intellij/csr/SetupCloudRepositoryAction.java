@@ -22,7 +22,7 @@ import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.CloudReposMessageBundle;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
 import com.intellij.ide.util.PropertiesComponent;
@@ -96,8 +96,8 @@ public class SetupCloudRepositoryAction extends DumbAwareAction {
 
   public SetupCloudRepositoryAction() {
     super(
-        GctBundle.message("uploadtogcp.text"),
-        GctBundle.message("uploadtogcp.description"),
+        CloudReposMessageBundle.message("uploadtogcp.text"),
+        CloudReposMessageBundle.message("uploadtogcp.description"),
         GoogleCloudCoreIcons.CLOUD);
   }
 
@@ -140,8 +140,8 @@ public class SetupCloudRepositoryAction extends DumbAwareAction {
         new SetupCloudRepositoryDialog(
             project,
             gitRepository,
-            GctBundle.message("uploadtogcp.title"),
-            GctBundle.message("uploadtogcp.oktext"));
+            CloudReposMessageBundle.message("uploadtogcp.title"),
+            CloudReposMessageBundle.message("uploadtogcp.oktext"));
     DialogManager.show(dialog);
     if (!dialog.isOK()
         || dialog.getCredentialedUser() == null
@@ -155,8 +155,8 @@ public class SetupCloudRepositoryAction extends DumbAwareAction {
       Notification notification =
           new Notification(
               NOTIFICATION_GROUP_ID,
-              GctBundle.message("uploadtogcp.remotename.collision.title"),
-              GctBundle.message("uploadtogcp.remotename.collision", remoteName),
+              CloudReposMessageBundle.message("uploadtogcp.remotename.collision.title"),
+              CloudReposMessageBundle.message("uploadtogcp.remotename.collision", remoteName),
               NotificationType.ERROR);
       notification.notify(project);
       return;
@@ -167,14 +167,15 @@ public class SetupCloudRepositoryAction extends DumbAwareAction {
     final CredentialedUser user = dialog.getCredentialedUser();
 
     // finish the job in background
-    new Task.Backgroundable(project, GctBundle.message("uploadtogcp.backgroundtitle")) {
+    new Task.Backgroundable(
+        project, CloudReposMessageBundle.message("uploadtogcp.backgroundtitle")) {
       @Override
       public void run(@NotNull ProgressIndicator indicator) {
         // creating empty git repo if git is not initialized
         LOG.info("Binding local project with Git");
         if (!gitDetected) {
           LOG.info("No git detected, creating empty git repo");
-          indicator.setText(GctBundle.message("uploadtogcp.indicatorinit"));
+          indicator.setText(CloudReposMessageBundle.message("uploadtogcp.indicatorinit"));
           if (!createEmptyGitRepository(project, root, indicator)) {
             return;
           }
@@ -188,8 +189,8 @@ public class SetupCloudRepositoryAction extends DumbAwareAction {
                 Notification notification =
                     new Notification(
                         NOTIFICATION_GROUP_ID,
-                        GctBundle.message("uploadtogcp.generic.failure.title"),
-                        GctBundle.message("uploadtogcp.failedtocreategit"),
+                        CloudReposMessageBundle.message("uploadtogcp.generic.failure.title"),
+                        CloudReposMessageBundle.message("uploadtogcp.failedtocreategit"),
                         NotificationType.ERROR);
                 notification.notify(project);
               });
@@ -201,7 +202,7 @@ public class SetupCloudRepositoryAction extends DumbAwareAction {
         final String remoteUrl = GcpHttpAuthDataProvider.getGcpUrl(projectId, repositoryId);
 
         LOG.info("Adding Google as a remote host");
-        indicator.setText(GctBundle.message("uploadtogcp.addingremote"));
+        indicator.setText(CloudReposMessageBundle.message("uploadtogcp.addingremote"));
         if (!addGitRemote(project, repository, remoteName, remoteUrl)) {
           return;
         }
@@ -212,7 +213,7 @@ public class SetupCloudRepositoryAction extends DumbAwareAction {
               .setValue(GcpHttpAuthDataProvider.GCP_USER, user.getEmail());
 
           LOG.info("Fetching from Google remote");
-          indicator.setText(GctBundle.message("uploadtogcp.fetching"));
+          indicator.setText(CloudReposMessageBundle.message("uploadtogcp.fetching"));
           if (!fetchGit(project, indicator, repository, remoteName)) {
             return;
           }
@@ -224,7 +225,7 @@ public class SetupCloudRepositoryAction extends DumbAwareAction {
 
           // git push origin master
           LOG.info("Pushing to Google master");
-          indicator.setText(GctBundle.message("uploadtogcp.pushingtotgcp"));
+          indicator.setText(CloudReposMessageBundle.message("uploadtogcp.pushingtotgcp"));
           if (!pushCurrentBranch(project, repository, remoteName, remoteUrl)) {
             return;
           }
@@ -237,7 +238,8 @@ public class SetupCloudRepositoryAction extends DumbAwareAction {
           }
         }
 
-        showInfoUrl(project, remoteName, GctBundle.message("uploadtogcp.success"), remoteUrl);
+        showInfoUrl(
+            project, remoteName, CloudReposMessageBundle.message("uploadtogcp.success"), remoteUrl);
       }
     }.queue();
   }
@@ -289,16 +291,17 @@ public class SetupCloudRepositoryAction extends DumbAwareAction {
     try {
       version = GitVersion.identifyVersion(executable);
     } catch (Exception ex) {
-      Messages.showErrorDialog(project, GctBundle.message("uploadtogcp.giterror"), ex.getMessage());
+      Messages.showErrorDialog(
+          project, CloudReposMessageBundle.message("uploadtogcp.giterror"), ex.getMessage());
       return false;
     }
 
     if (!version.isSupported()) {
       Messages.showWarningDialog(
           project,
-          GctBundle.message(
+          CloudReposMessageBundle.message(
               "uploadtogcp.git.unsupported.message", version.toString(), GitVersion.MIN),
-          GctBundle.message("uploadtogcp.giterror"));
+          CloudReposMessageBundle.message("uploadtogcp.giterror"));
       return false;
     }
     return true;
@@ -360,8 +363,8 @@ public class SetupCloudRepositoryAction extends DumbAwareAction {
             Notification notification =
                 new Notification(
                     NOTIFICATION_GROUP_ID,
-                    GctBundle.message("uploadtogcp.fetchfailedtitle"),
-                    GctBundle.message("uploadtogcp.fetchfailed", remote),
+                    CloudReposMessageBundle.message("uploadtogcp.fetchfailedtitle"),
+                    CloudReposMessageBundle.message("uploadtogcp.fetchfailed", remote),
                     NotificationType.ERROR);
             notification.notify(project);
           });
@@ -388,8 +391,9 @@ public class SetupCloudRepositoryAction extends DumbAwareAction {
               Notification notification =
                   new Notification(
                       NOTIFICATION_GROUP_ID,
-                      GctBundle.message("uploadtogcp.addremotefailedtitle"),
-                      GctBundle.message("uploadtogcp.addremotefailed", url, handler.getStderr()),
+                      CloudReposMessageBundle.message("uploadtogcp.addremotefailedtitle"),
+                      CloudReposMessageBundle.message(
+                          "uploadtogcp.addremotefailed", url, handler.getStderr()),
                       NotificationType.ERROR);
               notification.notify(project);
             });
@@ -404,8 +408,9 @@ public class SetupCloudRepositoryAction extends DumbAwareAction {
             Notification notification =
                 new Notification(
                     NOTIFICATION_GROUP_ID,
-                    GctBundle.message("uploadtogcp.addremotefailedtitle"),
-                    GctBundle.message("uploadtogcp.addremotefailed", url, ex.toString()),
+                    CloudReposMessageBundle.message("uploadtogcp.addremotefailedtitle"),
+                    CloudReposMessageBundle.message(
+                        "uploadtogcp.addremotefailed", url, ex.toString()),
                     NotificationType.ERROR);
             notification.notify(project);
           });
@@ -441,7 +446,7 @@ public class SetupCloudRepositoryAction extends DumbAwareAction {
     LOG.info("Trying to commit");
     try {
       LOG.info("Adding files for commit");
-      indicator.setText(GctBundle.getString("uploadsourceaction.addfiles"));
+      indicator.setText(CloudReposMessageBundle.getString("uploadsourceaction.addfiles"));
 
       // ask for files to add
       final List<VirtualFile> trackedFiles =
@@ -492,7 +497,7 @@ public class SetupCloudRepositoryAction extends DumbAwareAction {
 
       // commit
       LOG.info("Performing commit");
-      indicator.setText(GctBundle.getString("uploadsourceaction.performingcommit"));
+      indicator.setText(CloudReposMessageBundle.getString("uploadsourceaction.performingcommit"));
       GitSimpleHandler handler = new GitSimpleHandler(project, root, GitCommand.COMMIT);
       handler.setStdoutSuppressed(false);
       handler.addParameters("-m", dialog.getCommitMessage());
@@ -507,8 +512,9 @@ public class SetupCloudRepositoryAction extends DumbAwareAction {
             Notification notification =
                 new Notification(
                     NOTIFICATION_GROUP_ID,
-                    GctBundle.message("uploadtogcp.initialcommitfailedtitle"),
-                    GctBundle.message("uploadtogcp.initialcommitfailed", ex.toString()),
+                    CloudReposMessageBundle.message("uploadtogcp.initialcommitfailedtitle"),
+                    CloudReposMessageBundle.message(
+                        "uploadtogcp.initialcommitfailed", ex.toString()),
                     NotificationType.ERROR);
             notification.notify(project);
           });
@@ -541,8 +547,8 @@ public class SetupCloudRepositoryAction extends DumbAwareAction {
             Notification notification =
                 new Notification(
                     NOTIFICATION_GROUP_ID,
-                    GctBundle.message("uploadtogcp.initialpushfailedtitle"),
-                    GctBundle.message("uploadtogcp.initialpushfailed"),
+                    CloudReposMessageBundle.message("uploadtogcp.initialpushfailedtitle"),
+                    CloudReposMessageBundle.message("uploadtogcp.initialpushfailed"),
                     NotificationType.ERROR);
             notification.notify(project);
           });
@@ -557,7 +563,7 @@ public class SetupCloudRepositoryAction extends DumbAwareAction {
             Notification notification =
                 new Notification(
                     NOTIFICATION_GROUP_ID,
-                    GctBundle.message("uploadtogcp.initialpushfailedtitle"),
+                    CloudReposMessageBundle.message("uploadtogcp.initialpushfailedtitle"),
                     result.getErrorOutputAsHtmlString()
                         + "<br/>"
                         + joinAsErrorHtmlString(result.getOutput()),
@@ -587,7 +593,7 @@ public class SetupCloudRepositoryAction extends DumbAwareAction {
         @NotNull Project project, @NotNull List<VirtualFile> untrackedFiles) {
       super(project, untrackedFiles, null, null, true, false, false);
       this.project = project;
-      setTitle(GctBundle.getString("uploadsourceaction.addfilestitle"));
+      setTitle(CloudReposMessageBundle.getString("uploadsourceaction.addfilestitle"));
       init();
     }
 

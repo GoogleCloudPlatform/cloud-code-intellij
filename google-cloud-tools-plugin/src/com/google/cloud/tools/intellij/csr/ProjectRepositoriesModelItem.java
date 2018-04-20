@@ -20,7 +20,7 @@ import com.google.api.services.source.model.Repo;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.resources.ResourceEmptyModelItem;
 import com.google.cloud.tools.intellij.resources.ResourceErrorModelItem;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.CloudReposMessageBundle;
 import com.intellij.openapi.components.ServiceManager;
 import java.util.List;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -61,7 +61,9 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
                       }
                     });
               } else {
-                add(new ResourceEmptyModelItem(GctBundle.message("cloud.repository.list.empty")));
+                add(
+                    new ResourceEmptyModelItem(
+                        CloudReposMessageBundle.message("cloud.repository.list.empty")));
               }
 
               if (onComplete != null) {
@@ -71,7 +73,9 @@ public class ProjectRepositoriesModelItem extends DefaultMutableTreeNode {
         .exceptionally(
             response -> {
               removeAllChildren();
-              add(new ResourceErrorModelItem(GctBundle.message("cloud.repository.list.error")));
+              add(
+                  new ResourceErrorModelItem(
+                      CloudReposMessageBundle.message("cloud.repository.list.error")));
 
               if (onComplete != null) {
                 onComplete.run();

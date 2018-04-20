@@ -20,7 +20,7 @@ import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.resources.SelectUserDialog;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.CloudReposMessageBundle;
 import com.intellij.ide.DataManager;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -74,7 +74,8 @@ public class GcpHttpAuthDataProvider implements GitHttpAuthDataProvider {
                   public void run() {
                     SelectUserDialog dialog =
                         new SelectUserDialog(
-                            currentProject, GctBundle.getString("httpauthprovider.chooselogin"));
+                            currentProject,
+                            CloudReposMessageBundle.getString("httpauthprovider.chooselogin"));
                     DialogManager.show(dialog);
                     chooseManualLogin = !dialog.isOK();
                     selectedUser = dialog.getSelectedUser();
