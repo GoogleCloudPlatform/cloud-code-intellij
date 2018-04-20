@@ -26,7 +26,8 @@ intellij {
     pluginName = 'google-cloud-tools'
     plugins 'Groovy', 'gradle', 'git4idea', 'properties', 'junit', 'maven', 'yaml'
     patchPluginXml {
-        changeNotes = new File('google-cloud-tools-plugin/change_notes.html').getText('UTF-8')
+        changeNotes = project (":google-cloud-tools-plugin").file("change_notes.html")
+                .getText('UTF-8')
     }
 }
 
