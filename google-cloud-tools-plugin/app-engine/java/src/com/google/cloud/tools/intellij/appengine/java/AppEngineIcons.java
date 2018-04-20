@@ -20,6 +20,7 @@ import com.intellij.openapi.util.IconLoader;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
+/** Icons for App Engine related features. */
 public class AppEngineIcons {
 
   public static final Icon APP_ENGINE = load("/icons/appEngine.png");

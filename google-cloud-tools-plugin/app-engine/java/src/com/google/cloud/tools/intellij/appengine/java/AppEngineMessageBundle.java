@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.PropertyKey;
 
+/** App Engine related UI messages. */
 public class AppEngineMessageBundle {
   @NonNls private static final String BUNDLE_NAME = "messages.AppEngineBundle";
 
