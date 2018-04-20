@@ -16,6 +16,7 @@
 <idea-plugin xmlns:xi="http://www.w3.org/2001/XInclude">
     <!--TODO: make gradle optional-->
     <depends>org.jetbrains.plugins.gradle</depends>
+    <depends>org.jetbrains.plugins.yaml</depends>
     <depends optional="true" config-file="google-app-engine-maven-support.xml">
         org.jetbrains.idea.maven
     </depends>
