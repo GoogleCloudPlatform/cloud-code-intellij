@@ -105,11 +105,25 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
   @Override
   protected Action[] createActions() {
     List<Action> actions = new ArrayList<>();
-    actions.add(getOKAction());
     if (runConfigurationTableModel.getRowCount() > 0) {
       actions.add(new ApplyAction());
     }
+    actions.add(getOKAction());
     return actions.toArray(new Action[0]);
+  }
+
+  @Override
+  @NotNull
+  protected Action getOKAction() {
+    myOKAction =
+        new OkAction() {
+          @Override
+          public void actionPerformed(ActionEvent event) {
+            super.actionPerformed(event);
+            addEnvironmentVariablesToConfiguration(getSelectedConfigurations());
+          }
+        };
+    return myOKAction;
   }
 
   private void createUIComponents() {
