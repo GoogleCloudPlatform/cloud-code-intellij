@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.java.facet.flexible;
 
 import com.google.cloud.tools.intellij.analytics.GctTracking;
-import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.common.collect.ImmutableList;
 import com.intellij.facet.FacetType;
 import com.intellij.framework.detection.FacetBasedFrameworkDetector;
@@ -45,7 +45,7 @@ public class AppEngineFlexibleFrameworkDetector
   public void setupFacet(@NotNull AppEngineFlexibleFacet facet, ModifiableRootModel model) {
     AppEngineFlexibleSupportProvider.addSupport(facet, model, false /* generateConfigFiles */);
 
-    UsageTrackerProvider.getInstance()
+    UsageTrackerService.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_FACET_ADD)
         .addMetadata("source", "frameworkDetect")
         .addMetadata("env", "flex")

@@ -21,7 +21,7 @@ import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage.BlobListOption;
 import com.google.cloud.storage.StorageException;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
-import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.ui.CopyToClipboardActionListener;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
@@ -129,7 +129,7 @@ public final class GcsBucketContentEditorPanel {
       return;
     }
 
-    UsageTrackerProvider.getInstance().trackEvent(GctTracking.GCS_BLOB_BROWSE).ping();
+    UsageTrackerService.getInstance().trackEvent(GctTracking.GCS_BLOB_BROWSE).ping();
 
     Consumer<List<Blob>> afterLoad =
         blobs -> {
@@ -160,7 +160,7 @@ public final class GcsBucketContentEditorPanel {
       return;
     }
 
-    UsageTrackerProvider.getInstance().trackEvent(GctTracking.GCS_BLOB_BROWSE).ping();
+    UsageTrackerService.getInstance().trackEvent(GctTracking.GCS_BLOB_BROWSE).ping();
 
     tableModel.setRowCount(0);
 
@@ -204,7 +204,7 @@ public final class GcsBucketContentEditorPanel {
     if (selectedBlob != null) {
       copyBlobNameMenuItem.addActionListener(
           e ->
-              UsageTrackerProvider.getInstance()
+              UsageTrackerService.getInstance()
                   .trackEvent(GctTracking.GCS_BLOB_BROWSE_ACTION_COPY_BLOB_NAME)
                   .ping());
       copyBlobNameMenuItem.addActionListener(
@@ -212,7 +212,7 @@ public final class GcsBucketContentEditorPanel {
 
       copyBucketNameMenuItem.addActionListener(
           e ->
-              UsageTrackerProvider.getInstance()
+              UsageTrackerService.getInstance()
                   .trackEvent(GctTracking.GCS_BLOB_BROWSE_ACTION_COPY_BUCKET_NAME)
                   .ping());
       copyBucketNameMenuItem.addActionListener(
@@ -266,7 +266,7 @@ public final class GcsBucketContentEditorPanel {
                           hideLoader();
                           showError();
 
-                          UsageTrackerProvider.getInstance()
+                          UsageTrackerService.getInstance()
                               .trackEvent(GctTracking.GCS_BLOB_BROWSE_EXCEPTION)
                               .ping();
                           log.warn(
