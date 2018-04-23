@@ -28,6 +28,9 @@
       <add-to-group group-id="MainToolBar" anchor="last"  />
       <add-to-group group-id="NavBarToolBar" anchor="last"  />
     </action>
+    <group id="GoogleCloudTools" class="com.google.cloud.tools.intellij.CloudToolsMenuGroupAction" popup="true">
+        <add-to-group group-id="ToolsMenu" anchor="last"/>
+    </group>
   </actions>
 
   <extensions defaultExtensionNs="com.intellij">

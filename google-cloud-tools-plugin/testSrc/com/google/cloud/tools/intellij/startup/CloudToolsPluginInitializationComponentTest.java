@@ -24,8 +24,8 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService;
-import com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager;
+import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService;
+import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceManager;
 import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
 import com.google.cloud.tools.intellij.service.ApplicationPluginInfoService;
 import com.google.cloud.tools.intellij.service.PluginConfigurationService;
