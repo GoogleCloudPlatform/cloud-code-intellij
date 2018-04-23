@@ -54,6 +54,8 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -75,6 +77,7 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
   private JLabel runConfigurationUpdateLabel;
   private JScrollPane scrollPane;
   private BooleanTableModel<RunnerAndConfigurationSettings> runConfigurationTableModel;
+  private AddVariablesAction addVariablesAction;
 
   @VisibleForTesting public static List<RunnerAndConfigurationSettings> configurationSettingsList;
 
@@ -93,6 +96,17 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
       scrollPane.setVisible(false);
       runConfigurationTable.setVisible(false);
     }
+
+    runConfigurationTableModel.addTableModelListener(
+        new TableModelListener() {
+          @Override
+          public void tableChanged(TableModelEvent e) {
+            if (addVariablesAction != null) {
+              addVariablesAction.setEnabled(
+                  !runConfigurationTableModel.getSelectedItems().isEmpty());
+            }
+          }
+        });
   }
 
   @Nullable
@@ -106,7 +120,8 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
   protected Action[] createActions() {
     List<Action> actions = new ArrayList<>();
     if (runConfigurationTableModel.getRowCount() > 0) {
-      actions.add(new AddVariablesAction());
+      addVariablesAction = new AddVariablesAction();
+      actions.add(addVariablesAction);
     }
     actions.add(getCancelAction());
     setCancelButtonText(CommonBundle.getCloseButtonText());
