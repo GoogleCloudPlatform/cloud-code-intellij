@@ -106,24 +106,11 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
   protected Action[] createActions() {
     List<Action> actions = new ArrayList<>();
     if (runConfigurationTableModel.getRowCount() > 0) {
-      actions.add(new ApplyAction());
+      actions.add(new AddVariablesAction());
     }
-    actions.add(getOKAction());
+    actions.add(getCancelAction());
+    setCancelButtonText(CommonBundle.getCloseButtonText());
     return actions.toArray(new Action[0]);
-  }
-
-  @Override
-  @NotNull
-  protected Action getOKAction() {
-    myOKAction =
-        new OkAction() {
-          @Override
-          public void actionPerformed(ActionEvent event) {
-            super.actionPerformed(event);
-            addEnvironmentVariablesToConfiguration(getSelectedConfigurations());
-          }
-        };
-    return myOKAction;
   }
 
   private void createUIComponents() {
@@ -175,7 +162,8 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
       setErrorText(
           GctBundle.message(
               "cloud.apis.service.account.key.dialog.update.configuration.error",
-              configuration.getName()));
+              configuration.getName()),
+          mainPanel);
       return;
     }
 
@@ -185,7 +173,8 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
       setErrorText(
           GctBundle.message(
               "cloud.apis.service.account.key.dialog.update.configuration.error",
-              configuration.getName()));
+              configuration.getName()),
+          mainPanel);
       return;
     }
 
@@ -219,14 +208,20 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
   }
 
   /** Adds the Cloud Library environment variables to the selected App Engine run configurations. */
-  private class ApplyAction extends DialogWrapperAction {
-    private ApplyAction() {
-      super(CommonBundle.getApplyButtonText());
+  private class AddVariablesAction extends DialogWrapperAction {
+    private AddVariablesAction() {
+      super(GctBundle.message("cloud.apis.service.account.key.downloaded.update.server.button"));
+      putValue(DEFAULT_ACTION, Boolean.TRUE);
     }
 
     @Override
     protected void doAction(ActionEvent event) {
       addEnvironmentVariablesToConfiguration(getSelectedConfigurations());
+      if (hasErrors(mainPanel)) {
+        this.setEnabled(false);
+      } else {
+        close(OK_EXIT_CODE);
+      }
     }
   }
 

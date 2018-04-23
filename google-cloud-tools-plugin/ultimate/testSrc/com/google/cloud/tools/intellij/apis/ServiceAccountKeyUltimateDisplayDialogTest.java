@@ -113,7 +113,8 @@ public class ServiceAccountKeyUltimateDisplayDialogTest {
     JTable runConfigurationTable = dialog.getRunConfigurationTable();
     assertEquals(1, runConfigurationTable.getRowCount());
     assertEquals(2, runConfigurationTable.getColumnCount());
-    assertEquals(mockRunnerAndConfigurationSettings, runConfigurationTable.getModel().getValueAt(0, 0));
+    assertEquals(
+        mockRunnerAndConfigurationSettings, runConfigurationTable.getModel().getValueAt(0, 0));
     assertEquals(true, runConfigurationTable.getModel().getValueAt(0, 1));
   }
 
