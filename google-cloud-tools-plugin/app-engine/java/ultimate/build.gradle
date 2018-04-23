@@ -19,7 +19,7 @@ sourceSets.main.java.srcDirs = ['src']
 sourceSets.test.java.srcDirs = ['testSrc', 'testResources']
 
 intellij {
-    type 'IU'
+    type = 'IU'
 
     // only the 'JavaEE' and 'GwtStudio' plugins are directly used by the plugins,
     // the others are transitive dependencies of these and need to be defined explicitly

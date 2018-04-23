@@ -20,6 +20,8 @@ sourceSets.main.resources.srcDirs = ['resources']
 sourceSets.test.java.srcDirs = ['testSrc']
 sourceSets.test.resources.srcDirs = ['testResources', 'testData']
 
+def enableUltimate = false
+
 apply plugin: 'org.jetbrains.intellij'
 
 intellij {
@@ -28,6 +30,9 @@ intellij {
     patchPluginXml {
         changeNotes = project (":google-cloud-tools-plugin").file("change_notes.html")
                 .getText('UTF-8')
+    }
+    if (type == 'IU') {
+        enableUltimate = true
     }
 }
 
@@ -42,7 +47,9 @@ dependencies {
     compile(project(':google-cloud-tools-plugin:google-cloud-core'))
     compile(project(':google-cloud-tools-plugin:google-cloud-storage'))
     compile(project(':google-cloud-tools-plugin:app-engine:java'))
-    compile(project(':google-cloud-tools-plugin:app-engine:java:ultimate'))
+    if (enableUltimate) {
+        compile(project(':google-cloud-tools-plugin:app-engine:java:ultimate'))
+    }
     compile(project(':google-cloud-tools-plugin:stackdriver-debugger'))
 
     compile 'com.google.apis:google-api-services-clouddebugger:v2-rev7-1.21.0'
