@@ -36,341 +36,17 @@
   <idea-version since-build="171.3780" until-build="182.*"/>
 
   <change-notes>
-    <![CDATA[
-    <html>
-      <p>
-      IMPORTANT:
-      This plugin requires the use of Cloud SDK v 171.0.0 for correct execution of the local
-      development server with the latest Java 8 SDK. Please run 'gcloud components update' from your
-      shell to ensure you have the latest Cloud SDK release.
-      </p>
-      <br/>
-
-      <h2>[18.3.2]</h2>
-
-      <h3>Fixed</h3>
-      <ul>
-        <li>Fixed bug causing plugin initialization error on versions less than 2017.3. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1972">#1972</a>)</li>
-      </ul>
-
-      <h2>[18.3.1]</h2>
-
-      <h3>Added</h3>
-      <ul>
-        <li>Added ability to create service accounts and download service account keys from the IDE client library workflow. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1808">#1808</a>)</li>
-      </ul>
-
-      <h3>Fixed</h3>
-      <ul>
-        <li>Fixed cases where appengine-web.xml wasn't being generated due to missing web.xml. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1903">#1903</a>)</li>
-      </ul>
-
-      <h2>[18.2.1]</h2>
-
-      <h3>Added</h3>
-      <ul>
-        <li>Added Google Cloud Java client library discovery and addition from the IDE. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1806">#1806</a>)</li>
-        <li>Added ability to enable Google Cloud APIs from the IDE. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1807">#1807</a>)</li>
-      </ul>
-
-      <h3>Changed</h3>
-      <ul>
-        <li>Updated the cloud project selector with a greatly improved user experience. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1719">#1719</a>)</li>
-        <li>Updated the cloud project selector so that the last selection is remembered and defaulted. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1812">#1812</a>)</li>
-      </ul>
-
-      <h3>Fixed</h3>
-      <ul>
-        <li>Fixed missing App Engine standard local run artifacts. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1625">#1625</a>)</li>
-      </ul>
-
-      <h2>[18.1.1]</h2>
-
-      <h3>Fixed</h3>
-      <ul>
-        <li>Fixed broken error reporting mechanism. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1842">#1842</a>)</li>
-      </ul>
-
-      <h2>[17.12.2]</h2>
-
-      <h3>Fixed</h3>
-      <ul>
-        <li>Fixed broken analytics property setup causing dropped analytics. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1773">#1773</a>)</li>
-      </ul>
-
-      <h2>[17.12.1]</h2>
-
-      <p>The Google Account plugin has now been merged into the Cloud Tools plugin and is no longer a separate installation. If you previously had the Account Tools plugin installed, follow the new dialog prompt to remove it and restart the IDE to ensure that you don't experience any issues.</p>
-
-      <h3>Fixed</h3>
-      <ul>
-        <li>Fixed out of memory error when typing and searching for multiple projects in the cloud project selector. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1742">#1742</a>)</li>
-      </ul>
-
-      <h3>Changed</h3>
-      <ul>
-        <li>The Google Account plugin is now integrated into the Google Cloud Tools plugin. A separate Google Account plugin installation is no longer required. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1735">#1735</a>)</li>
-      </ul>
-
-      <h2>[17.11.1]</h2>
-
-      <h3>Added</h3>
-      <ul>
-        <li>Google Cloud Storage (GCS) integration in IntelliJ. You can now browse your GCS buckets and view their contents without leaving the IDE. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1696">#1696</a>)</li>
-        <li>Searching and filtering capabilities in the cloud project selector. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1660">#1660</a>)</li>
-        <li>New 'add App Engine framework support' tools menu shortcut to provide another way to add App Engine support to a project. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1685">#1685</a>)</li>
-      </ul>
-
-      <h3>Fixed</h3>
-      <ul>
-        <li>Fixed App Engine region indicator status message when no cloud project has been selected. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1607">#1607</a>)</li>
-      </ul>
-
-      <h2>[17.9.2]</h2>
-
-      <p>Java 8 on App Engine standard environment is now <a href="https://cloudplatform.googleblog.com/2017/09/Java-8-on-App-Engine-Standard-environment-is-now-generally-available.html">generally available</a>.</p>
-
-      <h3>Changed</h3>
-      <ul>
-        <li>Updated the new App Engine standard project wizard to generate Java 8 applications by default. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1641">#1641</a>)</li>
-      </ul>
-
-      <h2>[17.9.1]</h2>
-      <h3>Added</h3>
-      <ul>
-        <li>Added the ability to change the name of the staged artifact for App Engine flexible deployments. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1610">#1610</a>)</li>
-      </ul>
-
-      <h3>Changed</h3>
-      <ul>
-        <li>App Engine flexible deployment configurations now default to deploy the artifact as-is, without renaming to "target.jar" or "target.war". (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1151">#1151</a>)</li>
-        <li>Updated the name of the placeholder artifact name in the generated Dockerfile templates to make it clearer that it needs to be updated by the user. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1648">#1648</a>)</li>
-        <li>App Engine standard deployment configurations now default to update dos, dispatch, cron, queues, and datastore indexes. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1613">#1613</a>)</li>
-        <li>Native projects that add support for Cloud Endpoints Frameworks for App Engine will now use Endpoints V2. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1612">#1612</a>)</li>
-      </ul>
-
-      <h3>Fixed</h3>
-      <ul>
-        <li>Fixed the `Deployment source not found` error when deploying Maven artifacts. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1220">#1220</a>)</li>
-        <li>Fixed the scale of the user icon on HiDPI displays. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1633">#1633</a>)</li>
-        <li>Fixed an issue where the plugin was downgraded on the IDEA 2017.3 EAP. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1631">#1631</a>)</li>
-      </ul>
-
-      <h2>[17.8.2]</h2>
-      <h3>Fixed</h3>
-      <ul>
-        <li>Fixed "Error: invalid_scope" issue when logging in with your Google Account. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1598">#1598</a>)</li>
-      </ul>
-
-      <h2>[17.8.1]</h2>
-      <h3>Added</h3>
-      <ul>
-        <li>Added a feedback & issue reporting link to the Google Cloud Tools shortcut menu. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1560">#1560</a>)</li>
-      </ul>
-
-      <h3>Changed</h3>
-      <ul>
-        <li>Users can now save deployment run configurations that are partially completed or in an error state. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1407">#1407</a>)</li>
-      </ul>
-
-      <h3>Fixed</h3>
-      <ul>
-        <li>Fixed registered Docker language conflict causing issues running plugin alongside .ignore plugin. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1535">#1535</a>)</li>
-        <li>Fixed NPE parsing Stackdriver Debugger breakpoint timestamps. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1537">#1537</a>)</li>
-        <li>Removed EAR as acceptable App Engine artifact type for local dev server runs. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1190">#1190</a>)</li>
-        <li>Deployments are now displayed across multiple IDE windows. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1432">#1432</a>)</li>
-        <li>Fixed crash caused by attempting to modify a read-only collection. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1571">#1571</a>)</li>
-      </ul>
-
-      <h2>[17.6.2]</h2>
-      <h3>Fixed</h3>
-      <ul>
-        <li>Fixed NPE occurring when there is a local dev server configuration but no standard facet. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1525">#1525</a>)</li>
-      </ul>
-
-      <h2>[17.6.1]</h2>
-      <h3>Added</h3>
-      <ul>
-        <li>App Engine flexible facet with app.yaml and Dockerfile configuration. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1514">#1514</a>)</li>
-        <li>App Engine flexible framework support detection. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1277">#1277</a>)</li>
-      </ul>
-
-      <h3>Changed</h3>
-      <ul>
-        <li>Allow user to specify a Docker directory instead of just a Dockerfile for flexible deployments. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1304">#1304</a>)</li>
-        <li>Refresh the user experience of the deployment dialog (both standard and flexible). (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1477">#1477</a>)</li>
-      </ul>
-
-      <h3>Fixed</h3>
-      <ul>
-        <li>Fixed Google avatar size for HiDPI displays. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1391">#1391</a>)</li>
-      </ul>
-
-      <h2>[17.2.5_2017]</h2>
-      <h3>Added</h3>
-      <ul>
-        <li>Environment variables in the App Engine standard local run configuration are now passed in to the dev server. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1364">#1364</a>)</li>
-        <li>Environment variables configured in appengine-web.xml are now honored and passed in to the dev server. (<a href="https://github.com/GoogleCloudPlatform/appengine-plugins-core/issues/377">#377</a>)</li>
-      </ul>
-
-      <h2>[17.2.4_2017]</h2>
-      <h3>Added</h3>
-      <ul>
-        <li>Added a checkbox to deploy all App Engine config files during service deployment. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1346">#1346</a>)</li>
-      </ul>
-
-      <h2>[17.2.3_2017]</h2>
-      <h3>Changed</h3>
-      <ul>
-        <li>Removed the Clear Datastore flag from the App Engine standard local development server configuration since the current version of the server doesn't support it. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1345">#1345</a>)</li>
-      </ul>
-
-      <h2>[17.2.2_2017]</h2>
-      <h3>Fixed</h3>
-      <ul>
-        <li>Invalid Java Runtime Environment (JRE) on staging an App Engine standard app
-        (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1316">#1316</a>):
-
-        <blockquote>Unable to stage app: Cannot get the System Java Compiler. Please use a JDK, not a JRE.</blockquote>
-        </li>
-      </ul>
-
-      <h2>[17.2.1]</h2>
-
-      <p>Happy new year Cloud Tools for IntelliJ users! This year's first release is primarily a maintenance
-        release.  If you are having authentication problems using Cloud Source Repositories and our
-        plugin, check out <a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1174">this possible solution</a>.</p>
-
-      <p>Here is a list of the visible changes:</p>
-
-      <h3>Added</h3>
-
-      <ul>
-        <li>Support for multiple cloud source repositories for a single GCP project. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1024">#1024</a>)</li>
-        <li>App Engine initialization and region selection. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1232">#1232</a>)</li>
-      </ul>
-
-      <h3>Fixed</h3>
-
-      <ul>
-        <li>Stopping dev_appserver on Windows always fails with com.intellij.execution
-          .ExecutionException. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1215">#1215</a>)</li>
-        <li>New AE standard project wizard should generate web.xml with servlet 2.5. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1194">#1194</a>)</li>
-        <li>Clear datastore checkbox for app engine standard local server does not work. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1188">#1188</a>)</li>
-        <li>Don't show projects scheduled for deletion in the project selector. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1119">#1119</a>)</li>
-      </ul>
-
-      <p>Visit our <a href="https://github
-.com/GoogleCloudPlatform/google-cloud-intellij/milestone/19?closed=1">17.2 Release Milestone</a> for complete details.</p>
-
-      <h2>[16.11.6]</h2>
-      <h3>Added</h3>
-      <ul>
-        <li>
-        Expanded Google Cloud Tools menu item with various action shortcuts.
-        (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1061">#1061</a>)
-        </li>
-        <li>
-        Check for minimum support Cloud SDK version.
-        (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1051">#1051</a>)
-        </li>
-        <li>
-        Automatically create all relevant run configuration for App Engine Standard apps.
-        (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1063">#1063</a>)
-        </li>
-        <li>
-        App Engine framework is now a child of Web framework in the new project wizard.
-        (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1065">#1065</a>)
-        </li>
-      </ul>
-
-      <h3>Fixed</h3>
-      <ul>
-        <li>
-        Unique deployment sources in application server deployment panel now appear as separate line items.
-        (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/821">#821</a>)
-        </li>
-        <li>
-        Validation of invalid Cloud SDK paths on Windows.
-        (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1091">#1091</a>)
-        </li>
-      </ul>
-      <h2>[16.10.5]</h2>
-      <h3>Fixed</h3>
-      <ul>
-        <li>
-        Fixed issue with local development server debug mode when changes are made while the server is
-        running. (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/972">#972</a>)
-        </li>
-        <li>
-        Better wording when the development server has an invalid Cloud SDK path.
-        (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1043">#1043</a>).
-        </li>
-        <li>
-        Update run configuration names to be prefixed with 'Google ..'
-        (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1021">#1021</a>).
-        </li>
-      </ul>
-      <h2>[16.10.1]</h2>
-      <ul>
-        <li>Note we are changing the versioning scheme to YY.MM.i. We plan on a monthly release cadence
-          to minimize the disruption of updates. Also notice we have dropped the 'Beta' label.
-        </li>
-        <li><p>BE AWARE: The local App Engine development server is broken with the latest JDK 8
-          releases.
-          (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/920">#920</a>).
-          This should be fixed with the next App Engine SDK release coming soon.</p>
-
-        <h3>Added</h3></li>
-        <li><p>App Engine Standard Library importer in the Facet and Project wizard.
-          (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/866">#866</a>)
-        </p></li>
-        <li><p>Standard App Engine apps using Java 8 language level will be notified to use language
-          level 7
-          (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/pull/966">#966</a>)
-        </p>
-
-          <h3>Changed</h3></li>
-        <li><p>Updated run config labels and icons. (Cloud Debugger is now Stackdriver Debug)
-          (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/936">#936</a>)
-        </p>
-
-          <h3>Fixed</h3></li>
-        <li><p>Local Development server debug mode is fixed.
-          (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/928">#928</a>)
-        </p></li>
-        <li>Flex deployment broken on Windows 10.
-          (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/937">#937</a>)
-        </li>
-        <li>Cloud Debugger object inspector working again.
-          (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/929">#929</a>)
-        </li>
-        <li>Cloud Debugger snapshot timestamps causing NPE
-          (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/pull/919">#919</a>)
-        </li>
-      </ul>
-
-      <h2>[1.0-beta] - 2016-09-14</h2>
-      <h3>Added</h3>
-      <ul>
-        <li>App Engine standard environment support (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/767">#767</a>)</li>
-        <li>Extra fields now available in the deployment config (<a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/pull/868">#868</a>)</li>
-      </ul>
-    </html>
-    ]]>
+    <!--Patched in at build time-->
   </change-notes>
 
   <xi:include href="/META-INF/google-cloud-core.xml" xpointer="xpointer(/idea-plugin/*)"/>
   <xi:include href="/META-INF/google-cloud-storage.xml" xpointer="xpointer(/idea-plugin/*)"/>
+  <xi:include href="/META-INF/app-engine-java.xml" xpointer="xpointer(/idea-plugin/*)"/>
   <xi:include href="/META-INF/stackdriver-debugger.xml" xpointer="xpointer(/idea-plugin/*)"/>
 
-  <depends optional="true" config-file="javaee-integration.xml">com.intellij.javaee</depends>
-  <depends optional="true" config-file="gwt-integration.xml">com.intellij.gwt</depends>
   <depends>com.intellij.modules.lang</depends>
+  <depends>com.intellij.modules.java</depends>
   <depends>com.intellij.modules.vcs</depends>
-  <depends>com.intellij.modules.xml</depends>
-  <depends>org.jetbrains.plugins.gradle</depends>
-  <depends>org.jetbrains.plugins.yaml</depends>
   <depends>Git4Idea</depends>
   <depends>org.jetbrains.idea.maven</depends>
 
@@ -386,134 +62,30 @@
     </component>
   </project-components>
 
-  <extensionPoints>
-    <extensionPoint name="forbiddenCodeHandler" interface="com.google.cloud.tools.intellij.appengine.inspections.AppEngineForbiddenCodeHandler"/>
-  </extensionPoints>
 
   <extensions defaultExtensionNs="com.intellij">
-    <applicationConfigurable parentId="google.settings" instance="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkConfigurable"/>
-
-    <implicitUsageProvider implementation="com.google.cloud.tools.intellij.appengine.validation.EndpointImplicitUsageProvider"/>
-
-    <checkoutProvider implementation="com.google.cloud.tools.intellij.csr.GcpCheckoutProvider"/>
+     <checkoutProvider implementation="com.google.cloud.tools.intellij.csr.GcpCheckoutProvider"/>
     <vcsPopupProvider implementation="com.google.cloud.tools.intellij.csr.GcpQuickListContentProvider"/>
 
-    <dom.fileDescription
-            implementation="com.google.cloud.tools.intellij.appengine.descriptor.dom.AppEngineStandardWebFileDescriptor"/>
 
     <applicationService serviceInterface="com.google.cloud.tools.intellij.service.ApplicationPluginInfoService"
                         serviceImplementation="com.google.cloud.tools.intellij.service.DefaultApplicationPluginInfoService"/>
 
-    <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkServiceManager"/>
-    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkService"
-                        serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.DefaultCloudSdkService"/>
-    <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkValidator"/>
-    <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.ManagedCloudSdkUpdateService"/>
-
-    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardWebIntegration"
-                        serviceImplementation="com.google.cloud.tools.intellij.appengine.facet.standard.impl.AppEngineStandardCommunityWebIntegration"/>
-    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.project.AppEngineProjectService"
-                        serviceImplementation="com.google.cloud.tools.intellij.appengine.project.DefaultAppEngineProjectService"/>
-    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.project.AppEngineAssetProvider"
-                        serviceImplementation="com.google.cloud.tools.intellij.appengine.project.DefaultAppEngineAssetProvider"/>
-    <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.facet.standard.MavenRepositoryLibraryDownloader"/>
-    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.sdk.CloudSdkVersionNotifier"
-                        serviceImplementation="com.google.cloud.tools.intellij.appengine.sdk.DefaultCloudSdkVersionNotifier"/>
-    <applicationService serviceInterface="com.google.cloud.tools.intellij.appengine.application.AppEngineAdminService"
-                        serviceImplementation="com.google.cloud.tools.intellij.appengine.application.GoogleApiClientAppEngineAdminService"/>
-    <applicationService serviceImplementation="com.google.cloud.tools.intellij.csr.CloudRepositoryService"/>
     <applicationService serviceImplementation="com.google.cloud.tools.intellij.apis.CloudLibrariesService"/>
     <applicationService serviceImplementation="com.google.cloud.tools.intellij.apis.CloudApiMavenService"/>
     <applicationService serviceImplementation="com.google.cloud.tools.intellij.apis.ServiceAccountKeyDialogService"/>
-
-    <!-- App Engine Cloud and Deployment Sources Configuration-->
-    <remoteServer.type
-            implementation="com.google.cloud.tools.intellij.appengine.cloud.AppEngineCloudType"/>
-    <remoteServer.deploymentSource.type
-            implementation="com.google.cloud.tools.intellij.appengine.cloud.flexible.UserSpecifiedPathDeploymentSourceType"/>
-    <remoteServer.deploymentSource.type
-            implementation="com.google.cloud.tools.intellij.appengine.cloud.MavenBuildDeploymentSourceType"/>
-    <remoteServer.deploymentSource.type
-            implementation="com.google.cloud.tools.intellij.appengine.cloud.AppEngineArtifactDeploymentSourceType"/>
-
-    <framework.type implementation="com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFrameworkType"/>
-    <framework.type implementation="com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFrameworkType"/>
-    <fileTemplateGroup implementation="com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineTemplateGroupDescriptorFactory"/>
-    <facetType implementation="com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFacetType"/>
-    <facetType implementation="com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFacetType"/>
-    <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineStandardFacetConverterProvider"/>
-    <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.AppEngineConverterProvider"/>
-    <project.converterProvider implementation="com.google.cloud.tools.intellij.appengine.migration.StagedArtifactNameConverterProvider"/>
-    <framework.detector implementation="com.google.cloud.tools.intellij.appengine.facet.standard.AppEngineStandardFrameworkDetector"/>
-    <framework.detector implementation="com.google.cloud.tools.intellij.appengine.facet.flexible.AppEngineFlexibleFrameworkDetector"/>
-
-    <xml.schemaProvider implementation="com.google.cloud.tools.intellij.appengine.descriptor.AppEngineWebSchemaProvider"/>
-
-    <fileTypeFactory implementation="com.google.cloud.tools.intellij.appengine.file.DockerFileTemplateTypeFactory"/>
+    <applicationService serviceImplementation="com.google.cloud.tools.intellij.csr.CloudRepositoryService"/>
 
     <localInspection language="XML" shortName="DependencyVersionWithBom" bundle="messages.CloudToolsBundle"
                      hasStaticDescription="true" key="cloud.libraries.version.with.bom.inspection.display.name"
                      groupKey="cloud.libraries.bom.inspection.group.name"  enabledByDefault="true" level="WARNING"
-                     implementationClass="com.google.cloud.tools.intellij.apis.DependencyVersionWithBomInspection"/>
+                     implementationClass="com.google.cloud.tools.intellij.apis.CloudDependencyVersionWithBomInspection"/>
 
-    <localInspection language="JAVA" shortName="GoogleAppEngineForbiddenCode" displayName="Forbidden code in App Engine applications"
-                     groupName="Google App Engine" enabledByDefault="true" level="ERROR"
-                     implementationClass="com.google.cloud.tools.intellij.appengine.inspections.AppEngineForbiddenCodeInspection"/>
+  <localInspection language="XML" shortName="DependencyWithNoBom" bundle="messages.CloudToolsBundle"
+                   hasStaticDescription="true" key="cloud.libraries.with.no.bom.inspection.display.name"
+                   groupKey="cloud.libraries.bom.inspection.group.name"  enabledByDefault="true" level="WARNING"
+                   implementationClass="com.google.cloud.tools.intellij.apis.CloudDependencyWithNoBomInspection"/>
 
-    <localInspection language="JAVA" shortName="ApiName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="api.name.name" groupKey="inspections.group.name" enabledByDefault="true" level="ERROR"
-                     implementationClass="com.google.cloud.tools.intellij.appengine.validation.ApiNameInspection"/>
-
-    <localInspection language="JAVA" shortName="ApiNamespace" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="api.namespace.name" groupKey="inspections.group.name" enabledByDefault="true" level="ERROR"
-                     implementationClass="com.google.cloud.tools.intellij.appengine.validation.ApiNamespaceInspection"/>
-
-    <localInspection language="JAVA" shortName="ApiParameter" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="api.parameter.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.ApiParameterInspection"/>
-
-    <localInspection language="JAVA" shortName="Constructor" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="constructor.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.ConstructorInspection"/>
-
-    <localInspection language="JAVA" shortName="FullJavaName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="backend.name.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.FullJavaNameInspection"/>
-
-    <localInspection language="JAVA" shortName="FullMethodName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="full.method.name.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.FullMethodNameInspection"/>
-
-    <localInspection language="JAVA" shortName="InvalidParameterAnnotations" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="invalid.parameter.annotations.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.InvalidParameterAnnotationsInspection"/>
-
-    <localInspection language="JAVA" shortName="MethodName" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="method.name.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.MethodNameInspection"/>
-
-    <localInspection language="JAVA" shortName="MethodParameterType" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="method.parameter.type.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.MethodParameterTypeInspection"/>
-
-    <localInspection language="JAVA" shortName="MethodReturnType" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="method.return.type.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.MethodReturnTypeInspection"/>
-
-    <localInspection language="JAVA" shortName="NamedResource" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="named.resource.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.NamedResourceInspection"/>
-
-    <localInspection language="JAVA" shortName="ResourceParameter" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="resource.parameter.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.ResourceParameterInspection"/>
-
-    <localInspection language="JAVA" shortName="RestSignature" bundle="messages.EndpointBundle"  hasStaticDescription="true"
-                     key="unique.rest.signature.name" groupKey="inspections.group.name" enabledByDefault="true"
-                     level="ERROR" implementationClass="com.google.cloud.tools.intellij.appengine.validation.RestSignatureInspection"/>
-
-    <postStartupActivity implementation="com.google.cloud.tools.intellij.startup.AppEngineStandardUnsupportedJavaVersionCheck"/>
-    <postStartupActivity implementation="com.google.cloud.tools.intellij.startup.CloudSdkVersionStartupCheck"/>
   </extensions>
 
   <extensions defaultExtensionNs="Git4Idea">
@@ -535,24 +107,23 @@
       <add-to-group group-id="Vcs.Import"/>
     </action>
 
-    <group id="GoogleCloudTools" class="com.google.cloud.tools.intellij.CloudToolsMenuGroupAction" popup="true">
-      <group id="AddAppEngineFrameworkSupport" class="com.google.cloud.tools.intellij.appengine.facet.AddAppEngineFrameworkSupportMenuGroupAction" popup="true">
-        <action id="AddAppEngineFrameworkSupport.Standard" class="com.google.cloud.tools.intellij.appengine.facet.standard.AddAppEngineStandardFrameworkSupportToolsMenuAction"/>
-        <action id="AddAppEngineFrameworkSupport.Flexible" class="com.google.cloud.tools.intellij.appengine.facet.flexible.AddAppEngineFlexibleFrameworkSupportToolsMenuAction"/>
-      </group>
-      <action id="GoogleCloudTools.AppEngineDeploy" class="com.google.cloud.tools.intellij.appengine.cloud.AppEngineDeployToolsMenuAction"/>
+    <group id="GoogleCloudTools.misc">
       <separator/>
-      <action id="GoogleCloudTools.CloudDebugger" class="com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebuggerToolsMenuAction"/>
+      <action id="GoogleCloudTools.CloudDebugger"
+              class="com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebuggerToolsMenuAction"/>
       <separator/>
       <reference ref="GoogleCloudTools.UploadSourceToGCP"/>
       <separator/>
-      <action id="GoogleCloudTools.CloudStorage" class="com.google.cloud.tools.intellij.gcs.GcsToolWindowAction"/>
+      <action id="GoogleCloudTools.CloudStorage"
+              class="com.google.cloud.tools.intellij.gcs.GcsToolWindowAction"/>
       <separator/>
-      <action id="GoogleCloudTools.AddCloudLibraries" class="com.google.cloud.tools.intellij.apis.AddCloudLibrariesAction"/>
+      <action id="GoogleCloudTools.AddCloudLibraries"
+              class="com.google.cloud.tools.intellij.apis.AddCloudLibrariesAction"/>
       <separator/>
-      <action id="GoogleCloudTools.Feedback" class="com.google.cloud.tools.intellij.CloudToolsFeedbackAction"/>
-
-      <add-to-group group-id="ToolsMenu" anchor="last"/>
+      <action id="GoogleCloudTools.Feedback"
+              class="com.google.cloud.tools.intellij.CloudToolsFeedbackAction"/>
+      <separator/>
+      <add-to-group group-id="GoogleCloudTools" anchor="last"/>
     </group>
 
   </actions>

@@ -107,7 +107,6 @@ public class CloudLibraryProjectState implements ProjectComponent {
             .collect(Collectors.toMap(Function.identity(), this::loadManagedLibraries));
   }
 
-  @VisibleForTesting
   void syncCloudLibrariesBom() {
     moduleBomVersionMap =
         Stream.of(ModuleManager.getInstance(project).getModules())
