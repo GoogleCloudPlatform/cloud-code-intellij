@@ -21,7 +21,6 @@ import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.dvcs.ui.DvcsBundle;
 import com.intellij.ide.impl.ProjectUtil;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
@@ -34,13 +33,10 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.DocumentAdapter;
-import java.awt.Dimension;
+import java.awt.*;
 import java.io.File;
 import java.util.Optional;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.jetbrains.annotations.NotNull;
@@ -67,8 +63,8 @@ public class CloneCloudRepositoryDialog extends DialogWrapper {
     parentDirectoryLabel.setText(DvcsBundle.message("clone.parent.dir"));
     init();
     initComponents();
-    setTitle(GctBundle.message("clonefromgcp.title"));
-    setOKButtonText(GctBundle.message("clonefromgcp.button"));
+    setTitle(CloudReposMessageBundle.message("clonefromgcp.title"));
+    setOKButtonText(CloudReposMessageBundle.message("clonefromgcp.button"));
 
     projectSelector.loadActiveCloudProject();
   }
@@ -98,8 +94,9 @@ public class CloneCloudRepositoryDialog extends DialogWrapper {
   private void initComponents() {
     FileChooserDescriptor fcd = FileChooserDescriptorFactory.createSingleFolderDescriptor();
     fcd.setShowFileSystemRoots(true);
-    fcd.setTitle(GctBundle.message("clonefromgcp.destination.directory.title"));
-    fcd.setDescription(GctBundle.message("clonefromgcp.destination.directory.description"));
+    fcd.setTitle(CloudReposMessageBundle.message("clonefromgcp.destination.directory.title"));
+    fcd.setDescription(
+        CloudReposMessageBundle.message("clonefromgcp.destination.directory.description"));
     fcd.setHideIgnored(false);
     parentDirectory.addActionListener(
         new ComponentWithBrowseButton.BrowseFolderActionListener<JTextField>(
@@ -155,14 +152,14 @@ public class CloneCloudRepositoryDialog extends DialogWrapper {
             : Services.getLoginService().getLoggedInUser(selectedProject.googleUsername());
 
     if (selectedProject != null && !selectedUser.isPresent()) {
-      setErrorText(GctBundle.message("cloud.repository.dialog.invalid.project"));
+      setErrorText(CloudReposMessageBundle.message("cloud.repository.dialog.invalid.project"));
       setOKActionEnabled(false);
       return;
     }
 
     if (!StringUtil.isEmpty(repositorySelector.getText())
         && StringUtil.isEmpty(repositorySelector.getSelectedRepository())) {
-      setErrorText(GctBundle.message("cloud.repository.dialog.invalid.repository"));
+      setErrorText(CloudReposMessageBundle.message("cloud.repository.dialog.invalid.repository"));
       setOKActionEnabled(false);
       return;
     }
@@ -183,13 +180,13 @@ public class CloneCloudRepositoryDialog extends DialogWrapper {
 
     File file = new File(parentDirectory.getText(), directoryName.getText());
     if (file.exists()) {
-      setErrorText(GctBundle.message("clonefromgcp.destination.exists.error"));
+      setErrorText(CloudReposMessageBundle.message("clonefromgcp.destination.exists.error"));
       setOKActionEnabled(false);
       return;
     }
 
     if (!file.getParentFile().exists()) {
-      setErrorText(GctBundle.message("clonefromgcp.parent.missing.error"));
+      setErrorText(CloudReposMessageBundle.message("clonefromgcp.parent.missing.error"));
       setOKActionEnabled(false);
       return;
     }
