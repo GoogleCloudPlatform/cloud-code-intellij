@@ -67,7 +67,7 @@
                   key="Idea"/>
     <!-- For IJ Ultimate Edition -->
     <usageTracker implementationClass="com.google.cloud.tools.intellij.analytics.GoogleUsageTracker"
-                  key="idea"/>
+                  key="Idea"/>
   </extensions>
 
   <extensionPoints>
