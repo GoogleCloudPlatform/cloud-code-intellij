@@ -20,16 +20,14 @@ import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.DocumentAdapter;
 import git4idea.repo.GitRepository;
-import java.awt.Dimension;
+import java.awt.*;
 import java.util.Optional;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -143,14 +141,14 @@ public class SetupCloudRepositoryDialog extends DialogWrapper {
         Services.getLoginService().getLoggedInUser(selectedProject.googleUsername());
 
     if (!StringUtil.isEmpty(selectedProject.projectId()) && !user.isPresent()) {
-      setErrorText(GctBundle.message("cloud.repository.dialog.invalid.project"));
+      setErrorText(CloudReposMessageBundle.message("cloud.repository.dialog.invalid.project"));
       setOKActionEnabled(false);
       return;
     }
 
     if (!StringUtil.isEmpty(repositorySelector.getText())
         && StringUtil.isEmpty(repositorySelector.getSelectedRepository())) {
-      setErrorText(GctBundle.message("cloud.repository.dialog.invalid.repository"));
+      setErrorText(CloudReposMessageBundle.message("cloud.repository.dialog.invalid.repository"));
       setOKActionEnabled(false);
       return;
     }
@@ -162,7 +160,7 @@ public class SetupCloudRepositoryDialog extends DialogWrapper {
     }
 
     if (StringUtil.isEmpty(remoteNameSelector.getText())) {
-      setErrorText(GctBundle.message("uploadtogcp.dialog.missing.remote"));
+      setErrorText(CloudReposMessageBundle.message("uploadtogcp.dialog.missing.remote"));
       setOKActionEnabled(false);
       return;
     }
