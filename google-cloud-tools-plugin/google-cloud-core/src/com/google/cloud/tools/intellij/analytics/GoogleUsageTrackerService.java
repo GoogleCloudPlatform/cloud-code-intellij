@@ -92,7 +92,6 @@ public class GoogleUsageTrackerService implements UsageTrackerService, SendsEven
           // Apparently the hit type should always be of type 'pageview'.
           new BasicNameValuePair(HIT_TYPE_KEY, PAGE_VIEW_VALUE),
           new BasicNameValuePair(IS_NON_INTERACTIVE_KEY, STRING_FALSE_VALUE),
-          new BasicNameValuePair(UNIQUE_CLIENT_ID_KEY, PermanentInstallationID.get()),
           new BasicNameValuePair(PAGE_HOST_KEY, PAGE_HOST_VALUE));
   private final String analyticsId;
   private final String externalPluginName;
@@ -137,6 +136,8 @@ public class GoogleUsageTrackerService implements UsageTrackerService, SendsEven
         // https://developers.google.com/analytics/devguides/collection/protocol/v1/reference
 
         List<BasicNameValuePair> postData = Lists.newArrayList(ANALYTICS_BASE_DATA);
+
+        postData.add(new BasicNameValuePair(UNIQUE_CLIENT_ID_KEY, PermanentInstallationID.get()));
         postData.add(new BasicNameValuePair(PROPERTY_ID_KEY, analyticsId));
         postData.add(new BasicNameValuePair(EVENT_TYPE_KEY, eventCategory));
         postData.add(new BasicNameValuePair(EVENT_NAME_KEY, eventAction));
