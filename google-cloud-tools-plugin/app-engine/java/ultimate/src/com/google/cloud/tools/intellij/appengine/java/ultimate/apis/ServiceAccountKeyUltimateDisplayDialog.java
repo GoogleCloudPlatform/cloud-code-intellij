@@ -263,7 +263,7 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
    */
   private static final class RunnerAndConfigurationSettingsRenderer
       extends DefaultTableCellRenderer {
-
+    // TODO: test JBUI.Borders.empty(5)
     private static final Border NO_FOCUS_BORDER = new EmptyBorder(5, 5, 5, 5);
 
     @Override
