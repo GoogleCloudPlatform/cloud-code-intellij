@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+intellij {
+    plugins 'maven'
+}
+
 dependencies {
     compile project(':google-cloud-tools-plugin:google-cloud-core')
     compile 'junit:junit:4.+'

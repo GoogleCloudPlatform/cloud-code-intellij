@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-include 'google-cloud-tools-plugin'
-include 'common-test-lib'
-include 'google-cloud-tools-plugin:google-cloud-core'
-include 'google-cloud-tools-plugin:google-cloud-storage'
-include 'google-cloud-tools-plugin:google-cloud-repos'
-include 'google-cloud-tools-plugin:google-cloud-apis'
-include 'google-cloud-tools-plugin:stackdriver-debugger'
-include 'google-cloud-tools-plugin:app-engine:java'
-include 'google-cloud-tools-plugin:app-engine:java:ultimate'
+
+package com.google.cloud.tools.intellij.cloudapis;
+
+/** Defines the management specification of a single GCP API for actions such as API enablement. */
+class CloudApiManagementSpec {
+  private boolean shouldEnable;
+
+  CloudApiManagementSpec(boolean shouldEnable) {
+    this.shouldEnable = shouldEnable;
+  }
+
+  boolean shouldEnable() {
+    return shouldEnable;
+  }
+
+  void setShouldEnable(boolean shouldEnable) {
+    this.shouldEnable = shouldEnable;
+  }
+}
