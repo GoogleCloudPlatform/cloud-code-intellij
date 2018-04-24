@@ -42,6 +42,7 @@ dependencies {
     compile(project(':google-cloud-tools-plugin:google-cloud-core'))
     compile(project(':google-cloud-tools-plugin:google-cloud-storage'))
     compile(project(':google-cloud-tools-plugin:google-cloud-repos'))
+    compile(project(':google-cloud-tools-plugin:google-cloud-apis'))
     compile(project(':google-cloud-tools-plugin:app-engine:java'))
     compile(project(':google-cloud-tools-plugin:app-engine:java:ultimate'))
     compile(project(':google-cloud-tools-plugin:stackdriver-debugger'))

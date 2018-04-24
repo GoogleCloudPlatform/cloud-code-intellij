@@ -21,6 +21,8 @@
       <module name="common-test-lib_test" target="1.8" />
       <module name="google-account_main" target="1.8" />
       <module name="google-account_test" target="1.8" />
+      <module name="google-cloud-apis_main" target="1.8" />
+      <module name="google-cloud-apis_test" target="1.8" />
       <module name="google-cloud-core_main" target="1.8" />
       <module name="google-cloud-core_test" target="1.8" />
       <module name="google-cloud-repos_main" target="1.8" />
