@@ -29,6 +29,7 @@ import com.google.api.services.cloudresourcemanager.model.Policy;
 import com.google.api.services.iam.v1.Iam;
 import com.google.api.services.iam.v1.Iam.Projects.ServiceAccounts;
 import com.google.api.services.iam.v1.Iam.Projects.ServiceAccounts.Keys;
+import com.google.api.services.iam.v1.model.CreateServiceAccountRequest;
 import com.google.api.services.iam.v1.model.Role;
 import com.google.api.services.iam.v1.model.ServiceAccount;
 import com.google.api.services.iam.v1.model.ServiceAccountKey;
@@ -156,6 +157,30 @@ public class CloudApiManagerTest {
     verify(notifications).notify(captor.capture());
     assertThat(captor.getAllValues().size()).isEqualTo(1);
     assertThat(captor.getValue().getTitle()).isEqualTo("Error Creating Service Account");
+  }
+
+  @Test
+  public void createServiceAccount_withLongName_trims30ToCharsWithTimestamp() throws IOException {
+    String serviceAccountNameToTrim = "delete-me-spring-initlzr-demo";
+
+    Set<Role> roles = ImmutableSet.of();
+    CloudApiManager.createServiceAccountAndDownloadKey(
+        roles,
+        serviceAccountNameToTrim,
+        downloadDir.toPath(),
+        cloudProject,
+        testFixture.getProject());
+
+    ArgumentCaptor<CreateServiceAccountRequest> captor =
+        ArgumentCaptor.forClass(CreateServiceAccountRequest.class);
+    verify(serviceAccounts).create(anyString(), captor.capture());
+
+    String accountId = captor.getValue().getAccountId();
+    assertThat(accountId.length()).isEqualTo(30);
+    // Full expected string is "delete-me-spring--[timestamp]
+    // The double "--" are because of the trimming at the end of the service account name and
+    // the leading "-" from the timestampe
+    assertThat(accountId).matches("delete-me-spring--[0-9]{12}");
   }
 
   private void setupMockIamClient() throws IOException {
