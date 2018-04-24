@@ -178,8 +178,8 @@ public class CloudApiManagerTest {
     String accountId = captor.getValue().getAccountId();
     assertThat(accountId.length()).isEqualTo(30);
     // Full expected string is "delete-me-spring--[timestamp]
-    // The double "--" are because of the trimming at the end of the service account name and
-    // the leading "-" from the timestampe
+    // The double "--" are because of the trimming at the end of the service account name plus
+    // the leading "-" from the timestamp
     assertThat(accountId).matches("delete-me-spring--[0-9]{12}");
   }
 
