@@ -60,7 +60,7 @@ subprojects {
         type = ideaEdition
         version = ideaVersion
         updateSinceUntilBuild = false
-        downloadSources = false
+        downloadSources = true
         intellijRepo = intellijRepoUrl
     }
 
