@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.apis;
 
 import com.google.cloud.tools.intellij.analytics.GctTracking;
-import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
@@ -109,7 +109,7 @@ public class CloudDependencyVersionWithBomInspection extends CloudBomInspection 
       if (versionTag != null) {
         stripVersion(versionTag);
 
-        UsageTrackerProvider.getInstance()
+        UsageTrackerService.getInstance()
             .trackEvent(GctTracking.CLIENT_LIBRARY_VERSION_WITH_BOM_MAVEN_QUICKFIX)
             .ping();
       } else {

@@ -48,7 +48,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** Google Usage Tracker that reports to Cloud Tools Analytics backend. */
-public class GoogleUsageTracker implements UsageTracker, SendsEvents {
+public class GoogleUsageTrackerService implements UsageTrackerService, SendsEvents {
 
   private static final MapJoiner METADATA_JOINER =
       Joiner.on(',').useForNull("null").withKeyValueSeparator("=");
@@ -58,7 +58,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
           .addEscape('=', "\\=")
           .addEscape('\\', "\\\\")
           .toEscaper();
-  private static final Logger logger = Logger.getInstance(GoogleUsageTracker.class);
+  private static final Logger logger = Logger.getInstance(GoogleUsageTrackerService.class);
   private static final String ANALYTICS_URL = "https://ssl.google-analytics.com/collect";
   private static final String PROTOCOL_VERSION_KEY = "v";
   private static final String UNIQUE_CLIENT_ID_KEY = "cid";
@@ -92,7 +92,6 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
           // Apparently the hit type should always be of type 'pageview'.
           new BasicNameValuePair(HIT_TYPE_KEY, PAGE_VIEW_VALUE),
           new BasicNameValuePair(IS_NON_INTERACTIVE_KEY, STRING_FALSE_VALUE),
-          new BasicNameValuePair(UNIQUE_CLIENT_ID_KEY, PermanentInstallationID.get()),
           new BasicNameValuePair(PAGE_HOST_KEY, PAGE_HOST_VALUE));
   private final String analyticsId;
   private final String externalPluginName;
@@ -103,7 +102,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
    * Constructs a usage tracker configured with analytics and plugin name configured from its
    * environment.
    */
-  public GoogleUsageTracker() {
+  public GoogleUsageTrackerService() {
     analyticsId = UsageTrackingManagementService.getInstance().getAnalyticsProperty();
 
     PluginInfoService pluginInfo = ServiceManager.getService(PluginInfoService.class);
@@ -137,6 +136,8 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
         // https://developers.google.com/analytics/devguides/collection/protocol/v1/reference
 
         List<BasicNameValuePair> postData = Lists.newArrayList(ANALYTICS_BASE_DATA);
+
+        postData.add(new BasicNameValuePair(UNIQUE_CLIENT_ID_KEY, PermanentInstallationID.get()));
         postData.add(new BasicNameValuePair(PROPERTY_ID_KEY, analyticsId));
         postData.add(new BasicNameValuePair(EVENT_TYPE_KEY, eventCategory));
         postData.add(new BasicNameValuePair(EVENT_NAME_KEY, eventAction));

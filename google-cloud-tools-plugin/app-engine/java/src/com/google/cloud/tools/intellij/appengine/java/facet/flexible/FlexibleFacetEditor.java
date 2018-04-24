@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.java.facet.flexible;
 
 import com.google.cloud.tools.intellij.analytics.GctTracking;
-import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.cloud.flexible.AppEngineFlexibleDeploymentArtifactType;
 import com.google.cloud.tools.intellij.appengine.java.cloud.flexible.DockerfileArtifactTypePanel;
@@ -267,7 +267,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
     // Called on explicitly adding the facet through Project Settings -> Facets, but not on the
     // Framework discovered "Configure" popup.
-    UsageTrackerProvider.getInstance()
+    UsageTrackerService.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_FACET_ADD)
         .addMetadata("source", "setOnModule")
         .addMetadata("env", "flex")
@@ -279,7 +279,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
     @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
-      UsageTrackerProvider.getInstance()
+      UsageTrackerService.getInstance()
           .trackEvent(GctTracking.APP_ENGINE_GENERATE_FILE_APPYAML)
           .addMetadata("source", "setOnModule")
           .addMetadata("env", "flex")
@@ -330,7 +330,7 @@ public class FlexibleFacetEditor extends FacetEditorTab {
 
     @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
-      UsageTrackerProvider.getInstance()
+      UsageTrackerService.getInstance()
           .trackEvent(GctTracking.APP_ENGINE_GENERATE_FILE_DOCKERFILE)
           .addMetadata("source", "setOnModule")
           .addMetadata("env", "flex")

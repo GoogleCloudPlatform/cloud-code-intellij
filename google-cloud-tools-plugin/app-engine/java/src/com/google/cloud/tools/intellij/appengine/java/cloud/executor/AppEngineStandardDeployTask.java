@@ -20,7 +20,7 @@ import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInsta
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
-import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeploy;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineHelper;
@@ -59,7 +59,7 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
 
   @Override
   public void execute(ProcessStartListener startListener) {
-    UsageTrackerProvider.getInstance()
+    UsageTrackerService.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_DEPLOY)
         .addMetadata(GctTracking.METADATA_LABEL_KEY, isFlexCompat ? "flex-compat" : "standard")
         .addMetadata(
@@ -146,7 +146,7 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
 
   @Override
   void onCancel() {
-    UsageTrackerProvider.getInstance()
+    UsageTrackerService.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_DEPLOY_CANCEL)
         .addMetadata(GctTracking.METADATA_LABEL_KEY, isFlexCompat ? "flex-compat" : "standard")
         .ping();

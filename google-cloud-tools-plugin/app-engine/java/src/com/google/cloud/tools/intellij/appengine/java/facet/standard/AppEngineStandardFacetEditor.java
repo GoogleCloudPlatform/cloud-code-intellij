@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.java.facet.standard;
 
 import com.google.cloud.tools.intellij.analytics.GctTracking;
-import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
 import com.google.common.collect.Sets;
@@ -138,7 +138,7 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
 
     // Called on explicitly adding the facet through Project Settings -> Facets, but not on the
     // Framework discovered "Configure" popup.
-    UsageTrackerProvider.getInstance()
+    UsageTrackerService.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_FACET_ADD)
         .addMetadata("source", "setOnModule")
         .addMetadata("env", "standard")

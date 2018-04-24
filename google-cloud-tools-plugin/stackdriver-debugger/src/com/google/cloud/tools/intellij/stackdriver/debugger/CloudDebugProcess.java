@@ -20,7 +20,7 @@ import com.google.api.client.repackaged.com.google.common.annotations.VisibleFor
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.v2.model.Breakpoint;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
-import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcessStateController.ResolveBreakpointHandler;
 import com.google.cloud.tools.intellij.stackdriver.debugger.CloudLineBreakpointType.CloudLineBreakpoint;
 import com.google.cloud.tools.intellij.stackdriver.debugger.actions.CloudDebugHelpAction;
@@ -592,12 +592,12 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
               Messages.getQuestionIcon());
       if (result == Messages.OK) { // continue
         processState.setListenInBackground(true);
-        UsageTrackerProvider.getInstance()
+        UsageTrackerService.getInstance()
             .trackEvent(GctTracking.CLOUD_DEBUGGER_CLOSE_CONTINUE_LISTEN)
             .ping();
       } else {
         processState.setListenInBackground(false);
-        UsageTrackerProvider.getInstance()
+        UsageTrackerService.getInstance()
             .trackEvent(GctTracking.CLOUD_DEBUGGER_CLOSE_STOP_LISTEN)
             .ping();
       }

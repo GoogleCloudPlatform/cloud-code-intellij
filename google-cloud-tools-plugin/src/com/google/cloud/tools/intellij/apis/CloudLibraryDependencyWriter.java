@@ -18,7 +18,7 @@ package com.google.cloud.tools.intellij.apis;
 
 import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
-import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
@@ -166,7 +166,7 @@ final class CloudLibraryDependencyWriter {
               oldBomVersionDom -> {
                 oldBomVersionDom.setStringValue(bomVersion);
 
-                UsageTrackerProvider.getInstance()
+                UsageTrackerService.getInstance()
                     .trackEvent(GctTracking.CLIENT_LIBRARY_UPDATE_BOM_MAVEN)
                     .addMetadata(
                         GctTracking.METADATA_OLD_BOM_VERSION, oldBomVersionDom.getStringValue())
@@ -193,7 +193,7 @@ final class CloudLibraryDependencyWriter {
       dependency.getVersion().setStringValue(mavenId.getVersion());
     }
 
-    UsageTrackerProvider.getInstance()
+    UsageTrackerService.getInstance()
         .trackEvent(GctTracking.CLIENT_LIBRARY_ADD_LIBRARY_MAVEN)
         .addMetadata(GctTracking.METADATA_BUILD_SYSTEM_KEY, GctTracking.METADATA_BUILD_SYSTEM_MAVEN)
         .addMetadata(GctTracking.METADATA_LABEL_KEY, mavenId.getDisplayString())
@@ -212,7 +212,7 @@ final class CloudLibraryDependencyWriter {
     bomDependency.getType().setStringValue(CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_TYPE);
     bomDependency.getScope().setStringValue(CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_SCOPE);
 
-    UsageTrackerProvider.getInstance()
+    UsageTrackerService.getInstance()
         .trackEvent(GctTracking.CLIENT_LIBRARY_NEW_BOM_MAVEN)
         .addMetadata(GctTracking.METADATA_NEW_BOM_VERSION, bomVersion)
         .ping();
