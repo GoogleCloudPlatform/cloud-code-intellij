@@ -160,20 +160,11 @@ public class CloudApiManagerTest {
   }
 
   @Test
-  public void createServiceAccount_withLongName_trims30ToCharsWithTimestamp() throws IOException {
+  public void createServiceAccount_withLongerThanMaxLengthName_trims30ToCharsWithTimestamp()
+      throws IOException {
     String serviceAccountNameToTrim = "delete-me-spring-initlzr-demo";
-
-    Set<Role> roles = ImmutableSet.of();
-    CloudApiManager.createServiceAccountAndDownloadKey(
-        roles,
-        serviceAccountNameToTrim,
-        downloadDir.toPath(),
-        cloudProject,
-        testFixture.getProject());
-
     ArgumentCaptor<CreateServiceAccountRequest> captor =
-        ArgumentCaptor.forClass(CreateServiceAccountRequest.class);
-    verify(serviceAccounts).create(anyString(), captor.capture());
+        captureServiceAccountCreateRequest(serviceAccountNameToTrim);
 
     String accountId = captor.getValue().getAccountId();
     assertThat(accountId.length()).isEqualTo(30);
@@ -181,6 +172,41 @@ public class CloudApiManagerTest {
     // The double "--" are because of the trimming at the end of the service account name plus
     // the leading "-" from the timestamp
     assertThat(accountId).matches("delete-me-spring--[0-9]{12}");
+  }
+
+  @Test
+  public void createServiceAccount_withExactMaxLengthName_doesNotTrim() throws IOException {
+    String serviceAccountName = "abcdefghijklmnopq";
+    ArgumentCaptor<CreateServiceAccountRequest> captor =
+        captureServiceAccountCreateRequest(serviceAccountName);
+
+    String accountId = captor.getValue().getAccountId();
+    assertThat(accountId.length()).isEqualTo(30);
+    assertThat(accountId).matches(serviceAccountName + "-[0-9]{12}");
+  }
+
+  @Test
+  public void createServiceAccount_withLessThanMaxLengthName_doesNotTrim() throws IOException {
+    String serviceAccountName = "abcdefghijklmnop";
+    ArgumentCaptor<CreateServiceAccountRequest> captor =
+        captureServiceAccountCreateRequest(serviceAccountName);
+
+    String accountId = captor.getValue().getAccountId();
+    assertThat(accountId.length()).isEqualTo(29);
+    assertThat(accountId).matches(serviceAccountName + "-[0-9]{12}");
+  }
+
+  private ArgumentCaptor<CreateServiceAccountRequest> captureServiceAccountCreateRequest(
+      String serviceAccountName) throws IOException {
+    Set<Role> roles = ImmutableSet.of();
+    CloudApiManager.createServiceAccountAndDownloadKey(
+        roles, serviceAccountName, downloadDir.toPath(), cloudProject, testFixture.getProject());
+
+    ArgumentCaptor<CreateServiceAccountRequest> captor =
+        ArgumentCaptor.forClass(CreateServiceAccountRequest.class);
+    verify(serviceAccounts).create(anyString(), captor.capture());
+
+    return captor;
   }
 
   private void setupMockIamClient() throws IOException {
