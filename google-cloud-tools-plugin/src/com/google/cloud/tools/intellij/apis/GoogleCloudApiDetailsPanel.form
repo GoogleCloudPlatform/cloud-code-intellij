@@ -118,7 +118,7 @@
             </constraints>
             <properties>
               <enabled value="false"/>
-              <text resource-bundle="messages/CloudToolsBundle" key="cloud.apis.enable.checkbox.text"/>
+              <text resource-bundle="messages/CloudApisBundle" key="cloud.apis.enable.checkbox.text"/>
             </properties>
           </component>
           <component id="b5e18" class="javax.swing.JLabel">
@@ -128,7 +128,7 @@
             <properties>
               <icon value="general/help_small.png"/>
               <text value=""/>
-              <toolTipText resource-bundle="messages/CloudToolsBundle" key="cloud.apis.enable.checkbox.tooltip.text"/>
+              <toolTipText resource-bundle="messages/CloudApisBundle" key="cloud.apis.enable.checkbox.tooltip.text"/>
             </properties>
           </component>
           <grid id="3f210" binding="managementInfoPanel" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">

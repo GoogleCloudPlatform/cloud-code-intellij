@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.apis;
 
 import com.google.cloud.tools.intellij.ui.CopyToClipboardActionListener;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.GoogleCloudApisMessageBundle;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import javax.swing.JButton;
@@ -45,7 +45,8 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
     super(project);
     init();
 
-    setTitle(GctBundle.message("cloud.apis.service.account.key.downloaded.title"));
+    setTitle(
+        GoogleCloudApisMessageBundle.message("cloud.apis.service.account.key.downloaded.title"));
     downloadPathLabel.setText(downloadPath);
 
     envVarInfoText.setBackground(panel.getBackground());

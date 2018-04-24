@@ -20,7 +20,7 @@ import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.GoogleCloudApisMessageBundle;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
@@ -232,10 +232,12 @@ final class CloudLibraryDependencyWriter {
       return;
     }
 
-    String title = GctBundle.message("cloud.libraries.depwriter.maven.ignored.deps.title");
+    String title =
+        GoogleCloudApisMessageBundle.message("cloud.libraries.depwriter.maven.ignored.deps.title");
     String mavenIdString = joinMavenIds(ignoredMavenIds);
     String message =
-        GctBundle.message("cloud.libraries.depwriter.maven.ignored.deps.message", mavenIdString);
+        GoogleCloudApisMessageBundle.message(
+            "cloud.libraries.depwriter.maven.ignored.deps.message", mavenIdString);
     Notification notification =
         NOTIFICATION_GROUP.createNotification(
             title, /* subtitle= */ null, message, NotificationType.WARNING);
@@ -255,10 +257,12 @@ final class CloudLibraryDependencyWriter {
       return;
     }
 
-    String title = GctBundle.message("cloud.libraries.depwriter.maven.added.deps.title");
+    String title =
+        GoogleCloudApisMessageBundle.message("cloud.libraries.depwriter.maven.added.deps.title");
     String mavenIdString = joinMavenIds(addedMavenIds);
     String message =
-        GctBundle.message("cloud.libraries.depwriter.maven.added.deps.message", mavenIdString);
+        GoogleCloudApisMessageBundle.message(
+            "cloud.libraries.depwriter.maven.added.deps.message", mavenIdString);
     Notification notification =
         NOTIFICATION_GROUP.createNotification(
             title, /* subtitle= */ null, message, NotificationType.INFORMATION);

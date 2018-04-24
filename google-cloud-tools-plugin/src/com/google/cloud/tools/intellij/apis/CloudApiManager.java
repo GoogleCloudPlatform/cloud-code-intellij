@@ -38,7 +38,7 @@ import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.resources.GoogleApiClientFactory;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.GoogleCloudApisMessageBundle;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -131,7 +131,7 @@ class CloudApiManager {
 
         updateProgress(
             progress,
-            GctBundle.message(
+            GoogleCloudApisMessageBundle.message(
                 "cloud.apis.enable.progress.message",
                 library.getName(),
                 cloudProject.projectName()),
@@ -183,7 +183,8 @@ class CloudApiManager {
 
       updateProgress(
           progress,
-          GctBundle.message("cloud.apis.service.account.create.account.progress.message", name),
+          GoogleCloudApisMessageBundle.message(
+              "cloud.apis.service.account.create.account.progress.message", name),
           step / numSteps);
       step++;
       ServiceAccount serviceAccount = createServiceAccount(user.get(), name, cloudProject);
@@ -191,7 +192,8 @@ class CloudApiManager {
       if (!roles.isEmpty()) {
         updateProgress(
             progress,
-            GctBundle.message("cloud.apis.service.account.add.roles.progress.message"),
+            GoogleCloudApisMessageBundle.message(
+                "cloud.apis.service.account.add.roles.progress.message"),
             step / numSteps);
         step++;
         addRolesToServiceAccount(user.get(), serviceAccount, roles, cloudProject);
@@ -199,14 +201,16 @@ class CloudApiManager {
 
       updateProgress(
           progress,
-          GctBundle.message("cloud.apis.service.account.create.key.progress.message"),
+          GoogleCloudApisMessageBundle.message(
+              "cloud.apis.service.account.create.key.progress.message"),
           step / numSteps);
       step++;
       ServiceAccountKey serviceAccountKey = createServiceAccountKey(user.get(), serviceAccount);
 
       updateProgress(
           progress,
-          GctBundle.message("cloud.apis.service.account.download.key.progress.message"),
+          GoogleCloudApisMessageBundle.message(
+              "cloud.apis.service.account.download.key.progress.message"),
           step / numSteps);
       Path keyPath = writeServiceAccountKey(serviceAccountKey, downloadDir, cloudProject);
 
@@ -402,9 +406,9 @@ class CloudApiManager {
       Set<CloudLibrary> libraries, String cloudProjectId, Project project) {
     Notification notification =
         NOTIFICATION_GROUP.createNotification(
-            GctBundle.message("cloud.apis.enabled.title"),
+            GoogleCloudApisMessageBundle.message("cloud.apis.enabled.title"),
             null /*subtitle*/,
-            GctBundle.message(
+            GoogleCloudApisMessageBundle.message(
                 "cloud.apis.enabled.message", cloudProjectId, joinApiNames(libraries)),
             NotificationType.INFORMATION);
     notification.notify(project);
@@ -413,9 +417,10 @@ class CloudApiManager {
   private static void notifyApiEnableError(Set<CloudLibrary> apis, Project project) {
     Notification notification =
         NOTIFICATION_GROUP.createNotification(
-            GctBundle.message("cloud.apis.enable.error.title"),
+            GoogleCloudApisMessageBundle.message("cloud.apis.enable.error.title"),
             null /*subtitle*/,
-            GctBundle.message("cloud.apis.enable.error.message", joinApiNames(apis)),
+            GoogleCloudApisMessageBundle.message(
+                "cloud.apis.enable.error.message", joinApiNames(apis)),
             NotificationType.ERROR);
     notification.notify(project);
   }
@@ -423,9 +428,10 @@ class CloudApiManager {
   private static void notifyApiEnableSkipped(Set<CloudLibrary> apis, Project project) {
     Notification notification =
         NOTIFICATION_GROUP.createNotification(
-            GctBundle.message("cloud.apis.enable.skipped.title"),
+            GoogleCloudApisMessageBundle.message("cloud.apis.enable.skipped.title"),
             null /*subtitle*/,
-            GctBundle.message("cloud.apis.enable.skipped.message", joinApiNames(apis)),
+            GoogleCloudApisMessageBundle.message(
+                "cloud.apis.enable.skipped.message", joinApiNames(apis)),
             NotificationType.ERROR);
     notification.notify(project);
   }
@@ -433,9 +439,10 @@ class CloudApiManager {
   private static void notifyServiceAccountCreated(Project project, String name, Path downloadDir) {
     Notification notification =
         NOTIFICATION_GROUP.createNotification(
-            GctBundle.message("cloud.apis.service.account.created.title"),
+            GoogleCloudApisMessageBundle.message("cloud.apis.service.account.created.title"),
             null /*subtitle*/,
-            GctBundle.message("cloud.apis.service.account.created.message", name),
+            GoogleCloudApisMessageBundle.message(
+                "cloud.apis.service.account.created.message", name),
             NotificationType.INFORMATION);
     notification.notify(project);
 
@@ -451,9 +458,9 @@ class CloudApiManager {
   private static void notifyServiceAccountError(Project project, String name, String errorMessage) {
     Notification notification =
         NOTIFICATION_GROUP.createNotification(
-            GctBundle.message("cloud.apis.service.account.created.error.title"),
+            GoogleCloudApisMessageBundle.message("cloud.apis.service.account.created.error.title"),
             null /*subtitle*/,
-            GctBundle.message(
+            GoogleCloudApisMessageBundle.message(
                 "cloud.apis.service.account.created.error.message", name, errorMessage),
             NotificationType.ERROR);
     notification.notify(project);

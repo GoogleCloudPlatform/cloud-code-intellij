@@ -20,7 +20,7 @@ import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.GoogleCloudApisMessageBundle;
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;
@@ -40,8 +40,8 @@ public final class AddCloudLibrariesAction extends DumbAwareAction {
 
   public AddCloudLibrariesAction() {
     super(
-        GctBundle.message("cloud.libraries.menu.action.active.text"),
-        GctBundle.message("cloud.libraries.menu.action.description"),
+        GoogleCloudApisMessageBundle.message("cloud.libraries.menu.action.active.text"),
+        GoogleCloudApisMessageBundle.message("cloud.libraries.menu.action.description"),
         GoogleCloudCoreIcons.CLOUD);
   }
 
@@ -63,25 +63,33 @@ public final class AddCloudLibrariesAction extends DumbAwareAction {
             case MAVEN_REQUIRED:
               e.getPresentation()
                   .setDescription(
-                      GctBundle.message("cloud.libraries.menu.action.maven.required.description"));
+                      GoogleCloudApisMessageBundle.message(
+                          "cloud.libraries.menu.action.maven.required.description"));
               e.getPresentation()
-                  .setText(GctBundle.message("cloud.libraries.menu.action.disabled.maven.text"));
+                  .setText(
+                      GoogleCloudApisMessageBundle.message(
+                          "cloud.libraries.menu.action.disabled.maven.text"));
               break;
             case APPENGINE_JAVA8_REQUIRED:
               e.getPresentation()
                   .setDescription(
-                      GctBundle.message(
+                      GoogleCloudApisMessageBundle.message(
                           "cloud.libraries.menu.action.gae.java8.required.description"));
               e.getPresentation()
-                  .setText(GctBundle.message("cloud.libraries.menu.action.disabled.java8.text"));
+                  .setText(
+                      GoogleCloudApisMessageBundle.message(
+                          "cloud.libraries.menu.action.disabled.java8.text"));
               break;
           }
         }
       } else {
         // standard message for a supported module action.
         e.getPresentation()
-            .setDescription(GctBundle.message("cloud.libraries.menu.action.description"));
-        e.getPresentation().setText(GctBundle.message("cloud.libraries.menu.action.active.text"));
+            .setDescription(
+                GoogleCloudApisMessageBundle.message("cloud.libraries.menu.action.description"));
+        e.getPresentation()
+            .setText(
+                GoogleCloudApisMessageBundle.message("cloud.libraries.menu.action.active.text"));
       }
     }
 

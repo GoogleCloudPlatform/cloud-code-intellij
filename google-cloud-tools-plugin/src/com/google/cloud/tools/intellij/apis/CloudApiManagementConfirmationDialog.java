@@ -18,7 +18,7 @@ package com.google.cloud.tools.intellij.apis;
 
 import com.google.api.services.iam.v1.model.Role;
 import com.google.cloud.tools.intellij.project.CloudProject;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.GoogleCloudApisMessageBundle;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
@@ -113,23 +113,26 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
     this.roles = roles;
 
     init();
-    setTitle(GctBundle.message("cloud.apis.management.dialog.title"));
+    setTitle(GoogleCloudApisMessageBundle.message("cloud.apis.management.dialog.title"));
 
     apiEnablementPanel.setBorder(
         IdeBorderFactory.createTitledBorder(
-            GctBundle.message("cloud.apis.management.dialog.enablement.header")));
+            GoogleCloudApisMessageBundle.message(
+                "cloud.apis.management.dialog.enablement.header")));
     serviceAccountPanel.setBorder(
         IdeBorderFactory.createTitledBorder(
-            GctBundle.message("cloud.apis.management.dialog.serviceaccount.header")));
+            GoogleCloudApisMessageBundle.message(
+                "cloud.apis.management.dialog.serviceaccount.header")));
 
     serviceAccountDetailsPane.setBorder(JBUI.Borders.empty());
     serviceAccountInfoPane.setBackground(serviceAccountPanel.getBackground());
 
     enableConfirmationLabel.setText(
-        GctBundle.message(
+        GoogleCloudApisMessageBundle.message(
             "cloud.apis.management.dialog.apistoenable.header", cloudProject.projectName()));
     wontEnableConfirmationLabel.setText(
-        GctBundle.message("cloud.apis.management.dialog.apisnottoenable.header", module.getName()));
+        GoogleCloudApisMessageBundle.message(
+            "cloud.apis.management.dialog.apisnottoenable.header", module.getName()));
 
     apisToEnablePanel.setVisible(!apisToEnable.isEmpty());
     apisNotSelectedToEnablePanel.setVisible(!apisNotToEnable.isEmpty());
@@ -147,7 +150,8 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
     serviceAccountNameTextField.setText(module.getName());
 
     serviceKeyPathSelector.addBrowseFolderListener(
-        GctBundle.message("cloud.apis.management.dialog.serviceaccount.key.browser.title"),
+        GoogleCloudApisMessageBundle.message(
+            "cloud.apis.management.dialog.serviceaccount.key.browser.title"),
         null /*description*/,
         null /*project - null on purpose so that the path isn't defaulted to the project root*/,
         FileChooserDescriptorFactory.createSingleFolderDescriptor());
@@ -179,25 +183,29 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
 
       if (StringUtils.isEmpty(name)) {
         return new ValidationInfo(
-            GctBundle.message("cloud.apis.management.dialog.serviceaccount.name.empty.error"),
+            GoogleCloudApisMessageBundle.message(
+                "cloud.apis.management.dialog.serviceaccount.name.empty.error"),
             serviceAccountNameTextField);
       } else if (name.length() > CloudApiManager.SERVICE_ACCOUNT_NAME_MAX_LEN) {
         return new ValidationInfo(
-            GctBundle.message(
+            GoogleCloudApisMessageBundle.message(
                 "cloud.apis.management.dialog.serviceaccount.name.len.error",
                 CloudApiManager.SERVICE_ACCOUNT_NAME_MAX_LEN),
             serviceAccountNameTextField);
       } else if (!CloudApiManager.SERVICE_ACCOUNT_ID_PATTERN.matcher(name).matches()) {
         return new ValidationInfo(
-            GctBundle.message("cloud.apis.management.dialog.serviceaccount.name.regex.error"),
+            GoogleCloudApisMessageBundle.message(
+                "cloud.apis.management.dialog.serviceaccount.name.regex.error"),
             serviceAccountNameTextField);
       } else if (StringUtils.isEmpty(path)) {
         return new ValidationInfo(
-            GctBundle.message("cloud.apis.management.dialog.serviceaccount.key.path.empty.error"),
+            GoogleCloudApisMessageBundle.message(
+                "cloud.apis.management.dialog.serviceaccount.key.path.empty.error"),
             serviceKeyPathSelector);
       } else if (!isValidDirectory(path)) {
         return new ValidationInfo(
-            GctBundle.message("cloud.apis.management.dialog.serviceaccount.key.path.invalid.error"),
+            GoogleCloudApisMessageBundle.message(
+                "cloud.apis.management.dialog.serviceaccount.key.path.invalid.error"),
             serviceKeyPathSelector);
       }
     }

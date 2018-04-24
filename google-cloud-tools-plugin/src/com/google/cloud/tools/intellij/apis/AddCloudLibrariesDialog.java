@@ -18,7 +18,7 @@ package com.google.cloud.tools.intellij.apis;
 
 import com.google.api.services.iam.v1.model.Role;
 import com.google.cloud.tools.intellij.project.CloudProject;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.GoogleCloudApisMessageBundle;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.collect.Sets;
 import com.intellij.openapi.diagnostic.Logger;
@@ -63,8 +63,8 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
   @Override
   protected void init() {
     super.init();
-    setTitle(GctBundle.message("cloud.libraries.dialog.title"));
-    setOKButtonText(GctBundle.message("cloud.libraries.ok.button.text"));
+    setTitle(GoogleCloudApisMessageBundle.message("cloud.libraries.dialog.title"));
+    setOKButtonText(GoogleCloudApisMessageBundle.message("cloud.libraries.ok.button.text"));
     setOKActionEnabled(isReadyToSubmit());
   }
 
@@ -144,7 +144,7 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
     ProgressManager.getInstance()
         .runProcessWithProgressSynchronously(
             () -> CloudApiManager.enableApis(apisToEnable, getCloudProject(), project),
-            GctBundle.message("cloud.apis.enable.progress.title"),
+            GoogleCloudApisMessageBundle.message("cloud.apis.enable.progress.title"),
             true /*canBeCanceled*/,
             project);
   }
@@ -167,7 +167,8 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
                     serviceAccountKeyDownloadPath,
                     getCloudProject(),
                     project),
-            GctBundle.message("cloud.apis.service.account.create.progress.title"),
+            GoogleCloudApisMessageBundle.message(
+                "cloud.apis.service.account.create.progress.title"),
             true /*canBeCanceled*/,
             project);
   }

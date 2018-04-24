@@ -19,7 +19,7 @@ package com.google.cloud.tools.intellij.apis;
 import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
 import com.google.cloud.tools.intellij.apis.CloudApiMavenService.LibraryVersionFromBomException;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.GoogleCloudApisMessageBundle;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.cloud.tools.libraries.json.CloudLibraryClientMavenCoordinates;
@@ -166,7 +166,7 @@ public final class GoogleCloudApiDetailsPanel {
     apiManagementPanel = new JPanel();
     apiManagementPanel.setBorder(
         IdeBorderFactory.createTitledBorder(
-            GctBundle.message("cloud.apis.management.section.title")));
+            GoogleCloudApisMessageBundle.message("cloud.apis.management.section.title")));
 
     managementWarningTextPane = new JTextPane();
     managementWarningTextPane.setOpaque(false);
@@ -206,7 +206,7 @@ public final class GoogleCloudApiDetailsPanel {
                 } else {
                   if (client.getMavenCoordinates() != null) {
                     versionLabel.setText(
-                        GctBundle.message(
+                        GoogleCloudApisMessageBundle.message(
                             "cloud.libraries.version.label",
                             client.getMavenCoordinates().getVersion()));
                   }
@@ -227,7 +227,8 @@ public final class GoogleCloudApiDetailsPanel {
               });
     }
 
-    managementWarningTextPane.setText(GctBundle.message("cloud.apis.management.section.info.text"));
+    managementWarningTextPane.setText(
+        GoogleCloudApisMessageBundle.message("cloud.apis.management.section.info.text"));
   }
 
   /**
@@ -265,7 +266,7 @@ public final class GoogleCloudApiDetailsPanel {
                                     .invokeAndWait(
                                         () -> {
                                           versionLabel.setText(
-                                              GctBundle.message(
+                                              GoogleCloudApisMessageBundle.message(
                                                   "cloud.libraries.version.label",
                                                   versionOptional.get()));
                                         },
@@ -274,17 +275,18 @@ public final class GoogleCloudApiDetailsPanel {
                                 versionLabel.setIcon(null);
                               } else {
                                 versionLabel.setText(
-                                    GctBundle.message(
+                                    GoogleCloudApisMessageBundle.message(
                                         "cloud.libraries.version.label",
-                                        GctBundle.message(
+                                        GoogleCloudApisMessageBundle.message(
                                             "cloud.libraries.version.notfound.text", bomVersion)));
                                 versionLabel.setIcon(General.Error);
                               }
                             } catch (LibraryVersionFromBomException ex) {
                               versionLabel.setText(
-                                  GctBundle.message(
+                                  GoogleCloudApisMessageBundle.message(
                                       "cloud.libraries.version.label",
-                                      GctBundle.message("cloud.libraries.version.exception.text")));
+                                      GoogleCloudApisMessageBundle.message(
+                                          "cloud.libraries.version.exception.text")));
                               versionLabel.setIcon(General.Error);
                             }
                           });
@@ -335,7 +337,8 @@ public final class GoogleCloudApiDetailsPanel {
   /**
    * Optionally returns an HTML-formatted link for the given URL.
    *
-   * @param key the key of the text (via {@link GctBundle#message}) to show for the link
+   * @param key the key of the text (via {@link GoogleCloudApisMessageBundle#message}) to show for
+   *     the link
    * @param url the URL to make into an HTML link
    * @return the HTML-formatted link, or {@link Optional#empty()} if the given URL is {@code null}
    */
@@ -343,7 +346,8 @@ public final class GoogleCloudApiDetailsPanel {
     if (url == null) {
       return Optional.empty();
     }
-    return Optional.of(String.format("<a href=\"%s\">%s</a>", url, GctBundle.message(key)));
+    return Optional.of(
+        String.format("<a href=\"%s\">%s</a>", url, GoogleCloudApisMessageBundle.message(key)));
   }
 
   /**

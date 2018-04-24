@@ -18,7 +18,7 @@ package com.google.cloud.tools.intellij.apis;
 
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.GoogleCloudApisMessageBundle;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.lang.annotation.HighlightSeverity;
@@ -53,7 +53,8 @@ public class CloudDependencyWithNoBomInspection extends CloudBomInspection {
   @Nullable
   @Override
   public String getStaticDescription() {
-    return GctBundle.message("cloud.libraries.with.no.bom.inspection.description");
+    return GoogleCloudApisMessageBundle.message(
+        "cloud.libraries.with.no.bom.inspection.description");
   }
 
   /** Only apply the inspection if there is no BOM defined. */
@@ -74,7 +75,8 @@ public class CloudDependencyWithNoBomInspection extends CloudBomInspection {
     holder.createProblem(
         dependency,
         HighlightSeverity.GENERIC_SERVER_ERROR_OR_WARNING,
-        GctBundle.message("cloud.libraries.with.no.bom.inspection.problem.description"),
+        GoogleCloudApisMessageBundle.message(
+            "cloud.libraries.with.no.bom.inspection.problem.description"),
         new AddBomAndStripVersionQuickFix(module));
   }
 
@@ -94,7 +96,7 @@ public class CloudDependencyWithNoBomInspection extends CloudBomInspection {
     @NotNull
     @Override
     public String getFamilyName() {
-      return GctBundle.message("cloud.libraries.with.no.bom.quickfix.title");
+      return GoogleCloudApisMessageBundle.message("cloud.libraries.with.no.bom.quickfix.title");
     }
 
     @Override

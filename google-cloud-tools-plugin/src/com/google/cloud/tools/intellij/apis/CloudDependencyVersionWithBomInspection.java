@@ -18,7 +18,7 @@ package com.google.cloud.tools.intellij.apis;
 
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
-import com.google.cloud.tools.intellij.util.GctBundle;
+import com.google.cloud.tools.intellij.util.GoogleCloudApisMessageBundle;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.lang.annotation.HighlightSeverity;
@@ -49,7 +49,8 @@ public class CloudDependencyVersionWithBomInspection extends CloudBomInspection 
   @Nullable
   @Override
   public String getStaticDescription() {
-    return GctBundle.getString("cloud.libraries.version.with.bom.inspection.description");
+    return GoogleCloudApisMessageBundle.getString(
+        "cloud.libraries.version.with.bom.inspection.description");
   }
 
   /** Only apply the inspection if there is a BOM defined. */
@@ -71,7 +72,8 @@ public class CloudDependencyVersionWithBomInspection extends CloudBomInspection 
       holder.createProblem(
           dependency.getVersion(),
           HighlightSeverity.GENERIC_SERVER_ERROR_OR_WARNING,
-          GctBundle.message("cloud.libraries.version.with.bom.inspection.problem.description"),
+          GoogleCloudApisMessageBundle.message(
+              "cloud.libraries.version.with.bom.inspection.problem.description"),
           new StripDependencyVersionQuickFix());
     }
   }
@@ -92,7 +94,8 @@ public class CloudDependencyVersionWithBomInspection extends CloudBomInspection 
     @NotNull
     @Override
     public String getFamilyName() {
-      return GctBundle.message("cloud.libraries.version.with.bom.quickfix.title");
+      return GoogleCloudApisMessageBundle.message(
+          "cloud.libraries.version.with.bom.quickfix.title");
     }
 
     @Override
