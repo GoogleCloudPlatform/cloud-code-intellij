@@ -36,6 +36,7 @@ import com.intellij.ui.BooleanTableCellEditor;
 import com.intellij.ui.BooleanTableCellRenderer;
 import com.intellij.ui.TableUtil;
 import com.intellij.ui.table.JBTable;
+import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import java.awt.Component;
 import java.awt.Graphics;
@@ -54,7 +55,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -265,7 +265,7 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
   private static final class RunnerAndConfigurationSettingsRenderer
       extends DefaultTableCellRenderer {
     // TODO: test JBUI.Borders.empty(5)
-    private static final Border NO_FOCUS_BORDER = new EmptyBorder(5, 5, 5, 5);
+    private static final Border NO_FOCUS_BORDER = JBUI.Borders.empty(5);
 
     @Override
     public Component getTableCellRendererComponent(

@@ -28,6 +28,8 @@
         serviceImplementation="com.google.cloud.tools.intellij.cloudapis.CloudLibrariesService"/>
     <applicationService
         serviceImplementation="com.google.cloud.tools.intellij.cloudapis.CloudApiMavenService"/>
+    <applicationService
+            serviceImplementation="com.google.cloud.tools.intellij.cloudapis.ServiceAccountKeyDialogService"/>
 
     <localInspection language="XML" shortName="DependencyVersionWithBom"
         bundle="messages.CloudApisBundle"
