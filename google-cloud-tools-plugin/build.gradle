@@ -42,6 +42,8 @@ publishPlugin {
 dependencies {
     compile(project(':google-cloud-tools-plugin:google-cloud-core'))
     compile(project(':google-cloud-tools-plugin:google-cloud-storage'))
+    compile(project(':google-cloud-tools-plugin:google-cloud-repos'))
+    compile(project(':google-cloud-tools-plugin:google-cloud-apis'))
     compile(project(':google-cloud-tools-plugin:app-engine:java'))
     compile(project(':google-cloud-tools-plugin:app-engine:java:ultimate'))
     compile(project(':google-cloud-tools-plugin:stackdriver-debugger'))
@@ -55,7 +57,6 @@ dependencies {
         exclude group: 'com.google.guava', module: 'guava'
         exclude group: 'org.yaml', module: 'snakeyaml'
     }
-    compile files('lib/google-api-services-source.jar')
     compile 'org.yaml:snakeyaml:1.18'
 
     compileOnly 'com.google.auto.value:auto-value:1.4.1'
