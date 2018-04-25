@@ -135,7 +135,7 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
   }
 
   /**
-   * Runs the process that enables the set of {@link CloudLibrary apis} on GCP.
+   * Runs the process that enables the set of {@link CloudLibrary cloudapis} on GCP.
    *
    * @param apisToEnable the APIs selected by the user for enablement
    */
@@ -176,8 +176,8 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
    * Fetches all the available roles for the {@link CloudProject} and returns the set of roles
    * corresponding to the selected client libraries.
    *
-   * @param apis the set of {@link CloudLibrary apis} selected
-   * @return the set of {@link Role roles} corresponding to the selected apis
+   * @param apis the set of {@link CloudLibrary cloudapis} selected
+   * @return the set of {@link Role roles} corresponding to the selected cloudapis
    */
   private Set<Role> getServiceAccountRoles(Set<CloudLibrary> apis) {
     List<Role> serviceAccountRoles = CloudApiManager.getServiceAccountRoles(getCloudProject());

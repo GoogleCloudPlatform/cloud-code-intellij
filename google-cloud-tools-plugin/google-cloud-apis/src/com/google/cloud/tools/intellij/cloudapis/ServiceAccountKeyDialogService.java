@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.apis;
+package com.google.cloud.tools.intellij.cloudapis;
 
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.intellij.openapi.project.Project;

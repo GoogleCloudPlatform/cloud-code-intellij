@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.cloudapis;
 
-import com.google.cloud.tools.intellij.ui.CopyToClipboardActionListener;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -42,7 +41,8 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
     this.cloudProject = cloudProject;
     this.downloadPath = downloadPath;
     init();
-    setTitle(GoogleCloudApisMessageBundle.message("cloud.apis.service.account.key.downloaded.title"));
+    setTitle(
+        GoogleCloudApisMessageBundle.message("cloud.apis.service.account.key.downloaded.title"));
   }
 
   @Nullable

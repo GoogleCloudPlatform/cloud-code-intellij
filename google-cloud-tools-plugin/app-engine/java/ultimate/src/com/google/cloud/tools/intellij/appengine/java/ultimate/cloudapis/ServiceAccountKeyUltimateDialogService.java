@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.apis;
+package com.google.cloud.tools.intellij.appengine.java.ultimate.cloudapis;
 
+import com.google.cloud.tools.intellij.cloudapis.ServiceAccountKeyDialogService;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.apis;
+package com.google.cloud.tools.intellij.cloudapis;
 
 import com.google.cloud.tools.intellij.ui.CopyToClipboardActionListener;
 import com.intellij.execution.util.EnvironmentVariable;

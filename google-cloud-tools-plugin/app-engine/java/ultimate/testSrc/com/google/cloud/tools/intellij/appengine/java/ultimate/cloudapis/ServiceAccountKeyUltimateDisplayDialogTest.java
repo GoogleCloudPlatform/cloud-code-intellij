@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.java.ultimate.apis;
+package com.google.cloud.tools.intellij.appengine.java.ultimate.cloudapis;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertFalse;

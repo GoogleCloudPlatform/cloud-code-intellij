@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.apis;
+package com.google.cloud.tools.intellij.appengine.java.ultimate.cloudapis;
 
 import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
-import com.google.cloud.tools.intellij.appengine.server.run.AppEngineServerConfigurationType;
+import com.google.cloud.tools.intellij.appengine.java.ultimate.server.run.AppEngineServerConfigurationType;
+import com.google.cloud.tools.intellij.cloudapis.GoogleCloudApisMessageBundle;
+import com.google.cloud.tools.intellij.cloudapis.ServiceAccountKeyDownloadedPanel;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.ui.BooleanTableModel;
-import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.CommonBundle;
 import com.intellij.execution.ProgramRunnerUtil;
 import com.intellij.execution.RunManager;
@@ -54,8 +55,6 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -67,7 +66,6 @@ import org.jetbrains.annotations.Nullable;
  * to automatically update with these environment variables.
  */
 public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
-
   private final Project project;
   private final CloudProject cloudProject;
   private final String downloadPath;
@@ -81,14 +79,15 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
 
   @VisibleForTesting public static List<RunnerAndConfigurationSettings> configurationSettingsList;
 
-  public ServiceAccountKeyUltimateDisplayDialog(
+  ServiceAccountKeyUltimateDisplayDialog(
       @Nullable Project project, @NotNull CloudProject cloudProject, @NotNull String downloadPath) {
     super(project);
     this.project = project;
     this.cloudProject = cloudProject;
     this.downloadPath = downloadPath;
     init();
-    setTitle(GctBundle.message("cloud.apis.service.account.key.downloaded.title"));
+    setTitle(
+        GoogleCloudApisMessageBundle.message("cloud.apis.service.account.key.downloaded.title"));
     runConfigurationTable.setTableHeader(null);
 
     if (runConfigurationTableModel.getRowCount() == 0) {
@@ -98,13 +97,9 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
     }
 
     runConfigurationTableModel.addTableModelListener(
-        new TableModelListener() {
-          @Override
-          public void tableChanged(TableModelEvent e) {
-            if (addVariablesAction != null) {
-              addVariablesAction.setEnabled(
-                  !runConfigurationTableModel.getSelectedItems().isEmpty());
-            }
+        e -> {
+          if (addVariablesAction != null) {
+            addVariablesAction.setEnabled(!runConfigurationTableModel.getSelectedItems().isEmpty());
           }
         });
   }
@@ -175,7 +170,7 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
     ProgramRunner runner = ProgramRunnerUtil.getRunner(executorId, configuration);
     if (runner == null) {
       setErrorText(
-          GctBundle.message(
+          GoogleCloudApisMessageBundle.message(
               "cloud.apis.service.account.key.dialog.update.configuration.error",
               configuration.getName()),
           mainPanel);
@@ -186,7 +181,7 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
         (RunnerSpecificLocalConfigurationBit) configuration.getConfigurationSettings(runner);
     if (configurationSettings == null) {
       setErrorText(
-          GctBundle.message(
+          GoogleCloudApisMessageBundle.message(
               "cloud.apis.service.account.key.dialog.update.configuration.error",
               configuration.getName()),
           mainPanel);
@@ -225,7 +220,9 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
   /** Adds the Cloud Library environment variables to the selected App Engine run configurations. */
   private class AddVariablesAction extends DialogWrapperAction {
     private AddVariablesAction() {
-      super(GctBundle.message("cloud.apis.service.account.key.downloaded.update.server.button"));
+      super(
+          GoogleCloudApisMessageBundle.message(
+              "cloud.apis.service.account.key.downloaded.update.server.button"));
       putValue(DEFAULT_ACTION, Boolean.TRUE);
     }
 
