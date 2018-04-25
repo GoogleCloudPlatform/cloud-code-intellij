@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.analytics;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.KeyedExtensionCollector;
 import com.intellij.util.PlatformUtils;
 import java.util.Map;
@@ -38,6 +39,10 @@ public final class KeyedExtensionUsageTrackerProvider extends UsageTrackerProvid
   @NotNull
   @Override
   protected UsageTracker getTracker() {
+    if (ApplicationManager.getApplication().isUnitTestMode()) {
+      return new NoOpUsageTracker();
+    }
+
     String key = PlatformUtils.getPlatformPrefix();
     return getTracker(key);
   }
