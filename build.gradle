@@ -18,16 +18,19 @@ buildscript {
     repositories {
         maven { url "https://maven-central.storage.googleapis.com"}
         maven { url "https://plugins.gradle.org/m2/" }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url 'http://dl.bintray.com/jetbrains/intellij-plugin-service'  }
     }
     dependencies {
         classpath "net.ltgt.gradle:gradle-errorprone-plugin:0.0.13"
         classpath "net.ltgt.gradle:gradle-apt-plugin:0.13"
+        classpath "org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.4.0-SNAPSHOT"
     }
 }
 
 plugins {
     id 'net.researchgate.release' version '2.6.0'
-    id "org.jetbrains.intellij" version "0.3.1" apply false
+    // id "org.jetbrains.intellij" version "0.3.1" apply false
     id "com.diffplug.gradle.spotless" version "3.6.0" apply false
 }
 
