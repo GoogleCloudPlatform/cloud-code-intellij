@@ -383,18 +383,23 @@ class CloudApiManager {
   /**
    * Creates the unique ID for the service account in the form: [name]-[timestamp].
    *
-   * <p>Trims the id if necessary to be less than the max allowed characters.
+   * <p>Trims the id if necessary to be less than the max allowed characters by first trimming the
+   * service account name and then appending the timestamp so that the timestamp is always trailing.
    *
    * @param name the name chosen by the user for the service account
    * @return an usable ID for GCP that is a combination of a prefix, the filtered name, and a
    *     timestamp
    */
   private static String createServiceAccountId(String name) {
-    String id = String.format("%s-%s", name, getTimestamp());
+    String timestamp = getTimestamp();
+    int maxLengthMinusTimestamp = SERVICE_ACCOUNT_ID_MAX_LEN - (timestamp.length() + 1);
 
-    return id.length() <= SERVICE_ACCOUNT_ID_MAX_LEN
-        ? id
-        : id.substring(0, SERVICE_ACCOUNT_ID_MAX_LEN);
+    String trimmed = name;
+    if (name.length() > maxLengthMinusTimestamp) {
+      trimmed = name.substring(0, maxLengthMinusTimestamp);
+    }
+
+    return String.format("%s-%s", trimmed, getTimestamp());
   }
 
   private static String getTimestamp() {
