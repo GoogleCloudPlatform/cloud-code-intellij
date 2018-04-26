@@ -177,7 +177,7 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
    * corresponding to the selected client libraries.
    *
    * @param apis the set of {@link CloudLibrary apis} selected
-   * @return the set of {@link Role roles} corresponding to the selected apis
+   * @return the set of {@link Role roles} corresponding to the selected cloudapis
    */
   private Set<Role> getServiceAccountRoles(Set<CloudLibrary> apis) {
     List<Role> serviceAccountRoles = CloudApiManager.getServiceAccountRoles(getCloudProject());

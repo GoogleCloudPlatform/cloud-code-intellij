@@ -52,6 +52,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.DialogWrapper;
 import git4idea.DialogManager;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -213,7 +214,7 @@ class CloudApiManager {
           step / numSteps);
       Path keyPath = writeServiceAccountKey(serviceAccountKey, downloadDir, cloudProject);
 
-      notifyServiceAccountCreated(project, name, keyPath);
+      notifyServiceAccountCreated(project, cloudProject, name, keyPath);
     } catch (IOException e) {
       LOG.warn(
           "Exception occurred attempting to create service account on GCP and download its key", e);
@@ -440,7 +441,8 @@ class CloudApiManager {
     notification.notify(project);
   }
 
-  private static void notifyServiceAccountCreated(Project project, String name, Path downloadDir) {
+  private static void notifyServiceAccountCreated(
+      Project project, CloudProject cloudProject, String name, Path downloadDir) {
     Notification notification =
         NOTIFICATION_GROUP.createNotification(
             GoogleCloudApisMessageBundle.message("cloud.apis.service.account.created.title"),
@@ -453,8 +455,10 @@ class CloudApiManager {
     ApplicationManager.getApplication()
         .invokeLater(
             () -> {
-              ServiceAccountKeyDisplayDialog keyDialog =
-                  new ServiceAccountKeyDisplayDialog(project, downloadDir.toString());
+              ServiceAccountKeyDialogService dialogService =
+                  ServiceManager.getService(ServiceAccountKeyDialogService.class);
+              DialogWrapper keyDialog =
+                  dialogService.getDialog(project, cloudProject, downloadDir.toString());
               DialogManager.show(keyDialog);
             });
   }
