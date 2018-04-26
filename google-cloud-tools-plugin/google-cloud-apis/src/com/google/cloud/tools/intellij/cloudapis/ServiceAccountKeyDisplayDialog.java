@@ -16,14 +16,13 @@
 
 package com.google.cloud.tools.intellij.cloudapis;
 
-import com.google.cloud.tools.intellij.ui.CopyToClipboardActionListener;
+import com.google.cloud.tools.intellij.project.CloudProject;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
-import javax.swing.JButton;
+import javax.swing.Action;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextPane;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -31,35 +30,34 @@ import org.jetbrains.annotations.Nullable;
  * credential environment variables for local run.
  */
 public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
-
-  private JLabel downloadPathLabel;
+  private final CloudProject cloudProject;
+  private final String downloadPath;
   private JPanel panel;
-  private JLabel credentialEnvVarLabel;
-  private JButton copyToClipboardButton;
-  private JTextPane envVarInfoText;
-  private static final String CREDENTIAL_ENV_VAR_KEY = "GOOGLE_APPLICATION_CREDENTIALS";
-  private static final String ENV_VAR_DISPLAY_FORMAT = "%s=%s";
+  private ServiceAccountKeyDownloadedPanel commonPanel;
 
-  ServiceAccountKeyDisplayDialog(@Nullable Project project, String downloadPath) {
+  ServiceAccountKeyDisplayDialog(
+      @Nullable Project project, CloudProject cloudProject, String downloadPath) {
     super(project);
+    this.cloudProject = cloudProject;
+    this.downloadPath = downloadPath;
     init();
-
     setTitle(
         GoogleCloudApisMessageBundle.message("cloud.apis.service.account.key.downloaded.title"));
-    downloadPathLabel.setText(downloadPath);
-
-    envVarInfoText.setBackground(panel.getBackground());
-
-    String credentialEnvVar =
-        String.format(ENV_VAR_DISPLAY_FORMAT, CREDENTIAL_ENV_VAR_KEY, downloadPath);
-    credentialEnvVarLabel.setText(credentialEnvVar);
-
-    copyToClipboardButton.addActionListener(new CopyToClipboardActionListener(credentialEnvVar));
   }
 
   @Nullable
   @Override
   protected JComponent createCenterPanel() {
     return panel;
+  }
+
+  private void createUIComponents() {
+    commonPanel = new ServiceAccountKeyDownloadedPanel(cloudProject.projectId(), downloadPath);
+  }
+
+  @NotNull
+  @Override
+  protected Action[] createActions() {
+    return new Action[] {getOKAction()};
   }
 }
