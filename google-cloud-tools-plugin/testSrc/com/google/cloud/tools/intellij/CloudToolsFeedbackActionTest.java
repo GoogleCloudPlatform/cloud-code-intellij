@@ -30,6 +30,7 @@ import com.google.common.net.UrlEscapers;
 import com.intellij.ide.browsers.BrowserLauncher;
 import java.io.File;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,6 +38,7 @@ import org.junit.runners.JUnit4;
 import org.mockito.Mock;
 
 /** Tests for {@link CloudToolsFeedbackAction}. */
+@Ignore
 @RunWith(JUnit4.class)
 public final class CloudToolsFeedbackActionTest {
 
