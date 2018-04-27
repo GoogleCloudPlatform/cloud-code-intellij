@@ -37,7 +37,6 @@
         </action>
 
         <group id="GoogleCloudTools.csr">
-            <separator/>
             <reference ref="GoogleCloudTools.UploadSourceToGCP"/>
             <separator/>
             <add-to-group group-id="GoogleCloudTools"/>
