@@ -153,19 +153,24 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
   }
 
   @VisibleForTesting
-  public void addEnvironmentVariablesToConfiguration(
+  public boolean addEnvironmentVariablesToConfiguration(
       Set<RunnerAndConfigurationSettings> configurations) {
     String executorId = DefaultRunExecutor.getRunExecutorInstance().getId();
-    configurations.forEach(
-        configurationSettings ->
-            addEnvironmentVariablesToConfiguration(executorId, configurationSettings));
+    boolean result = true;
+    for (RunnerAndConfigurationSettings configurationSettings : configurations) {
+      result = result && addEnvironmentVariablesToConfiguration(executorId, configurationSettings);
+    }
+
+    return result;
   }
 
   /**
    * Adds the environment variables for the Google Cloud Libraries to the list of environment
    * variables for {@code configuration} if they don't exist. If they exist, it replaces them.
+   *
+   * @return true if adding variables succeeded, false in case of any error.
    */
-  private void addEnvironmentVariablesToConfiguration(
+  private boolean addEnvironmentVariablesToConfiguration(
       String executorId, RunnerAndConfigurationSettings configuration) {
     ProgramRunner runner = ProgramRunnerUtil.getRunner(executorId, configuration);
     if (runner == null) {
@@ -174,7 +179,7 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
               "cloud.apis.service.account.key.dialog.update.configuration.error",
               configuration.getName()),
           mainPanel);
-      return;
+      return false;
     }
 
     RunnerSpecificLocalConfigurationBit configurationSettings =
@@ -185,7 +190,7 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
               "cloud.apis.service.account.key.dialog.update.configuration.error",
               configuration.getName()),
           mainPanel);
-      return;
+      return false;
     }
 
     Set<EnvironmentVariable> serviceAccountEnvironmentVariables =
@@ -210,6 +215,8 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
           }
         });
     configurationSettings.setEnvironmentVariables(configurationSettingsEnvVariables);
+
+    return true;
   }
 
   @VisibleForTesting
@@ -228,11 +235,10 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
 
     @Override
     protected void doAction(ActionEvent event) {
-      addEnvironmentVariablesToConfiguration(getSelectedConfigurations());
-      if (hasErrors(mainPanel)) {
-        this.setEnabled(false);
-      } else {
+      if (addEnvironmentVariablesToConfiguration(getSelectedConfigurations())) {
         close(OK_EXIT_CODE);
+      } else {
+        this.setEnabled(false);
       }
     }
   }
