@@ -152,6 +152,12 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
     return runConfigurationTableModel.getSelectedItems();
   }
 
+  /**
+   * Adds the environment variables for the Google Cloud Libraries to the list of environment
+   * variables for given set of configurations if they don't exist. If they exist, it replaces them.
+   *
+   * @return true if adding variables succeeded, false in case of any error.
+   */
   @VisibleForTesting
   public boolean addEnvironmentVariablesToConfiguration(
       Set<RunnerAndConfigurationSettings> configurations) {
