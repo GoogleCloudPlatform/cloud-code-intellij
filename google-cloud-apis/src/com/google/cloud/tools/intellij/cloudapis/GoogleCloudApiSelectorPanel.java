@@ -32,9 +32,11 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.BooleanTableCellEditor;
 import com.intellij.ui.BooleanTableCellRenderer;
 import com.intellij.ui.JBSplitter;
+import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.TableUtil;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
@@ -57,6 +59,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -225,6 +228,9 @@ final class GoogleCloudApiSelectorPanel {
   private void createUIComponents() {
     modulesComboBox = new ModulesComboBox();
     modulesComboBox.fillModules(project);
+
+    bomComboBox = new ComboBox<>();
+    bomComboBox.setRenderer(new BomVersionRenderer());
 
     ApplicationManager.getApplication()
         .runReadAction(
@@ -450,6 +456,16 @@ final class GoogleCloudApiSelectorPanel {
     @Override
     public void removeTableModelListener(TableModelListener l) {
       listeners.remove(l);
+    }
+  }
+
+  private static class BomVersionRenderer extends ListCellRendererWrapper<String> {
+
+    private static final String BOM_VERSION_DISPLAY_FORMAT = "(BOM) %s";
+
+    @Override
+    public void customize(JList list, String value, int index, boolean selected, boolean hasFocus) {
+      setText(String.format(BOM_VERSION_DISPLAY_FORMAT, value));
     }
   }
 }
