@@ -27,6 +27,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.project.Project;
 import com.intellij.testFramework.PlatformTestCase;
+import com.intellij.util.PlatformUtils;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,6 +42,9 @@ public abstract class AddAppEngineFrameworkSupportActionTest extends PlatformTes
   }
 
   public void testGetSuitableModules_returnsAllModules_whenModulesHaveNoAppEngineFacet() {
+    if (!PlatformUtils.isIdeaUltimate()) {
+      return;
+    }
     Project project = getProject();
     ModuleType moduleType = JavaModuleType.getModuleType();
     String path = project.getBaseDir().getPath();
@@ -54,6 +58,10 @@ public abstract class AddAppEngineFrameworkSupportActionTest extends PlatformTes
 
   public void
       testGetSuitableModules_returnsNonAppEngineModules_whenSomeModulesHaveAppEngineFacet() {
+    if (!PlatformUtils.isIdeaUltimate()) {
+      return;
+    }
+
     Project project = getProject();
     ModuleType moduleType = JavaModuleType.getModuleType();
     String path = project.getBaseDir().getPath();
