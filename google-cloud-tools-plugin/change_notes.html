@@ -23,6 +23,25 @@
 </p>
 <br/>
 
+<h2>[18.4.1]</h2>
+
+<h3>Added</h3>
+<ul>
+    <li>Let the Google Cloud Tools plugin manage the Google Cloud SDK for you - including download,
+        installation, and updates. No longer any need to manually download the SDK. (<a
+                href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/673">#673</a>)
+    </li>
+    <li>Mitigate dependency version conflicts with built in Google Cloud Java BOM support. Includes
+        auto-adding the BOM when adding google client libraries, plus pom.xml inspections to help
+        manage dependency version conflicts. <a
+                href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1921">#1921</a>)
+    </li>
+    <li>Automatically add required environment variables to App Engine local run configurations for
+        locally accessing Google Cloud APIs. (<a
+                href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1917">#1917</a>)
+    </li>
+</ul>
+
 <h2>[18.3.2]</h2>
 
 <h3>Fixed</h3>
