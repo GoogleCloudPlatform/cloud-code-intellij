@@ -87,7 +87,7 @@
               <text resource-bundle="messages/CloudApisBundle" key="cloud.libraries.bom.selector.label"/>
             </properties>
           </component>
-          <component id="a480c" class="javax.swing.JComboBox" binding="bomComboBox">
+          <component id="a480c" class="javax.swing.JComboBox" binding="bomComboBox" custom-create="true">
             <constraints>
               <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
