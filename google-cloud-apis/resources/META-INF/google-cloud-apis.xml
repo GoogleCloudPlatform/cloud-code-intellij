@@ -44,10 +44,10 @@
         implementationClass="com.google.cloud.tools.intellij.cloudapis.CloudDependencyWithNoBomInspection"/>
   </extensions>
   <actions>
-    <group id="GoogleCloudTools.apis">
-      <separator/>
+    <group id="GoogleCloudTools.cloudapis">
       <action id="GoogleCloudTools.AddCloudLibraries"
           class="com.google.cloud.tools.intellij.cloudapis.AddCloudLibrariesAction"/>
+      <separator/>
       <add-to-group group-id="GoogleCloudTools"/>
     </group>
   </actions>

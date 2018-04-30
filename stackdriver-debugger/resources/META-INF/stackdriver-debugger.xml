@@ -34,6 +34,13 @@
     <actions>
         <action id="AddSnapshotLocation" class="com.google.cloud.tools.intellij.stackdriver.debugger.actions.ToggleSnapshotLocationAction"/>
 
+        <group id="GoogleCloudTools.stackdriver.debugger">
+            <action id="GoogleCloudTools.CloudDebugger"
+                    class="com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebuggerToolsMenuAction"/>
+            <separator/>
+            <add-to-group group-id="GoogleCloudTools"/>
+        </group>
+
         <group id="EditorGutterCloudDebuggerMenu">
             <separator/>
             <reference ref="AddSnapshotLocation"/>
