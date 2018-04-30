@@ -22,22 +22,15 @@ sourceSets.test.java.srcDirs = ['testSrc']
 sourceSets.test.resources.srcDirs = ['testResources']
 
 intellij {
+    plugins  'git4idea'
 }
 
 dependencies {
-    compile(project(':google-cloud-tools-plugin:google-cloud-core'))
-
-    compile ('com.google.cloud:google-cloud-storage:1.2.0') {
-        exclude group: 'com.google.http-client', module: 'google-http-client'
-        exclude group: 'com.google.http-client', module: 'google-http-client-jackson'
-        exclude group: 'com.google.code.findbugs', module: 'jsr305'
-        exclude group: 'com.google.guava', module: 'guava'
-        exclude group: 'com.google.oauth-client', module: 'google-oauth-client'
-        exclude group: 'com.google.protobuf', module: 'protobuf-java'
-        exclude group: 'com.google.protobuf', module: 'protobuf-java-util'
-    }
+    compile(project(':google-cloud-core'))
+    compile 'com.google.apis:google-api-services-clouddebugger:v2-rev7-1.21.0'
 
     compileOnly 'com.google.auto.value:auto-value:1.4.1'
+
     apt         'com.google.auto.value:auto-value:1.4.1'
 
     testCompile files("${System.properties['java.home']}/../lib/tools.jar")

@@ -13,20 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+// Use IntelliJ src structure for now
 sourceSets.main.java.srcDirs = ['src']
 // 'src' is included in resources to export .form files to upstream modules.
 sourceSets.main.resources.srcDirs = ['resources', 'src']
 sourceSets.test.java.srcDirs = ['testSrc']
-sourceSets.test.resources.srcDirs = ['testResources', 'testData']
+sourceSets.test.resources.srcDirs = ['testResources']
 
 intellij {
-    plugins 'Groovy', 'gradle', 'git4idea', 'properties', 'junit', 'yaml', 'maven'
+    plugins 'Groovy', 'gradle', 'git4idea', 'properties','maven', 'yaml'
 }
 
 dependencies {
-    compile(project(':google-cloud-tools-plugin:google-cloud-core'))
-    compile(project(':google-cloud-tools-plugin:stackdriver-debugger'))
-    compile 'com.google.apis:google-api-services-appengine:v1-rev8-1.22.0'
+    compile(project(':google-cloud-core'))
+    compile(project(':app-engine:java'))
+    compile 'com.google.apis:google-api-services-servicemanagement:v1-rev374-1.22.0'
     compile ('com.google.cloud.tools:appengine-plugins-core:' + toolsLibVersion) {
         exclude group: 'com.google.guava', module: 'guava'
         exclude group: 'org.yaml', module: 'snakeyaml'
