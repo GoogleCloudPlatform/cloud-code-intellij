@@ -5,7 +5,7 @@ This page documents production updates to Cloud Tools for IntelliJ. You can chec
 
 ### Added
   - Let the Google Cloud Tools plugin manage the Cloud SDK installation for you. No longer any need to manually download the SDK. [673](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/673)
-  - Added support for the Google Cloud Java BOM. Including auto-add the BOM when adding google client libraries, plus inspections to help manage dependency conflicts. [1921](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1921) 
+  - Added support for the Google Cloud Java BOM, including auto-adding the BOM when adding google client libraries, plus pom.xml inspections to help manage dependency conflicts. [1921](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1921) 
   - Automatically add required environment variables to App Engine local run configurations for locally accessing Google Cloud APIs.  [1917](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1917)
   
 ## 18.3.2
