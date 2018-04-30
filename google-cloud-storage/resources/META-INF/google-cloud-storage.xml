@@ -23,4 +23,13 @@
                 implementation="com.google.cloud.tools.intellij.gcs.GcsBucketEditorProvider"/>
     </extensions>
 
+    <actions>
+        <group id="GoogleCloudTools.csr">
+            <action id="GoogleCloudTools.CloudStorage"
+                    class="com.google.cloud.tools.intellij.gcs.GcsToolWindowAction"/>
+            <separator/>
+            <add-to-group group-id="GoogleCloudTools"/>
+        </group>
+    </actions>
+
 </idea-plugin>
