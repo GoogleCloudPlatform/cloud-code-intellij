@@ -48,6 +48,7 @@ dependencies {
     compile(project(':app-engine:java:ultimate'))
     compile(project(':stackdriver-debugger'))
 
+    compile 'com.google.protobuf:protobuf-java:2.5.0'
     compile 'com.google.apis:google-api-services-clouddebugger:v2-rev7-1.21.0'
     compile 'com.google.apis:google-api-services-cloudresourcemanager:v1beta1-rev12-1.21.0'
     compile 'com.google.apis:google-api-services-iam:v1-rev225-1.22.0'
