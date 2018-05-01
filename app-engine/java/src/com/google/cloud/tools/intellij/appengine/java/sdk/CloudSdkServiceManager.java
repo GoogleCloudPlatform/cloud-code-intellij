@@ -212,10 +212,15 @@ public class CloudSdkServiceManager {
                 } catch (InterruptedException e) {
                   /* valid cancellation exception, no handling needed. */
                 } finally {
-                  // remove the notification listener regardless of waiting outcome.
-                  cloudSdkService.removeStatusUpdateListener(sdkStatusUpdateListener);
-                  // process logging and error notifications.
-                  ApplicationManager.getApplication().invokeLater(() -> handleErrors(sdkLogging));
+                  // process UI related activities
+                  ApplicationManager.getApplication()
+                      .invokeLater(
+                          () -> {
+                            // remove the notification listener regardless of waiting outcome.
+                            cloudSdkService.removeStatusUpdateListener(sdkStatusUpdateListener);
+                            // process logging and error notifications.
+                            handleErrors(sdkLogging);
+                          });
                   // run the activity after wait is over, regardless of outcome.
                   afterWaitComplete.run();
                 }
