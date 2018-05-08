@@ -47,10 +47,7 @@
   <xi:include href="/META-INF/google-cloud-repos.xml" xpointer="xpointer(/idea-plugin/*)"/>
 
   <depends>com.intellij.modules.lang</depends>
-  <depends>com.intellij.modules.java</depends>
-  <depends>com.intellij.modules.vcs</depends>
   <depends>Git4Idea</depends>
-  <depends>org.jetbrains.idea.maven</depends>
 
   <application-components>
     <component>

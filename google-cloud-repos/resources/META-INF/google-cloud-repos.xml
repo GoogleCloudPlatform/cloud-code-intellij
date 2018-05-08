@@ -17,6 +17,7 @@
 <idea-plugin>
     <depends>com.intellij.modules.vcs</depends>
     <depends>Git4Idea</depends>
+
     <extensions defaultExtensionNs="com.intellij">
         <checkoutProvider implementation="com.google.cloud.tools.intellij.csr.GcpCheckoutProvider"/>
         <vcsPopupProvider
