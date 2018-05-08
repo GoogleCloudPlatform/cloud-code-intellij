@@ -101,5 +101,5 @@ public class GctTracking {
   public static final String MANAGED_SDK_CANCELLED_INSTALL = "managed.sdk.cancelled.install";
   public static final String MANAGED_SDK_SUCCESSFUL_UPDATE = "managed.sdk.successful.update";
   public static final String MANAGED_SDK_FAILED_UPDATE = "managed.sdk.failed.update";
-  public static final String MANAGED_SDK_CANCELLED_UPDATE = "managed.sdk.cancelled.install";
+  public static final String MANAGED_SDK_CANCELLED_UPDATE = "managed.sdk.cancelled.update";
 }
