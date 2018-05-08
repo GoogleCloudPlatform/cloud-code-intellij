@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.java.sdk;
 
 import com.google.cloud.tools.intellij.analytics.GctTracking;
+import com.google.cloud.tools.intellij.analytics.UsageTracker.FluentTrackingEventWithMetadata;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
@@ -369,27 +370,39 @@ public class ManagedCloudSdkService implements CloudSdkService {
             .notifyManagedSdkJobFailure(jobType, t.toString());
       }
 
+      // update status of the SDK and generate corresponding metric events.
       switch (jobType) {
         case INSTALL:
           updateStatus(SdkStatus.NOT_AVAILABLE);
 
-          UsageTrackerProvider.getInstance()
-              .trackEvent(
-                  jobCancelled
-                      ? GctTracking.MANAGED_SDK_CANCELLED_INSTALL
-                      : GctTracking.MANAGED_SDK_FAILED_INSTALL)
-              .ping();
+          FluentTrackingEventWithMetadata trackingEvent;
+          if (jobCancelled) {
+            trackingEvent =
+                UsageTrackerProvider.getInstance()
+                    .trackEvent(GctTracking.MANAGED_SDK_CANCELLED_INSTALL);
+          } else {
+            trackingEvent =
+                UsageTrackerProvider.getInstance()
+                    .trackEvent(GctTracking.MANAGED_SDK_FAILED_INSTALL)
+                    .addMetadata(GctTracking.METADATA_MESSAGE_KEY, t.toString());
+          }
+          trackingEvent.ping();
           break;
         case UPDATE:
           // failed or interrupted update might still keep SDK itself installed.
           checkSdkStatusAfterFailedUpdate();
 
-          UsageTrackerProvider.getInstance()
-              .trackEvent(
-                  jobCancelled
-                      ? GctTracking.MANAGED_SDK_CANCELLED_UPDATE
-                      : GctTracking.MANAGED_SDK_FAILED_UPDATE)
-              .ping();
+          if (jobCancelled) {
+            trackingEvent =
+                UsageTrackerProvider.getInstance()
+                    .trackEvent(GctTracking.MANAGED_SDK_CANCELLED_UPDATE);
+          } else {
+            trackingEvent =
+                UsageTrackerProvider.getInstance()
+                    .trackEvent(GctTracking.MANAGED_SDK_FAILED_UPDATE)
+                    .addMetadata(GctTracking.METADATA_MESSAGE_KEY, t.toString());
+          }
+          trackingEvent.ping();
           break;
       }
 
