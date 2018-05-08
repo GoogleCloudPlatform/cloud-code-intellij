@@ -356,8 +356,10 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
     @Override
     public void onFailure(Throwable t) {
+      boolean jobCancelled = false;
       if (t instanceof InterruptedException || t instanceof CancellationException) {
         logger.info("Managed Google Cloud SDK install/update cancelled.");
+        jobCancelled = true;
 
         ManagedCloudSdkServiceUiPresenter.getInstance().notifyManagedSdkJobCancellation(jobType);
       } else {
@@ -367,20 +369,26 @@ public class ManagedCloudSdkService implements CloudSdkService {
             .notifyManagedSdkJobFailure(jobType, t.toString());
       }
 
-      // failed or interrupted update might still keep SDK itself installed.
       switch (jobType) {
         case INSTALL:
           updateStatus(SdkStatus.NOT_AVAILABLE);
 
           UsageTrackerProvider.getInstance()
-              .trackEvent(GctTracking.MANAGED_SDK_FAILED_INSTALL)
+              .trackEvent(
+                  jobCancelled
+                      ? GctTracking.MANAGED_SDK_CANCELLED_INSTALL
+                      : GctTracking.MANAGED_SDK_FAILED_INSTALL)
               .ping();
           break;
         case UPDATE:
+          // failed or interrupted update might still keep SDK itself installed.
           checkSdkStatusAfterFailedUpdate();
 
           UsageTrackerProvider.getInstance()
-              .trackEvent(GctTracking.MANAGED_SDK_FAILED_UPDATE)
+              .trackEvent(
+                  jobCancelled
+                      ? GctTracking.MANAGED_SDK_CANCELLED_UPDATE
+                      : GctTracking.MANAGED_SDK_FAILED_UPDATE)
               .ping();
           break;
       }
