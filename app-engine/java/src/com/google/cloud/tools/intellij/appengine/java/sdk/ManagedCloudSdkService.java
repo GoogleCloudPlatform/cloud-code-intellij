@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.java.sdk;
 
 import com.google.cloud.tools.intellij.analytics.GctTracking;
+import com.google.cloud.tools.intellij.analytics.UsageTracker.FluentTrackingEventWithMetadata;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
@@ -39,6 +40,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -355,33 +357,40 @@ public class ManagedCloudSdkService implements CloudSdkService {
     }
 
     @Override
-    public void onFailure(Throwable t) {
-      if (t instanceof InterruptedException || t instanceof CancellationException) {
+    public void onFailure(@NotNull Throwable throwable) {
+      boolean jobCancelled = false;
+      if (throwable instanceof InterruptedException || throwable instanceof CancellationException) {
         logger.info("Managed Google Cloud SDK install/update cancelled.");
+        jobCancelled = true;
 
         ManagedCloudSdkServiceUiPresenter.getInstance().notifyManagedSdkJobCancellation(jobType);
       } else {
-        logger.warn("Error while installing/updating managed Cloud SDK", t);
+        logger.warn("Error while installing/updating managed Cloud SDK", throwable);
 
         ManagedCloudSdkServiceUiPresenter.getInstance()
-            .notifyManagedSdkJobFailure(jobType, t.toString());
+            .notifyManagedSdkJobFailure(jobType, throwable.toString());
       }
 
-      // failed or interrupted update might still keep SDK itself installed.
+      // update status of the SDK and generate corresponding metric events.
       switch (jobType) {
         case INSTALL:
           updateStatus(SdkStatus.NOT_AVAILABLE);
 
-          UsageTrackerProvider.getInstance()
-              .trackEvent(GctTracking.MANAGED_SDK_FAILED_INSTALL)
-              .ping();
+          sendManagedSdkTrackingEvent(
+              jobCancelled
+                  ? GctTracking.MANAGED_SDK_CANCELLED_INSTALL
+                  : GctTracking.MANAGED_SDK_FAILED_INSTALL,
+              jobCancelled ? null : throwable);
           break;
         case UPDATE:
+          // failed or interrupted update might still keep SDK itself installed.
           checkSdkStatusAfterFailedUpdate();
 
-          UsageTrackerProvider.getInstance()
-              .trackEvent(GctTracking.MANAGED_SDK_FAILED_UPDATE)
-              .ping();
+          sendManagedSdkTrackingEvent(
+              jobCancelled
+                  ? GctTracking.MANAGED_SDK_CANCELLED_UPDATE
+                  : GctTracking.MANAGED_SDK_FAILED_UPDATE,
+              jobCancelled ? null : throwable);
           break;
       }
 
@@ -400,5 +409,14 @@ public class ManagedCloudSdkService implements CloudSdkService {
     } catch (Exception ex) {
       updateStatus(SdkStatus.NOT_AVAILABLE);
     }
+  }
+
+  private void sendManagedSdkTrackingEvent(String eventName, @Nullable Throwable throwable) {
+    FluentTrackingEventWithMetadata trackingEvent =
+        UsageTrackerProvider.getInstance().trackEvent(eventName);
+    if (throwable != null) {
+      trackingEvent.addMetadata(GctTracking.METADATA_MESSAGE_KEY, throwable.toString());
+    }
+    trackingEvent.ping();
   }
 }
