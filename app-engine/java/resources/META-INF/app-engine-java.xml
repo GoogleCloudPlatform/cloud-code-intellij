@@ -18,6 +18,8 @@
     <depends>org.jetbrains.plugins.gradle</depends>
     <depends>org.jetbrains.plugins.yaml</depends>
 
+    <xi:include href="/META-INF/app-engine-java-ultimate.xml" xpointer="xpointer(/idea-plugin/*)"/>
+
     <application-components>
         <component>
             <implementation-class>com.google.cloud.tools.intellij.appengine.java.startup.AppEngineInitializationComponent</implementation-class>
