@@ -14,13 +14,14 @@
   ~ limitations under the License.
   -->
 <idea-plugin xmlns:xi="http://www.w3.org/2001/XInclude">
-    <!--TODO: make gradle optional-->
+    <module value="com.google.cloud.tools.intellij.appengine-java"/>
     <depends>com.intellij.modules.java</depends>
-    <depends>org.jetbrains.idea.maven</depends>
-    <depends>org.jetbrains.plugins.gradle</depends>
-    <depends>org.jetbrains.plugins.yaml</depends>
 
-    <xi:include href="/META-INF/app-engine-java-ultimate.xml" xpointer="xpointer(/idea-plugin/*)"/>
+    <application-components>
+        <component>
+            <implementation-class>com.google.cloud.tools.intellij.appengine.java.startup.AppEngineInitializationComponent</implementation-class>
+        </component>
+    </application-components>
 
     <application-components>
         <component>
