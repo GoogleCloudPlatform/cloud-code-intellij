@@ -21,6 +21,9 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.components.ServiceManager;
 
+/**
+ * Run at plugin startup to do App Engine specific plugin initialization.
+ */
 public class AppEngineInitializationComponent implements ApplicationComponent {
 
   @Override
