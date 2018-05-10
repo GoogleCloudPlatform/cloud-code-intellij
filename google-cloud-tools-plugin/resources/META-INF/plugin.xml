@@ -39,11 +39,13 @@
     <!--Patched in at build time-->
   </change-notes>
 
+  <depends>org.jetbrains.plugins.yaml</depends>
+  <depends optional="true" config-file="app-engine-java.xml">com.intellij.modules.java</depends>
+  <depends optional="true" config-file="javaee-integration.xml">com.intellij.javaee</depends>
+  <depends optional="true" config-file="gwt-integration.xml">com.intellij.gwt</depends>
+  <depends optional="true" config-file="google-cloud-apis.xml">org.jetbrains.idea.maven</depends>
   <xi:include href="/META-INF/google-cloud-core.xml" xpointer="xpointer(/idea-plugin/*)"/>
-  <xi:include href="/META-INF/google-cloud-apis.xml" xpointer="xpointer(/idea-plugin/*)"/>
   <xi:include href="/META-INF/google-cloud-storage.xml" xpointer="xpointer(/idea-plugin/*)"/>
-  <xi:include href="/META-INF/app-engine-java.xml" xpointer="xpointer(/idea-plugin/*)"/>
-  <xi:include href="/META-INF/stackdriver-debugger.xml" xpointer="xpointer(/idea-plugin/*)"/>
   <xi:include href="/META-INF/google-cloud-repos.xml" xpointer="xpointer(/idea-plugin/*)"/>
 
   <depends>com.intellij.modules.lang</depends>

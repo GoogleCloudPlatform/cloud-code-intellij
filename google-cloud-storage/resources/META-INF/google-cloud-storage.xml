@@ -15,6 +15,7 @@
   -->
 
 <idea-plugin>
+    <module value="com.google.cloud.tools.intellij.google-cloud-storage"/>
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="Google Cloud Storage" anchor="right"
