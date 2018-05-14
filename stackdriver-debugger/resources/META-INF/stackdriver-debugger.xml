@@ -15,6 +15,7 @@
   -->
 
 <idea-plugin>
+    <module value="com.google.cloud.tools.intellij.stackdriver-debugger"/>
     <depends>Git4Idea</depends>
     <depends>com.intellij.modules.vcs</depends>
     <depends>com.intellij.modules.xdebugger</depends>
