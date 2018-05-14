@@ -27,6 +27,7 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
+import java.util.Optional;
 import javax.swing.JComponent;
 
 /** Action to open the Google Login panel. */
@@ -64,7 +65,12 @@ public class GoogleLoginAction extends AnAction implements DumbAware, RightAlign
     ComponentPopupBuilder popupBuilder =
         JBPopupFactory.getInstance().createComponentPopupBuilder(usersPanel, usersPanel.getList());
     JBPopup popup = popupBuilder.setCancelOnWindowDeactivation(true).createPopup();
-    JComponent source = (JComponent) event.getInputEvent().getSource();
-    popup.showUnderneathOf(source);
+    Optional<JComponent> sourceComponentOptional =
+        Optional.ofNullable(event.getInputEvent()).map(e -> (JComponent) e.getSource());
+    if (sourceComponentOptional.isPresent()) {
+      popup.showUnderneathOf(sourceComponentOptional.get());
+    } else {
+      popup.showInFocusCenter();
+    }
   }
 }
