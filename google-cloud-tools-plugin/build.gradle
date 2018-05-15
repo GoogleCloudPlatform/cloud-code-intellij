@@ -52,6 +52,7 @@ dependencies {
     compile(project(':google-cloud-repos'))
     compile(project(':google-cloud-apis'))
     compile(project(':app-engine:java'))
+    compile(project(':app-engine:java:gradle'))
     compile(project(':app-engine:java:ultimate'))
     compile(project(':stackdriver-debugger'))
 

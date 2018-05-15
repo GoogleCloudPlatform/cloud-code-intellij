@@ -55,6 +55,8 @@
       <module name="google-cloud-tools-plugin-ultimate_test" target="1.8" />
       <module name="google-cloud-tools-plugin_main" target="1.8" />
       <module name="google-cloud-tools-plugin_test" target="1.8" />
+      <module name="gradle_main" target="1.8" />
+      <module name="gradle_test" target="1.8" />
       <module name="java-ultimate_main" target="1.8" />
       <module name="java-ultimate_test" target="1.8" />
       <module name="java_main" target="1.8" />

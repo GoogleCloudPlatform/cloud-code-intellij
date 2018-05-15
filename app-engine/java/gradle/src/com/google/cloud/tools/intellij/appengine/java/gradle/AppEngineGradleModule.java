@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-include 'google-cloud-tools-plugin'
-include 'common-test-lib'
-include 'google-cloud-core'
-include 'google-cloud-storage'
-include 'google-cloud-repos'
-include 'google-cloud-apis'
-include 'stackdriver-debugger'
-include 'app-engine:java'
-include 'app-engine:java:gradle'
-include 'app-engine:java:ultimate'
+
+package com.google.cloud.tools.intellij.appengine.java.gradle;
+
+import org.jetbrains.annotations.NotNull;
+
+public class AppEngineGradleModule {
+  private final String moduleName;
+  private final AppEngineGradleModel model;
+
+  AppEngineGradleModule(@NotNull String moduleName, @NotNull AppEngineGradleModel model) {
+    this.moduleName = moduleName;
+    this.model = model;
+  }
+
+  public String getModuleName() {
+    return moduleName;
+  }
+
+  public AppEngineGradleModel getModel() {
+    return model;
+  }
+}
