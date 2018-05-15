@@ -27,8 +27,8 @@ public class AppEngineGradleModelBuilderService implements ModelBuilderService {
   private static final String APP_GRADLE_PLUGIN_ID = "com.google.cloud.tools.appengine";
 
   @Override
-  public boolean canBuild(String s) {
-    return s.equals(AppEngineGradleModel.class.getName());
+  public boolean canBuild(String moduleName) {
+    return moduleName.equals(AppEngineGradleModel.class.getName());
   }
 
   @Override
