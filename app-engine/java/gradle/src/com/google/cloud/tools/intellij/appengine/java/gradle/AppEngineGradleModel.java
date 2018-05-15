@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.java.gradle;
 
-/** Model containing information obtained from the Gradle plugin */
+/** Model containing information obtained from the Gradle plugin. */
 public interface AppEngineGradleModel {
 
   /**

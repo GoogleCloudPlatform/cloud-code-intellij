@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.plugins.gradle.tooling.ErrorMessageBuilder;
 import org.jetbrains.plugins.gradle.tooling.ModelBuilderService;
 
-/** An {@link ModelBuilderService} for populating {@link AppEngineGradleModel}. */
+/** A {@link ModelBuilderService} for populating {@link AppEngineGradleModel}. */
 public class AppEngineGradleModelBuilderService implements ModelBuilderService {
 
   private static final String APP_GRADLE_PLUGIN_ID = "com.google.cloud.tools.appengine";

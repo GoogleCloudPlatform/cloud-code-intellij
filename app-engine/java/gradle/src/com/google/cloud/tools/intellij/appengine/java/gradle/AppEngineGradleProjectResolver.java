@@ -28,7 +28,7 @@ import org.jetbrains.plugins.gradle.service.project.AbstractProjectResolverExten
 import org.jetbrains.plugins.gradle.service.project.GradleProjectResolverExtension;
 
 /**
- * An {@link GradleProjectResolverExtension} for enhancing Gradle project resolution with App Engine
+ * A {@link GradleProjectResolverExtension} for enhancing Gradle project resolution with App Engine
  * related information. It will add the {@link AppEngineGradleModule} to the {@link
  * DataNode<ModuleData>} tree. It is called during Gradle import.
  */

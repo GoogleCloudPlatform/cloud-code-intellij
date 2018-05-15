@@ -18,6 +18,10 @@ package com.google.cloud.tools.intellij.appengine.java.gradle;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Simple wrapper representing an App Engine Gradle module containing an {@link
+ * AppEngineGradleModel} together with the module name.
+ */
 public class AppEngineGradleModule {
   private final String moduleName;
   private final AppEngineGradleModel model;
