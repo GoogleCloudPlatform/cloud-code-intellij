@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.java.gradle;
 
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
@@ -32,6 +33,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 
+/** Tests for {@link AppEngineGradleProjectDataService}. */
 public class AppEngineGradleProjectDataServiceTest {
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
   @TestFixture private IdeaProjectTestFixture testFixture;
@@ -50,7 +52,23 @@ public class AppEngineGradleProjectDataServiceTest {
 
   @Test
   public void importData_withAppEngineGradleModel_andGradlePlugin_addsFacet() {
-    AppEngineGradleModel model = new DefaultAppEngineGradleModel(true /*hasPlugin*/, "test/path");
+    AppEngineGradleModule appEngineGradleModule = createModelAndImportData(true /*hasPlugin*/);
+
+    verify(facetService)
+        .addFacet(appEngineGradleModule, module, modelsProvider.getModifiableFacetModel(module));
+  }
+
+  @Test
+  public void importData_withAppEngineGradleModel_andNoGradlePlugin_doesNotAddFacet() {
+    AppEngineGradleModule appEngineGradleModule = createModelAndImportData(false /*hasPlugin*/);
+
+    verify(facetService, never())
+        .addFacet(appEngineGradleModule, module, modelsProvider.getModifiableFacetModel(module));
+  }
+
+  private AppEngineGradleModule createModelAndImportData(boolean hasAppEngineGradlePlugin) {
+    AppEngineGradleModel model =
+        new DefaultAppEngineGradleModel(hasAppEngineGradlePlugin, "test/path");
     AppEngineGradleModule appEngineGradleModule =
         new AppEngineGradleModule(module.getName(), model);
 
@@ -63,7 +81,6 @@ public class AppEngineGradleProjectDataServiceTest {
     dataService.importData(
         ImmutableList.of(dataNode), null /*projectData*/, testFixture.getProject(), modelsProvider);
 
-    verify(facetService)
-        .addFacet(appEngineGradleModule, module, modelsProvider.getModifiableFacetModel(module));
+    return appEngineGradleModule;
   }
 }
