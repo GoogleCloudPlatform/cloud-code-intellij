@@ -41,7 +41,7 @@
 
   <depends>org.jetbrains.plugins.yaml</depends>
   <depends optional="true" config-file="app-engine-java.xml">com.intellij.modules.java</depends>
-  <depends optional="true" config-file="app-engine-gradle-java.xml">org.jetbrains.plugins.gradle</depends>
+  <depends optional="true" config-file="app-engine-java-gradle.xml">org.jetbrains.plugins.gradle</depends>
   <depends optional="true" config-file="javaee-integration.xml">com.intellij.javaee</depends>
   <depends optional="true" config-file="gwt-integration.xml">com.intellij.gwt</depends>
   <depends optional="true" config-file="google-cloud-apis.xml">org.jetbrains.idea.maven</depends>
