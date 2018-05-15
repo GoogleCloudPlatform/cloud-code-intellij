@@ -16,14 +16,13 @@
 
 package com.google.cloud.tools.intellij.appengine.java.gradle;
 
-import com.intellij.facet.ModifiableFacetModel;
+import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.externalSystem.model.DataNode;
 import com.intellij.openapi.externalSystem.model.Key;
 import com.intellij.openapi.externalSystem.model.project.ProjectData;
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider;
 import com.intellij.openapi.externalSystem.service.project.manage.AbstractProjectDataService;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import java.util.Collection;
 import java.util.Map;
@@ -42,6 +41,19 @@ public class AppEngineGradleProjectDataService
 
   static final Key<AppEngineGradleModule> APP_ENGINE_MODEL_KEY =
       Key.create(AppEngineGradleModule.class, 100 /* Use a high processing weight */);
+
+  private final AppEngineGradleFacetService appEngineGradleFacetService;
+
+  @SuppressWarnings("unused")
+  AppEngineGradleProjectDataService() {
+    this(AppEngineGradleFacetService.getInstance());
+  }
+
+  @VisibleForTesting
+  AppEngineGradleProjectDataService(
+      @NotNull AppEngineGradleFacetService appEngineGradleFacetService) {
+    this.appEngineGradleFacetService = appEngineGradleFacetService;
+  }
 
   /**
    * Adds the App Engine Gradle facet to Gradle modules if the module has the App Engine Gradle
@@ -69,7 +81,7 @@ public class AppEngineGradleProjectDataService
                   AppEngineGradleModule appEngineGradleModule =
                       moduleNameToModel.get(module.getName());
                   if (appEngineGradleModule.getModel().hasAppEngineGradlePlugin()) {
-                    addAppEngineGradleFacet(
+                    appEngineGradleFacetService.addFacet(
                         appEngineGradleModule,
                         module,
                         modelsProvider.getModifiableFacetModel(module));
@@ -77,28 +89,6 @@ public class AppEngineGradleProjectDataService
                 });
       }
     }.execute();
-  }
-
-  private void addAppEngineGradleFacet(
-      AppEngineGradleModule appEngineGradleModule,
-      Module module,
-      ModifiableFacetModel modifiableFacetModel) {
-    // TODO (eshaul) ignore for now in code review; will comment in facet logic in next PR
-    //    AppEngineGradleFacet facet = AppEngineGradleFacet.getInstance(module);
-    //
-    //    if (facet == null) {
-    //      facet =
-    //          FacetManager.getInstance(module)
-    //              .createFacet(
-    //                  AppEngineGradleFacet.getFacetType(),
-    //                  AppEngineGradleFacetType.NAME,
-    //                  null /*underlying*/);
-    //
-    //      modifiableFacetModel.addFacet(facet);
-    //    }
-    //
-    //
-    // facet.getConfiguration().setGradleBuildDir(appEngineGradleModule.getModel().gradleBuildDir());
   }
 
   private Map<String, AppEngineGradleModule> collectByModuleName(
