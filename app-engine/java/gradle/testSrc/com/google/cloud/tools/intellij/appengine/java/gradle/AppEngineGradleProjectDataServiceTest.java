@@ -40,7 +40,7 @@ public class AppEngineGradleProjectDataServiceTest {
   private IdeModifiableModelsProvider modelsProvider;
 
   @TestModule private Module module;
-  @Mock AppEngineGradleFacetService facetService;
+  @Mock private AppEngineGradleFacetService facetService;
 
   @Before
   public void setUp() {
