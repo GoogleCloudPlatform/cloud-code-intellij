@@ -42,7 +42,8 @@ public class AppEngineGradleModelBuilderService implements ModelBuilderService {
   @NotNull
   @Override
   public ErrorMessageBuilder getErrorMessageBuilder(
-      @NotNull Project project, @NotNull Exception e) {
-    return ErrorMessageBuilder.create(project, e, "blah").withDescription("failed miserably");
+      @NotNull Project project, @NotNull Exception ex) {
+    return ErrorMessageBuilder.create(project, ex, "App Engine Gradle model import errors")
+        .withDescription("Failed to build the App Engine Gradle model");
   }
 }
