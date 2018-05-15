@@ -18,9 +18,7 @@ package com.google.cloud.tools.intellij.appengine.java.gradle;
 
 import java.io.Serializable;
 
-/**
- * Default implementation of {@link AppEngineGradleModel}.
- */
+/** Default implementation of {@link AppEngineGradleModel}. */
 public class DefaultAppEngineGradleModel implements AppEngineGradleModel, Serializable {
 
   private boolean hasAppEngineGradlePlugin;
