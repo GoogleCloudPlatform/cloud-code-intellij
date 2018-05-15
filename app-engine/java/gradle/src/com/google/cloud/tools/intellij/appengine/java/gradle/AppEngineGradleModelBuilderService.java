@@ -32,7 +32,7 @@ public class AppEngineGradleModelBuilderService implements ModelBuilderService {
   }
 
   @Override
-  public Object buildAll(String s, Project project) {
+  public Object buildAll(String modelName, Project project) {
     boolean hasAppEngineGradlePlugin = project.getPlugins().hasPlugin(APP_GRADLE_PLUGIN_ID);
 
     return new DefaultAppEngineGradleModel(
