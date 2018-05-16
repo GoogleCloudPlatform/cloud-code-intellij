@@ -25,6 +25,9 @@ public interface AppEngineGradleModel {
    */
   boolean hasAppEngineGradlePlugin();
 
-  /** Returns the path to the Gradle build directory. */
+  /**
+   * Returns the path to the Gradle build directory where the Gradle build output and artifacts
+   * live.
+   */
   String gradleBuildDir();
 }
