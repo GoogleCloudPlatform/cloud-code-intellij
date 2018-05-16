@@ -28,6 +28,8 @@ import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsPr
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProviderImpl;
 import com.intellij.openapi.module.Module;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
+import com.intellij.util.PlatformUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,6 +43,8 @@ public class AppEngineGradleProjectDataServiceTest {
   private AppEngineGradleProjectDataService dataService;
   private IdeModifiableModelsProvider modelsProvider;
 
+  private String originalPlatformPrefix;
+
   @TestModule private Module module;
   @Mock private AppEngineGradleFacetService facetService;
 
@@ -48,10 +52,14 @@ public class AppEngineGradleProjectDataServiceTest {
   public void setUp() {
     dataService = new AppEngineGradleProjectDataService(facetService);
     modelsProvider = new IdeModifiableModelsProviderImpl(testFixture.getProject());
+
+    originalPlatformPrefix = System.getProperty(PlatformUtils.PLATFORM_PREFIX_KEY);
   }
 
   @Test
   public void importData_withAppEngineGradleModel_andGradlePlugin_addsFacet() {
+    System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, PlatformUtils.IDEA_CE_PREFIX);
+
     AppEngineGradleModule appEngineGradleModule = createModelAndImportData(true /*hasPlugin*/);
 
     verify(facetService)
@@ -60,7 +68,19 @@ public class AppEngineGradleProjectDataServiceTest {
 
   @Test
   public void importData_withAppEngineGradleModel_andNoGradlePlugin_doesNotAddFacet() {
+    System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, PlatformUtils.IDEA_CE_PREFIX);
+
     AppEngineGradleModule appEngineGradleModule = createModelAndImportData(false /*hasPlugin*/);
+
+    verify(facetService, never())
+        .addFacet(appEngineGradleModule, module, modelsProvider.getModifiableFacetModel(module));
+  }
+
+  @Test
+  public void importData_withGradlePlugin_andIdeaUltimateEdition_doesNotAddFacet() {
+    System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, PlatformUtils.IDEA_PREFIX);
+
+    AppEngineGradleModule appEngineGradleModule = createModelAndImportData(true /*hasPlugin*/);
 
     verify(facetService, never())
         .addFacet(appEngineGradleModule, module, modelsProvider.getModifiableFacetModel(module));
@@ -82,5 +102,14 @@ public class AppEngineGradleProjectDataServiceTest {
         ImmutableList.of(dataNode), null /*projectData*/, testFixture.getProject(), modelsProvider);
 
     return appEngineGradleModule;
+  }
+
+  @After
+  public void tearDown() {
+    if (originalPlatformPrefix == null) {
+      System.clearProperty(PlatformUtils.PLATFORM_PREFIX_KEY);
+    } else {
+      System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, originalPlatformPrefix);
+    }
   }
 }
