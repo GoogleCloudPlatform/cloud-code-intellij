@@ -119,9 +119,8 @@ public class ProjectRepositoryValidator {
     boolean foundDebuggee = false;
     if (getCloudDebuggerClient() != null
         && !com.google.common.base.Strings.isNullOrEmpty(processState.getProjectNumber())) {
-      ListDebuggeesResponse debuggees;
       try {
-        debuggees =
+        ListDebuggeesResponse debuggeesResponse =
             getCloudDebuggerClient()
                 .debuggees()
                 .list()
@@ -130,23 +129,24 @@ public class ProjectRepositoryValidator {
                     ServiceManager.getService(PluginInfoService.class)
                         .getClientVersionForCloudDebugger())
                 .execute();
-        for (Debuggee debuggee :
-            Optional.ofNullable(debuggees.getDebuggees()).orElse(Collections.emptyList())) {
-          if (processState.getDebuggeeId() != null
-              && processState.getDebuggeeId().equals(debuggee.getId())) {
-            // implicit assumption this doesn't happen more than once
-            foundDebuggee = true;
-            List<SourceContext> contexts = debuggee.getSourceContexts();
-            if (contexts != null) {
-              for (SourceContext sourceContext : contexts) {
-                cloudRepo = sourceContext.getCloudRepo();
-                gerritRepo = sourceContext.getGerrit();
-                otherGitRepo = sourceContext.getGit();
-                if (cloudRepo != null) {
-                  // shouldn't be more than one repo but if there is, we'll prefer cloud repos
-                  break;
-                } else if (sourceContext.getCloudWorkspace() != null) {
-                  repoType = StackdriverDebuggerBundle.getString("clouddebug.workspace");
+        if (debuggeesResponse.getDebuggees() != null) {
+          for (Debuggee debuggee : debuggeesResponse.getDebuggees()) {
+            if (processState.getDebuggeeId() != null
+                && processState.getDebuggeeId().equals(debuggee.getId())) {
+              // implicit assumption this doesn't happen more than once
+              foundDebuggee = true;
+              List<SourceContext> contexts = debuggee.getSourceContexts();
+              if (contexts != null) {
+                for (SourceContext sourceContext : contexts) {
+                  cloudRepo = sourceContext.getCloudRepo();
+                  gerritRepo = sourceContext.getGerrit();
+                  otherGitRepo = sourceContext.getGit();
+                  if (cloudRepo != null) {
+                    // shouldn't be more than one repo but if there is, we'll prefer cloud repos
+                    break;
+                  } else if (sourceContext.getCloudWorkspace() != null) {
+                    repoType = StackdriverDebuggerBundle.getString("clouddebug.workspace");
+                  }
                 }
               }
             }
