@@ -152,8 +152,10 @@ public class AppEngineUtil {
   }
 
   /**
-   * Assembles a list of {@link GradlePluginDeploymentSource} for each module, if the module has the
-   * App Engine standard facet, and the App Engine Gradle facet.
+   * Assembles a list of {@link GradlePluginDeploymentSource} for each module.
+   *
+   * <p>Will create a Gradle plugin deployment source if the module has both the App Engine standard
+   * the App Engine Gradle plugin facet.
    *
    * @param project the current {@link Project}
    * @return a list of {@link ModuleDeploymentSource} containing the app-gradle-plugin based
