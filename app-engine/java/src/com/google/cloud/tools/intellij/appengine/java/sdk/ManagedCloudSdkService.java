@@ -152,7 +152,10 @@ public class ManagedCloudSdkService implements CloudSdkService {
   void initManagedSdk() {
     try {
       managedCloudSdk = createManagedSdk();
-      install();
+      // do not install SDK on activation if user cancelled installation once.
+      if (!CloudSdkServiceUserSettings.getInstance().isUserCancelledInstallation()) {
+        install();
+      }
     } catch (UnsupportedOsException ex) {
       logger.warn("Unsupported OS for Managed Cloud SDK", ex);
       updateStatus(SdkStatus.NOT_AVAILABLE);
@@ -354,6 +357,8 @@ public class ManagedCloudSdkService implements CloudSdkService {
       }
 
       ManagedCloudSdkServiceUiPresenter.getInstance().notifyManagedSdkJobSuccess(jobType, result);
+      // no need to abstain from checking install status anymore after success.
+      CloudSdkServiceUserSettings.getInstance().setUserCancelledInstallation(false);
     }
 
     @Override
@@ -362,6 +367,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
       if (throwable instanceof InterruptedException || throwable instanceof CancellationException) {
         logger.info("Managed Google Cloud SDK install/update cancelled.");
         jobCancelled = true;
+        CloudSdkServiceUserSettings.getInstance().setUserCancelledInstallation(true);
 
         ManagedCloudSdkServiceUiPresenter.getInstance().notifyManagedSdkJobCancellation(jobType);
       } else {
