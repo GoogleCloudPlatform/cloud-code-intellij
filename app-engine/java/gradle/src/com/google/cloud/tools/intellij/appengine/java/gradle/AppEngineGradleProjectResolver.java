@@ -16,7 +16,10 @@
 
 package com.google.cloud.tools.intellij.appengine.java.gradle;
 
+import com.google.cloud.tools.intellij.GctFeature;
+import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.common.collect.Sets;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.externalSystem.model.DataNode;
 import com.intellij.openapi.externalSystem.model.project.ModuleData;
 import com.intellij.openapi.externalSystem.util.ExternalSystemConstants;
@@ -41,17 +44,22 @@ public class AppEngineGradleProjectResolver extends AbstractProjectResolverExten
   @Override
   public void populateModuleExtraModels(
       @NotNull IdeaModule gradleModule, @NotNull DataNode<ModuleData> ideModule) {
-    AppEngineGradleModel model =
-        resolverCtx.getExtraProject(gradleModule, AppEngineGradleModel.class);
+    if (ServiceManager.getService(PluginInfoService.class)
+        .shouldEnable(GctFeature.GRADLE_SYNC_CE)) {
+      AppEngineGradleModel model =
+          resolverCtx.getExtraProject(gradleModule, AppEngineGradleModel.class);
 
-    if (model != null) {
-      AppEngineGradleModule appEngineGradleModule =
-          new AppEngineGradleModule(gradleModule.getName(), model);
-      ideModule.createChild(
-          AppEngineGradleProjectDataService.APP_ENGINE_MODEL_KEY, appEngineGradleModule);
+      if (model != null) {
+        AppEngineGradleModule appEngineGradleModule =
+            new AppEngineGradleModule(gradleModule.getName(), model);
+        ideModule.createChild(
+            AppEngineGradleProjectDataService.APP_ENGINE_MODEL_KEY, appEngineGradleModule);
+      }
+
+      nextResolver.populateModuleExtraModels(gradleModule, ideModule);
+    } else {
+      super.populateModuleExtraModels(gradleModule, ideModule);
     }
-
-    nextResolver.populateModuleExtraModels(gradleModule, ideModule);
   }
 
   @NotNull

@@ -38,7 +38,8 @@ public enum GctFeature implements Feature {
 
   MANAGED_SDK(null, "feature.managed.sdk", "ct4ij.feature.managed.sdk"),
   MANAGED_SDK_UPDATE(null, "feature.managed.sdk.update", "ct4ij.feature.managed.sdk.update"),
-  BOM(null, "feature.bom", "ct4ij.feature.bom");
+  BOM(null, "feature.bom", "ct4ij.feature.bom"),
+  GRADLE_SYNC_CE(null, "feature.gradle.sync.ce", "ct4ij.feature.gradle.sync.ce");
 
   private final ImmutableSet<IntelliJPlatform> supportedPlatforms;
   private final String resourceFlagName;
