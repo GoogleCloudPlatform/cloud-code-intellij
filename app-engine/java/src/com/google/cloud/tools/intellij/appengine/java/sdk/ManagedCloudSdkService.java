@@ -312,9 +312,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
   private void notifySdkProcessingStarted() {
     invokeOnApplicationUIThread(
-        () -> {
-          statusUpdateListeners.forEach(SdkStatusUpdateListener::onSdkProcessingStarted);
-        });
+        () -> statusUpdateListeners.forEach(SdkStatusUpdateListener::onSdkProcessingStarted));
   }
 
   private void notifyListeners(CloudSdkService sdkService, SdkStatus status) {

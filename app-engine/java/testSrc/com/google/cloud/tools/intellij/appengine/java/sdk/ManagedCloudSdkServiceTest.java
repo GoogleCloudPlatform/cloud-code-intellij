@@ -310,6 +310,16 @@ public class ManagedCloudSdkServiceTest {
   }
 
   @Test
+  public void actual_install_notifiesListeners_onProcessingStart() {
+    sdkService.addStatusUpdateListener(mockStatusUpdateListener);
+    emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
+    sdkService.install();
+
+    // for real new install, 2 invocations - SDK and app-engine-java components.
+    verify(mockStatusUpdateListener, times(2)).onSdkProcessingStarted();
+  }
+
+  @Test
   public void successful_update_changesSdkStatus_inProgress() {
     makeMockSdkInstalled(MOCK_SDK_PATH);
     emulateMockSdkUpdateProcess();
@@ -344,6 +354,17 @@ public class ManagedCloudSdkServiceTest {
 
     verify(mockUiPresenter)
         .notifyManagedSdkJobSuccess(ManagedSdkJobType.UPDATE, ManagedSdkJobResult.UP_TO_DATE);
+  }
+
+  @Test
+  public void actual_update_notifiesListeners_onProcessingStart() {
+    sdkService.addStatusUpdateListener(mockStatusUpdateListener);
+    makeMockSdkInstalled(MOCK_SDK_PATH);
+    emulateMockSdkUpdateProcess();
+
+    sdkService.update();
+
+    verify(mockStatusUpdateListener).onSdkProcessingStarted();
   }
 
   @Test
