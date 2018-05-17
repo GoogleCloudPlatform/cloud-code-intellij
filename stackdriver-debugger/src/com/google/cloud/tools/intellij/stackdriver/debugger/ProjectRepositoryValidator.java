@@ -74,6 +74,7 @@ import git4idea.util.LocalChangesWouldBeOverwrittenHelper;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -129,7 +130,8 @@ public class ProjectRepositoryValidator {
                     ServiceManager.getService(PluginInfoService.class)
                         .getClientVersionForCloudDebugger())
                 .execute();
-        for (Debuggee debuggee : debuggees.getDebuggees()) {
+        for (Debuggee debuggee :
+            Optional.ofNullable(debuggees.getDebuggees()).orElse(Collections.emptyList())) {
           if (processState.getDebuggeeId() != null
               && processState.getDebuggeeId().equals(debuggee.getId())) {
             // implicit assumption this doesn't happen more than once
