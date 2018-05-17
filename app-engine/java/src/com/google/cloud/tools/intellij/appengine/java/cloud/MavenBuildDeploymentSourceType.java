@@ -41,8 +41,6 @@ public class MavenBuildDeploymentSourceType extends BuildDeploymentSourceType {
   private static final String MAVEN_TASK_PACKAGE = "package";
   private static final String SOURCE_TYPE_ID = "maven-build-source";
   private static final String NAME_ATTRIBUTE = "name";
-  private static final String PROJECT_ATTRIBUTE = "project";
-  private static final String VERSION_ATTRIBUTE = "version";
 
   public MavenBuildDeploymentSourceType() {
     super(SOURCE_TYPE_ID);
@@ -91,18 +89,7 @@ public class MavenBuildDeploymentSourceType extends BuildDeploymentSourceType {
   public void save(@NotNull ModuleDeploymentSource deploymentSource, @NotNull Element tag) {
     tag.setAttribute(NAME_ATTRIBUTE, deploymentSource.getModulePointer().getModuleName());
 
-    if (deploymentSource instanceof AppEngineDeployable) {
-      AppEngineDeployable deployable = (AppEngineDeployable) deploymentSource;
-
-      if (deployable.getProjectName() != null) {
-        tag.setAttribute(
-            PROJECT_ATTRIBUTE, ((AppEngineDeployable) deploymentSource).getProjectName());
-      }
-
-      if (deployable.getVersion() != null) {
-        tag.setAttribute(VERSION_ATTRIBUTE, ((AppEngineDeployable) deploymentSource).getVersion());
-      }
-    }
+    super.save(deploymentSource, tag);
   }
 
   @Override
