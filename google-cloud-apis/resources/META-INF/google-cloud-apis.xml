@@ -15,7 +15,6 @@
   -->
 
 <idea-plugin>
-  <module value="com.google.cloud.tools.intellij.google-cloud-apis"/>
   <depends>org.jetbrains.idea.maven</depends>
 
   <project-components>
