@@ -56,6 +56,15 @@ public class AppEngineGradleProjectDataServiceTest {
     originalPlatformPrefix = System.getProperty(PlatformUtils.PLATFORM_PREFIX_KEY);
   }
 
+  @After
+  public void tearDown() {
+    if (originalPlatformPrefix == null) {
+      System.clearProperty(PlatformUtils.PLATFORM_PREFIX_KEY);
+    } else {
+      System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, originalPlatformPrefix);
+    }
+  }
+
   @Test
   public void importData_withAppEngineGradleModel_andGradlePlugin_addsFacet() {
     System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, PlatformUtils.IDEA_CE_PREFIX);
@@ -102,14 +111,5 @@ public class AppEngineGradleProjectDataServiceTest {
         ImmutableList.of(dataNode), null /*projectData*/, testFixture.getProject(), modelsProvider);
 
     return appEngineGradleModule;
-  }
-
-  @After
-  public void tearDown() {
-    if (originalPlatformPrefix == null) {
-      System.clearProperty(PlatformUtils.PLATFORM_PREFIX_KEY);
-    } else {
-      System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, originalPlatformPrefix);
-    }
   }
 }
