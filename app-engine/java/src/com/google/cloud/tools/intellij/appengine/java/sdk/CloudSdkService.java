@@ -56,5 +56,7 @@ public interface CloudSdkService {
   /** Interface to receive SDK service updates like changes from installing to available. */
   interface SdkStatusUpdateListener {
     void onSdkStatusChange(CloudSdkService sdkService, SdkStatus status);
+    /** Callback to notify actual SDK processing (install or update) has started. */
+    void onSdkProcessingStarted();
   }
 }
