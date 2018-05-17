@@ -56,6 +56,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -107,6 +108,12 @@ public class ManagedCloudSdkServiceTest {
     when(mockUiPresenter.createProgressListener(any())).thenReturn(mockProgressListener);
     // init SDK, most tests require initialized state.
     sdkService.initManagedSdk();
+  }
+
+  @After
+  public void tearDown() {
+    // reset user cancelled flags.
+    CloudSdkServiceUserSettings.reset();
   }
 
   @Test
@@ -284,6 +291,22 @@ public class ManagedCloudSdkServiceTest {
     sdkService.install();
 
     verify(mockUiPresenter).notifyManagedSdkJobCancellation(ManagedSdkJobType.INSTALL);
+  }
+
+  @Test
+  public void cancelledInstall_stops_installing_onActivation() throws Exception {
+    emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
+    SdkInstaller sdkInstaller = mockManagedCloudSdk.newInstaller();
+    when(sdkInstaller.install(any(), any())).thenThrow(new CancellationException());
+    when(mockManagedCloudSdk.newInstaller()).thenReturn(sdkInstaller);
+
+    sdkService.install();
+    // cancelled, now attempt to do clean install process and activation.
+    emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
+    sdkService.activate();
+
+    // install is not supposed to run on activation anymore.
+    assertThat(sdkService.getStatus()).isEqualTo(SdkStatus.NOT_AVAILABLE);
   }
 
   @Test
