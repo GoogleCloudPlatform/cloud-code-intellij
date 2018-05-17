@@ -21,13 +21,9 @@ import static com.google.common.truth.Truth.assertThat;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineGradlePluginFacetType;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.ModuleTestUtils;
 import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.google.cloud.tools.intellij.testing.TestModule;
-import com.intellij.facet.FacetManager;
-import com.intellij.facet.FacetType;
-import com.intellij.facet.FacetTypeId;
-import com.intellij.facet.FacetTypeRegistry;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
@@ -44,8 +40,8 @@ public class AppEngineUtilTest {
 
   @Test
   public void createGradleSource_withAppEngineFacets_returnsGradleSource() {
-    addFacet(AppEngineStandardFacetType.ID);
-    addFacet(AppEngineGradlePluginFacetType.ID);
+    ModuleTestUtils.addFacet(module, AppEngineStandardFacetType.ID);
+    ModuleTestUtils.addFacet(module, AppEngineGradlePluginFacetType.ID);
 
     List<ModuleDeploymentSource> sources =
         AppEngineUtil.createGradlePluginDeploymentSources(testFixture.getProject());
@@ -63,7 +59,7 @@ public class AppEngineUtilTest {
 
   @Test
   public void createGradleSource_withAppEngineFacet_andNoAppEngineGradleFacet_returnsEmpty() {
-    addFacet(AppEngineStandardFacetType.ID);
+    ModuleTestUtils.addFacet(module, AppEngineStandardFacetType.ID);
 
     List<ModuleDeploymentSource> sources =
         AppEngineUtil.createGradlePluginDeploymentSources(testFixture.getProject());
@@ -73,25 +69,11 @@ public class AppEngineUtilTest {
 
   @Test
   public void createGradleSource_withAppEngineGradleFacet_andNoAppEngineFacet_returnsEmpty() {
-    addFacet(AppEngineGradlePluginFacetType.ID);
+    ModuleTestUtils.addFacet(module, AppEngineGradlePluginFacetType.ID);
 
     List<ModuleDeploymentSource> sources =
         AppEngineUtil.createGradlePluginDeploymentSources(testFixture.getProject());
 
     assertThat(sources).isEmpty();
-  }
-
-  private void addFacet(FacetTypeId<?> facetTypeId) {
-    FacetType<?, ?> facetType = FacetTypeRegistry.getInstance().findFacetType(facetTypeId);
-
-    ApplicationManager.getApplication()
-        .invokeAndWait(
-            () ->
-                ApplicationManager.getApplication()
-                    .runWriteAction(
-                        () -> {
-                          FacetManager.getInstance(module)
-                              .addFacet(facetType, facetTypeId.toString(), null /*underlying*/);
-                        }));
   }
 }

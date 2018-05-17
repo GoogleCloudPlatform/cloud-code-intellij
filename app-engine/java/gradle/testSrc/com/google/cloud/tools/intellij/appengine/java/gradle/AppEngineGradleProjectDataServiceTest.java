@@ -22,6 +22,7 @@ import static org.mockito.Mockito.verify;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.google.cloud.tools.intellij.testing.TestModule;
+import com.google.cloud.tools.intellij.testing.TestScopedSystemPropertyRule;
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.externalSystem.model.DataNode;
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider;
@@ -29,7 +30,6 @@ import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsPr
 import com.intellij.openapi.module.Module;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import com.intellij.util.PlatformUtils;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,9 +40,12 @@ public class AppEngineGradleProjectDataServiceTest {
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
   @TestFixture private IdeaProjectTestFixture testFixture;
 
+  @Rule
+  public final TestScopedSystemPropertyRule systemPropertyRule =
+      new TestScopedSystemPropertyRule(PlatformUtils.PLATFORM_PREFIX_KEY);
+
   private AppEngineGradleProjectDataService dataService;
   private IdeModifiableModelsProvider modelsProvider;
-
   private String originalPlatformPrefix;
 
   @TestModule private Module module;
@@ -52,17 +55,6 @@ public class AppEngineGradleProjectDataServiceTest {
   public void setUp() {
     dataService = new AppEngineGradleProjectDataService(facetService);
     modelsProvider = new IdeModifiableModelsProviderImpl(testFixture.getProject());
-
-    originalPlatformPrefix = System.getProperty(PlatformUtils.PLATFORM_PREFIX_KEY);
-  }
-
-  @After
-  public void tearDown() {
-    if (originalPlatformPrefix == null) {
-      System.clearProperty(PlatformUtils.PLATFORM_PREFIX_KEY);
-    } else {
-      System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, originalPlatformPrefix);
-    }
   }
 
   @Test
