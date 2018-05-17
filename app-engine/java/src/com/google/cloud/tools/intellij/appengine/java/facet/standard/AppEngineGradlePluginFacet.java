@@ -24,6 +24,10 @@ import com.intellij.facet.FacetTypeRegistry;
 import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * An App Engine Gradle plugin {@link Facet}. Indicates that the module has the app-gradle-plugin
+ * configured. The facet stores information provided by the Gradle integration.
+ */
 public class AppEngineGradlePluginFacet extends Facet<AppEngineGradlePluginFacetConfiguration> {
 
   public AppEngineGradlePluginFacet(
@@ -38,11 +42,15 @@ public class AppEngineGradlePluginFacet extends Facet<AppEngineGradlePluginFacet
     return FacetManager.getInstance(module).getFacetByType(AppEngineGradlePluginFacetType.ID);
   }
 
+  /** Returns {@code true} if the supplied module has the {@link AppEngineGradlePluginFacet}. */
   public static boolean hasFacet(@NotNull Module module) {
-    return FacetManager.getInstance(module).getFacetByType(AppEngineGradlePluginFacetType.ID) != null;
+    return FacetManager.getInstance(module).getFacetByType(AppEngineGradlePluginFacetType.ID)
+        != null;
   }
 
-  public static FacetType<AppEngineGradlePluginFacet, AppEngineGradlePluginFacetConfiguration> getFacetType() {
+  /** Returns the {@link AppEngineGradlePluginFacetType} associated with this facet. */
+  public static FacetType<AppEngineGradlePluginFacet, AppEngineGradlePluginFacetConfiguration>
+      getFacetType() {
     return FacetTypeRegistry.getInstance().findFacetType(AppEngineGradlePluginFacetType.ID);
   }
 }

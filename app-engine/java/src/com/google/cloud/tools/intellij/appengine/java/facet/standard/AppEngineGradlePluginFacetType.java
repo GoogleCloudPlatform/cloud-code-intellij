@@ -33,10 +33,12 @@ import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/** An App Engine Gradle plugin custom {@link FacetType}. */
 public class AppEngineGradlePluginFacetType
     extends FacetType<AppEngineGradlePluginFacet, AppEngineGradlePluginFacetConfiguration> {
 
-  public static final FacetTypeId<AppEngineGradlePluginFacet> ID = new FacetTypeId<>("appEngineGradle");
+  public static final FacetTypeId<AppEngineGradlePluginFacet> ID =
+      new FacetTypeId<>("appEngineGradle");
   public static final String STRING_ID = "app-engine-gradle";
   public static final String NAME = "Google App Engine Gradle";
 
@@ -68,8 +70,13 @@ public class AppEngineGradlePluginFacetType
     return AppEngineIcons.APP_ENGINE;
   }
 
+  /**
+   * The {@link FacetConfiguration} for {@link AppEngineGradlePluginFacetType}. Stores the path to
+   * the gradle build directory.
+   */
   public static class AppEngineGradlePluginFacetConfiguration
-      implements FacetConfiguration, PersistentStateComponent<AppEngineGradlePluginFacetConfiguration> {
+      implements FacetConfiguration,
+          PersistentStateComponent<AppEngineGradlePluginFacetConfiguration> {
 
     private String gradleBuildDir;
 
@@ -81,7 +88,7 @@ public class AppEngineGradlePluginFacetType
 
     @Nullable
     @Override
-    public AppEngineGradlePluginFacetConfiguration getState(){
+    public AppEngineGradlePluginFacetConfiguration getState() {
       return this;
     }
 
