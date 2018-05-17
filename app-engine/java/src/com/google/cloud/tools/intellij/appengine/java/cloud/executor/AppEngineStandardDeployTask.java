@@ -31,7 +31,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import java.io.IOException;
 import java.nio.file.Path;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.plugins.gradle.execution.GradleRunnerUtil;
 
 /**
  * Runnable that executes task responsible for deploying an application to the App Engine standard
