@@ -39,6 +39,7 @@ public class CloudSdkServiceUserSettings {
       "GCT_CLOUD_SDK_AUTOMATIC_UPDATES";
   private static final String SDK_LAST_AUTOMATIC_UPDATE_TMESTAMP_PROPERTY_NAME =
       "GCT_CLOUD_SDK_LAST_AUTOMATIC_UPDATE_TMESTAMP";
+  private static final String SDK_USER_CANCELLED_INSTALLATION = "SDK_USER_CANCELLED_INSTALLATION";
 
   private PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
 
@@ -55,6 +56,7 @@ public class CloudSdkServiceUserSettings {
     getInstance().propertiesComponent.unsetValue(CUSTOM_CLOUD_SDK_PATH_PROPERTY_NAME);
     getInstance().propertiesComponent.unsetValue(SDK_AUTOMATIC_UPDATES_PROPERTY_NAME);
     getInstance().propertiesComponent.unsetValue(SDK_LAST_AUTOMATIC_UPDATE_TMESTAMP_PROPERTY_NAME);
+    getInstance().propertiesComponent.unsetValue(SDK_USER_CANCELLED_INSTALLATION);
   }
 
   @NotNull
@@ -108,6 +110,19 @@ public class CloudSdkServiceUserSettings {
         SDK_LAST_AUTOMATIC_UPDATE_TMESTAMP_PROPERTY_NAME,
         Long.toString(timestamp),
         null /* null default not to remove property value. */);
+  }
+
+  boolean isUserCancelledInstallation() {
+    return propertiesComponent.getBoolean(
+        SDK_AUTOMATIC_UPDATES_PROPERTY_NAME,
+        false /* default - user hasn't cancelled SDK installs.*/);
+  }
+
+  void setUserCancelledInstallation(boolean userCancelledInstallation) {
+    propertiesComponent.setValue(
+        SDK_USER_CANCELLED_INSTALLATION,
+        userCancelledInstallation,
+        false /* default - user hasn't cancelled SDK installs.*/);
   }
 
   @VisibleForTesting
