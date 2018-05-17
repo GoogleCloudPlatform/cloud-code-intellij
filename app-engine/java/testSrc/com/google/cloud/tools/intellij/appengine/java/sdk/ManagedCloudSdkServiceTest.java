@@ -56,6 +56,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -107,6 +108,12 @@ public class ManagedCloudSdkServiceTest {
     when(mockUiPresenter.createProgressListener(any())).thenReturn(mockProgressListener);
     // init SDK, most tests require initialized state.
     sdkService.initManagedSdk();
+  }
+
+  @After
+  public void tearDown() {
+    // reset user cancelled flags.
+    CloudSdkServiceUserSettings.reset();
   }
 
   @Test
