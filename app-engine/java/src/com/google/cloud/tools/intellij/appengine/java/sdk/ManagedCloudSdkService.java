@@ -357,6 +357,8 @@ public class ManagedCloudSdkService implements CloudSdkService {
       }
 
       ManagedCloudSdkServiceUiPresenter.getInstance().notifyManagedSdkJobSuccess(jobType, result);
+      // no need to abstain from checking install status anymore after success.
+      CloudSdkServiceUserSettings.getInstance().setUserCancelledInstallation(false);
     }
 
     @Override

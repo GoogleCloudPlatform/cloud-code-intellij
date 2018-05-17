@@ -287,6 +287,22 @@ public class ManagedCloudSdkServiceTest {
   }
 
   @Test
+  public void cancelledInstall_stops_installing_onActivation() throws Exception {
+    emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
+    SdkInstaller sdkInstaller = mockManagedCloudSdk.newInstaller();
+    when(sdkInstaller.install(any(), any())).thenThrow(new CancellationException());
+    when(mockManagedCloudSdk.newInstaller()).thenReturn(sdkInstaller);
+
+    sdkService.install();
+    // cancelled, now attempt to do clean install process and activation.
+    emulateMockSdkInstallationProcess(MOCK_SDK_PATH);
+    sdkService.activate();
+
+    // install is not supposed to run on activation anymore.
+    assertThat(sdkService.getStatus()).isEqualTo(SdkStatus.NOT_AVAILABLE);
+  }
+
+  @Test
   public void successful_update_changesSdkStatus_inProgress() {
     makeMockSdkInstalled(MOCK_SDK_PATH);
     emulateMockSdkUpdateProcess();

@@ -114,8 +114,7 @@ public class CloudSdkServiceUserSettings {
 
   boolean isUserCancelledInstallation() {
     return propertiesComponent.getBoolean(
-        SDK_AUTOMATIC_UPDATES_PROPERTY_NAME,
-        false /* default - user hasn't cancelled SDK installs.*/);
+        SDK_USER_CANCELLED_INSTALLATION, false /* default - user hasn't cancelled SDK installs.*/);
   }
 
   void setUserCancelledInstallation(boolean userCancelledInstallation) {
