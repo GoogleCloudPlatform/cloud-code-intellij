@@ -20,6 +20,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService.SdkStatus;
+import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService.SdkStatusUpdateListener;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
@@ -174,23 +175,29 @@ public class CloudSdkServiceManager {
     // listener for SDK updates, waits until install / update is done. uses latch to notify UI
     // blocking thread.
     final CloudSdkService.SdkStatusUpdateListener sdkStatusUpdateListener =
-        (sdkService, status) -> {
-          switch (status) {
-            case READY:
-            case INVALID:
-            case NOT_AVAILABLE:
-              installationCompletionLatch.countDown();
-              break;
-            default:
-              // continue waiting for completion.
+        new SdkStatusUpdateListener() {
+          @Override
+          public void onSdkStatusChange(CloudSdkService sdkService, SdkStatus status) {
+            switch (status) {
+              case READY:
+              case INVALID:
+              case NOT_AVAILABLE:
+                installationCompletionLatch.countDown();
+                break;
+              default:
+                // continue waiting for completion.
+            }
+          }
+
+          @Override
+          public void onSdkProcessingStarted() {
+            openBackgroundProcessWindow(project);
           }
         };
 
     if (isInstallInProgress()) {
       cloudSdkService.addStatusUpdateListener(sdkStatusUpdateListener);
       sdkLogging.log(AppEngineMessageBundle.getString("managedsdk.waiting.for.sdk.ready") + "\n");
-
-      openBackgroundProcessWindow(project);
     }
 
     // wait for SDK to be ready and trigger the actual deployment if it properly installs.
