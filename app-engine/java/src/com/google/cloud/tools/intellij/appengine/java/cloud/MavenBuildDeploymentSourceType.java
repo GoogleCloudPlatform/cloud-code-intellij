@@ -79,8 +79,8 @@ public class MavenBuildDeploymentSourceType extends BuildDeploymentSourceType {
     MavenBuildDeploymentSource source =
         new MavenBuildDeploymentSource(
             ModulePointerManager.getInstance(project).create(moduleName), project);
-    source.setProjectName(tag.getAttributeValue(PROJECT_ATTRIBUTE));
-    source.setVersion(tag.getAttributeValue(VERSION_ATTRIBUTE));
+    source.setProjectName(tag.getAttributeValue(CLOUD_PROJECT_ATTRIBUTE));
+    source.setVersion(tag.getAttributeValue(APP_ENGINE_VERSION_ATTRIBUTE));
 
     return source;
   }

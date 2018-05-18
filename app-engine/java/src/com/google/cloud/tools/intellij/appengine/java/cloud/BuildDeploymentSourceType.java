@@ -43,8 +43,8 @@ import org.jetbrains.annotations.Nullable;
 public abstract class BuildDeploymentSourceType
     extends DeploymentSourceType<ModuleDeploymentSource> {
 
-  static final String PROJECT_ATTRIBUTE = "project";
-  static final String VERSION_ATTRIBUTE = "version";
+  static final String CLOUD_PROJECT_ATTRIBUTE = "project";
+  static final String APP_ENGINE_VERSION_ATTRIBUTE = "version";
 
   BuildDeploymentSourceType(@NotNull String id) {
     super(id);
@@ -135,11 +135,11 @@ public abstract class BuildDeploymentSourceType
 
       if (deployable.getProjectName() != null) {
         tag.setAttribute(
-            PROJECT_ATTRIBUTE, ((AppEngineDeployable) deploymentSource).getProjectName());
+            CLOUD_PROJECT_ATTRIBUTE, ((AppEngineDeployable) deploymentSource).getProjectName());
       }
 
       if (deployable.getVersion() != null) {
-        tag.setAttribute(VERSION_ATTRIBUTE, ((AppEngineDeployable) deploymentSource).getVersion());
+        tag.setAttribute(APP_ENGINE_VERSION_ATTRIBUTE, ((AppEngineDeployable) deploymentSource).getVersion());
       }
     }
   }

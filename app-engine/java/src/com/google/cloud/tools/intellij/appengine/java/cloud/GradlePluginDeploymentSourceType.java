@@ -74,8 +74,8 @@ public class GradlePluginDeploymentSourceType extends BuildDeploymentSourceType 
         new GradlePluginDeploymentSource(
             ModulePointerManager.getInstance(project)
                 .create(tag.getAttributeValue(MODULE_NAME_ATTRIBUTE)));
-    source.setProjectName(tag.getAttributeValue(PROJECT_ATTRIBUTE));
-    source.setVersion(tag.getAttributeValue(VERSION_ATTRIBUTE));
+    source.setProjectName(tag.getAttributeValue(CLOUD_PROJECT_ATTRIBUTE));
+    source.setVersion(tag.getAttributeValue(APP_ENGINE_VERSION_ATTRIBUTE));
 
     return source;
   }
