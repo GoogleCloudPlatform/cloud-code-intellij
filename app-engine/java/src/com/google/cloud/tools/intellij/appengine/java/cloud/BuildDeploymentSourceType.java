@@ -139,7 +139,8 @@ public abstract class BuildDeploymentSourceType
       }
 
       if (deployable.getVersion() != null) {
-        tag.setAttribute(APP_ENGINE_VERSION_ATTRIBUTE, ((AppEngineDeployable) deploymentSource).getVersion());
+        tag.setAttribute(
+            APP_ENGINE_VERSION_ATTRIBUTE, ((AppEngineDeployable) deploymentSource).getVersion());
       }
     }
   }
