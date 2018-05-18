@@ -30,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class AppEngineGradlePluginFacet extends Facet<AppEngineGradlePluginFacetConfiguration> {
 
-  public AppEngineGradlePluginFacet(
+  AppEngineGradlePluginFacet(
       @NotNull FacetType facetType,
       @NotNull Module module,
       @NotNull String name,
