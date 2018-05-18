@@ -124,6 +124,10 @@ public abstract class BuildDeploymentSourceType
     }
   }
 
+  /**
+   * Serializes the given {@link ModuleDeploymentSource}. Stores the cloud project along with the
+   * version so that it can be restored later and survive IDE restarts.
+   */
   @Override
   public void save(@NotNull ModuleDeploymentSource deploymentSource, @NotNull Element tag) {
     if (deploymentSource instanceof AppEngineDeployable) {
