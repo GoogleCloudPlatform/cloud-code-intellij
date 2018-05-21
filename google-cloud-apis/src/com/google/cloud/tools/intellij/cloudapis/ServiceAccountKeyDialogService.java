@@ -22,9 +22,7 @@ import com.intellij.openapi.ui.DialogWrapper;
 import org.jetbrains.annotations.Nullable;
 
 /** Application service that provides the handle to the IC's Service Account Key Created dialog */
-public class ServiceAccountKeyDialogService {
-  public DialogWrapper getDialog(
-      @Nullable Project project, CloudProject cloudProject, String downloadPath) {
-    return new ServiceAccountKeyDisplayDialog(project, cloudProject, downloadPath);
-  }
+public interface ServiceAccountKeyDialogService {
+  DialogWrapper getDialog(
+      @Nullable Project project, CloudProject cloudProject, String downloadPath);
 }
