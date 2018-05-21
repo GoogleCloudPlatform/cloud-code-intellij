@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.java.ultimate.cloudapis;
+package com.google.cloud.tools.intellij.cloudapis;
 
-import com.google.cloud.tools.intellij.cloudapis.ServiceAccountKeyDialogService;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import org.jetbrains.annotations.Nullable;
 
-/** Application service that provides a handle to the IU's Service Account Key Created dialog */
-public class ServiceAccountKeyUltimateDialogService implements ServiceAccountKeyDialogService {
+/** IDEA Community implementation of the {@link ServiceAccountKeyDialogService} service. */
+public class ServiceAccountKeyCommunityDialogService implements ServiceAccountKeyDialogService {
+
   @Override
   public DialogWrapper getDialog(
       @Nullable Project project, CloudProject cloudProject, String downloadPath) {
-    return new ServiceAccountKeyUltimateDisplayDialog(project, cloudProject, downloadPath);
+    return new ServiceAccountKeyDisplayDialog(project, cloudProject, downloadPath);
   }
 }
