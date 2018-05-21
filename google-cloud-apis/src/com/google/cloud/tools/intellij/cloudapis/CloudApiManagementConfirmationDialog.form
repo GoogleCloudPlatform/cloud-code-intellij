@@ -92,12 +92,11 @@
                   </component>
                 </children>
               </scrollpane>
-              <component id="540f4" class="javax.swing.JLabel">
+              <component id="540f4" class="javax.swing.JLabel" binding="infoLabel">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <icon value="general/information.png"/>
                   <text value=""/>
                 </properties>
               </component>
@@ -279,12 +278,11 @@
                           <text resource-bundle="messages/CloudApisBundle" key="cloud.apis.management.dialog.serviceaccount.download.warning.text"/>
                         </properties>
                       </component>
-                      <component id="ae3e3" class="javax.swing.JLabel">
+                      <component id="ae3e3" class="javax.swing.JLabel" binding="serviceAccountWarningLabel" custom-create="true">
                         <constraints>
                           <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                         </constraints>
                         <properties>
-                          <icon value="general/information.png"/>
                           <text value=""/>
                         </properties>
                       </component>

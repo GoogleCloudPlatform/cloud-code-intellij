@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.cloudapis;
 
 import com.google.cloud.tools.intellij.ui.CopyToClipboardActionListener;
 import com.intellij.execution.util.EnvironmentVariable;
+import com.intellij.icons.AllIcons.General;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.JButton;
@@ -45,12 +46,15 @@ public final class ServiceAccountKeyDownloadedPanel {
   private JLabel envVarInfoText;
   private JTable envVarTable;
   private JButton copyToClipboardButton;
+  private JLabel secureKeyWarningLabel;
 
   public ServiceAccountKeyDownloadedPanel(
       @NotNull String gcpProjectId, @NotNull String downloadPath) {
     this.gcpProjectId = gcpProjectId;
     this.downloadPath = downloadPath;
     downloadPathLabel.setText(downloadPath);
+
+    secureKeyWarningLabel.setIcon(General.Information);
 
     DefaultTableModel tableModel =
         new DefaultTableModel() {

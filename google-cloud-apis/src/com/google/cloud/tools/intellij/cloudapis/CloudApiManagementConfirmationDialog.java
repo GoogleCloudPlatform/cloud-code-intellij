@@ -22,6 +22,7 @@ import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import com.intellij.icons.AllIcons.General;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -43,6 +44,7 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -89,8 +91,10 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
   private JTextField serviceAccountNameTextField;
   private TextFieldWithBrowseButton serviceKeyPathSelector;
   private JTextPane serviceAccountInfoPane;
+  private JLabel infoLabel;
+  private JLabel serviceAccountWarningLabel;
 
-  private final Set<Role> roles;
+  private Set<Role> roles = Collections.emptySet();
   private static final boolean UPDATE_SERVICE_ACCOUNT_DEFAULT = true;
 
   /**
@@ -123,6 +127,9 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
             GoogleCloudApisMessageBundle.message(
                 "cloud.apis.management.dialog.serviceaccount.header")));
 
+    infoLabel.setIcon(General.Information);
+    serviceAccountWarningLabel.setIcon(General.Information);
+
     serviceAccountDetailsPane.setBorder(JBUI.Borders.empty());
     serviceAccountInfoPane.setBackground(serviceAccountPanel.getBackground());
 
@@ -142,9 +149,6 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
     createNewServiceAccountCheckbox.addActionListener(newServiceAccountClickHandler());
     createNewServiceAccountCheckbox.setSelected(UPDATE_SERVICE_ACCOUNT_DEFAULT);
     serviceAccountDetailsPanel.setVisible(createNewServiceAccountCheckbox.isSelected());
-    roleTable.setTableHeader(null);
-    rolePane.setBorder(JBUI.Borders.empty());
-    rolePanel.setVisible(!roles.isEmpty());
 
     serviceAccountNameTextField.setText(module.getName());
 
@@ -234,6 +238,9 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
 
   private void createUIComponents() {
     roleTable = new ServiceAccountRolesTable(roles);
+    roleTable.setTableHeader(null);
+    rolePane.setBorder(JBUI.Borders.empty());
+    rolePanel.setVisible(!roles.isEmpty());
   }
 
   private static boolean isValidDirectory(String pathString) {
