@@ -212,6 +212,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
       ConsoleListener sdkConsoleListener = logger::debug;
       progressListener =
           ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
+      notifySdkProcessingStarted();
 
       executeWithSdkWriteLock(
           () -> managedCloudSdk.newInstaller().install(progressListener, sdkConsoleListener));
@@ -225,9 +226,10 @@ public class ManagedCloudSdkService implements CloudSdkService {
   private ManagedSdkJobResult installAppEngineJavaComponent() throws Exception {
     if (!safeCheckSdkStatus(() -> managedCloudSdk.hasComponent(SdkComponent.APP_ENGINE_JAVA))) {
       ConsoleListener appEngineConsoleListener = logger::debug;
-
       progressListener =
           ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
+      notifySdkProcessingStarted();
+
       executeWithSdkWriteLock(
           () ->
               managedCloudSdk
@@ -247,6 +249,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
       ConsoleListener sdkUpdateListener = logger::debug;
       progressListener =
           ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
+      notifySdkProcessingStarted();
 
       executeWithSdkWriteLock(
           () -> managedCloudSdk.newUpdater().update(progressListener, sdkUpdateListener));
@@ -305,6 +308,11 @@ public class ManagedCloudSdkService implements CloudSdkService {
           this.sdkStatus = sdkStatus;
           notifyListeners(this, sdkStatus);
         });
+  }
+
+  private void notifySdkProcessingStarted() {
+    invokeOnApplicationUIThread(
+        () -> statusUpdateListeners.forEach(SdkStatusUpdateListener::onSdkProcessingStarted));
   }
 
   private void notifyListeners(CloudSdkService sdkService, SdkStatus status) {
