@@ -29,6 +29,7 @@
     <applicationService
         serviceImplementation="com.google.cloud.tools.intellij.cloudapis.CloudApiMavenService"/>
     <applicationService
+            id="serviceAccountKeyDialogService" order="before serviceAccountKeyUltimateDialogService"
             serviceImplementation="com.google.cloud.tools.intellij.cloudapis.ServiceAccountKeyDialogService"/>
 
     <localInspection language="XML" shortName="DependencyVersionWithBom"
