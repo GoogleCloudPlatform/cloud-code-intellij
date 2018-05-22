@@ -57,6 +57,7 @@
                 implementation="com.google.cloud.tools.intellij.appengine.java.descriptor.dom.AppEngineStandardWebFileDescriptor"/>
 
         <applicationService
+                id="appEngineStandardWebIntegration" order="before appEngineUltimateWebIntegration"
                 serviceInterface="com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardWebIntegration"
                 serviceImplementation="com.google.cloud.tools.intellij.appengine.java.facet.standard.impl.AppEngineStandardCommunityWebIntegration"/>
         <applicationService
