@@ -25,7 +25,7 @@ into the IntelliJ IDEA UI. Currently this includes:
   Add Java client libraries to your project and enable Google Cloud APIs.
 
 For detailed user documentation go to our documentation
- [website](https://cloud.google.com/tools/intellij/docs/).
+ [website](https://cloud.google.com/tools/intellij/docs/?utm_source=github&utm_medium=google-cloud-intellij&utm_campaign=ToolsforIntelliJ).
 
 ## Supported Platforms
 
