@@ -44,12 +44,13 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
@@ -94,7 +95,6 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
   private JLabel infoLabel;
   private JLabel serviceAccountWarningLabel;
 
-  private Set<Role> roles = Collections.emptySet();
   private static final boolean UPDATE_SERVICE_ACCOUNT_DEFAULT = true;
 
   /**
@@ -111,9 +111,8 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
       CloudProject cloudProject,
       Set<CloudLibrary> apisToEnable,
       Set<CloudLibrary> apisNotToEnable,
-      Set<Role> roles) {
+      @NotNull Set<Role> roles) {
     super(module.getProject());
-    this.roles = roles;
 
     init();
     setTitle(GoogleCloudApisMessageBundle.message("cloud.apis.management.dialog.title"));
@@ -149,6 +148,11 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
     createNewServiceAccountCheckbox.addActionListener(newServiceAccountClickHandler());
     createNewServiceAccountCheckbox.setSelected(UPDATE_SERVICE_ACCOUNT_DEFAULT);
     serviceAccountDetailsPanel.setVisible(createNewServiceAccountCheckbox.isSelected());
+
+    rolePane.setBorder(JBUI.Borders.empty());
+    rolePanel.setVisible(!roles.isEmpty());
+
+    ((ServiceAccountRolesTable) roleTable).initTableModel(roles);
 
     serviceAccountNameTextField.setText(module.getName());
 
@@ -237,10 +241,8 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
   }
 
   private void createUIComponents() {
-    roleTable = new ServiceAccountRolesTable(roles);
+    roleTable = new ServiceAccountRolesTable();
     roleTable.setTableHeader(null);
-    rolePane.setBorder(JBUI.Borders.empty());
-    rolePanel.setVisible(!roles.isEmpty());
   }
 
   private static boolean isValidDirectory(String pathString) {
@@ -254,13 +256,20 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
   }
 
   private static final class ServiceAccountRolesTable extends JBTable {
+    /**
+     * Provided for initial empty construction, since IJ code instrumentation sometimes starts
+     * before roles field assignment.
+     */
+    ServiceAccountRolesTable() {
+      super();
+    }
 
-    ServiceAccountRolesTable(Set<Role> roles) {
-      super(new ServiceAccountRolesTableModel(roles));
+    void initTableModel(@NotNull Set<Role> roles) {
+      setModel(new ServiceAccountRolesTableModel(roles));
       setDefaultRenderer(Role.class, new RoleNameRenderer());
       setDefaultRenderer(Boolean.class, new BooleanTableCellRenderer());
       setDefaultEditor(Boolean.class, new BooleanTableCellEditor());
-      TableUtil.setupCheckboxColumn(getColumnModel().getColumn(1));
+      TableUtil.setupCheckboxColumn(this, 1);
       setBorder(IdeBorderFactory.createBorder());
       setRowHeight(25);
     }
@@ -292,8 +301,10 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
     private static final int ROLE_NAME_COL_INDEX = 0;
     private static final int ROLE_ENABLED_COL_INDEX = 1;
 
-    ServiceAccountRolesTableModel(Set<Role> roles) {
-      roleMap.putAll(Maps.toMap(roles, role -> true));
+    ServiceAccountRolesTableModel(@NotNull Set<Role> roles) {
+      roleMap.putAll(
+          Maps.toMap(
+              roles.stream().filter(Objects::nonNull).collect(Collectors.toSet()), role -> true));
     }
 
     Set<Role> getSelectedRoles() {
