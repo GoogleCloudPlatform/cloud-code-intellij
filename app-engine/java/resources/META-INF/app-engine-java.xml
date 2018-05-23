@@ -41,7 +41,9 @@
             <action id="GoogleCloudTools.AppEngineDeploy"
                     class="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeployToolsMenuAction"/>
             <separator/>
-            <add-to-group group-id="GoogleCloudTools"/>
+            <add-to-group group-id="GoogleCloudTools"
+                          relative-to-action="GoogleCloudTools.stackdriver.debugger"
+                          anchor="before"/>
         </group>
     </actions>
 
