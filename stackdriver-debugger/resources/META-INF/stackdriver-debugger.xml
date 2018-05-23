@@ -38,7 +38,8 @@
             <action id="GoogleCloudTools.CloudDebugger"
                     class="com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebuggerToolsMenuAction"/>
             <separator/>
-            <add-to-group group-id="GoogleCloudTools"/>
+            <add-to-group group-id="GoogleCloudTools" relative-to-action="GoogleCloudTools.csr"
+                          anchor="before"/>
         </group>
 
         <group id="EditorGutterCloudDebuggerMenu">
