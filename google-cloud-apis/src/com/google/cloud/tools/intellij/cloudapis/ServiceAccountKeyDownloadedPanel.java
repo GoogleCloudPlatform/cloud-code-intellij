@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.cloudapis;
 
 import com.google.cloud.tools.intellij.ui.CopyToClipboardActionListener;
 import com.intellij.execution.util.EnvironmentVariable;
+import com.intellij.icons.AllIcons.Actions;
 import com.intellij.icons.AllIcons.General;
 import java.util.HashSet;
 import java.util.Set;
@@ -76,6 +77,7 @@ public final class ServiceAccountKeyDownloadedPanel {
     envVarTable.setRowSelectionAllowed(false);
     envVarTable.setTableHeader(null);
 
+    copyToClipboardButton.setIcon(Actions.Copy);
     copyToClipboardButton.addActionListener(
         new CopyToClipboardActionListener(credentialEnvVar + "\n" + cloudProjectEnvVar));
   }
