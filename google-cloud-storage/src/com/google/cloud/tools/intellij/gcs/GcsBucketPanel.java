@@ -20,7 +20,7 @@ import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageException;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
-import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.project.CloudProject;
@@ -174,7 +174,7 @@ public final class GcsBucketPanel {
       return;
     }
 
-    UsageTrackerProvider.getInstance().trackEvent(GctTracking.GCS_BUCKET_LIST).ping();
+    UsageTrackerService.getInstance().trackEvent(GctTracking.GCS_BUCKET_LIST).ping();
 
     bucketListModel.clear();
     notificationLabel.setText(
@@ -208,7 +208,7 @@ public final class GcsBucketPanel {
                         GoogleCloudStorageMessageBundle.message(
                             "gcs.panel.bucket.listing.error.loading.buckets"));
 
-                    UsageTrackerProvider.getInstance()
+                    UsageTrackerService.getInstance()
                         .trackEvent(GctTracking.GCS_BUCKET_LIST_EXCEPTION)
                         .ping();
                     log.warn(
@@ -267,7 +267,7 @@ public final class GcsBucketPanel {
     if (bucket != null) {
       copyBucketNameMenuItem.addActionListener(
           e ->
-              UsageTrackerProvider.getInstance()
+              UsageTrackerService.getInstance()
                   .trackEvent(GctTracking.GCS_BUCKET_LIST_ACTION_COPY_BUCKET_NAME)
                   .ping());
       copyBucketNameMenuItem.addActionListener(new CopyToClipboardActionListener(bucket.getName()));

@@ -48,7 +48,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** Google Usage Tracker that reports to Cloud Tools Analytics backend. */
-public class GoogleUsageTracker implements UsageTracker, SendsEvents {
+public class GoogleUsageTrackerService implements UsageTrackerService, SendsEvents {
 
   private static final MapJoiner METADATA_JOINER =
       Joiner.on(',').useForNull("null").withKeyValueSeparator("=");
@@ -58,7 +58,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
           .addEscape('=', "\\=")
           .addEscape('\\', "\\\\")
           .toEscaper();
-  private static final Logger logger = Logger.getInstance(GoogleUsageTracker.class);
+  private static final Logger logger = Logger.getInstance(GoogleUsageTrackerService.class);
   private static final String ANALYTICS_URL = "https://ssl.google-analytics.com/collect";
   private static final String PROTOCOL_VERSION_KEY = "v";
   private static final String UNIQUE_CLIENT_ID_KEY = "cid";
@@ -103,7 +103,7 @@ public class GoogleUsageTracker implements UsageTracker, SendsEvents {
    * Constructs a usage tracker configured with analytics and plugin name configured from its
    * environment.
    */
-  public GoogleUsageTracker() {
+  public GoogleUsageTrackerService() {
     analyticsId = UsageTrackingManagementService.getInstance().getAnalyticsProperty();
 
     PluginInfoService pluginInfo = ServiceManager.getService(PluginInfoService.class);

@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.java.facet.flexible;
 
 import com.google.cloud.tools.intellij.analytics.GctTracking;
-import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineCloudType;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineEnvironment;
@@ -94,7 +94,7 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       @NotNull AppEngineFlexibleFacet facet,
       @NotNull ModifiableRootModel rootModel,
       boolean generateConfigFiles) {
-    UsageTrackerProvider.getInstance()
+    UsageTrackerService.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_ADD_SUPPORT)
         .addMetadata("env", "flex");
     // Allows suggesting app.yaml and Dockerfile locations in facet and deployment UIs.
@@ -112,7 +112,7 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
       if (generateConfigFiles) {
         appEngineProjectService.generateAppYaml(
             FlexibleRuntime.JAVA, facet.getModule(), appYamlPath.getParent());
-        UsageTrackerProvider.getInstance()
+        UsageTrackerService.getInstance()
             .trackEvent(GctTracking.APP_ENGINE_GENERATE_FILE_APPYAML)
             .addMetadata("source", "addedByFramework")
             .addMetadata("env", "flex")

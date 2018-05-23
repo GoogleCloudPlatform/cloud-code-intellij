@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.java.facet.standard;
 
 import com.google.cloud.tools.intellij.analytics.GctTracking;
-import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.appengine.java.util.AppEngineUtil;
 import com.intellij.facet.FacetType;
 import com.intellij.framework.FrameworkType;
@@ -47,7 +47,7 @@ public class AppEngineStandardFrameworkDetector
             model.getModule(),
             null /*existingConfiguration*/);
 
-    UsageTrackerProvider.getInstance()
+    UsageTrackerService.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_FACET_ADD)
         .addMetadata("source", "frameworkDetect")
         .addMetadata("env", "standard")

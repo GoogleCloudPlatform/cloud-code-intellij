@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.stackdriver.debugger.ui;
 
 import com.google.cloud.tools.intellij.analytics.GctTracking;
-import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
@@ -160,9 +160,7 @@ public class CloudAttachDialog extends DialogWrapper {
   @Override
   protected void doOKAction() {
     if (getOKAction().isEnabled()) {
-      UsageTrackerProvider.getInstance()
-          .trackEvent(GctTracking.CLOUD_DEBUGGER_START_SESSION)
-          .ping();
+      UsageTrackerService.getInstance().trackEvent(GctTracking.CLOUD_DEBUGGER_START_SESSION).ping();
       // TODO : add source context tracking info
       if (syncStashCheckbox.isSelected()) {
         syncOrStash();
