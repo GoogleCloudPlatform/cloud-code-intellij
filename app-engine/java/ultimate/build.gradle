@@ -45,8 +45,7 @@ dependencies {
 
     testCompile project(':stackdriver-debugger')
     testCompile project(':google-cloud-core')
-    testCompile project(':app-engine:java')
-    // testRuntime project(':app-engine:java').sourceSets.test.output
+    testRuntime project(':app-engine:java').sourceSets.test.output
     testCompile project(':common-test-lib')
 }
 

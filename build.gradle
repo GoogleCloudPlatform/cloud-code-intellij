@@ -61,7 +61,7 @@ subprojects {
         version = ideaVersion
         updateSinceUntilBuild = false
         downloadSources = true
-        intellijRepo = 'https://www.jetbrains.com/intellij-repository'
+        intellijRepo = intellijRepoUrl
     }
 
     configurations.runtime {
