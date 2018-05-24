@@ -26,6 +26,9 @@ public interface CloudSdkService {
   /** Shortcut for getting currently active implementation of {@link CloudSdkService}. */
   static CloudSdkService getInstance() {
     CloudSdkServiceManager service = ServiceManager.getService(CloudSdkServiceManager.class);
+
+    // The service itself may be null if used from IDEs where the App Engine integration is not
+    // loaded (due to optional depends).
     return service != null ? service.getCloudSdkService() : null;
   }
 
