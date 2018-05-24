@@ -62,6 +62,8 @@
   </extensions>
 
   <extensions defaultExtensionNs="com.google.gct.core">
+    <!-- To exclude an IntelliJ platform from usage tracking, add an NoOpUsageTracker implementation here with a key equal to the platform key. -->
+
     <!-- Exclude Android Studio-->
     <usageTracker
             implementationClass="com.google.cloud.tools.intellij.analytics.KeyedExtensionUsageTrackerProvider.NoOpUsageTracker"
