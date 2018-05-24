@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.startup;
 
 import com.google.cloud.tools.intellij.analytics.GctTracking;
-import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.util.GctBundle;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
@@ -46,13 +46,13 @@ public class GoogleAccountPluginUninstaller {
     IdeaPluginDescriptor accountPlugin =
         PluginManager.getPlugin(PluginId.findId("com.google.gct.login"));
     if (accountPlugin != null) {
-      UsageTrackerProvider.getInstance().trackEvent(GctTracking.ACCOUNT_PLUGIN_DETECTED).ping();
+      UsageTrackerService.getInstance().trackEvent(GctTracking.ACCOUNT_PLUGIN_DETECTED).ping();
       LOGGER.info("legacy google account plugin found.");
       accountPlugin.setEnabled(false);
       PluginManagerConfigurable managerConfigurable =
           new PluginManagerConfigurable(PluginManagerUISettings.getInstance());
       UninstallPluginAction.uninstall(managerConfigurable.getOrCreatePanel(), true, accountPlugin);
-      UsageTrackerProvider.getInstance().trackEvent(GctTracking.ACCOUNT_PLUGIN_UNINSTALLED).ping();
+      UsageTrackerService.getInstance().trackEvent(GctTracking.ACCOUNT_PLUGIN_UNINSTALLED).ping();
       LOGGER.info(
           "legacy google account plugin has been disabled and uninstalled. This will take effect on"
               + " the next IDE restart.");
@@ -62,12 +62,12 @@ public class GoogleAccountPluginUninstaller {
           .yesText(GctBundle.message("OK"))
           .noText(GctBundle.message("Cancel"))
           .isYes()) {
-        UsageTrackerProvider.getInstance()
+        UsageTrackerService.getInstance()
             .trackEvent(GctTracking.ACCOUNT_PLUGIN_RESTART_DIALOG_YES_ACTION)
             .ping();
         ApplicationManagerEx.getApplicationEx().restart(true);
       } else {
-        UsageTrackerProvider.getInstance()
+        UsageTrackerService.getInstance()
             .trackEvent(GctTracking.ACCOUNT_PLUGIN_RESTART_DIALOG_NO_ACTION)
             .ping();
       }

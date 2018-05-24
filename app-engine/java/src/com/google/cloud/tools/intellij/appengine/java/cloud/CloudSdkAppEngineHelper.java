@@ -22,7 +22,7 @@ import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
-import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.cloud.executor.AppEngineExecutor;
 import com.google.cloud.tools.intellij.appengine.java.cloud.executor.AppEngineFlexibleDeployTask;
@@ -325,7 +325,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     return new DeploymentOperationCallback() {
       @Override
       public Deployment succeeded(@NotNull DeploymentRuntime deploymentRuntime) {
-        UsageTrackerProvider.getInstance()
+        UsageTrackerService.getInstance()
             .trackEvent(GctTracking.APP_ENGINE_DEPLOY_SUCCESS)
             .addMetadata(GctTracking.METADATA_LABEL_KEY, eventLabel)
             .ping();
@@ -334,7 +334,7 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
 
       @Override
       public void errorOccurred(@NotNull String errorMessage) {
-        UsageTrackerProvider.getInstance()
+        UsageTrackerService.getInstance()
             .trackEvent(GctTracking.APP_ENGINE_DEPLOY_FAIL)
             .addMetadata(GctTracking.METADATA_LABEL_KEY, eventLabel)
             .addMetadata(GctTracking.METADATA_MESSAGE_KEY, errorMessage)

@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.java.facet.standard;
 
 import com.google.cloud.tools.intellij.analytics.GctTracking;
-import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.appengine.java.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.java.util.AppEngineUtil;
 import com.google.common.annotations.VisibleForTesting;
@@ -190,7 +190,7 @@ public class AppEngineStandardSupportProvider extends FrameworkSupportInModulePr
               AppEngineStandardWebIntegration.getInstance()
                   .addLibraryToArtifact(mavenLibrary, webArtifact, module.getProject());
 
-              UsageTrackerProvider.getInstance()
+              UsageTrackerService.getInstance()
                   .trackEvent(GctTracking.APP_ENGINE_ADD_LIBRARY)
                   .addMetadata(GctTracking.METADATA_LABEL_KEY, libraryToAdd.name())
                   .ping();
@@ -286,7 +286,7 @@ public class AppEngineStandardSupportProvider extends FrameworkSupportInModulePr
 
       // Called when creating a new App Engine module from the 'new project' or 'new module' wizards
       // or upon adding App Engine 'Framework Support' to an existing module.
-      UsageTrackerProvider.getInstance()
+      UsageTrackerService.getInstance()
           .trackEvent(GctTracking.APP_ENGINE_ADD_SUPPORT)
           .addMetadata("source", "addedByFramework")
           .addMetadata("env", "standard")
