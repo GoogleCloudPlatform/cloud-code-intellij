@@ -142,6 +142,7 @@ public final class GoogleCloudApiSelectorPanelTest {
     moduleBuilder = MavenTestUtils.getInstance().initMavenModuleBuilder(testFixture.getProject());
 
     // TODO: remove after Batik fix is available in IDEA itself - happens when SVG icons are used.
+    // See b4df0c72ee3e88bf3cf48fde0a1e19fb948757fe in IJ Community Git.
     ThreadTracker.longRunningThreadCreated(
         ApplicationManager.getApplication(), "Batik CleanerThread");
   }
