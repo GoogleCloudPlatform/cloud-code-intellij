@@ -20,7 +20,7 @@ import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.clouddebugger.v2.model.Breakpoint;
 import com.google.api.services.clouddebugger.v2.model.SourceLocation;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
-import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcessStateController.SetBreakpointHandler;
 import com.google.cloud.tools.intellij.stackdriver.debugger.CloudLineBreakpointType.CloudLineBreakpoint;
 import com.intellij.debugger.ui.breakpoints.BreakpointManager;
@@ -172,7 +172,7 @@ public class CloudBreakpointHandler
               });
     }
 
-    UsageTrackerProvider.getInstance()
+    UsageTrackerService.getInstance()
         .trackEvent(GctTracking.CLOUD_DEBUGGER_CLONE_BREAKPOINTS)
         .ping();
   }

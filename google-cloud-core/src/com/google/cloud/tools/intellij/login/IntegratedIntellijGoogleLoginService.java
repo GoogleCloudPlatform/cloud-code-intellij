@@ -22,7 +22,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeReque
 import com.google.api.client.googleapis.auth.oauth2.GoogleOAuthConstants;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.cloud.tools.intellij.analytics.LoginTracking;
-import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.login.ui.GoogleLoginCopyAndPasteDialog;
 import com.google.cloud.tools.intellij.login.ui.GoogleLoginIcons;
 import com.google.cloud.tools.intellij.login.util.AccountMessageBundle;
@@ -183,7 +183,7 @@ public class IntegratedIntellijGoogleLoginService implements IntegratedGoogleLog
   public void logIn(
       @Nullable final String message,
       @Nullable final IGoogleLoginCompletedCallback loginCompletedCallback) {
-    UsageTrackerProvider.getInstance().trackEvent(LoginTracking.LOGIN_START).ping();
+    UsageTrackerService.getInstance().trackEvent(LoginTracking.LOGIN_START).ping();
 
     final CredentialedUser lastActiveUser = users.getActiveUser();
     users.removeActiveUser();
@@ -268,7 +268,7 @@ public class IntegratedIntellijGoogleLoginService implements IntegratedGoogleLog
     boolean loggedOut = activeUser.getGoogleLoginState().logOut(showPrompt);
     if (loggedOut) {
       logOutAllUsers();
-      UsageTrackerProvider.getInstance().trackEvent(LoginTracking.LOGOUT_COMPLETE).ping();
+      UsageTrackerService.getInstance().trackEvent(LoginTracking.LOGOUT_COMPLETE).ping();
     }
 
     return loggedOut;
@@ -470,7 +470,7 @@ public class IntegratedIntellijGoogleLoginService implements IntegratedGoogleLog
       try {
         verificationCode = receiver.waitForCode();
       } catch (RequestCancelledException rce) {
-        UsageTrackerProvider.getInstance().trackEvent(LoginTracking.LOGIN_CANCELLED).ping();
+        UsageTrackerService.getInstance().trackEvent(LoginTracking.LOGIN_CANCELLED).ping();
         return null;
       } catch (IOException ioe) {
         logErrorAndDisplayDialog(
@@ -483,7 +483,7 @@ public class IntegratedIntellijGoogleLoginService implements IntegratedGoogleLog
         receiver = null;
       }
 
-      UsageTrackerProvider.getInstance().trackEvent(LoginTracking.LOGIN_COMPLETE).ping();
+      UsageTrackerService.getInstance().trackEvent(LoginTracking.LOGIN_COMPLETE).ping();
       return new VerificationCodeHolder(verificationCode, redirectUrl);
     }
 

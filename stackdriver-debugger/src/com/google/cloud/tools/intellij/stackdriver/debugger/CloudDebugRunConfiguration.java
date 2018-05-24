@@ -18,7 +18,7 @@ package com.google.cloud.tools.intellij.stackdriver.debugger;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
-import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.intellij.execution.Executor;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.configurations.ConfigurationFactory;
@@ -74,7 +74,7 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
         == RunManager.getInstance(getProject())
             .getConfigurationTemplate(this.getFactory())
             .getConfiguration()) {
-      UsageTrackerProvider.getInstance()
+      UsageTrackerService.getInstance()
           .trackEvent(GctTracking.CLOUD_DEBUGGER_NEW_RUN_CONFIG)
           .ping();
     }

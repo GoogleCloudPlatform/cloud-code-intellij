@@ -32,7 +32,7 @@ import com.google.api.services.servicemanagement.ServiceManagement;
 import com.google.api.services.servicemanagement.model.EnableServiceRequest;
 import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
-import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
@@ -214,7 +214,7 @@ class CloudApiManager {
           step / numSteps);
       Path keyPath = writeServiceAccountKey(serviceAccountKey, downloadDir, cloudProject);
 
-      UsageTrackerProvider.getInstance()
+      UsageTrackerService.getInstance()
           .trackEvent(GctTracking.CLIENT_LIBRARY_NEW_SERVICE_ACCOUNT)
           .addMetadata(
               GctTracking.METADATA_SERVICE_ACCOUNT_ROLES,
@@ -348,7 +348,7 @@ class CloudApiManager {
   private static void enableApi(
       CloudLibrary library, CloudProject cloudProject, CredentialedUser user) throws IOException {
 
-    UsageTrackerProvider.getInstance()
+    UsageTrackerService.getInstance()
         .trackEvent(GctTracking.CLIENT_LIBRARY_ENABLE_API)
         .addMetadata(GctTracking.METADATA_LABEL_KEY, library.getName())
         .ping();

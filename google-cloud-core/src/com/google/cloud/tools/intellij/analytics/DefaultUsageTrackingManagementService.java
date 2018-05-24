@@ -60,9 +60,14 @@ public final class DefaultUsageTrackingManagementService implements UsageTrackin
     return datastore.getValue(USAGE_TRACKER_KEY) != null;
   }
 
+  /**
+   * Returns {@code true} if usage tracking is available. Usage tracking is excluded from Android
+   * Studio.
+   */
   @Override
   public boolean isUsageTrackingAvailable() {
-    return PlatformUtils.isIntelliJ() && (getAnalyticsProperty() != null);
+    return !"AndroidStudio".equals(PlatformUtils.getPlatformPrefix())
+        && getAnalyticsProperty() != null;
   }
 
   @Override

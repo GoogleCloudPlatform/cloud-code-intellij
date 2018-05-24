@@ -17,8 +17,8 @@
 package com.google.cloud.tools.intellij.appengine.java.sdk;
 
 import com.google.cloud.tools.intellij.analytics.GctTracking;
-import com.google.cloud.tools.intellij.analytics.UsageTracker.FluentTrackingEventWithMetadata;
-import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService.FluentTrackingEventWithMetadata;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.managedcloudsdk.ConsoleListener;
@@ -361,7 +361,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
             trackingEventAction = GctTracking.MANAGED_SDK_SUCCESSFUL_INSTALL;
             break;
         }
-        UsageTrackerProvider.getInstance().trackEvent(trackingEventAction).ping();
+        UsageTrackerService.getInstance().trackEvent(trackingEventAction).ping();
       }
 
       ManagedCloudSdkServiceUiPresenter.getInstance().notifyManagedSdkJobSuccess(jobType, result);
@@ -427,7 +427,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
 
   private void sendManagedSdkTrackingEvent(String eventName, @Nullable Throwable throwable) {
     FluentTrackingEventWithMetadata trackingEvent =
-        UsageTrackerProvider.getInstance().trackEvent(eventName);
+        UsageTrackerService.getInstance().trackEvent(eventName);
     if (throwable != null) {
       trackingEvent.addMetadata(GctTracking.METADATA_MESSAGE_KEY, throwable.toString());
     }

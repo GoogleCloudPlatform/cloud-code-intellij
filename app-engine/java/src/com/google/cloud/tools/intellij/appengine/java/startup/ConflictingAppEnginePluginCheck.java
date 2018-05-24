@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.java.startup;
 
 import com.google.cloud.tools.intellij.analytics.GctTracking;
-import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.service.ApplicationPluginInfoService;
 import com.google.cloud.tools.intellij.ui.DisablePluginWarningDialog;
@@ -87,7 +87,7 @@ public class ConflictingAppEnginePluginCheck {
             new IdeaAppEnginePluginLinkListener(plugin))
         .notify(null /*project*/);
 
-    UsageTrackerProvider.getInstance()
+    UsageTrackerService.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_OLD_PLUGIN_NOTIFICATION)
         .ping();
   }
@@ -106,7 +106,7 @@ public class ConflictingAppEnginePluginCheck {
       String href = event.getDescription();
 
       if (DEACTIVATE_LINK_HREF.equals(href)) {
-        UsageTrackerProvider.getInstance()
+        UsageTrackerService.getInstance()
             .trackEvent(GctTracking.APP_ENGINE_OLD_PLUGIN_NOTIFICATION_CLICK)
             .ping();
         showDisablePluginDialog();
