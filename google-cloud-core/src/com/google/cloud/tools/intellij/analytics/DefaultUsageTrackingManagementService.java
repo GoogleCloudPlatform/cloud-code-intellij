@@ -19,7 +19,6 @@ package com.google.cloud.tools.intellij.analytics;
 import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
 import com.google.cloud.tools.intellij.login.PluginFlagsService;
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.util.PlatformUtils;
 import org.jetbrains.annotations.Nullable;
 
 /** Stores the user's choice to opt in/out of sending usage metrics via the Google Usage Tracker. */
@@ -62,7 +61,7 @@ public final class DefaultUsageTrackingManagementService implements UsageTrackin
 
   @Override
   public boolean isUsageTrackingAvailable() {
-    return PlatformUtils.isIntelliJ() && (getAnalyticsProperty() != null);
+    return getAnalyticsProperty() != null;
   }
 
   @Override
