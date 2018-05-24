@@ -49,7 +49,6 @@ public final class GoogleCloudApiDetailsPanel {
 
   private static final String LINKS_SEPARATOR = " | ";
 
-  private JLabel icon;
   private JLabel nameLabel;
   private JLabel versionLabel;
   private JPanel panel;
@@ -59,6 +58,7 @@ public final class GoogleCloudApiDetailsPanel {
   private JCheckBox enableApiCheckbox;
   private JPanel managementInfoPanel;
   private JTextPane managementWarningTextPane;
+  private JLabel warningLabel;
 
   private CloudLibrary currentCloudLibrary;
   private String currentBomVersion;
@@ -107,7 +107,7 @@ public final class GoogleCloudApiDetailsPanel {
   /** Returns the {@link JLabel} that holds the library's icon. */
   @VisibleForTesting
   JLabel getIcon() {
-    return icon;
+    return nameLabel;
   }
 
   /** Returns the {@link JLabel} that holds the library's name. */
@@ -170,6 +170,9 @@ public final class GoogleCloudApiDetailsPanel {
     managementWarningTextPane = new JTextPane();
     managementWarningTextPane.setOpaque(false);
 
+    warningLabel = new JLabel();
+    warningLabel.setIcon(General.Information);
+
     enableApiCheckbox = new JCheckBox();
     enableApiCheckbox.addActionListener(
         event ->
@@ -185,10 +188,10 @@ public final class GoogleCloudApiDetailsPanel {
     panel.setVisible(true);
 
     if (currentCloudLibrary.getIcon() == null) {
-      icon.setIcon(null);
+      nameLabel.setIcon(null);
     } else {
-      icon.setIcon(GoogleCloudCoreIcons.LOADING);
-      loadImageAsync(currentCloudLibrary.getIcon(), icon::setIcon);
+      nameLabel.setIcon(GoogleCloudCoreIcons.LOADING);
+      loadImageAsync(currentCloudLibrary.getIcon(), nameLabel::setIcon);
     }
 
     nameLabel.setText(currentCloudLibrary.getName());
