@@ -43,8 +43,8 @@ public final class KeyedExtensionUsageTrackerProvider extends UsageTrackerProvid
       return new NoOpUsageTracker();
     }
 
-    String key = PlatformUtils.getPlatformPrefix();
-    return getTracker(key);
+    String excludedPlatformKey = PlatformUtils.getPlatformPrefix();
+    return getTracker(excludedPlatformKey);
   }
 
   /**
@@ -53,11 +53,13 @@ public final class KeyedExtensionUsageTrackerProvider extends UsageTrackerProvid
    * extension with a key equal to the platform key, and with an implementation class of {@link
    * NoOpUsageTracker}. For all those not excluded, the {@link GoogleUsageTracker} will be returned.
    *
-   * @param key A string search key associated with an extension
+   * @param excludedPlatformKey A string search key associated with an extension representing a
+   *     platform to exclude
    * @return the first implementation of UsageTracker associated with {@param key}
    */
-  static UsageTracker getTracker(@Nullable String key) {
-    UsageTracker instance = (key == null) ? null : COLLECTOR.findSingle(key);
+  static UsageTracker getTracker(@Nullable String excludedPlatformKey) {
+    UsageTracker instance =
+        (excludedPlatformKey == null) ? null : COLLECTOR.findSingle(excludedPlatformKey);
     if (instance != null) {
       return instance;
     }
