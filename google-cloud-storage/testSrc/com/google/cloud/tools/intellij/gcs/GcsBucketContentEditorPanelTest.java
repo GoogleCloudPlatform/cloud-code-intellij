@@ -39,6 +39,8 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.testFramework.ThreadTracker;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -93,6 +95,9 @@ public class GcsBucketContentEditorPanelTest {
     when(binaryBlob.getUpdateTime()).thenReturn(0L);
 
     when(binaryBlobInDirectory.getName()).thenReturn(NESTED_BLOB_FULL_NAME);
+
+    // TODO: consider shutting down timer instead when clear what is creating the timer.
+    ThreadTracker.longRunningThreadCreated(ApplicationManager.getApplication(), "Timer-0");
   }
 
   @Test

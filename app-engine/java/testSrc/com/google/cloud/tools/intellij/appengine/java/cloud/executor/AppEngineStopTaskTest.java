@@ -29,7 +29,9 @@ import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeploymentC
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineHelper;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineStop;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.remoteServer.runtime.deployment.DeploymentRuntime.UndeploymentTaskCallback;
+import com.intellij.testFramework.ThreadTracker;
 import java.nio.file.Paths;
 import java.util.Optional;
 import org.junit.Before;
@@ -61,6 +63,9 @@ public final class AppEngineStopTaskTest {
     when(stop.getHelper().stageCredentials(any())).thenReturn(Optional.of(Paths.get("/some/file")));
 
     task = new AppEngineStopTask(stop, "myModule", "myVersion");
+
+    // TODO: consider shutting down timer instead when clear what is creating the timer.
+    ThreadTracker.longRunningThreadCreated(ApplicationManager.getApplication(), "Timer-0");
   }
 
   @Test
