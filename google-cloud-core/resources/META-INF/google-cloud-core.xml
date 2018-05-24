@@ -62,12 +62,10 @@
   </extensions>
 
   <extensions defaultExtensionNs="com.google.gct.core">
-    <!-- For IJ Community Edition -->
-    <usageTracker implementationClass="com.google.cloud.tools.intellij.analytics.GoogleUsageTracker"
-                  key="Idea"/>
-    <!-- For IJ Ultimate Edition -->
-    <usageTracker implementationClass="com.google.cloud.tools.intellij.analytics.GoogleUsageTracker"
-                  key="idea"/>
+    <!-- Exclude Android Studio-->
+    <usageTracker
+            implementationClass="com.google.cloud.tools.intellij.analytics.KeyedExtensionUsageTrackerProvider.NoOpUsageTracker"
+            key="AndroidStudio"/>
   </extensions>
 
   <extensionPoints>

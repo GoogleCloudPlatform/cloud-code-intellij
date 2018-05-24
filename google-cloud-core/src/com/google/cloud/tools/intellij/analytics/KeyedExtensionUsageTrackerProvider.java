@@ -48,10 +48,10 @@ public final class KeyedExtensionUsageTrackerProvider extends UsageTrackerProvid
   }
 
   /**
-   * For usage tracking in the Cloud Tools family of plugins, we only want one tracker pinging an
-   * analytics backend for a given platform. New platform specific trackers can register with their
-   * platform prefix key and the UsageTrackerProvider will select them. Otherwise, the no-op usage
-   * tracker will be used.
+   * For usage tracking in in the Cloud Tools plugin we track usage across all platforms except for
+   * those excluded in the usageTracker extensions. To exclude a platform, add a new usageTracker
+   * extension with a key equal to the platform key, and with an implementation class of {@link
+   * NoOpUsageTracker}. For all those not excluded, the {@link GoogleUsageTracker} will be returned.
    *
    * @param key A string search key associated with an extension
    * @return the first implementation of UsageTracker associated with {@param key}
@@ -62,7 +62,7 @@ public final class KeyedExtensionUsageTrackerProvider extends UsageTrackerProvid
       return instance;
     }
 
-    return new NoOpUsageTracker();
+    return new GoogleUsageTracker();
   }
 
   private static class NoOpUsageTracker implements UsageTracker, SendsEvents {
