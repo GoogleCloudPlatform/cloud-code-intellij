@@ -62,12 +62,12 @@
   </extensions>
 
   <extensions defaultExtensionNs="com.google.gct.core">
-    <!-- For IJ Community Edition -->
-    <usageTracker implementationClass="com.google.cloud.tools.intellij.analytics.GoogleUsageTracker"
-                  key="Idea"/>
-    <!-- For IJ Ultimate Edition -->
-    <usageTracker implementationClass="com.google.cloud.tools.intellij.analytics.GoogleUsageTracker"
-                  key="idea"/>
+    <!-- To exclude an IntelliJ platform from usage tracking, add an NoOpUsageTracker implementation here with a key equal to the platform key. -->
+
+    <!-- Exclude Android Studio-->
+    <usageTracker
+            implementationClass="com.google.cloud.tools.intellij.analytics.KeyedExtensionUsageTrackerProvider.NoOpUsageTracker"
+            key="AndroidStudio"/>
   </extensions>
 
   <extensionPoints>
