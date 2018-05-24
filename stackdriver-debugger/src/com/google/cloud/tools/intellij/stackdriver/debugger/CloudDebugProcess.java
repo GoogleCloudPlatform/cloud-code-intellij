@@ -47,6 +47,7 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComponentWithActions;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.content.Content;
@@ -414,12 +415,23 @@ public class CloudDebugProcess extends XDebugProcess implements CloudBreakpointL
   }
 
   void updateBreakpointPresentation(CloudLineBreakpoint cloudLineBreakpoint) {
-    final XBreakpointManager manager =
-        XDebuggerManager.getInstance(getXDebugSession().getProject()).getBreakpointManager();
+    final XBreakpointManager manager = getXBreakpointManager(getXDebugSession().getProject());
+
     manager.updateBreakpointPresentation(
-        (XLineBreakpoint<?>) cloudLineBreakpoint.getXBreakpoint(),
+        getXBreakpoint(cloudLineBreakpoint),
         cloudLineBreakpoint.getSetIcon(areBreakpointsMuted()),
         cloudLineBreakpoint.getErrorMessage());
+  }
+
+  /** Workaround for unit testing, since original getter became final. */
+  @VisibleForTesting
+  XLineBreakpoint<?> getXBreakpoint(CloudLineBreakpoint cloudLineBreakpoint) {
+    return (XLineBreakpoint<?>) cloudLineBreakpoint.getXBreakpoint();
+  }
+
+  @VisibleForTesting
+  XBreakpointManager getXBreakpointManager(Project project) {
+    return XDebuggerManager.getInstance(project).getBreakpointManager();
   }
 
   private boolean areBreakpointsMuted() {
