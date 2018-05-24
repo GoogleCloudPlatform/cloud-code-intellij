@@ -25,7 +25,8 @@ public interface CloudSdkService {
 
   /** Shortcut for getting currently active implementation of {@link CloudSdkService}. */
   static CloudSdkService getInstance() {
-    return ServiceManager.getService(CloudSdkServiceManager.class).getCloudSdkService();
+    CloudSdkServiceManager service = ServiceManager.getService(CloudSdkServiceManager.class);
+    return service != null ? service.getCloudSdkService() : null;
   }
 
   /** Called when this service becomes primary choice for serving Cloud SDK. */
