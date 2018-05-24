@@ -24,7 +24,7 @@
     </extensions>
 
     <actions>
-        <group id="GoogleCloudTools.csr">
+        <group id="GoogleCloudTools.gcs">
             <action id="GoogleCloudTools.CloudStorage"
                     class="com.google.cloud.tools.intellij.gcs.GcsToolWindowAction"/>
             <separator/>

@@ -214,6 +214,13 @@ class CloudApiManager {
           step / numSteps);
       Path keyPath = writeServiceAccountKey(serviceAccountKey, downloadDir, cloudProject);
 
+      UsageTrackerProvider.getInstance()
+          .trackEvent(GctTracking.CLIENT_LIBRARY_NEW_SERVICE_ACCOUNT)
+          .addMetadata(
+              GctTracking.METADATA_SERVICE_ACCOUNT_ROLES,
+              roles.stream().map(Role::getName).collect(Collectors.joining(",")))
+          .ping();
+
       notifyServiceAccountCreated(project, cloudProject, name, keyPath);
     } catch (IOException e) {
       LOG.warn(

@@ -79,6 +79,7 @@ public class GctTracking {
   public static final String METADATA_BUILD_SYSTEM_MAVEN = "maven";
   public static final String METADATA_OLD_BOM_VERSION = "old.bom.version";
   public static final String METADATA_NEW_BOM_VERSION = "new.bom.version";
+  public static final String METADATA_SERVICE_ACCOUNT_ROLES = "service.account.roles";
 
   public static final String ACCOUNT_PLUGIN_DETECTED = "account.plugin.detected";
   public static final String ACCOUNT_PLUGIN_UNINSTALLED = "account.plugin.uninstalled";
@@ -91,6 +92,8 @@ public class GctTracking {
   public static final String CLIENT_LIBRARY_ENABLE_API = "client.library.enable.api";
   public static final String CLIENT_LIBRARY_NEW_BOM_MAVEN = "client.library.new.bom.write";
   public static final String CLIENT_LIBRARY_UPDATE_BOM_MAVEN = "client.library.new.bom.write";
+  public static final String CLIENT_LIBRARY_NEW_SERVICE_ACCOUNT =
+      "client.library.new.service.account";
   public static final String CLIENT_LIBRARY_VERSION_WITH_BOM_MAVEN_QUICKFIX =
       "client.library.version.with.bom.quickfix";
   public static final String CLIENT_LIBRARY_WITHOUT_BOM_MAVEN_QUICKFIX =

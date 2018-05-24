@@ -41,7 +41,9 @@
             <action id="GoogleCloudTools.AppEngineDeploy"
                     class="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeployToolsMenuAction"/>
             <separator/>
-            <add-to-group group-id="GoogleCloudTools"/>
+            <add-to-group group-id="GoogleCloudTools"
+                          relative-to-action="GoogleCloudTools.stackdriver.debugger"
+                          anchor="before"/>
         </group>
     </actions>
 
@@ -57,6 +59,7 @@
                 implementation="com.google.cloud.tools.intellij.appengine.java.descriptor.dom.AppEngineStandardWebFileDescriptor"/>
 
         <applicationService
+                id="appEngineStandardCommunityWebIntegration" order="before appEngineStandardUltimateWebIntegration"
                 serviceInterface="com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardWebIntegration"
                 serviceImplementation="com.google.cloud.tools.intellij.appengine.java.facet.standard.impl.AppEngineStandardCommunityWebIntegration"/>
         <applicationService

@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.analytics;
 
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurableProvider;
-import com.intellij.util.PlatformUtils;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -38,8 +37,7 @@ public class UsageTrackerConfigurableProvider extends ConfigurableProvider {
   public boolean canCreateConfigurable() {
     // For now we can hide Google entirely if usage tracking isn't available as there are no
     // other Google related account settings in the IJ UI.
-    // Create a sub-menu item for the cloud SDK and hide the usage tracker if not avaible
-    return PlatformUtils.isIntelliJ()
-        && UsageTrackingManagementService.getInstance().isUsageTrackingAvailable();
+    // Create a sub-menu item for the cloud SDK and hide the usage tracker if not available
+    return UsageTrackingManagementService.getInstance().isUsageTrackingAvailable();
   }
 }
