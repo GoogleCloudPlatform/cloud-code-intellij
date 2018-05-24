@@ -66,7 +66,7 @@ public final class DefaultUsageTrackingManagementService implements UsageTrackin
    */
   @Override
   public boolean isUsageTrackingAvailable() {
-    return !PlatformUtils.getPlatformPrefix().equals("AndroidStudio")
+    return !"AndroidStudio".equals(PlatformUtils.getPlatformPrefix())
         && getAnalyticsProperty() != null;
   }
 

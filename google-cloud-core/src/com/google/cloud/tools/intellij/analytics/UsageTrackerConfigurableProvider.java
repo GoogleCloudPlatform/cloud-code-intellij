@@ -39,7 +39,7 @@ public class UsageTrackerConfigurableProvider extends ConfigurableProvider {
     // For now we can hide Google entirely if usage tracking isn't available as there are no
     // other Google related account settings in the IJ UI.
     // Create a sub-menu item for the cloud SDK and hide the usage tracker if not available
-    return !PlatformUtils.getPlatformPrefix().equals("AndroidStudio")
+    return !"AndroidStudio".equals(PlatformUtils.getPlatformPrefix())
         && UsageTrackingManagementService.getInstance().isUsageTrackingAvailable();
   }
 }
