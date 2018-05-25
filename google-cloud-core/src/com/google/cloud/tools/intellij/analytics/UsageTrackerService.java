@@ -16,12 +16,21 @@
 
 package com.google.cloud.tools.intellij.analytics;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 
 /** Application service for usage tracking. */
 public interface UsageTrackerService {
 
+  /**
+   * Returns an instance of the {@link UsageTrackerService}. If in unit test mode, return a new
+   * {@link NoOpUsageTrackerService}, otherwise, return the bound application service.
+   */
   static UsageTrackerService getInstance() {
+    if (ApplicationManager.getApplication().isUnitTestMode()) {
+      return new NoOpUsageTrackerService();
+    }
+
     return ServiceManager.getService(UsageTrackerService.class);
   }
 
