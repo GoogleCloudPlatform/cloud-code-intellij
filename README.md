@@ -29,8 +29,33 @@ For detailed user documentation go to our documentation
 
 ## Supported Platforms
 
+The Cloud Tools for IntelliJ plugin primarily supports the following IDEs:
+
 * IntelliJ IDEA Community Edition 2017.1 or later
 * IntelliJ IDEA Ultimate Edition 2017.1 or later
+
+In addition to IntelliJ IDEA, the plugin provides limited support for other JetBrains IDEs:
+
+| | IntelliJ IDEA - Ultimate | IntelliJ IDEA - Community | PyCharm |
+|---|:---:|:---:|:---:|
+| Create App Engine Standard App | :heavy_check_mark: | :x: | :x: |
+| Create App Engine Flexible App | :heavy_check_mark: | :heavy_check_mark: | :x: |
+| Run and Debug App Engine<br>Standard App Locally | :heavy_check_mark: | :heavy_check_mark: \* | :x: |
+| Deploy App Engine Flexible App | :heavy_check_mark: | :heavy_check_mark: | :x: |
+| Deploy App Engine Standard App | :heavy_check_mark: | :heavy_check_mark: \** | :x: |
+| Manage Cloud Client Libraries | :heavy_check_mark: | :heavy_check_mark: | :x: |
+| Browse files in Cloud Storage | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| Use VCS for Source Control | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| Debug using Stackdriver | :heavy_check_mark: | :heavy_check_mark: | :x: |
+| Auto-manage the Cloud SDK | :heavy_check_mark: | :heavy_check_mark: | :x: |
+
+<p><b>*</b> You can follow the
+  <a href="/tools/intellij/docs/deploy-local#community">debugging your
+    application locally on Community Edition</a> instructions to use the Maven
+  or Gradle plugins for your local run.</p>
+
+<p><b>**</b> You can deploy Maven-based projects using the IntelliJ IDEA
+  Community Edition to the App Engine standard environment.</p>
 
 ## Installation
 
