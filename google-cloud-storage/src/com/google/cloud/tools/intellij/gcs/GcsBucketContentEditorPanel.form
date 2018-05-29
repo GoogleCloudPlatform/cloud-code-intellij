@@ -50,7 +50,7 @@
                 </constraints>
                 <properties>
                   <focusable value="false"/>
-                  <icon value="actions/refresh.png"/>
+                  <icon value="icons/refresh.png"/>
                   <text value=""/>
                 </properties>
               </component>

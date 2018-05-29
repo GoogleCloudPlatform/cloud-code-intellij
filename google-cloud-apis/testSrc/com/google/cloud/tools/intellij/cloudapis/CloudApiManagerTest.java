@@ -45,8 +45,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.intellij.notification.Notification;
 import com.intellij.notification.Notifications;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.testFramework.ThreadTracker;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import java.io.File;
 import java.io.IOException;
@@ -112,6 +114,9 @@ public class CloudApiManagerTest {
         .getMessageBus()
         .connect()
         .subscribe(Notifications.TOPIC, notifications);
+
+    // TODO: consider shutting down timer instead when clear what is creating the timer.
+    ThreadTracker.longRunningThreadCreated(ApplicationManager.getApplication(), "Timer-0");
   }
 
   @Test

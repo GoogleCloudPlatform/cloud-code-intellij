@@ -162,7 +162,7 @@
           <component id="4a8a3" class="javax.swing.JLabel">
             <constraints border-constraint="West"/>
             <properties>
-              <icon value="general/warning.png"/>
+              <icon value="ide/warning_notifications.png"/>
               <text value=""/>
               <verticalAlignment value="1"/>
             </properties>
