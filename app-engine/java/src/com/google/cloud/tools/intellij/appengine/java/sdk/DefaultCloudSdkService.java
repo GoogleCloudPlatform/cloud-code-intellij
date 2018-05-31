@@ -19,7 +19,7 @@ package com.google.cloud.tools.intellij.appengine.java.sdk;
 import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
-import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.common.base.Strings;
 import com.intellij.ide.util.PropertiesComponent;
 import java.nio.file.Path;
@@ -43,7 +43,7 @@ public class DefaultCloudSdkService implements CloudSdkService {
       // To let Windows users that persisted the old malformed path save a new one.
       // TODO(joaomartins): Delete this after a while so gets are faster.
       if (CloudSdkValidator.isMalformedCloudSdkPath(sdkPath)) {
-        UsageTrackerProvider.getInstance().trackEvent(GctTracking.CLOUD_SDK_MALFORMED_PATH).ping();
+        UsageTrackerService.getInstance().trackEvent(GctTracking.CLOUD_SDK_MALFORMED_PATH).ping();
         return null;
       }
       return Paths.get(sdkPath);

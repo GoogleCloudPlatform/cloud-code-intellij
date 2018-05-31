@@ -18,10 +18,10 @@ package com.google.cloud.tools.intellij.analytics;
 
 import com.google.api.client.repackaged.com.google.common.base.Preconditions;
 import com.google.api.client.util.Maps;
-import com.google.cloud.tools.intellij.analytics.UsageTracker.FluentTrackingEventWithMetadata;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService.FluentTrackingEventWithMetadata;
 import java.util.Map;
 
-/** Implements the fluent interface exposed for tracking by {@link UsageTracker}. */
+/** Implements the fluent interface exposed for tracking by {@link UsageTrackerService}. */
 class TrackingEventBuilder implements FluentTrackingEventWithMetadata {
 
   private SendsEvents eventSender;

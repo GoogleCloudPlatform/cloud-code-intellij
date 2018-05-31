@@ -1,6 +1,19 @@
 # Release notes
 This page documents production updates to Cloud Tools for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## 18.5.1
+
+Google Cloud Tools for IntelliJ is now available in PyCharm (Community and Professional). Browse your GCS buckets, and interact with Cloud Source Repositories from PyCharm. More IDEs coming soon.
+
+### Added
+  - Refactored plugin so that language agnostic features (Cloud Storage, Cloud Source Repos) are available in other JetBrains IDEs besides IDEA. [1896](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1896)
+
+### Changed
+  - The managed Cloud SDK will no longer be installed on each IDE load after the first manual cancellation. [2113](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2113)
+
+### Fixed
+  - Fixed exception in 2018.2 EAP. [2124](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2124)
+
 ## 18.4.1
 
 ### Added

@@ -19,7 +19,7 @@ package com.google.cloud.tools.intellij.stackdriver.debugger.ui;
 import com.google.api.services.clouddebugger.v2.model.Breakpoint;
 import com.google.api.services.clouddebugger.v2.model.StatusMessage;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
-import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.stackdriver.debugger.BreakpointUtil;
 import com.google.cloud.tools.intellij.stackdriver.debugger.CloudBreakpointListener;
 import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcess;
@@ -641,7 +641,7 @@ public class CloudDebugHistoricalSnapshots extends AdditionalTabComponent
         break; // NOPMD
       }
       if (rowForPopup != -1) {
-        UsageTrackerProvider.getInstance()
+        UsageTrackerService.getInstance()
             .trackEvent(GctTracking.CLOUD_DEBUGGER_SNAPSHOT_RECEIVED)
             .ping();
         // Show a popup indicating a new item has appeared.

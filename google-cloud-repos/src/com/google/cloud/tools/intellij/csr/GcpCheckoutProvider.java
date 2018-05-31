@@ -18,7 +18,7 @@ package com.google.cloud.tools.intellij.csr;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
-import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.notification.NotificationListener.UrlOpeningListener;
 import com.intellij.openapi.diagnostic.Logger;
@@ -65,7 +65,7 @@ public class GcpCheckoutProvider implements CheckoutProvider {
 
   @Override
   public void doCheckout(@NotNull final Project project, @Nullable final Listener listener) {
-    UsageTrackerProvider.getInstance().trackEvent(GctTracking.VCS_CHECKOUT).ping();
+    UsageTrackerService.getInstance().trackEvent(GctTracking.VCS_CHECKOUT).ping();
 
     BasicAction.saveAll();
     CloneCloudRepositoryDialog dialog = new CloneCloudRepositoryDialog(project);

@@ -16,11 +16,23 @@
 
 package com.google.cloud.tools.intellij.analytics;
 
-/**
- * Interface for defining the actual tracking behavior, implementations must be declared in
- * plugin.xml for the {@link UsageTrackerExtensionPointBean} extension point.
- */
-public interface UsageTracker {
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.ServiceManager;
+
+/** Application service for usage tracking. */
+public interface UsageTrackerService {
+
+  /**
+   * Returns an instance of the {@link UsageTrackerService}. If in unit test mode, return a new
+   * {@link NoOpUsageTrackerService}, otherwise, return the bound application service.
+   */
+  static UsageTrackerService getInstance() {
+    if (ApplicationManager.getApplication().isUnitTestMode()) {
+      return new NoOpUsageTrackerService();
+    }
+
+    return ServiceManager.getService(UsageTrackerService.class);
+  }
 
   /**
    * Returns a fluent API for pinging tracking events.

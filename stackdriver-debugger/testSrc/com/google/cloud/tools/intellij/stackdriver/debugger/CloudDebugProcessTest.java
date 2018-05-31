@@ -16,13 +16,15 @@
 
 package com.google.cloud.tools.intellij.stackdriver.debugger;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.same;
-import static org.mockito.Mockito.doCallRealMethod;
+import static com.intellij.testFramework.UsefulTestCase.assertEmpty;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -32,6 +34,8 @@ import com.google.api.services.clouddebugger.v2.model.StatusMessage;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
 import com.google.cloud.tools.intellij.stackdriver.debugger.CloudLineBreakpointType.CloudLineBreakpoint;
+import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.google.cloud.tools.intellij.testing.TestUtils;
 import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.intellij.debugger.actions.DebuggerActions;
@@ -44,16 +48,13 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.IdeActions;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.impl.ProjectImpl;
-import com.intellij.testFramework.PlatformTestCase;
 import com.intellij.testFramework.ThreadTracker;
+import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import com.intellij.ui.content.Content;
 import com.intellij.util.containers.ContainerUtil;
-import com.intellij.util.ui.UIUtil;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
 import com.intellij.xdebugger.breakpoints.XBreakpointManager;
-import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.impl.actions.XDebuggerActions;
 import com.intellij.xdebugger.impl.breakpoints.XLineBreakpointImpl;
 import com.intellij.xdebugger.ui.XDebugTabLayouter;
@@ -63,27 +64,31 @@ import java.util.List;
 import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
-import org.mockito.Matchers;
+import org.junit.Rule;
+import org.junit.Test;
 import org.mockito.Mockito;
 
-public class CloudDebugProcessTest extends PlatformTestCase {
+public class CloudDebugProcessTest {
+
+  @Rule public CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
+
+  @TestFixture private IdeaProjectTestFixture testFixture;
 
   private CloudDebugProcess process;
 
   @Before
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
-
+  public void setUp() throws Exception {
     ThreadTracker.longRunningThreadCreated(
         ApplicationManager.getApplication(),
         CloudDebugProcessStateController.LIST_BREAKPOINTS_TIMER_NAME);
 
     XDebugSession session = mock(XDebugSession.class);
-    when(session.getProject()).thenReturn(this.getProject());
-    process = new CloudDebugProcess(session);
+    when(session.getProject()).thenReturn(testFixture.getProject());
+
+    process = spy(new CloudDebugProcess(session));
   }
 
+  @Test
   public void testRemoveConsolePane() {
     // if this was a JUnit4 test case, we could set the LoggedErrorProcessor to a mock that does
     // not fail the test if an error is logged using @BeforeClass. Since this is a JUnit3 test
@@ -95,7 +100,7 @@ public class CloudDebugProcessTest extends PlatformTestCase {
     CredentialedUser credentialedUser = mock(CredentialedUser.class);
     when(credentialedUser.getGoogleLoginState()).thenReturn(mock(GoogleLoginState.class));
 
-    LinkedHashMap<String, CredentialedUser> users = new LinkedHashMap<String, CredentialedUser>();
+    LinkedHashMap<String, CredentialedUser> users = new LinkedHashMap<>();
     users.put(state.getUserEmail(), credentialedUser);
 
     IntegratedGoogleLoginService mockGoogleLoginService =
@@ -112,14 +117,17 @@ public class CloudDebugProcessTest extends PlatformTestCase {
     LayoutStateDefaults defaults = mock(LayoutStateDefaults.class);
     when(ui.getDefaults()).thenReturn(defaults);
 
-    layouter.registerAdditionalContent(ui);
-
-    verify(ui, Mockito.atLeast(1)).removeContent(console, false);
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              layouter.registerAdditionalContent(ui);
+              verify(ui, Mockito.atLeast(1)).removeContent(console, false);
+            });
 
     process.getStateController().stopBackgroundListening();
-    UIUtil.dispatchAllInvocationEvents();
   }
 
+  @Test
   public void testRegisterAdditionalActions_close() {
     ActionManager manager = ActionManager.getInstance();
     AnAction action0 = manager.getAction(IdeActions.ACTION_PIN_ACTIVE_TAB);
@@ -144,50 +152,62 @@ public class CloudDebugProcessTest extends PlatformTestCase {
     assertEquals(action3, leftToolbar.getChildActionsOrStubs()[1]);
   }
 
+  @Test
   public void testRegisterAdditionalActions_rerun() {
     assertRemoveFromLeftToolbar(IdeActions.ACTION_RERUN);
   }
 
+  @Test
   public void testRegisterAdditionalActions_stop() {
     assertRemoveFromLeftToolbar(IdeActions.ACTION_STOP_PROGRAM);
   }
 
+  @Test
   public void testRegisterAdditionalActions_resume() {
     assertRemoveFromLeftToolbar(XDebuggerActions.RESUME);
   }
 
+  @Test
   public void testRegisterAdditionalActions_pause() {
     assertRemoveFromLeftToolbar(XDebuggerActions.PAUSE);
   }
 
+  @Test
   public void testRegisterAdditionalActions_mute() {
     assertRemoveFromLeftToolbar(XDebuggerActions.MUTE_BREAKPOINTS);
   }
 
+  @Test
   public void testRegisterAdditionalActions_forceStepInto() {
     assertRemoveFromTopToolbar(XDebuggerActions.FORCE_STEP_INTO);
   }
 
+  @Test
   public void testRegisterAdditionalActions_stepOver() {
     assertRemoveFromTopToolbar(XDebuggerActions.STEP_OVER);
   }
 
+  @Test
   public void testRegisterAdditionalActions_stepInto() {
     assertRemoveFromTopToolbar(XDebuggerActions.STEP_INTO);
   }
 
+  @Test
   public void testRegisterAdditionalActions_stepOut() {
     assertRemoveFromTopToolbar(XDebuggerActions.STEP_OUT);
   }
 
+  @Test
   public void testRegisterAdditionalActions_runToCursor() {
     assertRemoveFromTopToolbar(XDebuggerActions.RUN_TO_CURSOR);
   }
 
+  @Test
   public void testRegisterAdditionalActions_evaluate() {
     assertRemoveFromTopToolbar(XDebuggerActions.EVALUATE_EXPRESSION);
   }
 
+  @Test
   public void testRegisterAdditionalActions_dropFrame() {
     // name of constant "POP_FRAME" and UI label "Drop Frame" are inconsistent
     assertRemoveFromTopToolbar(DebuggerActions.POP_FRAME);
@@ -227,32 +247,33 @@ public class CloudDebugProcessTest extends PlatformTestCase {
     assertEmpty(topToolbar.getChildActionsOrStubs());
   }
 
-  public void testUpdateBreakpointRepresentationUsesBreakpointErrorMsgAndIcon() throws Exception {
+  @Test
+  public void testUpdateBreakpointRepresentationUsesBreakpointErrorMsgAndIcon() {
     XBreakpointManager breakpointManager = mock(XBreakpointManager.class);
     CloudDebugProcess cloudDebugProcess =
         mockCloudDebugProcess(breakpointManager, mock(XDebugSession.class));
 
+    XLineBreakpointImpl xBreakpoint = mock(XLineBreakpointImpl.class);
     CloudLineBreakpoint breakpoint =
-        mockCloudLineBreakpoint("mock error message", mock(XLineBreakpointImpl.class));
-    XLineBreakpoint xBreakpoint = mock(XLineBreakpoint.class);
-    when(breakpoint.getXBreakpoint()).thenReturn(xBreakpoint);
+        mockCloudLineBreakpoint(cloudDebugProcess, "mock error message", xBreakpoint);
+
     Icon icon = mock(Icon.class);
     when(breakpoint.getSetIcon(anyBoolean())).thenReturn(icon);
     cloudDebugProcess.updateBreakpointPresentation(breakpoint);
 
-    verify(breakpoint).getXBreakpoint();
-    verify(breakpoint).getSetIcon(Matchers.anyBoolean());
+    verify(cloudDebugProcess, times(1)).getXBreakpoint(breakpoint);
+    verify(breakpoint).getSetIcon(anyBoolean());
     verify(breakpoint).getErrorMessage();
     verify(breakpointManager).updateBreakpointPresentation(xBreakpoint, icon, "mock error message");
   }
 
-  public void testUpdateBreakpointRepresentationUsesMutedIconIfBreakpointsAreMuted()
-      throws Exception {
+  @Test
+  public void testUpdateBreakpointRepresentationUsesMutedIconIfBreakpointsAreMuted() {
     verifyMutedIconSettingInUpdateBreakpointPresentation(Boolean.TRUE);
   }
 
-  public void testUpdateBreakpointRepresentationUsesNonMutedIconIfBreakpointsAreNotMuted()
-      throws Exception {
+  @Test
+  public void testUpdateBreakpointRepresentationUsesNonMutedIconIfBreakpointsAreNotMuted() {
     verifyMutedIconSettingInUpdateBreakpointPresentation(Boolean.FALSE);
   }
 
@@ -263,7 +284,8 @@ public class CloudDebugProcessTest extends PlatformTestCase {
     CloudDebugProcess cloudDebugProcess = mockCloudDebugProcess(breakpointManager, debugSession);
 
     CloudLineBreakpoint breakpoint =
-        mockCloudLineBreakpoint("mock error message", mock(XLineBreakpointImpl.class));
+        mockCloudLineBreakpoint(
+            cloudDebugProcess, "mock error message", mock(XLineBreakpointImpl.class));
     cloudDebugProcess.updateBreakpointPresentation(breakpoint);
 
     verify(breakpoint).getSetIcon(muted);
@@ -277,18 +299,19 @@ public class CloudDebugProcessTest extends PlatformTestCase {
     XDebuggerManager debuggerManager = mock(XDebuggerManager.class);
     when(project.getComponent(XDebuggerManager.class)).thenReturn(debuggerManager);
     when(debuggerManager.getBreakpointManager()).thenReturn(breakpointManager);
-    return new CloudDebugProcess(debugSession);
+    return spy(new CloudDebugProcess(debugSession));
   }
 
-  public void testOnBreakpointListChangedSetsErrorMessageAndUpdatesBreakpointPresentation()
-      throws Exception {
+  @Test
+  public void testOnBreakpointListChangedSetsErrorMessageAndUpdatesBreakpointPresentation() {
     // override the default XBreakpointManager implementation with mock to use Mockito.verify()
     XBreakpointManager breakpointManager = mock(XBreakpointManager.class);
     XDebuggerManager debuggerManager = mock(XDebuggerManager.class);
     when(debuggerManager.getBreakpointManager()).thenReturn(breakpointManager);
-    ((ProjectImpl) getProject()).registerComponentInstance(XDebuggerManager.class, debuggerManager);
 
-    ArrayList<Breakpoint> breakpoints = new ArrayList<Breakpoint>();
+    doAnswer(invocationOnMock -> breakpointManager).when(process).getXBreakpointManager(any());
+
+    ArrayList<Breakpoint> breakpoints = new ArrayList<>();
     Breakpoint breakpoint = new Breakpoint();
     breakpoint
         .setId("breakpointId")
@@ -300,8 +323,9 @@ public class CloudDebugProcessTest extends PlatformTestCase {
         .thenReturn(ContainerUtil.immutableList(breakpoints));
 
     XLineBreakpointImpl xLineBreakpointImpl = mock(XLineBreakpointImpl.class);
+    String breakPointErrorMessage = "General error";
     CloudLineBreakpoint cloudLineBreakpoint =
-        mockCloudLineBreakpoint("mock error message", xLineBreakpointImpl);
+        mockCloudLineBreakpoint(process, breakPointErrorMessage, xLineBreakpointImpl);
     when(xLineBreakpointImpl.getUserData(com.intellij.debugger.ui.breakpoints.Breakpoint.DATA_KEY))
         .thenReturn(cloudLineBreakpoint);
     CloudBreakpointHandler breakpointHandler = mock(CloudBreakpointHandler.class);
@@ -312,13 +336,13 @@ public class CloudDebugProcessTest extends PlatformTestCase {
 
     process.onBreakpointListChanged(mock(CloudDebugProcessState.class));
 
-    verify(cloudLineBreakpoint).setErrorMessage(eq("General error"));
-    verify(cloudLineBreakpoint).getXBreakpoint();
-    verify(cloudLineBreakpoint).getSetIcon(Matchers.anyBoolean());
+    verify(cloudLineBreakpoint).setErrorMessage(eq(breakPointErrorMessage));
+    verify(process, times(1)).getXBreakpoint(cloudLineBreakpoint);
+    verify(cloudLineBreakpoint).getSetIcon(anyBoolean());
     verify(cloudLineBreakpoint).getErrorMessage();
     verify(breakpointManager)
         .updateBreakpointPresentation(
-            same(xLineBreakpointImpl), any(Icon.class), eq("General error"));
+            eq(xLineBreakpointImpl), any(Icon.class), eq(breakPointErrorMessage));
 
     process.getStateController().stopBackgroundListening();
   }
@@ -326,14 +350,12 @@ public class CloudDebugProcessTest extends PlatformTestCase {
   @NotNull
   // mock behavior except for get/setErrorMessage() to simplify code
   private CloudLineBreakpoint mockCloudLineBreakpoint(
-      String errorMessage, XLineBreakpointImpl xLineBreakpoint) {
+      CloudDebugProcess spyDebugProcess, String errorMessage, XLineBreakpointImpl xLineBreakpoint) {
     CloudLineBreakpoint breakpoint = mock(CloudLineBreakpoint.class);
-    when(breakpoint.getSetIcon(Matchers.anyBoolean())).thenReturn(mock(Icon.class));
-    when(breakpoint.getXBreakpoint()).thenReturn(xLineBreakpoint);
+    when(breakpoint.getSetIcon(anyBoolean())).thenReturn(mock(Icon.class));
+    doAnswer(invocationOnMock -> xLineBreakpoint).when(spyDebugProcess).getXBreakpoint(any());
 
-    doCallRealMethod().when(breakpoint).setErrorMessage(anyString());
-    when(breakpoint.getErrorMessage()).thenCallRealMethod();
-    breakpoint.setErrorMessage(errorMessage);
+    when(breakpoint.getErrorMessage()).thenReturn(errorMessage);
 
     return breakpoint;
   }

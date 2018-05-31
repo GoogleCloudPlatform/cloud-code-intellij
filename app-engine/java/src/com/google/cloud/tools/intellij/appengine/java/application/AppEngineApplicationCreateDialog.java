@@ -19,7 +19,7 @@ package com.google.cloud.tools.intellij.appengine.java.application;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.services.appengine.v1.model.Location;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
-import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.ui.FontUtils;
@@ -116,7 +116,7 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
     disable();
 
     try {
-      UsageTrackerProvider.getInstance()
+      UsageTrackerService.getInstance()
           .trackEvent(GctTracking.APP_ENGINE_APPLICATION_CREATE)
           .ping();
 
@@ -132,7 +132,7 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
               true /* cancellable */,
               ProjectManager.getInstance().getDefaultProject());
 
-      UsageTrackerProvider.getInstance()
+      UsageTrackerService.getInstance()
           .trackEvent(GctTracking.APP_ENGINE_APPLICATION_CREATE_SUCCESS)
           .ping();
 
@@ -157,7 +157,7 @@ public class AppEngineApplicationCreateDialog extends DialogWrapper {
   }
 
   private void trackApplicationCreateFailure() {
-    UsageTrackerProvider.getInstance()
+    UsageTrackerService.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_APPLICATION_CREATE_FAIL)
         .ping();
   }

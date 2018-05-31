@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,23 @@
 
 package com.google.cloud.tools.intellij.analytics;
 
-import com.intellij.openapi.components.ServiceManager;
+import java.util.Map;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-/** Usage Tracker Provider (as a Service) for obtaining UsageTracker implementations. */
-public abstract class UsageTrackerProvider {
+/** A NoOp implementation of {@link UsageTrackerService} and {@link SendsEvents}. */
+public class NoOpUsageTrackerService implements UsageTrackerService, SendsEvents {
 
-  @NotNull
-  public static UsageTracker getInstance() {
-    return ServiceManager.getService(UsageTrackerProvider.class).getTracker();
+  @Override
+  public FluentTrackingEventWithMetadata trackEvent(String action) {
+    return new TrackingEventBuilder(this, "no-category", action);
   }
 
-  /** Do not return a tracker that includes PII. */
-  @NotNull
-  protected abstract UsageTracker getTracker();
+  @Override
+  public void sendEvent(
+      @NotNull String eventCategory,
+      @NotNull String eventAction,
+      @Nullable Map<String, String> metadataMap) {
+    // Do nothing
+  }
 }

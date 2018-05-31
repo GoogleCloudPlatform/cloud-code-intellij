@@ -25,7 +25,6 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
-import git4idea.DialogManager;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
@@ -113,7 +112,7 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
       CloudApiManagementConfirmationDialog managementDialog =
           new CloudApiManagementConfirmationDialog(
               getSelectedModule(), cloudProject, apisToEnable, apisNotEnabled, roles);
-      DialogManager.show(managementDialog);
+      managementDialog.show();
 
       if (managementDialog.isOK()) {
         if (!apisToEnable.isEmpty()) {

@@ -21,7 +21,7 @@ import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineDevServer1;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
-import com.google.cloud.tools.intellij.analytics.UsageTrackerProvider;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceUserSettings;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkVersionNotifier;
@@ -73,7 +73,7 @@ public class AppEngineStandardRunTask extends AppEngineTask {
     CloudSdkAppEngineDevServer1 devServer = new CloudSdkAppEngineDevServer1(sdkBuilder.build());
     devServer.run(runConfig);
 
-    UsageTrackerProvider.getInstance()
+    UsageTrackerService.getInstance()
         .trackEvent(GctTracking.APP_ENGINE_RUN)
         .addMetadata(GctTracking.METADATA_LABEL_KEY, Strings.nullToEmpty(runnerId))
         .addMetadata(

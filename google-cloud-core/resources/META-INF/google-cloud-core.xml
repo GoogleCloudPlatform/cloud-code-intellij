@@ -46,8 +46,8 @@
             serviceInterface="com.google.cloud.tools.intellij.analytics.UsageTrackingManagementService"
             serviceImplementation="com.google.cloud.tools.intellij.analytics.DefaultUsageTrackingManagementService"/>
     <applicationService
-            serviceInterface="com.google.cloud.tools.intellij.analytics.UsageTrackerProvider"
-            serviceImplementation="com.google.cloud.tools.intellij.analytics.KeyedExtensionUsageTrackerProvider"/>
+            serviceInterface="com.google.cloud.tools.intellij.analytics.UsageTrackerService"
+            serviceImplementation="com.google.cloud.tools.intellij.analytics.GoogleUsageTrackerService"/>
     <applicationService
             serviceInterface="com.google.cloud.tools.intellij.service.PluginInfoService"
             serviceImplementation="com.google.cloud.tools.intellij.service.DefaultPluginInfoService"/>
@@ -61,23 +61,9 @@
                         serviceImplementation="com.google.cloud.tools.intellij.resources.DefaultGoogleApiClientFactory"/>
   </extensions>
 
-  <extensions defaultExtensionNs="com.google.gct.core">
-    <!-- For IJ Community Edition -->
-    <usageTracker implementationClass="com.google.cloud.tools.intellij.analytics.GoogleUsageTracker"
-                  key="Idea"/>
-    <!-- For IJ Ultimate Edition -->
-    <usageTracker implementationClass="com.google.cloud.tools.intellij.analytics.GoogleUsageTracker"
-                  key="idea"/>
-  </extensions>
-
   <extensionPoints>
     <extensionPoint name="googleLoginListener" interface="com.google.cloud.tools.intellij.login.GoogleLoginListener"/>
     <extensionPoint name="googleLoginMessageExtender" interface="com.google.cloud.tools.intellij.login.GoogleLoginMessageExtender"/>
-    <extensionPoint name="usageTracker"
-                    beanClass="com.google.cloud.tools.intellij.analytics.UsageTrackerExtensionPointBean">
-      <with attribute="implementationClass"
-            implements="com.google.cloud.tools.intellij.analytics.UsageTracker"/>
-    </extensionPoint>
   </extensionPoints>
 
 </idea-plugin>

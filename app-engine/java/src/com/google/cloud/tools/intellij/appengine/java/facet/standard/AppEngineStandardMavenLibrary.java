@@ -52,7 +52,7 @@ public enum AppEngineStandardMavenLibrary {
       AppEngineMessageBundle.message("appengine.library.objectify.api.name"),
       "com.googlecode.objectify",
       "objectify",
-      AppEngineStandardMavenLibrary.RELEASE_VERSION_ID,
+      "5.1.22",
       DependencyScope.COMPILE);
 
   private final String displayName;
