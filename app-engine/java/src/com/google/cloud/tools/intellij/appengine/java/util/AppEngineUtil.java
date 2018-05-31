@@ -20,9 +20,12 @@ import static java.util.stream.Collectors.toList;
 
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineArtifactDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineEnvironment;
+import com.google.cloud.tools.intellij.appengine.java.cloud.GradlePluginDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.java.cloud.MavenBuildDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.java.cloud.flexible.UserSpecifiedPathDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.java.facet.flexible.AppEngineFlexibleFacetType;
+import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineGradlePluginFacet;
+import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
 import com.google.common.collect.Lists;
@@ -40,6 +43,7 @@ import com.intellij.packaging.impl.artifacts.ArtifactUtil;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -143,6 +147,34 @@ public class AppEngineUtil {
     if (!hasStandardModules) {
       moduleDeploymentSources.add(createUserSpecifiedPathDeploymentSource(project));
     }
+
+    return moduleDeploymentSources;
+  }
+
+  /**
+   * Assembles a list of {@link GradlePluginDeploymentSource} for each module.
+   *
+   * <p>Will create a Gradle plugin deployment source if the module has both the App Engine standard
+   * the App Engine Gradle plugin facet.
+   *
+   * @param project the current {@link Project}
+   * @return a list of {@link ModuleDeploymentSource} containing the app-gradle-plugin based
+   *     deployment sources.
+   */
+  public static List<ModuleDeploymentSource> createGradlePluginDeploymentSources(
+      @NotNull Project project) {
+    List<ModuleDeploymentSource> moduleDeploymentSources = Lists.newArrayList();
+
+    Stream.of(ModuleManager.getInstance(project).getModules())
+        .forEach(
+            module -> {
+              if (AppEngineStandardFacet.hasFacet(module)
+                  && AppEngineGradlePluginFacet.hasFacet(module)) {
+                moduleDeploymentSources.add(
+                    new GradlePluginDeploymentSource(
+                        ModulePointerManager.getInstance(project).create(module)));
+              }
+            });
 
     return moduleDeploymentSources;
   }

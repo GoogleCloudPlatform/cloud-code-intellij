@@ -16,6 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.java.gradle;
 
+import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineGradlePluginFacet;
+import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineGradlePluginFacetType;
+import com.intellij.facet.FacetManager;
 import com.intellij.facet.ModifiableFacetModel;
 import com.intellij.openapi.module.Module;
 
@@ -36,21 +39,19 @@ public class AppEngineGradleFacetService {
       AppEngineGradleModule appEngineGradleModule,
       Module module,
       ModifiableFacetModel modifiableFacetModel) {
-    // TODO (eshaul) ignore for now in code review; will comment in facet logic in next PR
-    //    AppEngineGradleFacet facet = AppEngineGradleFacet.getInstance(module);
-    //
-    //    if (facet == null) {
-    //      facet =
-    //          FacetManager.getInstance(module)
-    //              .createFacet(
-    //                  AppEngineGradleFacet.getFacetType(),
-    //                  AppEngineGradleFacetType.NAME,
-    //                  null /*underlying*/);
-    //
-    //      modifiableFacetModel.addFacet(facet);
-    //    }
-    //
-    //
-    // facet.getConfiguration().setGradleBuildDir(appEngineGradleModule.getModel().gradleBuildDir());
+    AppEngineGradlePluginFacet facet = AppEngineGradlePluginFacet.getInstance(module);
+
+    if (facet == null) {
+      facet =
+          FacetManager.getInstance(module)
+              .createFacet(
+                  AppEngineGradlePluginFacet.getFacetType(),
+                  AppEngineGradlePluginFacetType.NAME,
+                  null /*underlying*/);
+
+      modifiableFacetModel.addFacet(facet);
+    }
+
+    facet.getConfiguration().setGradleBuildDir(appEngineGradleModule.getModel().gradleBuildDir());
   }
 }

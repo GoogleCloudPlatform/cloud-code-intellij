@@ -25,6 +25,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.configuration.RemoteServer;
 import com.intellij.remoteServer.configuration.deployment.DeploymentConfigurator;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
+import com.intellij.util.PlatformUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -49,6 +50,10 @@ public class AppEngineDeploymentConfigurator
 
     deploymentSources.addAll(AppEngineUtil.createArtifactDeploymentSources(project));
     deploymentSources.addAll(AppEngineUtil.createModuleDeploymentSources(project));
+
+    if (PlatformUtils.isIdeaCommunity()) {
+      deploymentSources.addAll(AppEngineUtil.createGradlePluginDeploymentSources(project));
+    }
 
     return deploymentSources;
   }

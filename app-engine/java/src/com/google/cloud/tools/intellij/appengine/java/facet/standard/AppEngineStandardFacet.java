@@ -65,6 +65,11 @@ public class AppEngineStandardFacet extends Facet<AppEngineStandardFacetConfigur
     return FacetManager.getInstance(module).getFacetByType(AppEngineStandardFacetType.ID);
   }
 
+  /** Return {@code true} if the supplied module has the {@link AppEngineStandardFacet}. */
+  public static boolean hasFacet(@NotNull Module module) {
+    return FacetManager.getInstance(module).getFacetByType(AppEngineStandardFacetType.ID) != null;
+  }
+
   /**
    * Returns {@code true} if this app is targeting the Flexible Environment instead of the Standard
    * Environment.

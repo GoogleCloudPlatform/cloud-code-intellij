@@ -31,6 +31,7 @@ import com.intellij.remoteServer.impl.configuration.deployment.DeployToServerRun
 import java.util.Collection;
 import java.util.List;
 import javax.swing.JComponent;
+import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,7 +43,10 @@ import org.jetbrains.annotations.Nullable;
 public abstract class BuildDeploymentSourceType
     extends DeploymentSourceType<ModuleDeploymentSource> {
 
-  public BuildDeploymentSourceType(@NotNull String id) {
+  static final String CLOUD_PROJECT_ATTRIBUTE = "project";
+  static final String APP_ENGINE_VERSION_ATTRIBUTE = "version";
+
+  BuildDeploymentSourceType(@NotNull String id) {
     super(id);
   }
 
@@ -116,6 +120,27 @@ public abstract class BuildDeploymentSourceType
       BeforeRunTask buildTask = createBuildTask(module);
       if (buildTask != null) {
         editor.addBeforeLaunchStep(buildTask);
+      }
+    }
+  }
+
+  /**
+   * Serializes the given {@link ModuleDeploymentSource}. Stores the cloud project along with the
+   * version so that it can be restored later and survive IDE restarts.
+   */
+  @Override
+  public void save(@NotNull ModuleDeploymentSource deploymentSource, @NotNull Element tag) {
+    if (deploymentSource instanceof AppEngineDeployable) {
+      AppEngineDeployable deployable = (AppEngineDeployable) deploymentSource;
+
+      if (deployable.getProjectName() != null) {
+        tag.setAttribute(
+            CLOUD_PROJECT_ATTRIBUTE, ((AppEngineDeployable) deploymentSource).getProjectName());
+      }
+
+      if (deployable.getVersion() != null) {
+        tag.setAttribute(
+            APP_ENGINE_VERSION_ATTRIBUTE, ((AppEngineDeployable) deploymentSource).getVersion());
       }
     }
   }
