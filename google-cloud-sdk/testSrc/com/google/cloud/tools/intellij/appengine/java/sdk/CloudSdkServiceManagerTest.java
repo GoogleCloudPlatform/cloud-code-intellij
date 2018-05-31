@@ -24,7 +24,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService.SdkStatusUpdateListener;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceManager.CloudSdkStatusHandler;
@@ -136,8 +135,8 @@ public class CloudSdkServiceManagerTest {
   @Test
   public void installingSdk_then_invalidSdk_showsErrorNotification() {
     mockSdkStatusChange(SdkStatus.INSTALLING, SdkStatus.INVALID);
-    when(mockStatusHandler.getErrorMessage(SdkStatus.INVALID))
-        .thenReturn(AppEngineMessageBundle.message("appengine.deployment.error.sdk.not.available"));
+    String errorMessage = "Deployment failed: Google Cloud SDK is not ready.";
+    when(mockStatusHandler.getErrorMessage(SdkStatus.INVALID)).thenReturn(errorMessage);
 
     cloudSdkServiceManager.runWhenSdkReady(mockProject, mockRunnable, "", mockStatusHandler);
 
@@ -145,10 +144,7 @@ public class CloudSdkServiceManagerTest {
         .invokeAndWait(
             () ->
                 verify(cloudSdkServiceManager)
-                    .showCloudSdkNotification(
-                        AppEngineMessageBundle.message(
-                            "appengine.deployment.error.sdk.not.available"),
-                        NotificationType.WARNING));
+                    .showCloudSdkNotification(errorMessage, NotificationType.WARNING));
   }
 
   @Test
@@ -181,7 +177,7 @@ public class CloudSdkServiceManagerTest {
             () ->
                 verify(cloudSdkServiceManager)
                     .showCloudSdkNotification(
-                        AppEngineMessageBundle.message("managedsdk.not.available"),
+                        CloudSdkMessageBundle.message("managedsdk.not.available"),
                         NotificationType.ERROR));
   }
 

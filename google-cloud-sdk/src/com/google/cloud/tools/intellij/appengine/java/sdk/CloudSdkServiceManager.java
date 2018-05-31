@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.appengine.java.sdk;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService.SdkStatusUpdateListener;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
@@ -197,7 +196,7 @@ public class CloudSdkServiceManager {
 
     if (isInstallInProgress()) {
       cloudSdkService.addStatusUpdateListener(sdkStatusUpdateListener);
-      sdkLogging.log(AppEngineMessageBundle.getString("managedsdk.waiting.for.sdk.ready") + "\n");
+      sdkLogging.log(CloudSdkMessageBundle.getString("managedsdk.waiting.for.sdk.ready") + "\n");
     }
 
     // wait for SDK to be ready and trigger the actual deployment if it properly installs.
@@ -271,7 +270,7 @@ public class CloudSdkServiceManager {
         NotificationType notificationType;
         boolean fatalSdkError = !CloudSdkService.getInstance().isInstallSupported();
         if (fatalSdkError) {
-          message = AppEngineMessageBundle.message("managedsdk.not.available");
+          message = CloudSdkMessageBundle.message("managedsdk.not.available");
           notificationType = NotificationType.ERROR;
         } else {
           message = sdkLogging.getErrorMessage(postInstallSdkStatus);
@@ -292,14 +291,14 @@ public class CloudSdkServiceManager {
       Notification invalidSdkWarning =
           new Notification(
               new PropertiesFileFlagReader().getFlagString("notifications.plugin.groupdisplayid"),
-              AppEngineMessageBundle.message("cloudsdk.notification.title"),
+              CloudSdkMessageBundle.message("cloudsdk.notification.title"),
               notificationMessage,
               notificationType);
       // add a link to SDK settings for a quick fix if this is a fatal error.
       if (notificationType == NotificationType.ERROR) {
         invalidSdkWarning.addAction(
             new AnAction(
-                AppEngineMessageBundle.message("appengine.deployment.error.sdk.settings.action")) {
+                CloudSdkMessageBundle.message("appengine.deployment.error.sdk.settings.action")) {
               @Override
               public void actionPerformed(AnActionEvent e) {
                 ShowSettingsUtil.getInstance()

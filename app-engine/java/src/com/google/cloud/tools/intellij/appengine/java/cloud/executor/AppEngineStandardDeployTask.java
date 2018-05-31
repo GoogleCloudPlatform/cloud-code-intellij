@@ -25,6 +25,7 @@ import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeploy;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineHelper;
 import com.google.cloud.tools.intellij.appengine.java.cloud.standard.AppEngineStandardStage;
+import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceUserSettings;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.openapi.diagnostic.Logger;
@@ -100,9 +101,9 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
       deploy
           .getCallback()
           .errorOccurred(
-              AppEngineMessageBundle.message("appengine.cloudsdk.java.components.missing")
+              CloudSdkMessageBundle.message("appengine.cloudsdk.java.components.missing")
                   + "\n"
-                  + AppEngineMessageBundle.message(
+                  + CloudSdkMessageBundle.message(
                       "appengine.cloudsdk.java.components.howtoinstall"));
       logger.warn(ex);
     } catch (RuntimeException re) {

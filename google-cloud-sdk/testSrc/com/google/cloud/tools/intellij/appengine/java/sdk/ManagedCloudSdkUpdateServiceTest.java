@@ -44,6 +44,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Spy;
 
@@ -110,7 +111,10 @@ public class ManagedCloudSdkUpdateServiceTest {
     managedCloudSdkUpdateService.activate();
 
     verify(managedCloudSdkUpdateService)
-        .schedule(any(), eq(0L), eq(ManagedCloudSdkUpdateService.SDK_UPDATE_INTERVAL_MS));
+        .schedule(
+            any(),
+            eq(0L),
+            ArgumentMatchers.eq(ManagedCloudSdkUpdateService.SDK_UPDATE_INTERVAL_MS));
   }
 
   @Test
@@ -123,8 +127,8 @@ public class ManagedCloudSdkUpdateServiceTest {
     verify(managedCloudSdkUpdateService)
         .schedule(
             any(),
-            eq((ManagedCloudSdkUpdateService.SDK_UPDATE_INTERVAL_MS / 2) + 1),
-            eq(ManagedCloudSdkUpdateService.SDK_UPDATE_INTERVAL_MS));
+            ArgumentMatchers.eq((ManagedCloudSdkUpdateService.SDK_UPDATE_INTERVAL_MS / 2) + 1),
+            ArgumentMatchers.eq(ManagedCloudSdkUpdateService.SDK_UPDATE_INTERVAL_MS));
   }
 
   @Test

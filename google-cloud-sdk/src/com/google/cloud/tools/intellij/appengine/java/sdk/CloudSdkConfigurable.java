@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.java.sdk;
 
-import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import javax.swing.JComponent;
@@ -31,7 +30,7 @@ public class CloudSdkConfigurable implements Configurable {
   @Nls
   @Override
   public String getDisplayName() {
-    return AppEngineMessageBundle.message("settings.menu.item.cloud.sdk.text");
+    return CloudSdkMessageBundle.message("settings.menu.item.cloud.sdk.text");
   }
 
   @Nullable

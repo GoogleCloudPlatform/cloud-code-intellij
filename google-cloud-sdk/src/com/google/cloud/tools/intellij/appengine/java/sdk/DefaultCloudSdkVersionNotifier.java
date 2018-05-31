@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.java.sdk;
 
-import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
@@ -39,7 +38,7 @@ public class DefaultCloudSdkVersionNotifier extends CloudSdkVersionNotifier {
   void showNotification() {
     NotificationGroup notification =
         new NotificationGroup(
-            AppEngineMessageBundle.message("appengine.cloudsdk.version.support.title"),
+            CloudSdkMessageBundle.message("appengine.cloudsdk.version.support.title"),
             NotificationDisplayType.BALLOON,
             true);
 
@@ -48,7 +47,7 @@ public class DefaultCloudSdkVersionNotifier extends CloudSdkVersionNotifier {
 
     notification
         .createNotification(
-            AppEngineMessageBundle.message("appengine.cloudsdk.version.support.title"),
+            CloudSdkMessageBundle.message("appengine.cloudsdk.version.support.title"),
             message,
             NotificationType.WARNING,
             null /* notificationListener */)

@@ -15,12 +15,8 @@
   -->
 
 <idea-plugin xmlns:xi="http://www.w3.org/2001/XInclude">
-    <name>App Engine Java Tests</name>
+    <name>Google Cloud SDK Tests</name>
     <id>com.google.gct.core</id>
-
     <xi:include href="/META-INF/google-cloud-core.xml" xpointer="xpointer(/idea-plugin/*)"/>
-    <xi:include href="/META-INF/app-engine-java.xml" xpointer="xpointer(/idea-plugin/*)"/>
     <xi:include href="/META-INF/google-cloud-sdk.xml" xpointer="xpointer(/idea-plugin/*)"/>
-    <xi:include href="/META-INF/gwt-integration.xml" xpointer="xpointer(/idea-plugin/*)"/>
-    <xi:include href="/META-INF/javaee-integration.xml" xpointer="xpointer(/idea-plugin/*)"/>
 </idea-plugin>

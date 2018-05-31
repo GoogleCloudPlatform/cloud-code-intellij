@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.java.sdk;
 
 import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
-import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.sdk.ManagedCloudSdkService.ManagedSdkJobResult;
 import com.google.cloud.tools.intellij.appengine.java.sdk.ManagedCloudSdkService.ManagedSdkJobType;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
@@ -59,7 +58,7 @@ public class ManagedCloudSdkServiceUiPresenter {
 
   public void notifyManagedSdkJobSuccess(ManagedSdkJobType jobType, ManagedSdkJobResult jobResult) {
     String message =
-        AppEngineMessageBundle.message("managedsdk.success." + jobType.name().toLowerCase());
+        CloudSdkMessageBundle.message("managedsdk.success." + jobType.name().toLowerCase());
     switch (jobResult) {
       case PROCESSED:
         showNotification(message, NotificationType.INFORMATION);
@@ -71,14 +70,14 @@ public class ManagedCloudSdkServiceUiPresenter {
 
   public void notifyManagedSdkJobFailure(ManagedSdkJobType jobType, String errorMessage) {
     String message =
-        AppEngineMessageBundle.message(
+        CloudSdkMessageBundle.message(
             "managedsdk.failure." + jobType.name().toLowerCase(), errorMessage);
     showNotification(message, NotificationType.ERROR);
   }
 
   public void notifyManagedSdkJobCancellation(ManagedSdkJobType jobType) {
     String message =
-        AppEngineMessageBundle.message("managedsdk.cancel." + jobType.name().toLowerCase());
+        CloudSdkMessageBundle.message("managedsdk.cancel." + jobType.name().toLowerCase());
     showNotification(message, NotificationType.WARNING);
   }
 
@@ -93,10 +92,10 @@ public class ManagedCloudSdkServiceUiPresenter {
       @NotNull ActionListener cancelListener, @NotNull ActionListener disableListener) {
     Notification notification =
         showNotification(
-            AppEngineMessageBundle.message("managedsdk.update.notification"),
+            CloudSdkMessageBundle.message("managedsdk.update.notification"),
             NotificationType.INFORMATION);
     notification.addAction(
-        new AnAction(AppEngineMessageBundle.message("managedsdk.update.notification.cancel")) {
+        new AnAction(CloudSdkMessageBundle.message("managedsdk.update.notification.cancel")) {
           @Override
           public void actionPerformed(AnActionEvent e) {
             cancelListener.actionPerformed(new ActionEvent(notification, 0, ""));
@@ -104,7 +103,7 @@ public class ManagedCloudSdkServiceUiPresenter {
           }
         });
     notification.addAction(
-        new AnAction(AppEngineMessageBundle.message("managedsdk.update.notification.disable")) {
+        new AnAction(CloudSdkMessageBundle.message("managedsdk.update.notification.disable")) {
           @Override
           public void actionPerformed(AnActionEvent e) {
             disableListener.actionPerformed(new ActionEvent(notification, 0, ""));
@@ -122,7 +121,7 @@ public class ManagedCloudSdkServiceUiPresenter {
   private Notification showNotification(String message, NotificationType notificationType) {
     Notification notification =
         NOTIFICATION_GROUP.createNotification(
-            AppEngineMessageBundle.message("managedsdk.notifications.title"),
+            CloudSdkMessageBundle.message("managedsdk.notifications.title"),
             null /*subtitle*/,
             message,
             notificationType);
