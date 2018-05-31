@@ -29,7 +29,10 @@ import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
+import com.intellij.openapi.util.InvalidDataException;
+import com.intellij.openapi.util.WriteExternalException;
 import javax.swing.Icon;
+import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -84,6 +87,16 @@ public class AppEngineGradlePluginFacetType
     public FacetEditorTab[] createEditorTabs(
         FacetEditorContext editorContext, FacetValidatorsManager validatorsManager) {
       return new FacetEditorTab[0];
+    }
+
+    @Override
+    public void readExternal(Element element) throws InvalidDataException {
+      // Deprecated in favor of loadState
+    }
+
+    @Override
+    public void writeExternal(Element element) throws WriteExternalException {
+      // Deprecated in favor of getState
     }
 
     @Nullable
