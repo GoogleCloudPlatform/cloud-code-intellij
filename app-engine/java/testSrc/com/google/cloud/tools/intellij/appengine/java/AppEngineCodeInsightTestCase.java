@@ -19,7 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacet;
-import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkInternals;
+import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkJavaInternals;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService;
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.application.ApplicationManager;
@@ -76,9 +76,9 @@ public abstract class AppEngineCodeInsightTestCase extends UsefulTestCase {
 
   private void addAppEngineSupport(Module module) {
     CloudSdkService sdkService = mock(CloudSdkService.class);
-    CloudSdkInternals mockSdkInternals = mock(CloudSdkInternals.class);
+    CloudSdkJavaInternals mockSdkInternals = mock(CloudSdkJavaInternals.class);
     when(mockSdkInternals.getWebSchemeFile()).thenReturn(getWebSchemeFile());
-    CloudSdkInternals.setInstance(mockSdkInternals);
+    CloudSdkJavaInternals.setInstance(mockSdkInternals);
 
     MutablePicoContainer applicationContainer =
         (MutablePicoContainer) ApplicationManager.getApplication().getPicoContainer();
