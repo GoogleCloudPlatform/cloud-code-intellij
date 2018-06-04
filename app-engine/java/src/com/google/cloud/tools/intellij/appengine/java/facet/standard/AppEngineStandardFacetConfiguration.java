@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.appengine.java.facet.standard;
 
 import static java.util.stream.Collectors.toSet;
 
-import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacetConfiguration.AppEngineStandardFacetProperties;
 import com.intellij.facet.FacetConfiguration;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
@@ -36,9 +35,9 @@ import org.jetbrains.annotations.NotNull;
 
 /** @author nik */
 public class AppEngineStandardFacetConfiguration
-    implements FacetConfiguration, PersistentStateComponent<AppEngineStandardFacetProperties> {
+    implements FacetConfiguration, PersistentStateComponent<AppEngineStandardFacetConfiguration> {
 
-  private AppEngineStandardFacetProperties properties = new AppEngineStandardFacetProperties();
+  private String gradleBuildDir;
 
   @Override
   public FacetEditorTab[] createEditorTabs(
@@ -71,14 +70,22 @@ public class AppEngineStandardFacetConfiguration
   }
 
   @Override
-  public AppEngineStandardFacetProperties getState() {
-    return properties;
+  public AppEngineStandardFacetConfiguration getState() {
+    return this;
   }
 
   @Override
-  public void loadState(AppEngineStandardFacetProperties state) {
-    properties = state;
+  public void loadState(@NotNull AppEngineStandardFacetConfiguration state) {
+    gradleBuildDir = state.getGradleBuildDir().orElse(null);
   }
 
-  public static class AppEngineStandardFacetProperties {}
+  /** Returns, optionally, the path to the Gradle build directory. */
+  public Optional<String> getGradleBuildDir() {
+    return Optional.ofNullable(gradleBuildDir);
+  }
+
+  /** Sets the path to the Gradle build directory. */
+  public void setGradleBuildDir(String gradleBuildDir) {
+    this.gradleBuildDir = gradleBuildDir;
+  }
 }

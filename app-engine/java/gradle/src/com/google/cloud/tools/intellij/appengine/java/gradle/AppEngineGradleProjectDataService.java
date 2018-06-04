@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.java.gradle;
 
-import com.google.common.annotations.VisibleForTesting;
+import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacet;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.externalSystem.model.DataNode;
 import com.intellij.openapi.externalSystem.model.Key;
@@ -43,19 +43,6 @@ public class AppEngineGradleProjectDataService
   static final Key<AppEngineGradleModule> APP_ENGINE_MODEL_KEY =
       Key.create(AppEngineGradleModule.class, 100 /* Use a high processing weight */);
 
-  private final AppEngineGradleFacetService appEngineGradleFacetService;
-
-  @SuppressWarnings("unused")
-  AppEngineGradleProjectDataService() {
-    this(AppEngineGradleFacetService.getInstance());
-  }
-
-  @VisibleForTesting
-  AppEngineGradleProjectDataService(
-      @NotNull AppEngineGradleFacetService appEngineGradleFacetService) {
-    this.appEngineGradleFacetService = appEngineGradleFacetService;
-  }
-
   /**
    * Adds the App Engine Gradle facet to Gradle modules if the module has the App Engine Gradle
    * plugin.
@@ -81,12 +68,15 @@ public class AppEngineGradleProjectDataService
                 module -> {
                   AppEngineGradleModule appEngineGradleModule =
                       moduleNameToModel.get(module.getName());
-                  if (PlatformUtils.isIdeaCommunity()
-                      && appEngineGradleModule.getModel().hasAppEngineGradlePlugin()) {
-                    appEngineGradleFacetService.addFacet(
-                        appEngineGradleModule,
-                        module,
-                        modelsProvider.getModifiableFacetModel(module));
+                  if (PlatformUtils.isIdeaCommunity()) {
+                    AppEngineStandardFacet standardFacet =
+                        AppEngineStandardFacet.getAppEngineFacetByModule(module);
+
+                    if (standardFacet != null) {
+                      standardFacet
+                          .getConfiguration()
+                          .setGradleBuildDir(appEngineGradleModule.getModel().gradleBuildDir());
+                    }
                   }
                 });
       }

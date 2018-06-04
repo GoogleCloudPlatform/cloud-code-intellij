@@ -16,13 +16,14 @@
 
 package com.google.cloud.tools.intellij.appengine.java.cloud;
 
-import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineGradlePluginFacet;
+import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacet;
 import com.intellij.openapi.module.ModulePointer;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
 import com.intellij.remoteServer.impl.configuration.deployment.ModuleDeploymentSourceImpl;
 import icons.GradleIcons;
 import java.io.File;
+import java.util.Optional;
 import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -82,11 +83,22 @@ public class GradlePluginDeploymentSource extends ModuleDeploymentSourceImpl
       return null;
     }
 
-    String gradleBuildDir =
-        AppEngineGradlePluginFacet.getInstance(getModule()).getConfiguration().getGradleBuildDir();
+    AppEngineStandardFacet appEngineFacet =
+        AppEngineStandardFacet.getAppEngineFacetByModule(getModule());
 
-    return new File(
-        gradleBuildDir, String.format(EXPLODED_WAR_DIR_PREFIX_FORMAT, getModule().getName()));
+    if (appEngineFacet == null) {
+      return null;
+    }
+
+    Optional<String> gradleBuildDirOptional = appEngineFacet.getConfiguration().getGradleBuildDir();
+
+    return gradleBuildDirOptional
+        .map(
+            gradleBuildDir ->
+                new File(
+                    gradleBuildDir,
+                    String.format(EXPLODED_WAR_DIR_PREFIX_FORMAT, getModule().getName())))
+        .orElse(null);
   }
 
   @NotNull

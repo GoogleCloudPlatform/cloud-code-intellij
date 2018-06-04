@@ -24,7 +24,6 @@ import com.google.cloud.tools.intellij.appengine.java.cloud.GradlePluginDeployme
 import com.google.cloud.tools.intellij.appengine.java.cloud.MavenBuildDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.java.cloud.flexible.UserSpecifiedPathDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.java.facet.flexible.AppEngineFlexibleFacetType;
-import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineGradlePluginFacet;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
@@ -164,15 +163,21 @@ public class AppEngineUtil {
   public static List<ModuleDeploymentSource> createGradlePluginDeploymentSources(
       @NotNull Project project) {
     List<ModuleDeploymentSource> moduleDeploymentSources = Lists.newArrayList();
+    AppEngineProjectService projectService = AppEngineProjectService.getInstance();
 
     Stream.of(ModuleManager.getInstance(project).getModules())
         .forEach(
             module -> {
-              if (AppEngineStandardFacet.hasFacet(module)
-                  && AppEngineGradlePluginFacet.hasFacet(module)) {
-                moduleDeploymentSources.add(
-                    new GradlePluginDeploymentSource(
-                        ModulePointerManager.getInstance(project).create(module)));
+              if (projectService.isGradleModule(module)) {
+                AppEngineStandardFacet appEngineFacet =
+                    AppEngineStandardFacet.getAppEngineFacetByModule(module);
+
+                if (appEngineFacet != null
+                    && appEngineFacet.getConfiguration().getGradleBuildDir().isPresent()) {
+                  moduleDeploymentSources.add(
+                      new GradlePluginDeploymentSource(
+                          ModulePointerManager.getInstance(project).create(module)));
+                }
               }
             });
 

@@ -108,8 +108,6 @@
                 implementation="com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacetType"/>
         <facetType
                 implementation="com.google.cloud.tools.intellij.appengine.java.facet.flexible.AppEngineFlexibleFacetType"/>
-        <facetType
-                implementation="com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineGradlePluginFacetType"/>
         <project.converterProvider
                 implementation="com.google.cloud.tools.intellij.appengine.java.migration.AppEngineStandardFacetConverterProvider"/>
         <project.converterProvider
