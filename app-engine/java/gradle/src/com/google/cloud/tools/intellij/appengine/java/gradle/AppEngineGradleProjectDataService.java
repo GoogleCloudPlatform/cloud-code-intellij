@@ -34,8 +34,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * On module import, augments App Engine Gradle modules by adding the Gradle facet containing
- * information from the {@link AppEngineGradleModel}.
+ * On module import, augments App Engine Gradle modules by adding information from the {@link
+ * AppEngineGradleModel} to the {@link AppEngineStandardFacet}.
  */
 public class AppEngineGradleProjectDataService
     extends AbstractProjectDataService<AppEngineGradleModule, Void> {
@@ -44,8 +44,8 @@ public class AppEngineGradleProjectDataService
       Key.create(AppEngineGradleModule.class, 100 /* Use a high processing weight */);
 
   /**
-   * Adds the App Engine Gradle facet to Gradle modules if the module has the App Engine Gradle
-   * plugin.
+   * Sets the Gradle directory on the {@link AppEngineStandardFacet} if the module has the App
+   * Engine Gradle plugin.
    */
   @Override
   public void importData(
