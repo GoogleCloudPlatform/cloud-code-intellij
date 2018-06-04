@@ -26,7 +26,7 @@ import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineSt
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardMavenLibrary;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardSupportProvider.AppEngineSupportConfigurable;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.MavenRepositoryLibraryDownloader;
-import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkInternals;
+import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkJavaInternals;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceManager;
 import com.google.cloud.tools.intellij.appengine.java.ultimate.artifacts.ArtifactsTestUtil;
@@ -124,9 +124,9 @@ public class AppEngineStandardSupportProviderTest extends JavaeeFrameworkSupport
     CloudSdkService sdkService = mock(CloudSdkService.class);
     CloudSdkServiceManager sdkServiceManager = mock(CloudSdkServiceManager.class);
     when(sdkServiceManager.getCloudSdkService()).thenReturn(sdkService);
-    CloudSdkInternals mockSdkInternals = mock(CloudSdkInternals.class);
+    CloudSdkJavaInternals mockSdkInternals = mock(CloudSdkJavaInternals.class);
     when(mockSdkInternals.getLibraries()).thenReturn(new File[] {});
-    CloudSdkInternals.setInstance(mockSdkInternals);
+    CloudSdkJavaInternals.setInstance(mockSdkInternals);
 
     MavenRepositoryLibraryDownloader libraryDownloader =
         mock(MavenRepositoryLibraryDownloader.class);

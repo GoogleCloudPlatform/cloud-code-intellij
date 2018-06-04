@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.java.sdk;
 
 import com.google.cloud.tools.intellij.GctFeature;
-import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
@@ -100,7 +99,7 @@ public class CloudSdkPanel {
 
   public static String buildSdkMessage(String path, boolean htmlEnabled) {
     if (StringUtil.isEmpty(path)) {
-      String missingMessage = AppEngineMessageBundle.message("cloudsdk.location.missing.message");
+      String missingMessage = CloudSdkMessageBundle.message("cloudsdk.location.missing.message");
 
       return htmlEnabled ? missingMessage + " " + getCloudSdkDownloadMessage() : missingMessage;
     }
@@ -208,7 +207,7 @@ public class CloudSdkPanel {
           .validateCloudSdk(customSdkPathText)
           .contains(CloudSdkValidationResult.MALFORMED_PATH)) {
         throw new ConfigurationException(
-            AppEngineMessageBundle.message("appengine.cloudsdk.location.badchars.message"));
+            CloudSdkMessageBundle.message("appengine.cloudsdk.location.badchars.message"));
       }
 
       sdkServiceUserSettings.setCustomSdkPath(customSdkPathText);
@@ -276,7 +275,7 @@ public class CloudSdkPanel {
 
   private static String getCloudSdkDownloadMessage() {
     String openTag = "<a href='" + CLOUD_SDK_DOWNLOAD_LINK + "'>";
-    return AppEngineMessageBundle.message("cloudsdk.download.message", openTag, "</a>");
+    return CloudSdkMessageBundle.message("cloudsdk.download.message", openTag, "</a>");
   }
 
   private void checkManagedSdkFeatureStatus() {
@@ -286,7 +285,7 @@ public class CloudSdkPanel {
       customRadioButton.setSelected(true);
       // more specific title for this case as this panel will be re-used in multiple places.
       customRadioButton.setText(
-          AppEngineMessageBundle.getString("cloudsdk.customsdk.without.managedsdk.feature"));
+          CloudSdkMessageBundle.getString("cloudsdk.customsdk.without.managedsdk.feature"));
     }
   }
 
@@ -328,7 +327,7 @@ public class CloudSdkPanel {
         });
 
     cloudSdkDirectoryField.addBrowseFolderListener(
-        AppEngineMessageBundle.message("cloudsdk.location.browse.window.title"),
+        CloudSdkMessageBundle.message("cloudsdk.location.browse.window.title"),
         null, /* description */
         null, /* project */
         FileChooserDescriptorFactory.createSingleFolderDescriptor());

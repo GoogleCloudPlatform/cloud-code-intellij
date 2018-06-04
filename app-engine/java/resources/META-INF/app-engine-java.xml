@@ -16,6 +16,7 @@
 <idea-plugin xmlns:xi="http://www.w3.org/2001/XInclude">
     <depends>com.intellij.modules.java</depends>
 
+    <xi:include href="/META-INF/google-cloud-sdk.xml" xpointer="xpointer(/idea-plugin/*)"/>
     <xi:include href="/META-INF/stackdriver-debugger.xml" xpointer="xpointer(/idea-plugin/*)"/>
 
     <application-components>
@@ -49,9 +50,6 @@
 
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationConfigurable parentId="google.settings"
-                                 instance="com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkConfigurable"/>
-
         <implicitUsageProvider
                 implementation="com.google.cloud.tools.intellij.appengine.java.validation.EndpointImplicitUsageProvider"/>
 
@@ -71,20 +69,8 @@
         <applicationService
                 serviceImplementation="com.google.cloud.tools.intellij.appengine.java.facet.standard.MavenRepositoryLibraryDownloader"/>
         <applicationService
-                serviceInterface="com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkVersionNotifier"
-                serviceImplementation="com.google.cloud.tools.intellij.appengine.java.sdk.DefaultCloudSdkVersionNotifier"/>
-        <applicationService
                 serviceInterface="com.google.cloud.tools.intellij.appengine.java.application.AppEngineAdminService"
                 serviceImplementation="com.google.cloud.tools.intellij.appengine.java.application.GoogleApiClientAppEngineAdminService"/>
-        <applicationService
-                serviceImplementation="com.google.cloud.tools.intellij.appengine.java.sdk.ManagedCloudSdkUpdateService"/>
-        <applicationService
-                serviceImplementation="com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceManager"/>
-        <applicationService
-                serviceInterface="com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService"
-                serviceImplementation="com.google.cloud.tools.intellij.appengine.java.sdk.DefaultCloudSdkService"/>
-        <applicationService
-                serviceImplementation="com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkValidator"/>
 
         <!-- App Engine Cloud and Deployment Sources Configuration-->
         <remoteServer.type
