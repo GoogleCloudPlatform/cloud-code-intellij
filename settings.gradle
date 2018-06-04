@@ -23,3 +23,5 @@ include 'stackdriver-debugger'
 include 'app-engine:java'
 include 'app-engine:java:gradle'
 include 'app-engine:java:ultimate'
+include 'google-cloud-sdk'
+

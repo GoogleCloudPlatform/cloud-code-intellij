@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package com.google.cloud.tools.intellij.appengine.java.sdk;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerService.FluentTrackingEventWithMetadata;
-import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.managedcloudsdk.ConsoleListener;
 import com.google.cloud.tools.managedcloudsdk.ManagedCloudSdk;
@@ -162,7 +161,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
       ManagedCloudSdkServiceUiPresenter.getInstance()
           .notifyManagedSdkJobFailure(
               ManagedSdkJobType.INSTALL,
-              AppEngineMessageBundle.message("managedsdk.unsupported.os"));
+              CloudSdkMessageBundle.message("managedsdk.unsupported.os"));
     }
   }
 
@@ -268,7 +267,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
         ProgressListener waitForSdkProcessesProgress =
             ManagedCloudSdkServiceUiPresenter.getInstance().createProgressListener(this);
         waitForSdkProcessesProgress.start(
-            AppEngineMessageBundle.message("managedsdk.progress.wait.for.processes"),
+            CloudSdkMessageBundle.message("managedsdk.progress.wait.for.processes"),
             ProgressListener.UNKNOWN);
         try {
           CloudSdkServiceManager.getInstance().getSdkWriteLock().lockInterruptibly();
