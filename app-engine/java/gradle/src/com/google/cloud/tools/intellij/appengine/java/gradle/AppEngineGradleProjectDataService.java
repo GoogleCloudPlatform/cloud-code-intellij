@@ -68,7 +68,8 @@ public class AppEngineGradleProjectDataService
                 module -> {
                   AppEngineGradleModule appEngineGradleModule =
                       moduleNameToModel.get(module.getName());
-                  if (PlatformUtils.isIdeaCommunity()) {
+                  if (PlatformUtils.isIdeaCommunity()
+                      && appEngineGradleModule.getModel().hasAppEngineGradlePlugin()) {
                     AppEngineStandardFacet standardFacet =
                         AppEngineStandardFacet.getAppEngineFacetByModule(module);
 
