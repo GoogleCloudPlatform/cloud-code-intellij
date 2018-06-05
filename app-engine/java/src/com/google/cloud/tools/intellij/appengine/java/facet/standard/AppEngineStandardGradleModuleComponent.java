@@ -66,5 +66,6 @@ public class AppEngineStandardGradleModuleComponent
   @Override
   public void loadState(@NotNull AppEngineStandardGradleModuleComponent state) {
     gradleBuildDir = state.gradleBuildDir;
+    gradleModuleDir = state.gradleModuleDir;
   }
 }
