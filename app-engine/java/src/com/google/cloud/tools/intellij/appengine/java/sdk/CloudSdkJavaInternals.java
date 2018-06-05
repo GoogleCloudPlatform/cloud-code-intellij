@@ -38,11 +38,14 @@ import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/** Internal details of GCP Cloud SDK implementation, including library and methods names. */
-public class CloudSdkInternals {
-  private static final Logger logger = Logger.getInstance(CloudSdkInternals.class);
+/**
+ * Internal details of GCP Cloud SDK Java related components implementation, including library and
+ * methods names.
+ */
+public class CloudSdkJavaInternals {
+  private static final Logger logger = Logger.getInstance(CloudSdkJavaInternals.class);
 
-  private static CloudSdkInternals instance = new CloudSdkInternals();
+  private static CloudSdkJavaInternals instance = new CloudSdkJavaInternals();
 
   private static final Path JAVA_TOOLS_RELATIVE_PATH =
       Paths.get("platform", "google_appengine", "google", "appengine", "tools", "java");
@@ -53,13 +56,13 @@ public class CloudSdkInternals {
 
   private Map<String, Set<String>> myMethodsBlackList;
 
-  public static CloudSdkInternals getInstance() {
+  public static CloudSdkJavaInternals getInstance() {
     return instance;
   }
 
   @VisibleForTesting
-  public static void setInstance(CloudSdkInternals instance) {
-    CloudSdkInternals.instance = instance;
+  public static void setInstance(CloudSdkJavaInternals instance) {
+    CloudSdkJavaInternals.instance = instance;
   }
 
   @Nullable

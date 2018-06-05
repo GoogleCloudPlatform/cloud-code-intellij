@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.java.ultimate.gwt;
 
 import com.google.cloud.tools.intellij.appengine.java.AppEngineIcons;
-import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkInternals;
+import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkJavaInternals;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService;
 import com.intellij.execution.configurations.JavaParameters;
 import com.intellij.execution.configurations.ParametersList;
@@ -50,7 +50,7 @@ public class AppEngineGwtServer extends GwtDevModeServer {
     programParameters.add("com.google.appengine.tools.development.gwt.AppEngineLauncher");
 
     final CloudSdkService sdkService = CloudSdkService.getInstance();
-    CloudSdkInternals sdkInternals = CloudSdkInternals.getInstance();
+    CloudSdkJavaInternals sdkInternals = CloudSdkJavaInternals.getInstance();
     sdkInternals.patchJavaParametersForDevServer(parameters.getVMParametersList());
 
     // actually these jars are added by AppEngine dev server automatically. But they need to be
