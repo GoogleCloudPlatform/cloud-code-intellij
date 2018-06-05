@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.appengine.java.gradle;
 
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardGradleModuleComponent;
-import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.externalSystem.model.DataNode;
 import com.intellij.openapi.externalSystem.model.Key;
 import com.intellij.openapi.externalSystem.model.project.ProjectData;
@@ -64,7 +63,7 @@ public class AppEngineGradleProjectDataService
         .forEach(
             module -> {
               AppEngineGradleModule appEngineGradleModule = moduleNameToModel.get(module.getName());
-              if (!PlatformUtils.isIdeaUltimate()
+              if (PlatformUtils.isIdeaUltimate()
                   && appEngineGradleModule.getModel().hasAppEngineGradlePlugin()) {
                 AppEngineStandardGradleModuleComponent gradleModuleComponent =
                     AppEngineStandardGradleModuleComponent.getInstance(module);

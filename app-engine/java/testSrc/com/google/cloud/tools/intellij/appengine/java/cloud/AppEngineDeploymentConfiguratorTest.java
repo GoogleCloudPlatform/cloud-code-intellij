@@ -126,11 +126,11 @@ public final class AppEngineDeploymentConfiguratorTest {
   }
 
   @Test
-  public void getDeploymentSources_withPyCharm_andGradle_returnsSource() {
+  public void getDeploymentSources_withPyCharm_andGradle_returnsEmpty() {
     System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, PlatformUtils.PYCHARM_CE_PREFIX);
     addAppEngineFacetWithGradleBuildDir();
 
-    assertGradleDeploymentSourceExists();
+    assertGradleDeploymentSourcesEmpty();
   }
 
   @Test
@@ -138,14 +138,7 @@ public final class AppEngineDeploymentConfiguratorTest {
     System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, PlatformUtils.IDEA_PREFIX);
     addAppEngineFacetWithGradleBuildDir();
 
-    ApplicationManager.getApplication()
-        .invokeAndWait(
-            () -> {
-              List<DeploymentSource> availableDeploymentSources =
-                  configurator.getAvailableDeploymentSources();
-
-              assertThat(availableDeploymentSources).isEmpty();
-            });
+    assertGradleDeploymentSourcesEmpty();
   }
 
   private void assertGradleDeploymentSourceExists() {
@@ -158,6 +151,17 @@ public final class AppEngineDeploymentConfiguratorTest {
               assertThat(availableDeploymentSources).hasSize(1);
               assertThat(availableDeploymentSources.get(0))
                   .isInstanceOf(GradlePluginDeploymentSource.class);
+            });
+  }
+
+  private void assertGradleDeploymentSourcesEmpty() {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              List<DeploymentSource> availableDeploymentSources =
+                  configurator.getAvailableDeploymentSources();
+
+              assertThat(availableDeploymentSources).isEmpty();
             });
   }
 

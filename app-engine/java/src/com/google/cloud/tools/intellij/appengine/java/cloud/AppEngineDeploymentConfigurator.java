@@ -51,7 +51,7 @@ public class AppEngineDeploymentConfigurator
     deploymentSources.addAll(AppEngineUtil.createArtifactDeploymentSources(project));
     deploymentSources.addAll(AppEngineUtil.createModuleDeploymentSources(project));
 
-    if (!PlatformUtils.isIdeaUltimate()) {
+    if (PlatformUtils.isIdeaCommunity()) {
       deploymentSources.addAll(AppEngineUtil.createGradlePluginDeploymentSources(project));
     }
 
