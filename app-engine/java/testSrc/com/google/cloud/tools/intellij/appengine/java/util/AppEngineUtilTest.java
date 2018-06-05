@@ -18,8 +18,8 @@ package com.google.cloud.tools.intellij.appengine.java.util;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacetType;
+import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardGradleModuleComponent;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.ModuleTestUtils;
 import com.google.cloud.tools.intellij.testing.TestFixture;
@@ -42,9 +42,9 @@ public class AppEngineUtilTest {
 
   @Test
   public void createGradleSource_withAppEngineFacet_andGradleBuildDir_returnsGradleSource() {
-    addFacetWithGradleBuildDir();
-    ExternalSystemModulePropertyManager.getInstance(module)
-        .setExternalId(GradleConstants.SYSTEM_ID);
+    addGradleBuildDir();
+    addAppEngineStandardFacet();
+    enableGradle();
 
     List<ModuleDeploymentSource> sources =
         AppEngineUtil.createGradlePluginDeploymentSources(testFixture.getProject());
@@ -54,7 +54,8 @@ public class AppEngineUtilTest {
 
   @Test
   public void createGradleSource_withAppEngineFacet_andGradleBuildDir_withNoGradle_returnsEmpty() {
-    addFacetWithGradleBuildDir();
+    addGradleBuildDir();
+    addAppEngineStandardFacet();
 
     List<ModuleDeploymentSource> sources =
         AppEngineUtil.createGradlePluginDeploymentSources(testFixture.getProject());
@@ -63,7 +64,10 @@ public class AppEngineUtilTest {
   }
 
   @Test
-  public void createGradleSource_withNoAppEngineFacets_returnsEmpty() {
+  public void createGradleSource_withNoAppEngineFacet_returnsEmpty() {
+    addGradleBuildDir();
+    enableGradle();
+
     List<ModuleDeploymentSource> sources =
         AppEngineUtil.createGradlePluginDeploymentSources(testFixture.getProject());
 
@@ -72,7 +76,8 @@ public class AppEngineUtilTest {
 
   @Test
   public void createGradleSource_withAppEngineFacet_andNoGradleBuildDir_returnsEmpty() {
-    ModuleTestUtils.addFacet(module, AppEngineStandardFacetType.ID);
+    addAppEngineStandardFacet();
+    enableGradle();
 
     List<ModuleDeploymentSource> sources =
         AppEngineUtil.createGradlePluginDeploymentSources(testFixture.getProject());
@@ -80,10 +85,17 @@ public class AppEngineUtilTest {
     assertThat(sources).isEmpty();
   }
 
-  private void addFacetWithGradleBuildDir() {
-    ModuleTestUtils.addFacet(module, AppEngineStandardFacetType.ID);
-    AppEngineStandardFacet.getAppEngineFacetByModule(module)
-        .getConfiguration()
+  private void addGradleBuildDir() {
+    AppEngineStandardGradleModuleComponent.getInstance(module)
         .setGradleBuildDir("/path/to/gradle/build");
+  }
+
+  private void addAppEngineStandardFacet() {
+    ModuleTestUtils.addFacet(module, AppEngineStandardFacetType.ID);
+  }
+
+  private void enableGradle() {
+    ExternalSystemModulePropertyManager.getInstance(module)
+        .setExternalId(GradleConstants.SYSTEM_ID);
   }
 }

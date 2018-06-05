@@ -23,8 +23,8 @@ import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.java.cloud.flexible.AppEngineFlexibleDeploymentEditor;
 import com.google.cloud.tools.intellij.appengine.java.cloud.standard.AppEngineStandardDeploymentEditor;
-import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacetType;
+import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardGradleModuleComponent;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.ModuleTestUtils;
 import com.google.cloud.tools.intellij.testing.TestFixture;
@@ -120,25 +120,22 @@ public final class AppEngineDeploymentConfiguratorTest {
   @Test
   public void getDeploymentSources_withCommunityEdition_andGradle_returnsSource() {
     System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, PlatformUtils.IDEA_CE_PREFIX);
-
     addAppEngineFacetWithGradleBuildDir();
 
-    ApplicationManager.getApplication()
-        .invokeAndWait(
-            () -> {
-              List<DeploymentSource> availableDeploymentSources =
-                  configurator.getAvailableDeploymentSources();
+    assertGradleDeploymentSourceExists();
+  }
 
-              assertThat(availableDeploymentSources).hasSize(1);
-              assertThat(availableDeploymentSources.get(0))
-                  .isInstanceOf(GradlePluginDeploymentSource.class);
-            });
+  @Test
+  public void getDeploymentSources_withPyCharm_andGradle_returnsSource() {
+    System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, PlatformUtils.PYCHARM_CE_PREFIX);
+    addAppEngineFacetWithGradleBuildDir();
+
+    assertGradleDeploymentSourceExists();
   }
 
   @Test
   public void getDeploymentSources_withUltimateEdition_andGradle_returnsEmpty() {
     System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, PlatformUtils.IDEA_PREFIX);
-
     addAppEngineFacetWithGradleBuildDir();
 
     ApplicationManager.getApplication()
@@ -151,13 +148,25 @@ public final class AppEngineDeploymentConfiguratorTest {
             });
   }
 
+  private void assertGradleDeploymentSourceExists() {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              List<DeploymentSource> availableDeploymentSources =
+                  configurator.getAvailableDeploymentSources();
+
+              assertThat(availableDeploymentSources).hasSize(1);
+              assertThat(availableDeploymentSources.get(0))
+                  .isInstanceOf(GradlePluginDeploymentSource.class);
+            });
+  }
+
   private void addAppEngineFacetWithGradleBuildDir() {
     ModuleTestUtils.addFacet(gradleModule, AppEngineStandardFacetType.ID);
     ExternalSystemModulePropertyManager.getInstance(gradleModule)
         .setExternalId(GradleConstants.SYSTEM_ID);
 
-    AppEngineStandardFacet.getAppEngineFacetByModule(gradleModule)
-        .getConfiguration()
+    AppEngineStandardGradleModuleComponent.getInstance(gradleModule)
         .setGradleBuildDir("/path/to/gradle/build");
   }
 }

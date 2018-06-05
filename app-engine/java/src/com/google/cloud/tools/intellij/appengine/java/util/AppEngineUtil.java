@@ -164,6 +164,7 @@ public class AppEngineUtil {
    */
   public static List<ModuleDeploymentSource> createGradlePluginDeploymentSources(
       @NotNull Project project) {
+    AppEngineProjectService projectService = AppEngineProjectService.getInstance();
     List<ModuleDeploymentSource> moduleDeploymentSources = Lists.newArrayList();
 
     Stream.of(ModuleManager.getInstance(project).getModules())
@@ -172,7 +173,9 @@ public class AppEngineUtil {
               Optional<String> gradleBuildDir =
                   AppEngineStandardGradleModuleComponent.getInstance(module).getGradleBuildDir();
 
-              if (AppEngineStandardFacet.hasFacet(module) && gradleBuildDir.isPresent()) {
+              if (projectService.isGradleModule(module)
+                  && AppEngineStandardFacet.hasFacet(module)
+                  && gradleBuildDir.isPresent()) {
                 moduleDeploymentSources.add(
                     new GradlePluginDeploymentSource(
                         ModulePointerManager.getInstance(project).create(module)));
