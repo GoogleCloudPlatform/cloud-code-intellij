@@ -21,9 +21,9 @@ import java.io.Serializable;
 /** Default implementation of {@link AppEngineGradleModel}. */
 public class DefaultAppEngineGradleModel implements AppEngineGradleModel, Serializable {
 
-  private boolean hasAppEngineGradlePlugin;
-  private String gradleBuildDir;
-  private String gradleModuleDir;
+  private final boolean hasAppEngineGradlePlugin;
+  private final String gradleBuildDir;
+  private final String gradleModuleDir;
 
   DefaultAppEngineGradleModel(
       boolean hasAppEngineGradlePlugin, String gradleBuildDir, String gradleModuleDir) {
