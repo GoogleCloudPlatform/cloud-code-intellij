@@ -59,28 +59,22 @@ public class AppEngineGradleProjectDataService
 
     Map<String, AppEngineGradleModule> moduleNameToModel = collectByModuleName(toImport);
 
-    new WriteCommandAction.Simple(project) {
-      @Override
-      protected void run() {
-        Stream.of(modelsProvider.getModules())
-            .filter(module -> moduleNameToModel.containsKey(module.getName()))
-            .forEach(
-                module -> {
-                  AppEngineGradleModule appEngineGradleModule =
-                      moduleNameToModel.get(module.getName());
-                  if (!PlatformUtils.isIdeaUltimate()
-                      && appEngineGradleModule.getModel().hasAppEngineGradlePlugin()) {
-                    AppEngineStandardGradleModuleComponent gradleModuleComponent =
-                        AppEngineStandardGradleModuleComponent.getInstance(module);
+    Stream.of(modelsProvider.getModules())
+        .filter(module -> moduleNameToModel.containsKey(module.getName()))
+        .forEach(
+            module -> {
+              AppEngineGradleModule appEngineGradleModule = moduleNameToModel.get(module.getName());
+              if (!PlatformUtils.isIdeaUltimate()
+                  && appEngineGradleModule.getModel().hasAppEngineGradlePlugin()) {
+                AppEngineStandardGradleModuleComponent gradleModuleComponent =
+                    AppEngineStandardGradleModuleComponent.getInstance(module);
 
-                    gradleModuleComponent.setGradleBuildDir(
-                        appEngineGradleModule.getModel().gradleBuildDir());
-                    gradleModuleComponent.setGradleModuleDir(
-                        appEngineGradleModule.getModel().gradleModuleDir());
-                  }
-                });
-      }
-    }.execute();
+                gradleModuleComponent.setGradleBuildDir(
+                    appEngineGradleModule.getModel().gradleBuildDir());
+                gradleModuleComponent.setGradleModuleDir(
+                    appEngineGradleModule.getModel().gradleModuleDir());
+              }
+            });
   }
 
   private Map<String, AppEngineGradleModule> collectByModuleName(
