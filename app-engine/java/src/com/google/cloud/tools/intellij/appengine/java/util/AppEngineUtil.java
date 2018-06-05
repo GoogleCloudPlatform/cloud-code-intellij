@@ -170,12 +170,11 @@ public class AppEngineUtil {
     Stream.of(ModuleManager.getInstance(project).getModules())
         .forEach(
             module -> {
-              Optional<String> gradleBuildDir =
-                  AppEngineStandardGradleModuleComponent.getInstance(module).getGradleBuildDir();
-
               if (projectService.isGradleModule(module)
                   && AppEngineStandardFacet.hasFacet(module)
-                  && gradleBuildDir.isPresent()) {
+                  && AppEngineStandardGradleModuleComponent.getInstance(module)
+                      .getGradleBuildDir()
+                      .isPresent()) {
                 moduleDeploymentSources.add(
                     new GradlePluginDeploymentSource(
                         ModulePointerManager.getInstance(project).create(module)));
