@@ -34,9 +34,18 @@ The Cloud Tools for IntelliJ plugin primarily supports the following IDEs:
 * IntelliJ IDEA Community Edition 2017.1 or later
 * IntelliJ IDEA Ultimate Edition 2017.1 or later
 
-In addition to IntelliJ IDEA, the plugin provides limited support for other JetBrains IDEs:
+In addition to IntelliJ IDEA, the plugin provides limited support for the following JetBrains IDEs:
+* PyCharm
+* WebStorm
+* PhpStorm
+* Rider
+* CLion
+* RubyMine
+* GoLand
 
-| | IntelliJ IDEA - Ultimate | IntelliJ IDEA - Community | PyCharm |
+This table displays the features available in the IDEs:
+
+| | IntelliJ IDEA - Ultimate | IntelliJ IDEA - Community | All other IDEs |
 |---|:---:|:---:|:---:|
 | Create App Engine Standard App | :heavy_check_mark: | :x: | :x: |
 | Create App Engine Flexible App | :heavy_check_mark: | :heavy_check_mark: | :x: |
