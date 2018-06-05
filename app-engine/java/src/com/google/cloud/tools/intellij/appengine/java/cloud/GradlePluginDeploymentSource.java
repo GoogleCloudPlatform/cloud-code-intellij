@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.java.cloud;
 
-import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacet;
+import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardGradleModuleComponent;
 import com.intellij.openapi.module.ModulePointer;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
@@ -83,14 +83,8 @@ public class GradlePluginDeploymentSource extends ModuleDeploymentSourceImpl
       return null;
     }
 
-    AppEngineStandardFacet appEngineFacet =
-        AppEngineStandardFacet.getAppEngineFacetByModule(getModule());
-
-    if (appEngineFacet == null) {
-      return null;
-    }
-
-    Optional<String> gradleBuildDirOptional = appEngineFacet.getConfiguration().getGradleBuildDir();
+    Optional<String> gradleBuildDirOptional =
+        AppEngineStandardGradleModuleComponent.getInstance(getModule()).getGradleBuildDir();
 
     return gradleBuildDirOptional
         .map(

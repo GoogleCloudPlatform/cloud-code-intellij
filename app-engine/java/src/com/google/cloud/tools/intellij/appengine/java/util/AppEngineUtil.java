@@ -26,6 +26,7 @@ import com.google.cloud.tools.intellij.appengine.java.cloud.flexible.UserSpecifi
 import com.google.cloud.tools.intellij.appengine.java.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacetType;
+import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardGradleModuleComponent;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
 import com.google.common.collect.Lists;
 import com.intellij.facet.FacetManager;
@@ -42,6 +43,7 @@ import com.intellij.packaging.impl.artifacts.ArtifactUtil;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -163,21 +165,17 @@ public class AppEngineUtil {
   public static List<ModuleDeploymentSource> createGradlePluginDeploymentSources(
       @NotNull Project project) {
     List<ModuleDeploymentSource> moduleDeploymentSources = Lists.newArrayList();
-    AppEngineProjectService projectService = AppEngineProjectService.getInstance();
 
     Stream.of(ModuleManager.getInstance(project).getModules())
         .forEach(
             module -> {
-              if (projectService.isGradleModule(module)) {
-                AppEngineStandardFacet appEngineFacet =
-                    AppEngineStandardFacet.getAppEngineFacetByModule(module);
+              Optional<String> gradleBuildDir =
+                  AppEngineStandardGradleModuleComponent.getInstance(module).getGradleBuildDir();
 
-                if (appEngineFacet != null
-                    && appEngineFacet.getConfiguration().getGradleBuildDir().isPresent()) {
-                  moduleDeploymentSources.add(
-                      new GradlePluginDeploymentSource(
-                          ModulePointerManager.getInstance(project).create(module)));
-                }
+              if (AppEngineStandardFacet.hasFacet(module) && gradleBuildDir.isPresent()) {
+                moduleDeploymentSources.add(
+                    new GradlePluginDeploymentSource(
+                        ModulePointerManager.getInstance(project).create(module)));
               }
             });
 
