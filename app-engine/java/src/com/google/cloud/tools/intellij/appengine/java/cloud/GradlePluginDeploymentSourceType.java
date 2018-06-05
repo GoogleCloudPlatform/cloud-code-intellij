@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.java.cloud;
 
+import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardGradleModuleComponent;
 import com.google.common.collect.ImmutableList;
 import com.intellij.execution.BeforeRunTask;
 import com.intellij.execution.RunManagerEx;
@@ -30,6 +31,7 @@ import com.intellij.openapi.util.Key;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
 import java.util.Collection;
+import java.util.Optional;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -59,7 +61,12 @@ public class GradlePluginDeploymentSourceType extends BuildDeploymentSourceType 
   @Override
   protected BeforeRunTask createBuildTask(Module module) {
     ExternalSystemTaskExecutionSettings settings = new ExternalSystemTaskExecutionSettings();
-    settings.setExternalProjectPath(module.getModuleFilePath());
+
+    Optional<String> gradleModuleDirOptional =
+        AppEngineStandardGradleModuleComponent.getInstance(module).getGradleModuleDir();
+
+    gradleModuleDirOptional.ifPresent(settings::setExternalProjectPath);
+
     settings.setTaskNames(ImmutableList.of(GRADLE_ASSEMBLE_TASK));
     settings.setExternalSystemIdString(GradleConstants.SYSTEM_ID.getId());
 
@@ -121,6 +128,11 @@ public class GradlePluginDeploymentSourceType extends BuildDeploymentSourceType 
     @Override
     public ExternalSystemTaskExecutionSettings getTaskExecutionSettings() {
       return settings;
+    }
+
+    @Override
+    public boolean isEnabled() {
+      return true;
     }
   }
 }

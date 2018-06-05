@@ -75,6 +75,8 @@ public class AppEngineGradleProjectDataService
 
                     gradleModuleComponent.setGradleBuildDir(
                         appEngineGradleModule.getModel().gradleBuildDir());
+                    gradleModuleComponent.setGradleModuleDir(
+                        appEngineGradleModule.getModel().gradleModuleDir());
                   }
                 });
       }

@@ -31,6 +31,7 @@ public class AppEngineStandardGradleModuleComponent
   static final String COMPONENT_NAME = "AppEngineStandardGradleModuleComponent";
 
   public String gradleBuildDir;
+  public String gradleModuleDir;
 
   public static AppEngineStandardGradleModuleComponent getInstance(@NotNull Module module) {
     return module.getComponent(AppEngineStandardGradleModuleComponent.class);
@@ -44,6 +45,16 @@ public class AppEngineStandardGradleModuleComponent
   /** Sets the path to the Gradle build directory. */
   public void setGradleBuildDir(String gradleBuildDir) {
     this.gradleBuildDir = gradleBuildDir;
+  }
+
+  /** Returns, optionally, the path to the root of the Gradle module. */
+  public Optional<String> getGradleModuleDir() {
+    return Optional.ofNullable(gradleModuleDir);
+  }
+
+  /** Sets the path to the root of the Gradle module. */
+  public void setGradleModuleDir(String gradleModuleDir) {
+    this.gradleModuleDir = gradleModuleDir;
   }
 
   @Nullable
