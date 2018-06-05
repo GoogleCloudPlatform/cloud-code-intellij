@@ -30,7 +30,7 @@ public class AppEngineStandardGradleModuleComponent
     implements ModuleComponent, PersistentStateComponent<AppEngineStandardGradleModuleComponent> {
   static final String COMPONENT_NAME = "AppEngineStandardGradleModuleComponent";
 
-  private String gradleBuildDir;
+  public String gradleBuildDir;
 
   public static AppEngineStandardGradleModuleComponent getInstance(@NotNull Module module) {
     return module.getComponent(AppEngineStandardGradleModuleComponent.class);
