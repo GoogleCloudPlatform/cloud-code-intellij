@@ -122,17 +122,13 @@ public class GradlePluginDeploymentSourceType extends BuildDeploymentSourceType 
       super(providerId, systemId);
 
       this.settings = settings;
+      setEnabled(true);
     }
 
     @NotNull
     @Override
     public ExternalSystemTaskExecutionSettings getTaskExecutionSettings() {
       return settings;
-    }
-
-    @Override
-    public boolean isEnabled() {
-      return true;
     }
   }
 }
