@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.java.gradle;
 
-import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardGradleModuleComponent;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.externalSystem.model.DataNode;
@@ -36,7 +35,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * On module import, augments App Engine Gradle modules by adding information from the {@link
- * AppEngineGradleModel} to the {@link AppEngineStandardFacet}.
+ * AppEngineGradleModel} to the {@link AppEngineStandardGradleModuleComponent}.
  */
 public class AppEngineGradleProjectDataService
     extends AbstractProjectDataService<AppEngineGradleModule, Void> {
@@ -45,8 +44,8 @@ public class AppEngineGradleProjectDataService
       Key.create(AppEngineGradleModule.class, 100 /* Use a high processing weight */);
 
   /**
-   * Sets the Gradle directory on the {@link AppEngineStandardFacet} if the module has the App
-   * Engine Gradle plugin.
+   * Sets the Gradle directory on the {@link AppEngineStandardGradleModuleComponent} if the module
+   * has the App Engine Gradle plugin.
    */
   @Override
   public void importData(
