@@ -20,7 +20,7 @@
   <description>
     <![CDATA[<html>
       <p>This plugin integrates Google Cloud Platform into your IDE development workflows.</p>
-      <p>The following features are all available in IntelliJ IDEA, but only Cloud Storage and Cloud Source Repositories integration are available in PyCharm:</p>
+      <p>The following features are all available in IntelliJ IDEA, but only Cloud Storage and Cloud Source Repositories integration are available in the other JetBrains IDEs:</p>
       <ul>
         <li>Deploying to the App Engine standard and flexible environments.</li>
         <li>Setting Stackdriver Debugger snapshots to debug your applications running in the cloud.</li>
@@ -29,7 +29,7 @@
         <li>Running and debugging App Engine standard applications on a local development server.</li>
         <li>Adding Cloud Client Libraries for Java to your project.</li>
       </ul>
-      <p>Refer to the <a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/blob/master/README.md#supported-platforms">Supported Platforms</a> page to see which features are available in which IDEs.</p>
+      <p>Refer to the <a href="https://github.com/GoogleCloudPlatform/google-cloud-intellij/blob/master/README.md#supported-platforms">Supported Platforms</a> page to see the full list of features available in the IDEs.</p>
     </html>]]>
   </description>
   <vendor>Google</vendor>
