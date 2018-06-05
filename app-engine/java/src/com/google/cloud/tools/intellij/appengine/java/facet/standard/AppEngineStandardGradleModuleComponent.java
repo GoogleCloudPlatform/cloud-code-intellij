@@ -24,7 +24,7 @@ import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/** A module-level persistent component for store information about App Engine Gradle modules. */
+/** A module-level persistent component for storing information about App Engine Gradle modules. */
 @State(name = AppEngineStandardGradleModuleComponent.COMPONENT_NAME)
 public class AppEngineStandardGradleModuleComponent
     implements ModuleComponent, PersistentStateComponent<AppEngineStandardGradleModuleComponent> {
