@@ -31,8 +31,6 @@ public interface AppEngineGradleModel {
    */
   String gradleBuildDir();
 
-  /**
-   * Returns the path to the root of the Gradle module
-   */
+  /** Returns the path to the root of the Gradle module */
   String gradleModuleDir();
 }

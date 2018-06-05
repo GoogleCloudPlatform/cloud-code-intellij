@@ -43,7 +43,6 @@ import com.intellij.packaging.impl.artifacts.ArtifactUtil;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
