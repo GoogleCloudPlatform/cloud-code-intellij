@@ -63,7 +63,7 @@ public class AppEngineGradleProjectDataService
         .forEach(
             module -> {
               AppEngineGradleModule appEngineGradleModule = moduleNameToModel.get(module.getName());
-              if (PlatformUtils.isIdeaUltimate()
+              if (PlatformUtils.isIdeaCommunity()
                   && appEngineGradleModule.getModel().hasAppEngineGradlePlugin()) {
                 AppEngineStandardGradleModuleComponent gradleModuleComponent =
                     AppEngineStandardGradleModuleComponent.getInstance(module);
