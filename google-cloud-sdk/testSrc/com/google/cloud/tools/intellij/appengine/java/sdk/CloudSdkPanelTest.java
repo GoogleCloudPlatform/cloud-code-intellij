@@ -20,7 +20,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
@@ -40,6 +39,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 
 /** Tests for {@link CloudSdkPanel}. */
 public class CloudSdkPanelTest {
@@ -70,7 +70,7 @@ public class CloudSdkPanelTest {
     // enable managed SDK UI - remove when feature is rolled out.
     when(pluginInfoService.shouldEnable(GctFeature.MANAGED_SDK)).thenReturn(true);
     // now safe to create panel spy.
-    panel = spy(new CloudSdkPanel());
+    panel = Mockito.spy(new CloudSdkPanel());
     // reset SDK settings on each run to clean previous settings.
     CloudSdkServiceUserSettings.reset();
   }

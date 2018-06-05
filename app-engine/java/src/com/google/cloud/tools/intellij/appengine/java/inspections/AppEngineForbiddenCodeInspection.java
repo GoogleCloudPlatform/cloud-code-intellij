@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.java.inspections;
 
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacet;
-import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkInternals;
+import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkJavaInternals;
 import com.intellij.codeHighlighting.HighlightDisplayLevel;
 import com.intellij.codeInspection.BaseJavaLocalInspectionTool;
 import com.intellij.codeInspection.InspectionManager;
@@ -74,7 +74,7 @@ public class AppEngineForbiddenCodeInspection extends BaseJavaLocalInspectionToo
     final List<ProblemDescriptor> problems = new ArrayList<ProblemDescriptor>();
     file.accept(
         new JavaRecursiveElementWalkingVisitor() {
-          CloudSdkInternals sdkInternals = CloudSdkInternals.getInstance();
+          CloudSdkJavaInternals sdkInternals = CloudSdkJavaInternals.getInstance();
 
           @Override
           public void visitDocComment(PsiDocComment comment) {}
