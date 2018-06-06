@@ -17,10 +17,10 @@
 package com.google.cloud.tools.intellij.appengine.java.cloud;
 
 import com.google.cloud.tools.appengine.api.AppEngineException;
+import com.google.cloud.tools.appengine.cloudsdk.AppCfg;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
-import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
-import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListener;
-import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
+import com.google.cloud.tools.appengine.cloudsdk.Gcloud;
+import com.google.cloud.tools.appengine.cloudsdk.LocalRun;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
@@ -224,32 +224,36 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
   }
 
   @Override
-  public CloudSdk createSdk(
-      LoggingHandler loggingHandler,
-      ProcessStartListener startListener,
-      ProcessOutputLineListener logListener,
-      ProcessOutputLineListener outputListener,
-      ProcessExitListener exitListener) {
+  public Gcloud createGcloud(LoggingHandler loggingHandler) throws AppEngineException {
+    PluginInfoService pluginInfoService = ServiceManager.getService(PluginInfoService.class);
+
+    return Gcloud.builder(createSdk(loggingHandler))
+        .setCredentialFile(credentialsPath.toFile())
+        .setMetricsEnvironment(
+            pluginInfoService.getExternalPluginName(), pluginInfoService.getPluginVersion())
+        .setOutputFormat("json")
+        .build();
+  }
+
+  @Override
+  public AppCfg createAppCfg(LoggingHandler loggingHandler) throws AppEngineException {
+    return AppCfg.builder(createSdk(loggingHandler)).build();
+  }
+
+  @Override
+  public LocalRun createLocalRun(LoggingHandler loggingHandler) throws AppEngineException {
+    return LocalRun.builder(createSdk(loggingHandler)).build();
+  }
+
+  private CloudSdk createSdk(LoggingHandler loggingHandler) throws AppEngineException {
     if (credentialsPath == null) {
       loggingHandler.print(
           AppEngineMessageBundle.message("appengine.action.credential.not.found") + "\n");
       throw new AppEngineException("Failed to create application default credentials.");
     }
 
-    PluginInfoService pluginInfoService = ServiceManager.getService(PluginInfoService.class);
-
     CloudSdk.Builder sdkBuilder =
-        new CloudSdk.Builder()
-            .sdkPath(CloudSdkService.getInstance().getSdkHomePath())
-            .async(true)
-            .addStdErrLineListener(logListener)
-            .addStdOutLineListener(outputListener)
-            .exitListener(exitListener)
-            .startListener(startListener)
-            .appCommandCredentialFile(credentialsPath.toFile())
-            .appCommandMetricsEnvironment(pluginInfoService.getExternalPluginName())
-            .appCommandMetricsEnvironmentVersion(pluginInfoService.getPluginVersion())
-            .appCommandOutputFormat("json");
+        new CloudSdk.Builder().sdkPath(CloudSdkService.getInstance().getSdkHomePath());
 
     getProjectJavaSdk(project).ifPresent(sdkBuilder::javaHome);
 

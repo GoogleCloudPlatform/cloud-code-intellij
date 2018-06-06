@@ -16,9 +16,12 @@
 
 package com.google.cloud.tools.intellij.appengine.java.cloud.executor;
 
+import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
-import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineDevServer1;
+import com.google.cloud.tools.appengine.cloudsdk.LocalRun;
+import com.google.cloud.tools.appengine.cloudsdk.process.LegacyProcessHandler;
+import com.google.cloud.tools.appengine.cloudsdk.process.ProcessHandler;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
@@ -55,30 +58,32 @@ public class AppEngineStandardRunTask extends AppEngineTask {
 
   @Override
   public void execute(ProcessStartListener startListener) {
-    CloudSdkService sdkService = CloudSdkService.getInstance();
-
     // show a warning notification if the cloud sdk version is not supported
     CloudSdkVersionNotifier.getInstance().notifyIfUnsupportedVersion();
 
     CloudSdk.Builder sdkBuilder =
-        new CloudSdk.Builder()
-            .sdkPath(sdkService.getSdkHomePath())
-            .async(true)
-            .startListener(startListener);
+        new CloudSdk.Builder().sdkPath(CloudSdkService.getInstance().getSdkHomePath());
 
     if (javaSdk.getHomePath() != null) {
       sdkBuilder.javaHome(Paths.get(javaSdk.getHomePath()));
     }
 
-    CloudSdkAppEngineDevServer1 devServer = new CloudSdkAppEngineDevServer1(sdkBuilder.build());
-    devServer.run(runConfig);
+    ProcessHandler processHandler =
+        LegacyProcessHandler.builder().async(true).setStartListener(startListener).build();
 
-    UsageTrackerService.getInstance()
-        .trackEvent(GctTracking.APP_ENGINE_RUN)
-        .addMetadata(GctTracking.METADATA_LABEL_KEY, Strings.nullToEmpty(runnerId))
-        .addMetadata(
-            GctTracking.METADATA_SDK_KEY,
-            CloudSdkServiceUserSettings.getInstance().getUserSelectedSdkServiceType().name())
-        .ping();
+    try {
+      LocalRun localRun = LocalRun.builder(sdkBuilder.build()).build();
+      localRun.newDevAppServer1(processHandler).run(runConfig);
+
+      UsageTrackerService.getInstance()
+          .trackEvent(GctTracking.APP_ENGINE_RUN)
+          .addMetadata(GctTracking.METADATA_LABEL_KEY, Strings.nullToEmpty(runnerId))
+          .addMetadata(
+              GctTracking.METADATA_SDK_KEY,
+              CloudSdkServiceUserSettings.getInstance().getUserSelectedSdkServiceType().name())
+          .ping();
+    } catch (AppEngineException aee) {
+      // todo
+    }
   }
 }

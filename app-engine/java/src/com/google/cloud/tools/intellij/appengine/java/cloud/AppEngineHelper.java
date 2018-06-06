@@ -16,10 +16,11 @@
 
 package com.google.cloud.tools.intellij.appengine.java.cloud;
 
+import com.google.cloud.tools.appengine.api.AppEngineException;
+import com.google.cloud.tools.appengine.cloudsdk.AppCfg;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
-import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
-import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListener;
-import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
+import com.google.cloud.tools.appengine.cloudsdk.Gcloud;
+import com.google.cloud.tools.appengine.cloudsdk.LocalRun;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.impl.CancellableRunnable;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
@@ -66,18 +67,16 @@ public interface AppEngineHelper {
    * Creates a {@link CloudSdk} object that is used in execution of various App Engine actions.
    *
    * @param loggingHandler logging messages will be output to this
-   * @param startListener the "callback" listener used for fetching the running process
-   * @param logListener the output listener for handling "normal" operation log messages
-   * @param outputListener the output listener for handling the output messages of the operation
-   * @param exitListener the listener for handling the completion of the operation
    * @return the {@link CloudSdk} object used in executing the operation
    */
-  CloudSdk createSdk(
-      LoggingHandler loggingHandler,
-      ProcessStartListener startListener,
-      ProcessOutputLineListener logListener,
-      ProcessOutputLineListener outputListener,
-      ProcessExitListener exitListener);
+  //  CloudSdk createSdk(
+  //      LoggingHandler loggingHandler) throws AppEngineException;
+
+  Gcloud createGcloud(LoggingHandler loggingHandler) throws AppEngineException;
+
+  AppCfg createAppCfg(LoggingHandler loggingHandler) throws AppEngineException;
+
+  LocalRun createLocalRun(LoggingHandler loggingHandler) throws AppEngineException;
 
   /**
    * Attempts to locally stage the user credentials to support various App Engine tasks. If not
