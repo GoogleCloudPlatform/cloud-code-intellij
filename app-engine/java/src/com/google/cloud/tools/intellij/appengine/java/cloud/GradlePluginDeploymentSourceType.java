@@ -63,8 +63,8 @@ public class GradlePluginDeploymentSourceType extends BuildDeploymentSourceType 
   @Nullable
   @Override
   protected BeforeRunTask createBuildTask(Module module) {
-    GradleBeforeRunTask gradleBeforeRunTask = new GradleBeforeRunTask(
-        GradleBeforeRunTaskProvider.ID, GradleConstants.SYSTEM_ID);
+    GradleBeforeRunTask gradleBeforeRunTask =
+        new GradleBeforeRunTask(GradleBeforeRunTaskProvider.ID, GradleConstants.SYSTEM_ID);
     ExternalSystemTaskExecutionSettings settings = gradleBeforeRunTask.getTaskExecutionSettings();
 
     Optional<String> gradleModuleDirOptional =
@@ -118,14 +118,11 @@ public class GradlePluginDeploymentSourceType extends BuildDeploymentSourceType 
     return beforeRunTasks.stream().anyMatch(task -> task instanceof GradleBeforeRunTask);
   }
 
-  /**
-   * A Gradle specific {@link ExternalSystemBeforeRunTask}.
-   */
+  /** A Gradle specific {@link ExternalSystemBeforeRunTask}. */
   private static class GradleBeforeRunTask extends ExternalSystemBeforeRunTask {
 
     GradleBeforeRunTask(
-        @NotNull Key<ExternalSystemBeforeRunTask> providerId,
-        @NotNull ProjectSystemId systemId) {
+        @NotNull Key<ExternalSystemBeforeRunTask> providerId, @NotNull ProjectSystemId systemId) {
       super(providerId, systemId);
 
       setEnabled(true);
