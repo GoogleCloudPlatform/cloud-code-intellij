@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import com.intellij.execution.BeforeRunTask;
 import com.intellij.execution.RunManagerEx;
 import com.intellij.execution.configurations.RunConfiguration;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.externalSystem.model.ProjectSystemId;
 import com.intellij.openapi.externalSystem.model.execution.ExternalSystemTaskExecutionSettings;
 import com.intellij.openapi.externalSystem.service.execution.ExternalSystemBeforeRunTask;
@@ -45,6 +46,8 @@ import org.jetbrains.plugins.gradle.util.GradleConstants;
  */
 public class GradlePluginDeploymentSourceType extends BuildDeploymentSourceType {
 
+  private static final Logger log = Logger.getInstance(GradlePluginDeploymentSourceType.class);
+
   private static final String SOURCE_TYPE_ID = "gradle-plugin-build-source";
   private static final String GRADLE_ASSEMBLE_TASK = "assemble";
   private static final String MODULE_NAME_ATTRIBUTE = "module_name";
@@ -65,7 +68,13 @@ public class GradlePluginDeploymentSourceType extends BuildDeploymentSourceType 
     Optional<String> gradleModuleDirOptional =
         AppEngineStandardGradleModuleComponent.getInstance(module).getGradleModuleDir();
 
-    gradleModuleDirOptional.ifPresent(settings::setExternalProjectPath);
+    if (gradleModuleDirOptional.isPresent()) {
+      settings.setExternalProjectPath(gradleModuleDirOptional.get());
+    } else {
+      log.warn(
+          "Gradle module root directory not found. Unable to set root path for Gradle "
+              + "assemble before run task.");
+    }
 
     settings.setTaskNames(ImmutableList.of(GRADLE_ASSEMBLE_TASK));
     settings.setExternalSystemIdString(GradleConstants.SYSTEM_ID.getId());
@@ -113,6 +122,7 @@ public class GradlePluginDeploymentSourceType extends BuildDeploymentSourceType 
    * ExternalSystemTaskExecutionSettings} with the Gradle task information.
    */
   private static class GradleBeforeRunTask extends ExternalSystemBeforeRunTask {
+
     private final ExternalSystemTaskExecutionSettings settings;
 
     GradleBeforeRunTask(
