@@ -16,8 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.java.gradle;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.intellij.openapi.command.WriteCommandAction;
+import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardGradleModuleComponent;
 import com.intellij.openapi.externalSystem.model.DataNode;
 import com.intellij.openapi.externalSystem.model.Key;
 import com.intellij.openapi.externalSystem.model.project.ProjectData;
@@ -34,8 +33,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * On module import, augments App Engine Gradle modules by adding the Gradle facet containing
- * information from the {@link AppEngineGradleModel}.
+ * On module import, augments App Engine Gradle modules by adding information from the {@link
+ * AppEngineGradleModel} to the {@link AppEngineStandardGradleModuleComponent}.
  */
 public class AppEngineGradleProjectDataService
     extends AbstractProjectDataService<AppEngineGradleModule, Void> {
@@ -43,22 +42,9 @@ public class AppEngineGradleProjectDataService
   static final Key<AppEngineGradleModule> APP_ENGINE_MODEL_KEY =
       Key.create(AppEngineGradleModule.class, 100 /* Use a high processing weight */);
 
-  private final AppEngineGradleFacetService appEngineGradleFacetService;
-
-  @SuppressWarnings("unused")
-  AppEngineGradleProjectDataService() {
-    this(AppEngineGradleFacetService.getInstance());
-  }
-
-  @VisibleForTesting
-  AppEngineGradleProjectDataService(
-      @NotNull AppEngineGradleFacetService appEngineGradleFacetService) {
-    this.appEngineGradleFacetService = appEngineGradleFacetService;
-  }
-
   /**
-   * Adds the App Engine Gradle facet to Gradle modules if the module has the App Engine Gradle
-   * plugin.
+   * Sets the Gradle directory on the {@link AppEngineStandardGradleModuleComponent} if the module
+   * has the App Engine Gradle plugin.
    */
   @Override
   public void importData(
@@ -72,25 +58,22 @@ public class AppEngineGradleProjectDataService
 
     Map<String, AppEngineGradleModule> moduleNameToModel = collectByModuleName(toImport);
 
-    new WriteCommandAction.Simple(project) {
-      @Override
-      protected void run() {
-        Stream.of(modelsProvider.getModules())
-            .filter(module -> moduleNameToModel.containsKey(module.getName()))
-            .forEach(
-                module -> {
-                  AppEngineGradleModule appEngineGradleModule =
-                      moduleNameToModel.get(module.getName());
-                  if (PlatformUtils.isIdeaCommunity()
-                      && appEngineGradleModule.getModel().hasAppEngineGradlePlugin()) {
-                    appEngineGradleFacetService.addFacet(
-                        appEngineGradleModule,
-                        module,
-                        modelsProvider.getModifiableFacetModel(module));
-                  }
-                });
-      }
-    }.execute();
+    Stream.of(modelsProvider.getModules())
+        .filter(module -> moduleNameToModel.containsKey(module.getName()))
+        .forEach(
+            module -> {
+              AppEngineGradleModule appEngineGradleModule = moduleNameToModel.get(module.getName());
+              if (PlatformUtils.isIdeaCommunity()
+                  && appEngineGradleModule.getModel().hasAppEngineGradlePlugin()) {
+                AppEngineStandardGradleModuleComponent gradleModuleComponent =
+                    AppEngineStandardGradleModuleComponent.getInstance(module);
+
+                gradleModuleComponent.setGradleBuildDir(
+                    appEngineGradleModule.getModel().gradleBuildDir());
+                gradleModuleComponent.setGradleModuleDir(
+                    appEngineGradleModule.getModel().gradleModuleDir());
+              }
+            });
   }
 
   private Map<String, AppEngineGradleModule> collectByModuleName(

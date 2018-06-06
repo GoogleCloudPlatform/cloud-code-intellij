@@ -16,9 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.java.gradle;
 
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static com.google.common.truth.Truth.assertThat;
 
+import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardGradleModuleComponent;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.google.cloud.tools.intellij.testing.TestModule;
@@ -33,7 +33,6 @@ import com.intellij.util.PlatformUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mock;
 
 /** Tests for {@link AppEngineGradleProjectDataService}. */
 public class AppEngineGradleProjectDataServiceTest {
@@ -47,49 +46,54 @@ public class AppEngineGradleProjectDataServiceTest {
   private AppEngineGradleProjectDataService dataService;
   private IdeModifiableModelsProvider modelsProvider;
   private String originalPlatformPrefix;
+  private AppEngineStandardGradleModuleComponent gradleModuleComponent;
+
+  private static final String GRADLE_BUILD_DIR = "/path/to/build/dir";
+  private static final String GRADLE_MODULE_DIR = "/path/to/module";
 
   @TestModule private Module module;
-  @Mock private AppEngineGradleFacetService facetService;
 
   @Before
   public void setUp() {
-    dataService = new AppEngineGradleProjectDataService(facetService);
+    dataService = new AppEngineGradleProjectDataService();
     modelsProvider = new IdeModifiableModelsProviderImpl(testFixture.getProject());
+    gradleModuleComponent = AppEngineStandardGradleModuleComponent.getInstance(module);
   }
 
   @Test
-  public void importData_withAppEngineGradleModel_andGradlePlugin_addsFacet() {
+  public void importData_withAppEngineGradleModel_andGradlePlugin_savesGradleData() {
     System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, PlatformUtils.IDEA_CE_PREFIX);
 
-    AppEngineGradleModule appEngineGradleModule = createModelAndImportData(true /*hasPlugin*/);
+    createModelAndImportData(true /*hasPlugin*/);
 
-    verify(facetService)
-        .addFacet(appEngineGradleModule, module, modelsProvider.getModifiableFacetModel(module));
+    assertThat(gradleModuleComponent.getGradleBuildDir().isPresent()).isTrue();
+    assertThat(gradleModuleComponent.getGradleModuleDir().isPresent()).isTrue();
   }
 
   @Test
-  public void importData_withAppEngineGradleModel_andNoGradlePlugin_doesNotAddFacet() {
+  public void importData_withAppEngineGradleModel_andNoGradlePlugin_doesNotSaveGradleData() {
     System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, PlatformUtils.IDEA_CE_PREFIX);
 
-    AppEngineGradleModule appEngineGradleModule = createModelAndImportData(false /*hasPlugin*/);
+    createModelAndImportData(false /*hasPlugin*/);
 
-    verify(facetService, never())
-        .addFacet(appEngineGradleModule, module, modelsProvider.getModifiableFacetModel(module));
+    assertThat(gradleModuleComponent.getGradleBuildDir().isPresent()).isFalse();
+    assertThat(gradleModuleComponent.getGradleModuleDir().isPresent()).isFalse();
   }
 
   @Test
-  public void importData_withGradlePlugin_andIdeaUltimateEdition_doesNotAddFacet() {
+  public void importData_withGradlePlugin_andIdeaUltimateEdition_doesNotSaveGradleData() {
     System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, PlatformUtils.IDEA_PREFIX);
 
-    AppEngineGradleModule appEngineGradleModule = createModelAndImportData(true /*hasPlugin*/);
+    createModelAndImportData(true /*hasPlugin*/);
 
-    verify(facetService, never())
-        .addFacet(appEngineGradleModule, module, modelsProvider.getModifiableFacetModel(module));
+    assertThat(gradleModuleComponent.getGradleBuildDir().isPresent()).isFalse();
+    assertThat(gradleModuleComponent.getGradleModuleDir().isPresent()).isFalse();
   }
 
-  private AppEngineGradleModule createModelAndImportData(boolean hasAppEngineGradlePlugin) {
+  private void createModelAndImportData(boolean hasAppEngineGradlePlugin) {
     AppEngineGradleModel model =
-        new DefaultAppEngineGradleModel(hasAppEngineGradlePlugin, "test/path");
+        new DefaultAppEngineGradleModel(
+            hasAppEngineGradlePlugin, GRADLE_BUILD_DIR, GRADLE_MODULE_DIR);
     AppEngineGradleModule appEngineGradleModule =
         new AppEngineGradleModule(module.getName(), model);
 
@@ -101,7 +105,5 @@ public class AppEngineGradleProjectDataServiceTest {
 
     dataService.importData(
         ImmutableList.of(dataNode), null /*projectData*/, testFixture.getProject(), modelsProvider);
-
-    return appEngineGradleModule;
   }
 }
