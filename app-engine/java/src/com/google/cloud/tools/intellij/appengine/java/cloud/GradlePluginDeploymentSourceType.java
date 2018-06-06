@@ -63,7 +63,9 @@ public class GradlePluginDeploymentSourceType extends BuildDeploymentSourceType 
   @Nullable
   @Override
   protected BeforeRunTask createBuildTask(Module module) {
-    ExternalSystemTaskExecutionSettings settings = new ExternalSystemTaskExecutionSettings();
+    GradleBeforeRunTask gradleBeforeRunTask = new GradleBeforeRunTask(
+        GradleBeforeRunTaskProvider.ID, GradleConstants.SYSTEM_ID);
+    ExternalSystemTaskExecutionSettings settings = gradleBeforeRunTask.getTaskExecutionSettings();
 
     Optional<String> gradleModuleDirOptional =
         AppEngineStandardGradleModuleComponent.getInstance(module).getGradleModuleDir();
@@ -79,8 +81,7 @@ public class GradlePluginDeploymentSourceType extends BuildDeploymentSourceType 
     settings.setTaskNames(ImmutableList.of(GRADLE_ASSEMBLE_TASK));
     settings.setExternalSystemIdString(GradleConstants.SYSTEM_ID.getId());
 
-    return new GradleBeforeRunTask(
-        GradleBeforeRunTaskProvider.ID, GradleConstants.SYSTEM_ID, settings);
+    return gradleBeforeRunTask;
   }
 
   @NotNull
@@ -118,27 +119,16 @@ public class GradlePluginDeploymentSourceType extends BuildDeploymentSourceType 
   }
 
   /**
-   * A Gradle specific {@link ExternalSystemBeforeRunTask} that allows setting custom {@link
-   * ExternalSystemTaskExecutionSettings} with the Gradle task information.
+   * A Gradle specific {@link ExternalSystemBeforeRunTask}.
    */
   private static class GradleBeforeRunTask extends ExternalSystemBeforeRunTask {
 
-    private final ExternalSystemTaskExecutionSettings settings;
-
     GradleBeforeRunTask(
         @NotNull Key<ExternalSystemBeforeRunTask> providerId,
-        @NotNull ProjectSystemId systemId,
-        @NotNull ExternalSystemTaskExecutionSettings settings) {
+        @NotNull ProjectSystemId systemId) {
       super(providerId, systemId);
 
-      this.settings = settings;
       setEnabled(true);
-    }
-
-    @NotNull
-    @Override
-    public ExternalSystemTaskExecutionSettings getTaskExecutionSettings() {
-      return settings;
     }
   }
 }
