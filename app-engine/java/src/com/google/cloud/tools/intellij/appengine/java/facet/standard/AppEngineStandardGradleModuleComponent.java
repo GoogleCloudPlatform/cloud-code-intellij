@@ -43,7 +43,7 @@ public class AppEngineStandardGradleModuleComponent
   }
 
   /** Sets the path to the Gradle build directory. */
-  public void setGradleBuildDir(String gradleBuildDir) {
+  public void setGradleBuildDir(@Nullable String gradleBuildDir) {
     this.gradleBuildDir = gradleBuildDir;
   }
 
@@ -53,7 +53,7 @@ public class AppEngineStandardGradleModuleComponent
   }
 
   /** Sets the path to the root of the Gradle module. */
-  public void setGradleModuleDir(String gradleModuleDir) {
+  public void setGradleModuleDir(@Nullable String gradleModuleDir) {
     this.gradleModuleDir = gradleModuleDir;
   }
 
