@@ -24,9 +24,9 @@ import com.google.cloud.tools.intellij.appengine.java.cloud.GradlePluginDeployme
 import com.google.cloud.tools.intellij.appengine.java.cloud.MavenBuildDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.java.cloud.flexible.UserSpecifiedPathDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.java.facet.flexible.AppEngineFlexibleFacetType;
-import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineGradlePluginFacet;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacetType;
+import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardGradleModuleComponent;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
 import com.google.common.collect.Lists;
 import com.intellij.facet.FacetManager;
@@ -163,13 +163,17 @@ public class AppEngineUtil {
    */
   public static List<ModuleDeploymentSource> createGradlePluginDeploymentSources(
       @NotNull Project project) {
+    AppEngineProjectService projectService = AppEngineProjectService.getInstance();
     List<ModuleDeploymentSource> moduleDeploymentSources = Lists.newArrayList();
 
     Stream.of(ModuleManager.getInstance(project).getModules())
         .forEach(
             module -> {
-              if (AppEngineStandardFacet.hasFacet(module)
-                  && AppEngineGradlePluginFacet.hasFacet(module)) {
+              if (projectService.isGradleModule(module)
+                  && AppEngineStandardFacet.hasFacet(module)
+                  && AppEngineStandardGradleModuleComponent.getInstance(module)
+                      .getGradleBuildDir()
+                      .isPresent()) {
                 moduleDeploymentSources.add(
                     new GradlePluginDeploymentSource(
                         ModulePointerManager.getInstance(project).create(module)));

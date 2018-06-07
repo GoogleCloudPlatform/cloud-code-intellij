@@ -23,14 +23,15 @@ import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.java.cloud.flexible.AppEngineFlexibleDeploymentEditor;
 import com.google.cloud.tools.intellij.appengine.java.cloud.standard.AppEngineStandardDeploymentEditor;
-import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineGradlePluginFacetType;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacetType;
+import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardGradleModuleComponent;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.ModuleTestUtils;
 import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.google.cloud.tools.intellij.testing.TestModule;
 import com.google.cloud.tools.intellij.testing.TestScopedSystemPropertyRule;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.externalSystem.ExternalSystemModulePropertyManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.remoteServer.configuration.RemoteServer;
@@ -39,6 +40,7 @@ import com.intellij.testFramework.UsefulTestCase;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import com.intellij.util.PlatformUtils;
 import java.util.List;
+import org.jetbrains.plugins.gradle.util.GradleConstants;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -116,11 +118,30 @@ public final class AppEngineDeploymentConfiguratorTest {
   }
 
   @Test
-  public void getDeploymentSources_withCommunityEdition_returnsSource() {
+  public void getDeploymentSources_withCommunityEdition_andGradle_returnsSource() {
     System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, PlatformUtils.IDEA_CE_PREFIX);
+    addAppEngineFacetWithGradleBuildDir();
 
-    addAppEngineAndGradleFacets();
+    assertGradleDeploymentSourceExists();
+  }
 
+  @Test
+  public void getDeploymentSources_withPyCharm_andGradle_returnsEmpty() {
+    System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, PlatformUtils.PYCHARM_CE_PREFIX);
+    addAppEngineFacetWithGradleBuildDir();
+
+    assertGradleDeploymentSourcesEmpty();
+  }
+
+  @Test
+  public void getDeploymentSources_withUltimateEdition_andGradle_returnsEmpty() {
+    System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, PlatformUtils.IDEA_PREFIX);
+    addAppEngineFacetWithGradleBuildDir();
+
+    assertGradleDeploymentSourcesEmpty();
+  }
+
+  private void assertGradleDeploymentSourceExists() {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> {
@@ -133,12 +154,7 @@ public final class AppEngineDeploymentConfiguratorTest {
             });
   }
 
-  @Test
-  public void getDeploymentSources_withUltimateEdition_returnsEmpty() {
-    System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, PlatformUtils.IDEA_PREFIX);
-
-    addAppEngineAndGradleFacets();
-
+  private void assertGradleDeploymentSourcesEmpty() {
     ApplicationManager.getApplication()
         .invokeAndWait(
             () -> {
@@ -149,8 +165,12 @@ public final class AppEngineDeploymentConfiguratorTest {
             });
   }
 
-  private void addAppEngineAndGradleFacets() {
+  private void addAppEngineFacetWithGradleBuildDir() {
     ModuleTestUtils.addFacet(gradleModule, AppEngineStandardFacetType.ID);
-    ModuleTestUtils.addFacet(gradleModule, AppEngineGradlePluginFacetType.ID);
+    ExternalSystemModulePropertyManager.getInstance(gradleModule)
+        .setExternalId(GradleConstants.SYSTEM_ID);
+
+    AppEngineStandardGradleModuleComponent.getInstance(gradleModule)
+        .setGradleBuildDir("/path/to/gradle/build");
   }
 }
