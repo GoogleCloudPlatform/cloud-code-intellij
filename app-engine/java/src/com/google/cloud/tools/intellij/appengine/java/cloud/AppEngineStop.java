@@ -61,12 +61,6 @@ public class AppEngineStop {
       throws AppEngineException {
     ProcessOutputLineListener outputListener = line -> loggingHandler.print(line + "\n");
 
-    DefaultVersionsSelectionConfiguration configuration =
-        new DefaultVersionsSelectionConfiguration();
-    configuration.setVersions(Collections.singletonList(version));
-    configuration.setService(module);
-    configuration.setProject(deploymentConfiguration.getCloudProjectName());
-
     ProcessHandler processHandler =
         LegacyProcessHandler.builder()
             .async(true)
@@ -75,6 +69,12 @@ public class AppEngineStop {
             .setExitListener(new StopExitListener())
             .setStartListener(startListener)
             .build();
+
+    DefaultVersionsSelectionConfiguration configuration =
+        new DefaultVersionsSelectionConfiguration();
+    configuration.setVersions(Collections.singletonList(version));
+    configuration.setService(module);
+    configuration.setProject(deploymentConfiguration.getCloudProjectName());
 
     helper.createGcloud(loggingHandler).newVersions(processHandler).stop(configuration);
   }

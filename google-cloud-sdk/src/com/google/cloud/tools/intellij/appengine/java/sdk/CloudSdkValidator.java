@@ -59,11 +59,10 @@ public class CloudSdkValidator {
       return validationResults;
     } catch (CloudSdkOutOfDateException exception) {
       validationResults.add(
-          com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkValidationResult
+          CloudSdkValidationResult
               .CLOUD_SDK_VERSION_NOT_SUPPORTED);
     } catch (CloudSdkVersionFileException e) {
-      // TODO
-      e.printStackTrace();
+      validationResults.add(CloudSdkValidationResult.CLOUD_SDK_VERSION_FILE_ERROR);
     }
 
     try {
@@ -76,7 +75,8 @@ public class CloudSdkValidator {
   }
   /** Checks if the default SDK stored path contains a valid Cloud SDK. */
   public Set<CloudSdkValidationResult> validateCloudSdk() {
-    return validateCloudSdk(CloudSdkService.getInstance().getSdkHomePath());
+    CloudSdkService instance = CloudSdkService.getInstance();
+    return validateCloudSdk(instance != null ? instance.getSdkHomePath() : null);
   }
 
   /**

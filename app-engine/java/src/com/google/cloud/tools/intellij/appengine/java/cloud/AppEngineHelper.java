@@ -64,19 +64,20 @@ public interface AppEngineHelper {
       throws IOException;
 
   /**
-   * Creates a {@link CloudSdk} object that is used in execution of various App Engine actions.
+   * Creates a {@link Gcloud} object that is used in execution of various Gcloud actions.
    *
    * @param loggingHandler logging messages will be output to this
-   * @return the {@link CloudSdk} object used in executing the operation
+   * @return the {@link Gcloud} object used in executing the operation
    */
-  //  CloudSdk createSdk(
-  //      LoggingHandler loggingHandler) throws AppEngineException;
-
   Gcloud createGcloud(LoggingHandler loggingHandler) throws AppEngineException;
 
+  /**
+   * Creates an {@link AppCfg} object that is used in execution of various AppCfg actions.
+   *
+   * @param loggingHandler logging messages will be output to this
+   * @return the {@link AppCfg} object used in executing the operation
+   */
   AppCfg createAppCfg(LoggingHandler loggingHandler) throws AppEngineException;
-
-  LocalRun createLocalRun(LoggingHandler loggingHandler) throws AppEngineException;
 
   /**
    * Attempts to locally stage the user credentials to support various App Engine tasks. If not

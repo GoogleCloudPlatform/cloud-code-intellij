@@ -20,7 +20,6 @@ import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.cloudsdk.AppCfg;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.Gcloud;
-import com.google.cloud.tools.appengine.cloudsdk.LocalRun;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
@@ -240,11 +239,6 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
     return AppCfg.builder(createSdk(loggingHandler)).build();
   }
 
-  @Override
-  public LocalRun createLocalRun(LoggingHandler loggingHandler) throws AppEngineException {
-    return LocalRun.builder(createSdk(loggingHandler)).build();
-  }
-
   private CloudSdk createSdk(LoggingHandler loggingHandler) throws AppEngineException {
     if (credentialsPath == null) {
       loggingHandler.print(
@@ -252,8 +246,11 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
       throw new AppEngineException("Failed to create application default credentials.");
     }
 
+    CloudSdkService cloudSdkService = CloudSdkService.getInstance();
+
     CloudSdk.Builder sdkBuilder =
-        new CloudSdk.Builder().sdkPath(CloudSdkService.getInstance().getSdkHomePath());
+        new CloudSdk.Builder()
+            .sdkPath(cloudSdkService != null ? cloudSdkService.getSdkHomePath() : null);
 
     getProjectJavaSdk(project).ifPresent(sdkBuilder::javaHome);
 
