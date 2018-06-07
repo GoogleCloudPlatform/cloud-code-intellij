@@ -16,10 +16,12 @@
 
 package com.google.cloud.tools.intellij.appengine.java.cloud;
 
+import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardGradleModuleComponent;
 import com.google.common.collect.ImmutableList;
 import com.intellij.execution.BeforeRunTask;
 import com.intellij.execution.RunManagerEx;
 import com.intellij.execution.configurations.RunConfiguration;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.externalSystem.model.ProjectSystemId;
 import com.intellij.openapi.externalSystem.model.execution.ExternalSystemTaskExecutionSettings;
 import com.intellij.openapi.externalSystem.service.execution.ExternalSystemBeforeRunTask;
@@ -30,6 +32,7 @@ import com.intellij.openapi.util.Key;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSourceType;
 import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
 import java.util.Collection;
+import java.util.Optional;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,6 +45,8 @@ import org.jetbrains.plugins.gradle.util.GradleConstants;
  * exploded-war directory.
  */
 public class GradlePluginDeploymentSourceType extends BuildDeploymentSourceType {
+
+  private static final Logger log = Logger.getInstance(GradlePluginDeploymentSourceType.class);
 
   private static final String SOURCE_TYPE_ID = "gradle-plugin-build-source";
   private static final String GRADLE_ASSEMBLE_TASK = "assemble";
@@ -58,13 +63,25 @@ public class GradlePluginDeploymentSourceType extends BuildDeploymentSourceType 
   @Nullable
   @Override
   protected BeforeRunTask createBuildTask(Module module) {
-    ExternalSystemTaskExecutionSettings settings = new ExternalSystemTaskExecutionSettings();
-    settings.setExternalProjectPath(module.getModuleFilePath());
+    GradleBeforeRunTask gradleBeforeRunTask =
+        new GradleBeforeRunTask(GradleBeforeRunTaskProvider.ID, GradleConstants.SYSTEM_ID);
+    ExternalSystemTaskExecutionSettings settings = gradleBeforeRunTask.getTaskExecutionSettings();
+
+    Optional<String> gradleModuleDirOptional =
+        AppEngineStandardGradleModuleComponent.getInstance(module).getGradleModuleDir();
+
+    if (gradleModuleDirOptional.isPresent()) {
+      settings.setExternalProjectPath(gradleModuleDirOptional.get());
+    } else {
+      log.warn(
+          "Gradle module root directory not found. Unable to set root path for Gradle "
+              + "assemble before run task.");
+    }
+
     settings.setTaskNames(ImmutableList.of(GRADLE_ASSEMBLE_TASK));
     settings.setExternalSystemIdString(GradleConstants.SYSTEM_ID.getId());
 
-    return new GradleBeforeRunTask(
-        GradleBeforeRunTaskProvider.ID, GradleConstants.SYSTEM_ID, settings);
+    return gradleBeforeRunTask;
   }
 
   @NotNull
@@ -101,26 +118,14 @@ public class GradlePluginDeploymentSourceType extends BuildDeploymentSourceType 
     return beforeRunTasks.stream().anyMatch(task -> task instanceof GradleBeforeRunTask);
   }
 
-  /**
-   * A Gradle specific {@link ExternalSystemBeforeRunTask} that allows setting custom {@link
-   * ExternalSystemTaskExecutionSettings} with the Gradle task information.
-   */
+  /** A Gradle specific {@link ExternalSystemBeforeRunTask}. */
   private static class GradleBeforeRunTask extends ExternalSystemBeforeRunTask {
-    private final ExternalSystemTaskExecutionSettings settings;
 
     GradleBeforeRunTask(
-        @NotNull Key<ExternalSystemBeforeRunTask> providerId,
-        @NotNull ProjectSystemId systemId,
-        @NotNull ExternalSystemTaskExecutionSettings settings) {
+        @NotNull Key<ExternalSystemBeforeRunTask> providerId, @NotNull ProjectSystemId systemId) {
       super(providerId, systemId);
 
-      this.settings = settings;
-    }
-
-    @NotNull
-    @Override
-    public ExternalSystemTaskExecutionSettings getTaskExecutionSettings() {
-      return settings;
+      setEnabled(true);
     }
   }
 }

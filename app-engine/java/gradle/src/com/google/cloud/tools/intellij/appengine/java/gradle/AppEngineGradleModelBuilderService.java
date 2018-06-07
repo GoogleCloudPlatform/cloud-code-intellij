@@ -36,7 +36,9 @@ public class AppEngineGradleModelBuilderService implements ModelBuilderService {
     boolean hasAppEngineGradlePlugin = project.getPlugins().hasPlugin(APP_GRADLE_PLUGIN_ID);
 
     return new DefaultAppEngineGradleModel(
-        hasAppEngineGradlePlugin, project.getBuildDir().getAbsolutePath());
+        hasAppEngineGradlePlugin,
+        project.getBuildDir().getAbsolutePath(),
+        project.getBuildFile().getParent());
   }
 
   @NotNull
