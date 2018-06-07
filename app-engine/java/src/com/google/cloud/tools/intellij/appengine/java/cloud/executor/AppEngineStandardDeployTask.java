@@ -124,7 +124,7 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
       if (exitCode == 0) {
         try {
           deploy.deploy(stagingDirectory, startListener);
-        } catch (RuntimeException re) {
+        } catch (Exception re) {
           deploy
               .getCallback()
               .errorOccurred(

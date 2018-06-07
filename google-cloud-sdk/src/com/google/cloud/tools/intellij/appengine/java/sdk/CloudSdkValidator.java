@@ -58,9 +58,7 @@ public class CloudSdkValidator {
       // If the Cloud SDK is not found, don't bother checking anything else
       return validationResults;
     } catch (CloudSdkOutOfDateException exception) {
-      validationResults.add(
-          CloudSdkValidationResult
-              .CLOUD_SDK_VERSION_NOT_SUPPORTED);
+      validationResults.add(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED);
     } catch (CloudSdkVersionFileException e) {
       validationResults.add(CloudSdkValidationResult.CLOUD_SDK_VERSION_FILE_ERROR);
     }

@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.java.cloud.executor;
 
-import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.LocalRun;
@@ -29,6 +28,7 @@ import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceUserSettings;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkVersionNotifier;
 import com.google.common.base.Strings;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.projectRoots.Sdk;
 import java.nio.file.Paths;
 import org.jetbrains.annotations.NotNull;
@@ -36,6 +36,8 @@ import org.jetbrains.annotations.Nullable;
 
 /** Represents an App Engine Standard run task. (i.e., devappserver) */
 public class AppEngineStandardRunTask extends AppEngineTask {
+
+  private static final Logger logger = Logger.getInstance(AppEngineStandardRunTask.class);
 
   private RunConfiguration runConfig;
   private Sdk javaSdk;
@@ -83,8 +85,8 @@ public class AppEngineStandardRunTask extends AppEngineTask {
               GctTracking.METADATA_SDK_KEY,
               CloudSdkServiceUserSettings.getInstance().getUserSelectedSdkServiceType().name())
           .ping();
-    } catch (AppEngineException aee) {
-      // todo
+    } catch (Exception ex) {
+      logger.error(ex);
     }
   }
 }
