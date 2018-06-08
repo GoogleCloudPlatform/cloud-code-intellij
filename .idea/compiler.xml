@@ -45,6 +45,8 @@
       <module name="google-cloud-intellij-stackdriver-debugger_test" target="1.8" />
       <module name="google-cloud-repos_main" target="1.8" />
       <module name="google-cloud-repos_test" target="1.8" />
+      <module name="google-cloud-sdk_main" target="1.8" />
+      <module name="google-cloud-sdk_test" target="1.8" />
       <module name="google-cloud-storage_main" target="1.8" />
       <module name="google-cloud-storage_test" target="1.8" />
       <module name="google-cloud-tools-plugin-app-engine-java_main" target="1.8" />
