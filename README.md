@@ -35,8 +35,7 @@ The Cloud Tools for IntelliJ plugin primarily supports the following IDEs, versi
 * IntelliJ IDEA Ultimate Edition
 
 In addition to IntelliJ IDEA, the plugin provides limited support for the following IDEs, version 2017.1 or later:
-* PyCharm Professional Edition
-* PyCharm Community Edition
+* PyCharm (Professional and Community Editions)
 * WebStorm
 * PhpStorm
 * Rider
