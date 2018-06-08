@@ -24,6 +24,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeploymentConfiguration;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineHelper;
@@ -86,8 +87,8 @@ public final class AppEngineStopTaskTest {
   }
 
   @Test
-  public void testStop_error() {
-    doThrow(new RuntimeException("myError")).when(stop).stop(any(), any(), any());
+  public void testStop_error() throws AppEngineException {
+    doThrow(new AppEngineException("myError")).when(stop).stop(any(), any(), any());
     try {
       task.execute(startListener);
     } catch (AssertionError ae) {

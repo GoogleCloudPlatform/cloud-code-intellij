@@ -106,14 +106,14 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
                   + CloudSdkMessageBundle.message(
                       "appengine.cloudsdk.java.components.howtoinstall"));
       logger.warn(ex);
-    } catch (RuntimeException re) {
+    } catch (Exception e) {
       deploy
           .getCallback()
           .errorOccurred(
               AppEngineMessageBundle.message("appengine.deployment.exception.during.staging")
                   + "\n"
                   + AppEngineMessageBundle.message("appengine.action.error.update.message"));
-      logger.error(re);
+      logger.error(e);
     }
   }
 
@@ -124,7 +124,7 @@ public class AppEngineStandardDeployTask extends AppEngineTask {
       if (exitCode == 0) {
         try {
           deploy.deploy(stagingDirectory, startListener);
-        } catch (RuntimeException re) {
+        } catch (Exception re) {
           deploy
               .getCallback()
               .errorOccurred(

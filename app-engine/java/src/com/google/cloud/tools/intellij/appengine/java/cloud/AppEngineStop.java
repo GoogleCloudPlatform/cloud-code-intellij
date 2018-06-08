@@ -16,10 +16,11 @@
 
 package com.google.cloud.tools.intellij.appengine.java.cloud;
 
+import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.api.versions.DefaultVersionsSelectionConfiguration;
-import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
-import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineVersions;
+import com.google.cloud.tools.appengine.cloudsdk.process.LegacyProcessHandler;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
+import com.google.cloud.tools.appengine.cloudsdk.process.ProcessHandler;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
@@ -56,22 +57,18 @@ public class AppEngineStop {
 
   /** Stops the given module / version of an App Engine application. */
   public void stop(
-      @NotNull String module,
-      @NotNull String version,
-      @NotNull ProcessStartListener startListener) {
-    ProcessOutputLineListener outputListener =
-        new ProcessOutputLineListener() {
-          @Override
-          public void onOutputLine(String line) {
-            loggingHandler.print(line + "\n");
-          }
-        };
+      @NotNull String module, @NotNull String version, @NotNull ProcessStartListener startListener)
+      throws AppEngineException {
+    ProcessOutputLineListener outputListener = line -> loggingHandler.print(line + "\n");
 
-    ProcessExitListener stopExitListener = new StopExitListener();
-
-    CloudSdk sdk =
-        helper.createSdk(
-            loggingHandler, startListener, outputListener, outputListener, stopExitListener);
+    ProcessHandler processHandler =
+        LegacyProcessHandler.builder()
+            .async(true)
+            .addStdErrLineListener(outputListener)
+            .addStdOutLineListener(outputListener)
+            .setExitListener(new StopExitListener())
+            .setStartListener(startListener)
+            .build();
 
     DefaultVersionsSelectionConfiguration configuration =
         new DefaultVersionsSelectionConfiguration();
@@ -79,8 +76,7 @@ public class AppEngineStop {
     configuration.setService(module);
     configuration.setProject(deploymentConfiguration.getCloudProjectName());
 
-    CloudSdkAppEngineVersions command = new CloudSdkAppEngineVersions(sdk);
-    command.stop(configuration);
+    helper.createGcloud(loggingHandler).newVersions(processHandler).stop(configuration);
   }
 
   public AppEngineHelper getHelper() {

@@ -16,10 +16,11 @@
 
 package com.google.cloud.tools.intellij.appengine.java.cloud.standard;
 
+import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.api.deploy.DefaultStageStandardConfiguration;
-import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
-import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineStandardStaging;
+import com.google.cloud.tools.appengine.cloudsdk.process.LegacyProcessHandler;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
+import com.google.cloud.tools.appengine.cloudsdk.process.ProcessHandler;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessOutputLineListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.java.cloud.CloudSdkAppEngineHelper;
@@ -29,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 
 /** Stages an application in preparation for deployment to the App Engine flexible environment. */
 public class AppEngineStandardStage {
+
   private CloudSdkAppEngineHelper helper;
   private LoggingHandler loggingHandler;
   private Path deploymentArtifactPath;
@@ -52,19 +54,10 @@ public class AppEngineStandardStage {
   public void stage(
       @NotNull Path stagingDirectory,
       @NotNull ProcessStartListener startListener,
-      @NotNull ProcessExitListener onStageComplete) {
+      @NotNull ProcessExitListener onStageComplete)
+      throws AppEngineException {
 
-    ProcessOutputLineListener outputListener =
-        new ProcessOutputLineListener() {
-          @Override
-          public void onOutputLine(String line) {
-            loggingHandler.print(line + "\n");
-          }
-        };
-
-    CloudSdk sdk =
-        helper.createSdk(
-            loggingHandler, startListener, outputListener, outputListener, onStageComplete);
+    ProcessOutputLineListener outputListener = line -> loggingHandler.print(line + "\n");
 
     // TODO determine the default set of flags we want to set for AE standard staging
     DefaultStageStandardConfiguration stageConfig = new DefaultStageStandardConfiguration();
@@ -73,7 +66,15 @@ public class AppEngineStandardStage {
     stageConfig.setStagingDirectory(stagingDirectory.toFile());
     stageConfig.setSourceDirectory(deploymentArtifactPath.toFile());
 
-    CloudSdkAppEngineStandardStaging staging = new CloudSdkAppEngineStandardStaging(sdk);
-    staging.stageStandard(stageConfig);
+    ProcessHandler processHandler =
+        LegacyProcessHandler.builder()
+            .async(true)
+            .addStdErrLineListener(outputListener)
+            .addStdOutLineListener(outputListener)
+            .setExitListener(onStageComplete)
+            .setStartListener(startListener)
+            .build();
+
+    helper.createAppCfg(loggingHandler).newStaging(processHandler).stageStandard(stageConfig);
   }
 }
