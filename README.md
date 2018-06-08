@@ -35,7 +35,8 @@ The Cloud Tools for IntelliJ plugin primarily supports the following IDEs, versi
 * IntelliJ IDEA Ultimate Edition
 
 In addition to IntelliJ IDEA, the plugin provides limited support for the following IDEs, version 2017.1 or later:
-* PyCharm (all editions)
+* PyCharm Professional Edition
+* PyCharm Community Edition
 * WebStorm
 * PhpStorm
 * Rider
@@ -43,8 +44,6 @@ In addition to IntelliJ IDEA, the plugin provides limited support for the follow
 * RubyMine
 * GoLand
 * AppCode
-* DataGrip
-* MPS
 
 This table displays the features available in the IDEs:
 
