@@ -26,6 +26,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeploy;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeploymentConfiguration;
@@ -122,8 +123,8 @@ public class AppEngineFlexibleDeployTaskTest {
   }
 
   @Test
-  public void deploy_exception() {
-    doThrow(new RuntimeException())
+  public void deploy_exception() throws AppEngineException {
+    doThrow(new AppEngineException())
         .when(deploy)
         .deploy(any(Path.class), any(ProcessStartListener.class));
 

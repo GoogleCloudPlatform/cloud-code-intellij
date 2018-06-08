@@ -52,10 +52,10 @@ public class AppEngineStopTask extends AppEngineTask {
       }
 
       stop.stop(module, version, startListener);
-    } catch (RuntimeException re) {
+    } catch (Exception ex) {
       stop.getCallback()
           .errorOccurred(AppEngineMessageBundle.message("appengine.stop.modules.version.error"));
-      logger.error(re);
+      logger.error(ex);
     }
   }
 }
