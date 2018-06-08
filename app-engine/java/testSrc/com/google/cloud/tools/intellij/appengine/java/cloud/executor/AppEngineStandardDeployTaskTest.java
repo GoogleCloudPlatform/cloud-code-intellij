@@ -24,6 +24,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInstalledException;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeploy;
@@ -111,8 +112,8 @@ public final class AppEngineStandardDeployTaskTest {
   }
 
   @Test
-  public void stage_runtime_exception() {
-    doThrow(new RuntimeException()).when(stage).stage(any(), any(), any());
+  public void stage_runtime_exception() throws AppEngineException {
+    doThrow(new AppEngineException()).when(stage).stage(any(), any(), any());
     try {
       task.execute(startListener);
     } catch (AssertionError ae) {
@@ -124,7 +125,7 @@ public final class AppEngineStandardDeployTaskTest {
   }
 
   @Test
-  public void stage_missingJavaComponents_error() {
+  public void stage_missingJavaComponents_error() throws AppEngineException {
     doThrow(new AppEngineJavaComponentsNotInstalledException(""))
         .when(stage)
         .stage(any(), any(), any());
@@ -134,15 +135,15 @@ public final class AppEngineStandardDeployTaskTest {
   }
 
   @Test
-  public void deploy_success() {
+  public void deploy_success() throws AppEngineException {
     task.deploy(Paths.get("myFile.jar"), startListener).onExit(0);
 
     verify(callback, never()).errorOccurred(any());
   }
 
   @Test
-  public void deploy_exception() {
-    doThrow(new RuntimeException()).when(deploy).deploy(any(), any());
+  public void deploy_exception() throws AppEngineException {
+    doThrow(new AppEngineException()).when(deploy).deploy(any(), any());
     try {
       task.deploy(Paths.get("myFile.jar"), startListener).onExit(0);
     } catch (AssertionError ae) {

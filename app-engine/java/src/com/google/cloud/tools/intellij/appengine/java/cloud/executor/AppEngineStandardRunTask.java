@@ -18,7 +18,9 @@ package com.google.cloud.tools.intellij.appengine.java.cloud.executor;
 
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
-import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineDevServer1;
+import com.google.cloud.tools.appengine.cloudsdk.LocalRun;
+import com.google.cloud.tools.appengine.cloudsdk.process.LegacyProcessHandler;
+import com.google.cloud.tools.appengine.cloudsdk.process.ProcessHandler;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
@@ -26,6 +28,7 @@ import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceUserSettings;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkVersionNotifier;
 import com.google.common.base.Strings;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.projectRoots.Sdk;
 import java.nio.file.Paths;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +36,8 @@ import org.jetbrains.annotations.Nullable;
 
 /** Represents an App Engine Standard run task. (i.e., devappserver) */
 public class AppEngineStandardRunTask extends AppEngineTask {
+
+  private static final Logger logger = Logger.getInstance(AppEngineStandardRunTask.class);
 
   private RunConfiguration runConfig;
   private Sdk javaSdk;
@@ -55,30 +60,33 @@ public class AppEngineStandardRunTask extends AppEngineTask {
 
   @Override
   public void execute(ProcessStartListener startListener) {
-    CloudSdkService sdkService = CloudSdkService.getInstance();
-
     // show a warning notification if the cloud sdk version is not supported
     CloudSdkVersionNotifier.getInstance().notifyIfUnsupportedVersion();
 
+    CloudSdkService instance = CloudSdkService.getInstance();
     CloudSdk.Builder sdkBuilder =
-        new CloudSdk.Builder()
-            .sdkPath(sdkService.getSdkHomePath())
-            .async(true)
-            .startListener(startListener);
+        new CloudSdk.Builder().sdkPath(instance != null ? instance.getSdkHomePath() : null);
 
     if (javaSdk.getHomePath() != null) {
       sdkBuilder.javaHome(Paths.get(javaSdk.getHomePath()));
     }
 
-    CloudSdkAppEngineDevServer1 devServer = new CloudSdkAppEngineDevServer1(sdkBuilder.build());
-    devServer.run(runConfig);
+    ProcessHandler processHandler =
+        LegacyProcessHandler.builder().async(true).setStartListener(startListener).build();
 
-    UsageTrackerService.getInstance()
-        .trackEvent(GctTracking.APP_ENGINE_RUN)
-        .addMetadata(GctTracking.METADATA_LABEL_KEY, Strings.nullToEmpty(runnerId))
-        .addMetadata(
-            GctTracking.METADATA_SDK_KEY,
-            CloudSdkServiceUserSettings.getInstance().getUserSelectedSdkServiceType().name())
-        .ping();
+    try {
+      LocalRun localRun = LocalRun.builder(sdkBuilder.build()).build();
+      localRun.newDevAppServer1(processHandler).run(runConfig);
+
+      UsageTrackerService.getInstance()
+          .trackEvent(GctTracking.APP_ENGINE_RUN)
+          .addMetadata(GctTracking.METADATA_LABEL_KEY, Strings.nullToEmpty(runnerId))
+          .addMetadata(
+              GctTracking.METADATA_SDK_KEY,
+              CloudSdkServiceUserSettings.getInstance().getUserSelectedSdkServiceType().name())
+          .ping();
+    } catch (Exception ex) {
+      logger.error(ex);
+    }
   }
 }

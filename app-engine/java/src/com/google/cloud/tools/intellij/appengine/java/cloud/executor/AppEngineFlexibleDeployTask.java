@@ -99,14 +99,14 @@ public class AppEngineFlexibleDeployTask extends AppEngineTask {
       }
 
       deploy.deploy(stagingDirectory, startListener);
-    } catch (RuntimeException re) {
+    } catch (Exception ex) {
       deploy
           .getCallback()
           .errorOccurred(
               AppEngineMessageBundle.message("appengine.deployment.exception")
                   + "\n"
                   + AppEngineMessageBundle.message("appengine.action.error.update.message"));
-      logger.error(re);
+      logger.error(ex);
     }
   }
 

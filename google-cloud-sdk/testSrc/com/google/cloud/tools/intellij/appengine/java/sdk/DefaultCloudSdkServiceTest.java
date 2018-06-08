@@ -28,6 +28,7 @@ import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInsta
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkOutOfDateException;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkVersionFileException;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
 import java.nio.file.Path;
@@ -59,7 +60,8 @@ public class DefaultCloudSdkServiceTest {
   }
 
   @Test
-  public void testValidateCloudSdk_cloudSdkNotFound() {
+  public void testValidateCloudSdk_cloudSdkNotFound()
+      throws CloudSdkNotFoundException, CloudSdkOutOfDateException, CloudSdkVersionFileException {
     doThrow(CloudSdkNotFoundException.class).when(mockSdk).validateCloudSdk();
     Set<CloudSdkValidationResult> results = sdkValidator.validateCloudSdk();
     assertEquals(1, results.size());
@@ -68,7 +70,8 @@ public class DefaultCloudSdkServiceTest {
   }
 
   @Test
-  public void testValidateCloudSdk_versionUnsupported() {
+  public void testValidateCloudSdk_versionUnsupported()
+      throws CloudSdkNotFoundException, CloudSdkOutOfDateException, CloudSdkVersionFileException {
     doThrow(CloudSdkOutOfDateException.class).when(mockSdk).validateCloudSdk();
     Set<CloudSdkValidationResult> results = sdkValidator.validateCloudSdk();
     assertEquals(1, results.size());
@@ -124,7 +127,7 @@ public class DefaultCloudSdkServiceTest {
   }
 
   @Test
-  public void testValidateJavaComponents() {
+  public void testValidateJavaComponents() throws AppEngineJavaComponentsNotInstalledException {
     doThrow(AppEngineJavaComponentsNotInstalledException.class)
         .when(mockSdk)
         .validateAppEngineJavaComponents();
@@ -134,7 +137,9 @@ public class DefaultCloudSdkServiceTest {
   }
 
   @Test
-  public void testValidateCloudSdk_multipleResults() {
+  public void testValidateCloudSdk_multipleResults()
+      throws AppEngineJavaComponentsNotInstalledException, CloudSdkNotFoundException,
+          CloudSdkOutOfDateException, CloudSdkVersionFileException {
     doThrow(AppEngineJavaComponentsNotInstalledException.class)
         .when(mockSdk)
         .validateAppEngineJavaComponents();
