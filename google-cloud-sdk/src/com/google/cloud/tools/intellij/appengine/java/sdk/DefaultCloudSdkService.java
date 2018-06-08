@@ -51,7 +51,7 @@ public class DefaultCloudSdkService implements CloudSdkService {
 
     // Let common library auto-discover Cloud SDK's location.
     try {
-      return new CloudSdk.Builder().build().getSdkPath();
+      return new CloudSdk.Builder().build().getPath();
     } catch (AppEngineException aee) {
       return null;
     }

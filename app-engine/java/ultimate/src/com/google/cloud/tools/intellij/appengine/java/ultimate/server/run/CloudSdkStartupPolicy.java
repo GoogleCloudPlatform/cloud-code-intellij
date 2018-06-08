@@ -52,6 +52,7 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
 
   @Nullable
   @Override
+  // TODO (eshaul) this method needs to be refactored and simplified / broken down
   public ScriptHelper createStartupScriptHelper(final ProgramRunner programRunner) {
     return new ScriptHelper() {
       @Nullable

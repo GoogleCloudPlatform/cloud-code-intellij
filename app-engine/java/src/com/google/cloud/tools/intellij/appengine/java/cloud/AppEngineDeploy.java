@@ -17,10 +17,11 @@
 package com.google.cloud.tools.intellij.appengine.java.cloud;
 
 import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
+import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.api.deploy.DefaultDeployConfiguration;
-import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
-import com.google.cloud.tools.appengine.cloudsdk.CloudSdkAppEngineDeployment;
+import com.google.cloud.tools.appengine.cloudsdk.process.LegacyProcessHandler;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
+import com.google.cloud.tools.appengine.cloudsdk.process.ProcessHandler;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.facet.flexible.AppEngineFlexibleFacet;
@@ -80,7 +81,8 @@ public class AppEngineDeploy {
   /** Given a staging directory, deploy the application to Google App Engine. */
   // TODO(eshaul) break this down into smaller parts
   public void deploy(
-      @NotNull Path stagingDirectory, @NotNull ProcessStartListener deployStartListener) {
+      @NotNull Path stagingDirectory, @NotNull ProcessStartListener deployStartListener)
+      throws AppEngineException {
     final StringBuilder rawDeployOutput = new StringBuilder();
 
     DefaultDeployConfiguration configuration = new DefaultDeployConfiguration();
@@ -135,21 +137,19 @@ public class AppEngineDeploy {
       configuration.setVersion(deploymentConfiguration.getVersion());
     }
 
-    ProcessExitListener deployExitListener = new DeployExitListener(rawDeployOutput);
-
-    CloudSdk sdk =
-        helper.createSdk(
-            loggingHandler,
-            deployStartListener,
-            line -> loggingHandler.print(line + "\n"),
-            rawDeployOutput::append,
-            deployExitListener);
+    ProcessHandler processHandler =
+        LegacyProcessHandler.builder()
+            .async(true)
+            .addStdErrLineListener(line -> loggingHandler.print(line + "\n"))
+            .addStdOutLineListener(rawDeployOutput::append)
+            .setExitListener(new DeployExitListener(rawDeployOutput))
+            .setStartListener(deployStartListener)
+            .build();
 
     // show a warning notification if the cloud sdk version is not supported
     CloudSdkVersionNotifier.getInstance().notifyIfUnsupportedVersion();
 
-    CloudSdkAppEngineDeployment deployment = new CloudSdkAppEngineDeployment(sdk);
-    deployment.deploy(configuration);
+    helper.createGcloud(loggingHandler).newDeployment(processHandler).deploy(configuration);
   }
 
   public AppEngineHelper getHelper() {
@@ -169,6 +169,7 @@ public class AppEngineDeploy {
   }
 
   private class DeployExitListener implements ProcessExitListener {
+
     final StringBuilder rawDeployOutput;
 
     DeployExitListener(StringBuilder rawDeployOutput) {
@@ -242,7 +243,9 @@ public class AppEngineDeploy {
    * uses it for automatic de-serialization.
    */
   static class DeployOutput {
+
     private static class Version {
+
       String id;
       String service;
     }

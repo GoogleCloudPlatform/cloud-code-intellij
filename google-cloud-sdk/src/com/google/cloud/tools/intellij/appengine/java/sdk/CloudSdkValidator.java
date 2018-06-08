@@ -20,6 +20,7 @@ import com.google.cloud.tools.appengine.cloudsdk.AppEngineJavaComponentsNotInsta
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdkOutOfDateException;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkVersionFileException;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.intellij.openapi.components.ServiceManager;
@@ -47,17 +48,19 @@ public class CloudSdkValidator {
       return validationResults;
     }
 
-    CloudSdk sdk = buildCloudSdkWithPath(path);
+    CloudSdk sdk = null;
     try {
+      sdk = buildCloudSdkWithPath(path);
+
       sdk.validateCloudSdk();
     } catch (CloudSdkNotFoundException exception) {
       validationResults.add(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
       // If the Cloud SDK is not found, don't bother checking anything else
       return validationResults;
     } catch (CloudSdkOutOfDateException exception) {
-      validationResults.add(
-          com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkValidationResult
-              .CLOUD_SDK_VERSION_NOT_SUPPORTED);
+      validationResults.add(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED);
+    } catch (CloudSdkVersionFileException e) {
+      validationResults.add(CloudSdkValidationResult.CLOUD_SDK_VERSION_FILE_ERROR);
     }
 
     try {
@@ -70,7 +73,8 @@ public class CloudSdkValidator {
   }
   /** Checks if the default SDK stored path contains a valid Cloud SDK. */
   public Set<CloudSdkValidationResult> validateCloudSdk() {
-    return validateCloudSdk(CloudSdkService.getInstance().getSdkHomePath());
+    CloudSdkService instance = CloudSdkService.getInstance();
+    return validateCloudSdk(instance != null ? instance.getSdkHomePath() : null);
   }
 
   /**
@@ -114,7 +118,7 @@ public class CloudSdkValidator {
   }
 
   @VisibleForTesting
-  CloudSdk buildCloudSdkWithPath(@NotNull Path path) {
+  CloudSdk buildCloudSdkWithPath(@NotNull Path path) throws CloudSdkNotFoundException {
     return new CloudSdk.Builder().sdkPath(path).build();
   }
 }
