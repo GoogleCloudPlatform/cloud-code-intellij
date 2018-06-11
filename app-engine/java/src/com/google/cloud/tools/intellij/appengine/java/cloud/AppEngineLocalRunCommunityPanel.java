@@ -27,15 +27,15 @@ import org.jetbrains.annotations.NotNull;
  * Edition.
  */
 public class AppEngineLocalRunCommunityPanel
-    extends SettingsEditor<AppEngineCommunityRunConfiguration> {
+    extends SettingsEditor<AppEngineCommunityLocalServerRunConfiguration> {
 
   private JPanel panel;
 
   @Override
-  protected void resetEditorFrom(@NotNull AppEngineCommunityRunConfiguration s) {}
+  protected void resetEditorFrom(@NotNull AppEngineCommunityLocalServerRunConfiguration s) {}
 
   @Override
-  protected void applyEditorTo(@NotNull AppEngineCommunityRunConfiguration s)
+  protected void applyEditorTo(@NotNull AppEngineCommunityLocalServerRunConfiguration s)
       throws ConfigurationException {}
 
   @NotNull
