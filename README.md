@@ -21,7 +21,7 @@ into the IntelliJ IDEA UI. Currently this includes:
 * [Google App Engine](https://cloud.google.com/appengine/docs/) deployment via the Cloud SDK.
 * [Google Cloud Storage](https://cloud.google.com/storage/) 
   Browse your Google Cloud Storage buckets.
-* [Google Cloud Java Client Libraries](https://googlecloudplatform.github.io/google-cloud-java/) 
+* [Google Cloud Java Client Libraries](https://cloud.google.com/tools/intellij/docs/client-libraries) 
   Add Java client libraries to your project and enable Google Cloud APIs.
 
 For detailed user documentation go to our documentation
@@ -60,7 +60,7 @@ This table displays the features available in the IDEs:
 | Auto-manage the Cloud SDK | :heavy_check_mark: | :heavy_check_mark: | :x: |
 
 <p><b>*</b> You can follow the
-  <a href="/tools/intellij/docs/deploy-local#community">debugging your
+  <a href="https://cloud.google.com/tools/intellij/docs/deploy-local#debugging_your_application_locally_on_community_edition">debugging your
     application locally on Community Edition</a> instructions to use the Maven
   or Gradle plugins for your local run.</p>
 
