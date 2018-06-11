@@ -32,10 +32,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** A local-run configuration for App Engine standard application in Community Edition. */
-class AppEngineCommunityRunConfiguration
+class AppEngineCommunityLocalServerRunConfiguration
     extends ModuleBasedConfiguration<JavaRunConfigurationModule> {
 
-  AppEngineCommunityRunConfiguration(
+  AppEngineCommunityLocalServerRunConfiguration(
       @NotNull String name, @NotNull Project project, @NotNull ConfigurationFactory factory) {
     super(name, new JavaRunConfigurationModule(project, false), factory);
   }

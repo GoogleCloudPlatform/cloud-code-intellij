@@ -73,7 +73,7 @@ public class AppEngineLocalServerCommunityConfigurationType implements Configura
     @NotNull
     @Override
     public RunConfiguration createTemplateConfiguration(@NotNull Project project) {
-      return new AppEngineCommunityRunConfiguration(
+      return new AppEngineCommunityLocalServerRunConfiguration(
           AppEngineMessageBundle.getString("appengine.run.server.name"), project, this);
     }
   }
