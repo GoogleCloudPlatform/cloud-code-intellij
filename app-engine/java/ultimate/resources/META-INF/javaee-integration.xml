@@ -29,7 +29,7 @@
             serviceImplementation="com.google.cloud.tools.intellij.appengine.java.ultimate.cloudapis.ServiceAccountKeyUltimateDialogService"
             overrides="true"/>
 
-    <configurationType implementation="com.google.cloud.tools.intellij.appengine.java.ultimate.server.run.AppEngineServerConfigurationType"/>
+    <configurationType implementation="com.google.cloud.tools.intellij.appengine.java.ultimate.server.run.AppEngineLocalServerUltimateConfigurationType"/>
     <configurationProducer implementation="com.google.cloud.tools.intellij.appengine.java.ultimate.server.run.AppEngineServerConfigurationProducer"/>
 
     <javaee.frameworkSupportContributor

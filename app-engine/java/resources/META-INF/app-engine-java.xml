@@ -55,6 +55,8 @@
     </module-components>
 
     <extensions defaultExtensionNs="com.intellij">
+        <!--<configurationType implementation="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineServerCommunityConfigurationType"/>-->
+
         <implicitUsageProvider
                 implementation="com.google.cloud.tools.intellij.appengine.java.validation.EndpointImplicitUsageProvider"/>
 

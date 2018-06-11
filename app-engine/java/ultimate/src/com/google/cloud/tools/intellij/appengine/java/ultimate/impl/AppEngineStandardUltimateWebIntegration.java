@@ -22,7 +22,7 @@ import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineSt
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.java.ultimate.server.instance.AppEngineServerModel;
 import com.google.cloud.tools.intellij.appengine.java.ultimate.server.integration.AppEngineServerIntegration;
-import com.google.cloud.tools.intellij.appengine.java.ultimate.server.run.AppEngineServerConfigurationType;
+import com.google.cloud.tools.intellij.appengine.java.ultimate.server.run.AppEngineLocalServerUltimateConfigurationType;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configurations.ModuleRunConfiguration;
@@ -151,8 +151,8 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
       Artifact artifact, @NotNull Project project, ModuleRunConfiguration existingConfiguration) {
     final ApplicationServer appServer = getOrCreateAppServer();
     if (appServer != null) {
-      AppEngineServerConfigurationType configurationType =
-          AppEngineServerConfigurationType.getInstance();
+      AppEngineLocalServerUltimateConfigurationType configurationType =
+          AppEngineLocalServerUltimateConfigurationType.getInstance();
 
       CommonModel configuration;
       if (existingConfiguration instanceof CommonModel

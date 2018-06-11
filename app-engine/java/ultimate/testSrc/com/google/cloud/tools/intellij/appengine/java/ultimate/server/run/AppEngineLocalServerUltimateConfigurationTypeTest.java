@@ -30,8 +30,8 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.testFramework.PlatformTestCase;
 import org.picocontainer.MutablePicoContainer;
 
-/** Tests for {@link AppEngineServerConfigurationType}. */
-public class AppEngineServerConfigurationTypeTest extends PlatformTestCase {
+/** Tests for {@link AppEngineLocalServerUltimateConfigurationType}. */
+public class AppEngineLocalServerUltimateConfigurationTypeTest extends PlatformTestCase {
   private AppEngineAssetProvider assetProvider;
 
   @Override
@@ -53,8 +53,8 @@ public class AppEngineServerConfigurationTypeTest extends PlatformTestCase {
     when(assetProvider.loadAppEngineStandardWebXml(
             any(Project.class), anyCollectionOf(Module.class)))
         .thenReturn(null);
-    AppEngineServerConfigurationType configurationType =
-        AppEngineServerConfigurationType.getInstance();
+    AppEngineLocalServerUltimateConfigurationType configurationType =
+        AppEngineLocalServerUltimateConfigurationType.getInstance();
 
     ConfigurationFactory factory = configurationType.getConfigurationFactories()[0];
     assertFalse(factory.isApplicable(getProject()));
@@ -65,8 +65,8 @@ public class AppEngineServerConfigurationTypeTest extends PlatformTestCase {
             any(Project.class), anyCollectionOf(Module.class)))
         .thenReturn(mock(XmlFile.class));
 
-    AppEngineServerConfigurationType configurationType =
-        AppEngineServerConfigurationType.getInstance();
+    AppEngineLocalServerUltimateConfigurationType configurationType =
+        AppEngineLocalServerUltimateConfigurationType.getInstance();
 
     ConfigurationFactory factory = configurationType.getConfigurationFactories()[0];
     assertTrue(factory.isApplicable(getProject()));

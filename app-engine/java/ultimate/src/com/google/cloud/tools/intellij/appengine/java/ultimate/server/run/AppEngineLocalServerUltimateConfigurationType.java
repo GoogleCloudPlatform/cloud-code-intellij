@@ -36,10 +36,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** @author nik */
-public class AppEngineServerConfigurationType extends J2EEConfigurationType {
+public class AppEngineLocalServerUltimateConfigurationType extends J2EEConfigurationType {
 
-  public static AppEngineServerConfigurationType getInstance() {
-    return ConfigurationTypeUtil.findConfigurationType(AppEngineServerConfigurationType.class);
+  public static AppEngineLocalServerUltimateConfigurationType getInstance() {
+    return ConfigurationTypeUtil.findConfigurationType(
+        AppEngineLocalServerUltimateConfigurationType.class);
   }
 
   @Override

@@ -35,7 +35,7 @@ public class AppEngineStandardLocalRunToolsMenuAction extends CloudToolsRunConfi
 
   public AppEngineStandardLocalRunToolsMenuAction() {
     super(
-        AppEngineServerConfigurationType.getInstance(),
+        AppEngineLocalServerUltimateConfigurationType.getInstance(),
         AppEngineMessageBundle.message("appengine.tools.menu.run.server.text"),
         AppEngineMessageBundle.message("appengine.tools.menu.run.server.description"),
         AppEngineIcons.APP_ENGINE);
