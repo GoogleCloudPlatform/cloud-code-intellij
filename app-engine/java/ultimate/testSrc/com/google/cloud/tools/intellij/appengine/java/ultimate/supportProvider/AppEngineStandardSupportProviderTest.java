@@ -30,7 +30,7 @@ import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkJavaInternals;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceManager;
 import com.google.cloud.tools.intellij.appengine.java.ultimate.artifacts.ArtifactsTestUtil;
-import com.google.cloud.tools.intellij.appengine.java.ultimate.server.run.AppEngineServerConfigurationType;
+import com.google.cloud.tools.intellij.appengine.java.ultimate.server.run.AppEngineServerUltimateConfigurationType;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.facet.FacetManager;
@@ -159,7 +159,7 @@ public class AppEngineStandardSupportProviderTest extends JavaeeFrameworkSupport
   private void assertRunConfigurationCreated(Artifact artifactToDeploy) {
     List<RunConfiguration> list =
         RunManager.getInstance(myProject)
-            .getConfigurationsList(AppEngineServerConfigurationType.getInstance());
+            .getConfigurationsList(AppEngineServerUltimateConfigurationType.getInstance());
     CommonModel configuration = assertInstanceOf(assertOneElement(list), CommonModel.class);
     assertSameElements(configuration.getDeployedArtifacts(), artifactToDeploy);
   }
