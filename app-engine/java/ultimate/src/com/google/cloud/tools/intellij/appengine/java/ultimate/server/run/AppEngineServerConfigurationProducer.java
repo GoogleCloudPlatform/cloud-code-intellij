@@ -26,6 +26,6 @@ import com.intellij.javaee.run.configuration.J2EEConfigurationProducer;
 public class AppEngineServerConfigurationProducer extends J2EEConfigurationProducer {
 
   public AppEngineServerConfigurationProducer() {
-    super(AppEngineServerUltimateConfigurationType.getInstance());
+    super(AppEngineLocalServerUltimateConfigurationType.getInstance());
   }
 }

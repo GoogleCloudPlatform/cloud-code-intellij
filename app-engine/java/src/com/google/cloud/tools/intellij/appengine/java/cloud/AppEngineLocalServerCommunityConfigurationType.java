@@ -27,12 +27,12 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
 /** An App Engine standard Community Edition {@link ConfigurationType} implementation. */
-public class AppEngineServerCommunityConfigurationType implements ConfigurationType {
+public class AppEngineLocalServerCommunityConfigurationType implements ConfigurationType {
 
   private static final String ID = "gcp-app-engine-local-run-ce";
   private final AppEngineConfigurationFactory factory;
 
-  public AppEngineServerCommunityConfigurationType() {
+  public AppEngineLocalServerCommunityConfigurationType() {
     factory = new AppEngineConfigurationFactory(this);
   }
 

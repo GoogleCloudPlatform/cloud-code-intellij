@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.java.ultimate.cloudapis;
 
 import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
-import com.google.cloud.tools.intellij.appengine.java.ultimate.server.run.AppEngineServerUltimateConfigurationType;
+import com.google.cloud.tools.intellij.appengine.java.ultimate.server.run.AppEngineLocalServerUltimateConfigurationType;
 import com.google.cloud.tools.intellij.cloudapis.GoogleCloudApisMessageBundle;
 import com.google.cloud.tools.intellij.cloudapis.ServiceAccountKeyDownloadedPanel;
 import com.google.cloud.tools.intellij.project.CloudProject;
@@ -145,7 +145,7 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
     }
 
     return RunManager.getInstance(project)
-        .getConfigurationSettingsList(AppEngineServerUltimateConfigurationType.getInstance());
+        .getConfigurationSettingsList(AppEngineLocalServerUltimateConfigurationType.getInstance());
   }
 
   private Set<RunnerAndConfigurationSettings> getSelectedConfigurations() {
