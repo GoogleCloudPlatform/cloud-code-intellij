@@ -20,6 +20,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -51,6 +52,7 @@ import com.intellij.testFramework.ThreadTracker;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Clock;
 import java.util.Arrays;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
@@ -81,7 +83,7 @@ public class ManagedCloudSdkServiceTest {
 
   @Mock private ProgressListener mockProgressListener;
 
-  @TestService @Mock private ManagedCloudSdkUpdateService mockUpdater;
+  @TestService @Mock private ManagedCloudSdkUpdateService mockUpdateService;
 
   @Before
   public void setUp() throws UnsupportedOsException {
@@ -112,7 +114,7 @@ public class ManagedCloudSdkServiceTest {
 
   @After
   public void tearDown() {
-    // reset user cancelled flags.
+    // reset user cancelled flag and other Cloud SDK settings used in these tests.
     CloudSdkServiceUserSettings.reset();
   }
 
@@ -447,6 +449,29 @@ public class ManagedCloudSdkServiceTest {
 
     assertThat(statusCaptor.getAllValues())
         .isEqualTo(Arrays.asList(SdkStatus.INSTALLING, SdkStatus.NOT_AVAILABLE));
+  }
+
+  @Test
+  public void failed_update_writes_lastUpdateTime() throws Exception {
+    makeMockSdkInstalled(MOCK_SDK_PATH);
+    emulateMockSdkUpdateProcess();
+    SdkUpdater mockUpdater = mockManagedCloudSdk.newUpdater();
+    doThrow(new CommandExitException(-1, "")).when(mockUpdater).update(any(), any());
+    // supply custom clock to check update time has been properly set in settings.
+    Clock mockClock = mock(Clock.class);
+    when(mockUpdateService.getClock()).thenReturn(mockClock);
+    long updateTime = 1000L;
+    when(mockClock.millis()).thenReturn(updateTime);
+    doCallRealMethod().when(mockUpdateService).notifySdkUpdateCompleted();
+
+    sdkService.update();
+
+    verify(mockUpdateService).notifySdkUpdateCompleted();
+    assertThat(
+            CloudSdkServiceUserSettings.getInstance().getLastAutomaticUpdateTimestamp().isPresent())
+        .isTrue();
+    assertThat(CloudSdkServiceUserSettings.getInstance().getLastAutomaticUpdateTimestamp().get())
+        .isEqualTo(updateTime);
   }
 
   @Test
