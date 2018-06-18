@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.appengine.java.cloud.standard;
 
 import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.api.deploy.DefaultStageStandardConfiguration;
+import com.google.cloud.tools.appengine.api.deploy.StageStandardConfiguration;
 import com.google.cloud.tools.appengine.cloudsdk.process.LegacyProcessHandler;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessHandler;
@@ -60,11 +61,13 @@ public class AppEngineStandardStage {
     ProcessOutputLineListener outputListener = line -> loggingHandler.print(line + "\n");
 
     // TODO determine the default set of flags we want to set for AE standard staging
-    DefaultStageStandardConfiguration stageConfig = new DefaultStageStandardConfiguration();
-    stageConfig.setEnableJarSplitting(true);
     // TODO(joaomartins): Change File to Path on library configs.
-    stageConfig.setStagingDirectory(stagingDirectory.toFile());
-    stageConfig.setSourceDirectory(deploymentArtifactPath.toFile());
+    StageStandardConfiguration stageConfig =
+        new DefaultStageStandardConfiguration.Builder()
+            .setEnableJarSplitting(true)
+            .setStagingDirectory(stagingDirectory.toFile())
+            .setSourceDirectory(deploymentArtifactPath.toFile())
+            .build();
 
     ProcessHandler processHandler =
         LegacyProcessHandler.builder()
