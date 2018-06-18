@@ -16,48 +16,261 @@
 
 package com.google.cloud.tools.intellij.cloudapis;
 
+import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
 import com.google.cloud.tools.intellij.project.CloudProject;
+import com.google.cloud.tools.intellij.ui.BooleanTableModel;
+import com.google.common.collect.ImmutableMap;
+import com.intellij.CommonBundle;
+import com.intellij.execution.ProgramRunnerUtil;
+import com.intellij.execution.RunManager;
+import com.intellij.execution.RunnerAndConfigurationSettings;
+import com.intellij.execution.application.ApplicationConfiguration;
+import com.intellij.execution.application.ApplicationConfigurationType;
+import com.intellij.execution.configurations.RunConfiguration;
+import com.intellij.execution.executors.DefaultRunExecutor;
+import com.intellij.execution.runners.ProgramRunner;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.ui.BooleanTableCellEditor;
+import com.intellij.ui.BooleanTableCellRenderer;
+import com.intellij.ui.TableUtil;
+import com.intellij.ui.table.JBTable;
+import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UIUtil;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 import javax.swing.Action;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.border.Border;
+import javax.swing.table.DefaultTableCellRenderer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Dialog confirming the download of the service account JSON key with information on how to set the
- * credential environment variables for local run.
+ * Dialog visible only in Ultimate Edition that (1) confirms the download of the service account
+ * JSON key for the Google Cloud Libraries , (2) provides information on how to set the environment
+ * variables for local run and (3) allows the user to select App Engine Standard run configurations
+ * to automatically update with these environment variables.
  */
 public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
+  private final Project project;
   private final CloudProject cloudProject;
   private final String downloadPath;
-  private JPanel panel;
+  private JPanel mainPanel;
   private ServiceAccountKeyDownloadedPanel commonPanel;
+  private JTable runConfigurationTable;
+  private JLabel runConfigurationUpdateLabel;
+  private JScrollPane scrollPane;
+  private BooleanTableModel<RunnerAndConfigurationSettings> runConfigurationTableModel;
+  private AddVariablesAction addVariablesAction;
 
   ServiceAccountKeyDisplayDialog(
-      @Nullable Project project, CloudProject cloudProject, String downloadPath) {
+      @Nullable Project project, @NotNull CloudProject cloudProject, @NotNull String downloadPath) {
     super(project);
+    this.project = project;
     this.cloudProject = cloudProject;
     this.downloadPath = downloadPath;
     init();
     setTitle(
         GoogleCloudApisMessageBundle.message("cloud.apis.service.account.key.downloaded.title"));
+    runConfigurationTable.setTableHeader(null);
+
+    if (runConfigurationTableModel.getRowCount() == 0) {
+      runConfigurationUpdateLabel.setVisible(false);
+      scrollPane.setVisible(false);
+      runConfigurationTable.setVisible(false);
+    }
+
+    runConfigurationTableModel.addTableModelListener(
+        e -> {
+          if (addVariablesAction != null) {
+            addVariablesAction.setEnabled(!runConfigurationTableModel.getSelectedItems().isEmpty());
+          }
+        });
   }
 
   @Nullable
   @Override
   protected JComponent createCenterPanel() {
-    return panel;
-  }
-
-  private void createUIComponents() {
-    commonPanel = new ServiceAccountKeyDownloadedPanel(cloudProject.projectId(), downloadPath);
+    return mainPanel;
   }
 
   @NotNull
   @Override
   protected Action[] createActions() {
-    return new Action[] {getOKAction()};
+    List<Action> actions = new ArrayList<>();
+    if (runConfigurationTableModel.getRowCount() > 0) {
+      addVariablesAction = new AddVariablesAction();
+      actions.add(addVariablesAction);
+    }
+    actions.add(getCancelAction());
+    setCancelButtonText(CommonBundle.getCloseButtonText());
+    return actions.toArray(new Action[0]);
+  }
+
+  private void createUIComponents() {
+    commonPanel = new ServiceAccountKeyDownloadedPanel(cloudProject.projectId(), downloadPath);
+    List<RunnerAndConfigurationSettings> configurationSettingsList =
+        getStandardRunConfigurations();
+
+    if (runConfigurationTableModel == null) {
+      runConfigurationTableModel =
+          new BooleanTableModel<>(
+              configurationSettingsList,
+              RunnerAndConfigurationSettings.class,
+              Comparator.comparing(RunnerAndConfigurationSettings::getName),
+              true);
+    }
+    runConfigurationTable = new RunConfigurationTable(runConfigurationTableModel);
+  }
+
+  private List<RunnerAndConfigurationSettings> getStandardRunConfigurations() {
+    RunManager runManager = RunManager.getInstance(project);
+    return runManager.getConfigurationSettingsList(ApplicationConfigurationType.getInstance());
+  }
+
+  private Set<RunnerAndConfigurationSettings> getSelectedConfigurations() {
+    return runConfigurationTableModel.getSelectedItems();
+  }
+
+  /**
+   * Adds the environment variables for the Google Cloud Libraries to the list of environment
+   * variables for given set of configurations if they don't exist. If they exist, it replaces them.
+   *
+   * @return true if adding variables succeeded, false in case of any error.
+   */
+  @VisibleForTesting
+  public boolean addEnvironmentVariablesToConfiguration(
+      Set<RunnerAndConfigurationSettings> configurations) {
+    String executorId = DefaultRunExecutor.getRunExecutorInstance().getId();
+    boolean result = true;
+    for (RunnerAndConfigurationSettings configurationSettings : configurations) {
+      result = result && addEnvironmentVariablesToConfiguration(executorId, configurationSettings);
+    }
+
+    return result;
+  }
+
+  /**
+   * Adds the environment variables for the Google Cloud Libraries to the list of environment
+   * variables for {@code configuration} if they don't exist. If they exist, it replaces them.
+   *
+   * @return true if adding variables succeeded, false in case of any error.
+   */
+  private boolean addEnvironmentVariablesToConfiguration(
+      String executorId, RunnerAndConfigurationSettings configuration) {
+    ProgramRunner runner = ProgramRunnerUtil.getRunner(executorId, configuration);
+    System.out.println(
+        "runner for exId: "
+            + executorId
+            + ", config: "
+            + configuration
+            + ", class: "
+            + configuration.getClass());
+    if (runner == null) {
+      setErrorText(
+          GoogleCloudApisMessageBundle.message(
+              "cloud.apis.service.account.key.dialog.update.configuration.error",
+              configuration.getName()),
+          mainPanel);
+      return false;
+    }
+
+    if (configuration.getType() instanceof ApplicationConfigurationType) {
+      System.out.println("this is main app type.");
+      RunConfiguration baseConfiguration = configuration.getConfiguration();
+      System.out.println("this is config data: " + baseConfiguration);
+      if (baseConfiguration instanceof ApplicationConfiguration) {
+        System.out.println("env: " + ((ApplicationConfiguration) baseConfiguration).getEnvs());
+        ((ApplicationConfiguration) baseConfiguration)
+            .setEnvs(ImmutableMap.of("TEST", "Ivan Porty"));
+      }
+    }
+
+    return true;
+  }
+
+  @VisibleForTesting
+  public JTable getRunConfigurationTable() {
+    return runConfigurationTable;
+  }
+
+  /** Adds the Cloud Library environment variables to the selected App Engine run configurations. */
+  private class AddVariablesAction extends DialogWrapperAction {
+    private AddVariablesAction() {
+      super(
+          GoogleCloudApisMessageBundle.message(
+              "cloud.apis.service.account.key.downloaded.update.server.button"));
+      putValue(DEFAULT_ACTION, Boolean.TRUE);
+    }
+
+    @Override
+    protected void doAction(ActionEvent event) {
+      if (addEnvironmentVariablesToConfiguration(getSelectedConfigurations())) {
+        close(OK_EXIT_CODE);
+      } else {
+        this.setEnabled(false);
+      }
+    }
+  }
+
+  /** The custom {@link JBTable} for the table of existing Google App Engine run configurations. */
+  private static final class RunConfigurationTable extends JBTable {
+
+    RunConfigurationTable(BooleanTableModel<RunnerAndConfigurationSettings> tableModel) {
+      super(tableModel);
+      setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+      setDefaultRenderer(
+          RunnerAndConfigurationSettings.class, new RunnerAndConfigurationSettingsRenderer());
+      setDefaultRenderer(Boolean.class, new BooleanTableCellRenderer());
+      setDefaultEditor(Boolean.class, new BooleanTableCellEditor());
+      TableUtil.setupCheckboxColumn(this, tableModel.getBooleanColumn());
+    }
+
+    /** See {@link com.intellij.ide.plugins.PluginTable#paint(Graphics)} for reasoning. */
+    @Override
+    public void paint(@NotNull Graphics g) {
+      super.paint(g);
+      UIUtil.fixOSXEditorBackground(this);
+    }
+  }
+
+  /**
+   * The custom {@link javax.swing.table.TableCellRenderer TableCellRenderer} for {@link
+   * RunnerAndConfigurationSettings} objects.
+   */
+  private static final class RunnerAndConfigurationSettingsRenderer
+      extends DefaultTableCellRenderer {
+    private static final Border NO_FOCUS_BORDER = JBUI.Borders.empty(5);
+
+    @Override
+    public Component getTableCellRendererComponent(
+        JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+      Component component =
+          super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+      setBorder(NO_FOCUS_BORDER);
+      return component;
+    }
+
+    @Override
+    public void setValue(Object value) {
+      if (value instanceof RunnerAndConfigurationSettings) {
+        RunnerAndConfigurationSettings runnerAndConfigurationSettings =
+            (RunnerAndConfigurationSettings) value;
+        setText(runnerAndConfigurationSettings.getName());
+      } else {
+        setText("");
+      }
+    }
   }
 }

@@ -22,10 +22,14 @@ import com.google.cloud.tools.intellij.cloudapis.GoogleCloudApisMessageBundle;
 import com.google.cloud.tools.intellij.cloudapis.ServiceAccountKeyDownloadedPanel;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.ui.BooleanTableModel;
+import com.google.common.collect.ImmutableMap;
 import com.intellij.CommonBundle;
 import com.intellij.execution.ProgramRunnerUtil;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
+import com.intellij.execution.application.ApplicationConfiguration;
+import com.intellij.execution.application.ApplicationConfigurationType;
+import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.execution.runners.ProgramRunner;
 import com.intellij.execution.util.EnvironmentVariable;
@@ -46,7 +50,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -77,7 +83,7 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
   private BooleanTableModel<RunnerAndConfigurationSettings> runConfigurationTableModel;
   private AddVariablesAction addVariablesAction;
 
-  @VisibleForTesting public static List<RunnerAndConfigurationSettings> configurationSettingsList;
+  @VisibleForTesting static List<RunnerAndConfigurationSettings> configurationSettingsList;
 
   ServiceAccountKeyUltimateDisplayDialog(
       @Nullable Project project, @NotNull CloudProject cloudProject, @NotNull String downloadPath) {
@@ -144,8 +150,16 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
       return configurationSettingsList;
     }
 
-    return RunManager.getInstance(project)
-        .getConfigurationSettingsList(AppEngineLocalServerUltimateConfigurationType.getInstance());
+    RunManager runManager = RunManager.getInstance(project);
+    return Stream.concat(
+            runManager
+                .getConfigurationSettingsList(
+                    AppEngineLocalServerUltimateConfigurationType.getInstance())
+                .stream(),
+            runManager
+                .getConfigurationSettingsList(ApplicationConfigurationType.getInstance())
+                .stream())
+        .collect(Collectors.toList());
   }
 
   private Set<RunnerAndConfigurationSettings> getSelectedConfigurations() {
@@ -179,6 +193,7 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
   private boolean addEnvironmentVariablesToConfiguration(
       String executorId, RunnerAndConfigurationSettings configuration) {
     ProgramRunner runner = ProgramRunnerUtil.getRunner(executorId, configuration);
+    System.out.println("runner for exId: " + executorId + ", config: " + configuration + ", class: " + configuration.getClass());
     if (runner == null) {
       setErrorText(
           GoogleCloudApisMessageBundle.message(
@@ -188,8 +203,19 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
       return false;
     }
 
+
     RunnerSpecificLocalConfigurationBit configurationSettings =
         (RunnerSpecificLocalConfigurationBit) configuration.getConfigurationSettings(runner);
+    System.out.println("configSettings: " + configurationSettings);
+    if (configuration.getType() instanceof ApplicationConfigurationType) {
+      System.out.println("this is main app type.");
+      RunConfiguration baseConfiguration = configuration.getConfiguration();
+      System.out.println("this is config data: " + baseConfiguration);
+      if (baseConfiguration instanceof ApplicationConfiguration) {
+        System.out.println("env: " + ((ApplicationConfiguration) baseConfiguration).getEnvs());
+        ((ApplicationConfiguration) baseConfiguration).setEnvs(ImmutableMap.of("TEST", "Ivan Porty"));
+      }
+    }
     if (configurationSettings == null) {
       setErrorText(
           GoogleCloudApisMessageBundle.message(
@@ -276,7 +302,6 @@ public class ServiceAccountKeyUltimateDisplayDialog extends DialogWrapper {
    */
   private static final class RunnerAndConfigurationSettingsRenderer
       extends DefaultTableCellRenderer {
-    // TODO: test JBUI.Borders.empty(5)
     private static final Border NO_FOCUS_BORDER = JBUI.Borders.empty(5);
 
     @Override
