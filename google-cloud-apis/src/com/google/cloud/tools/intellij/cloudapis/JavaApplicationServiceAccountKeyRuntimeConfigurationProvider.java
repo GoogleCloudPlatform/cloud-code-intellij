@@ -16,15 +16,20 @@
 
 package com.google.cloud.tools.intellij.cloudapis;
 
-import com.google.cloud.tools.intellij.project.CloudProject;
+import com.intellij.execution.RunManager;
+import com.intellij.execution.RunnerAndConfigurationSettings;
+import com.intellij.execution.application.ApplicationConfigurationType;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.DialogWrapper;
-import org.jetbrains.annotations.Nullable;
+import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
-/** Application service that provides the handle to the IC's Service Account Key Created dialog */
-public class ServiceAccountKeyDialogService {
-  public DialogWrapper getDialog(
-      @Nullable Project project, CloudProject cloudProject, String downloadPath) {
-    return new ServiceAccountKeyDisplayDialog(project, cloudProject, downloadPath);
+public class JavaApplicationServiceAccountKeyRuntimeConfigurationProvider
+    implements ServiceAccountKeyRuntimeConfigurationProvider {
+
+  @Override
+  public List<RunnerAndConfigurationSettings> getRunConfigurationsForServiceAccount(
+      @NotNull Project project) {
+    RunManager runManager = RunManager.getInstance(project);
+    return runManager.getConfigurationSettingsList(ApplicationConfigurationType.getInstance());
   }
 }

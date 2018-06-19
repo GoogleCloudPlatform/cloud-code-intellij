@@ -29,6 +29,7 @@ import com.intellij.execution.application.ApplicationConfigurationType;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.execution.runners.ProgramRunner;
+import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.BooleanTableCellEditor;
@@ -57,10 +58,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Dialog visible only in Ultimate Edition that (1) confirms the download of the service account
- * JSON key for the Google Cloud Libraries , (2) provides information on how to set the environment
- * variables for local run and (3) allows the user to select App Engine Standard run configurations
- * to automatically update with these environment variables.
+ * Dialog that (1) confirms the download of the service account JSON key for the Google Cloud
+ * Libraries , (2) provides information on how to set the environment variables for local run and
+ * (3) allows the user to select plain Java application run configurations to automatically update
+ * with these environment variables.
  */
 public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
   private final Project project;
@@ -97,6 +98,8 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
             addVariablesAction.setEnabled(!runConfigurationTableModel.getSelectedItems().isEmpty());
           }
         });
+
+    ServiceAccountKeyRuntimeConfigurationProvider[] runtimeConfigurationProviders = Extensions.getExtensions(ServiceAccountKeyRuntimeConfigurationProvider.EP_NAME);
   }
 
   @Nullable
@@ -120,8 +123,7 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
 
   private void createUIComponents() {
     commonPanel = new ServiceAccountKeyDownloadedPanel(cloudProject.projectId(), downloadPath);
-    List<RunnerAndConfigurationSettings> configurationSettingsList =
-        getStandardRunConfigurations();
+    List<RunnerAndConfigurationSettings> configurationSettingsList = getStandardRunConfigurations();
 
     if (runConfigurationTableModel == null) {
       runConfigurationTableModel =

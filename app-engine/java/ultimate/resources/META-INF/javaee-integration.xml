@@ -25,7 +25,7 @@
             overrides="true"/>
     <applicationService
             id="serviceAccountKeyUltimateDialogService"
-            serviceInterface="com.google.cloud.tools.intellij.cloudapis.ServiceAccountKeyDialogService"
+            serviceInterface="com.google.cloud.tools.intellij.cloudapis.ServiceAccountKeyRuntimeConfigurationProvider"
             serviceImplementation="com.google.cloud.tools.intellij.appengine.java.ultimate.cloudapis.ServiceAccountKeyUltimateDialogService"
             overrides="true"/>
 

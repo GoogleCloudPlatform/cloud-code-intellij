@@ -15,42 +15,50 @@
   -->
 
 <idea-plugin>
-  <depends>org.jetbrains.idea.maven</depends>
+    <depends>org.jetbrains.idea.maven</depends>
 
-  <project-components>
-    <component>
-      <implementation-class>com.google.cloud.tools.intellij.cloudapis.CloudLibraryProjectState
-      </implementation-class>
-    </component>
-  </project-components>
-  <extensions defaultExtensionNs="com.intellij">
-    <applicationService
-        serviceImplementation="com.google.cloud.tools.intellij.cloudapis.CloudLibrariesService"/>
-    <applicationService
-        serviceImplementation="com.google.cloud.tools.intellij.cloudapis.CloudApiMavenService"/>
-    <applicationService
-            id="serviceAccountKeyDialogService" order="before serviceAccountKeyUltimateDialogService"
-            serviceImplementation="com.google.cloud.tools.intellij.cloudapis.ServiceAccountKeyDialogService"/>
+    <project-components>
+        <component>
+            <implementation-class>com.google.cloud.tools.intellij.cloudapis.CloudLibraryProjectState
+            </implementation-class>
+        </component>
+    </project-components>
+    <extensionPoints>
+        <extensionPoint name="serviceAccountRuntimeConfiguration"
+                        interface="com.google.cloud.tools.intellij.cloudapis.ServiceAccountKeyRuntimeConfigurationProvider"/>
+    </extensionPoints>
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService
+                serviceImplementation="com.google.cloud.tools.intellij.cloudapis.CloudLibrariesService"/>
+        <applicationService
+                serviceImplementation="com.google.cloud.tools.intellij.cloudapis.CloudApiMavenService"/>
+        <serviceAccountRuntimeConfiguration
+                implementation="com.google.cloud.tools.intellij.cloudapis.JavaApplicationServiceAccountKeyRuntimeConfigurationProvider"/>
+        <localInspection language="XML" shortName="DependencyVersionWithBom"
+                         bundle="messages.CloudApisBundle"
+                         hasStaticDescription="true"
+                         key="cloud.libraries.version.with.bom.inspection.display.name"
+                         groupKey="cloud.libraries.bom.inspection.group.name"
+                         enabledByDefault="true" level="WARNING"
+                         implementationClass="com.google.cloud.tools.intellij.cloudapis.CloudDependencyVersionWithBomInspection"/>
 
-    <localInspection language="XML" shortName="DependencyVersionWithBom"
-        bundle="messages.CloudApisBundle"
-        hasStaticDescription="true" key="cloud.libraries.version.with.bom.inspection.display.name"
-        groupKey="cloud.libraries.bom.inspection.group.name" enabledByDefault="true" level="WARNING"
-        implementationClass="com.google.cloud.tools.intellij.cloudapis.CloudDependencyVersionWithBomInspection"/>
-
-    <localInspection language="XML" shortName="DependencyWithNoBom"
-        bundle="messages.CloudApisBundle"
-        hasStaticDescription="true" key="cloud.libraries.with.no.bom.inspection.display.name"
-        groupKey="cloud.libraries.bom.inspection.group.name" enabledByDefault="true" level="WARNING"
-        implementationClass="com.google.cloud.tools.intellij.cloudapis.CloudDependencyWithNoBomInspection"/>
-  </extensions>
-  <actions>
-    <group id="GoogleCloudTools.cloudapis">
-      <action id="GoogleCloudTools.AddCloudLibraries"
-          class="com.google.cloud.tools.intellij.cloudapis.AddCloudLibrariesAction"/>
-      <separator/>
-      <add-to-group group-id="GoogleCloudTools" anchor="first"/>
-    </group>
-  </actions>
+        <localInspection language="XML" shortName="DependencyWithNoBom"
+                         bundle="messages.CloudApisBundle"
+                         hasStaticDescription="true"
+                         key="cloud.libraries.with.no.bom.inspection.display.name"
+                         groupKey="cloud.libraries.bom.inspection.group.name"
+                         enabledByDefault="true" level="WARNING"
+                         implementationClass="com.google.cloud.tools.intellij.cloudapis.CloudDependencyWithNoBomInspection"/>
+    </extensions>
+    <extensions defaultExtensionNs="com.google.gct.cloudapis">
+    </extensions>
+    <actions>
+        <group id="GoogleCloudTools.cloudapis">
+            <action id="GoogleCloudTools.AddCloudLibraries"
+                    class="com.google.cloud.tools.intellij.cloudapis.AddCloudLibrariesAction"/>
+            <separator/>
+            <add-to-group group-id="GoogleCloudTools" anchor="first"/>
+        </group>
+    </actions>
 
 </idea-plugin>

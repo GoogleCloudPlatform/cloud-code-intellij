@@ -16,14 +16,15 @@
 
 package com.google.cloud.tools.intellij.appengine.java.ultimate.cloudapis;
 
-import com.google.cloud.tools.intellij.cloudapis.ServiceAccountKeyDialogService;
+import com.google.cloud.tools.intellij.cloudapis.ServiceAccountKeyRuntimeConfigurationProvider;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import org.jetbrains.annotations.Nullable;
 
 /** Application service that provides a handle to the IU's Service Account Key Created dialog */
-public class ServiceAccountKeyUltimateDialogService extends ServiceAccountKeyDialogService {
+public class ServiceAccountKeyUltimateDialogService extends
+    ServiceAccountKeyRuntimeConfigurationProvider {
   @Override
   public DialogWrapper getDialog(
       @Nullable Project project, CloudProject cloudProject, String downloadPath) {
