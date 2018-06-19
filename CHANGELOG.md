@@ -4,7 +4,7 @@ This page documents production updates to Cloud Tools for IntelliJ. You can chec
 ## 18.6.1
 
 ### Fixed
-  - Fixed errors in the managed Cloud SDK cause by downgrading the version. [666](https://github.com/GoogleCloudPlatform/appengine-plugins-core/issues/666)
+  - Fixed errors in the managed Cloud SDK caused by downgrading the version. [666](https://github.com/GoogleCloudPlatform/appengine-plugins-core/issues/666)
   - Fixed error in the managed Cloud SDK caused by "HEAD" in the version file. [561](https://github.com/GoogleCloudPlatform/appengine-plugins-core/issues/561)
 
 
