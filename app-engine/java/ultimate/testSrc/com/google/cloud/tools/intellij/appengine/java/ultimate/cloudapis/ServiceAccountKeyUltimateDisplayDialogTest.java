@@ -56,7 +56,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 
-/** Tests for {@link ServiceAccountKeyUltimateDisplayDialog}. */
+/** Tests for {@link AppEngineLocalRunServiceAccountKeyRuntimeConfigurationProvider}. */
 public class ServiceAccountKeyUltimateDisplayDialogTest {
 
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
@@ -68,7 +68,6 @@ public class ServiceAccountKeyUltimateDisplayDialogTest {
   @Mock private JavaPatchableProgramRunner mockProgramRunner;
   @Mock private CommonStrategy mockCommonStrategy;
   @Mock private ScriptHelper mockScriptHelper;
-  private ServiceAccountKeyUltimateDisplayDialog dialog;
   private RunnerSpecificLocalConfigurationBit runnerSpecificLocalConfigurationBit;
 
   @Before

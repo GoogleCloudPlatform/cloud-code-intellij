@@ -17,9 +17,12 @@
 package com.google.cloud.tools.intellij.cloudapis;
 
 import com.intellij.execution.RunnerAndConfigurationSettings;
+import com.intellij.execution.util.EnvironmentVariable;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.project.Project;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -32,4 +35,17 @@ public interface ServiceAccountKeyRuntimeConfigurationProvider {
 
   List<RunnerAndConfigurationSettings> getRunConfigurationsForServiceAccount(
       @NotNull Project project);
+
+  /**
+   * Adds the environment variables for the Google Cloud Libraries to the list of environment
+   * variables for {@code configuration} if they don't exist. If they exist, it replaces them.
+   * Configuration is guaranteed to be one from the list returned by {@link
+   * #getRunConfigurationsForServiceAccount(Project)} method of this instance.
+   *
+   * @return Empty optional without error message in case of success, error message in case of any
+   *     error.
+   */
+  Optional<String> addEnvironmentVariablesToConfiguration(
+      RunnerAndConfigurationSettings configuration,
+      Set<EnvironmentVariable> serviceAccountEnvironmentVariables);
 }

@@ -19,15 +19,8 @@ package com.google.cloud.tools.intellij.cloudapis;
 import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.ui.BooleanTableModel;
-import com.google.common.collect.ImmutableMap;
 import com.intellij.CommonBundle;
-import com.intellij.execution.ProgramRunnerUtil;
 import com.intellij.execution.RunnerAndConfigurationSettings;
-import com.intellij.execution.application.ApplicationConfiguration;
-import com.intellij.execution.application.ApplicationConfigurationType;
-import com.intellij.execution.configurations.RunConfiguration;
-import com.intellij.execution.executors.DefaultRunExecutor;
-import com.intellij.execution.runners.ProgramRunner;
 import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -45,6 +38,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -64,8 +58,9 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Dialog that (1) confirms the download of the service account JSON key for the Google Cloud
  * Libraries , (2) provides information on how to set the environment variables for local run and
- * (3) allows the user to select plain Java application run configurations to automatically update
- * with these environment variables.
+ * (3) allows the user to select set of run configurations to automatically update with these
+ * environment variables. Set of configurations is defined by extension point {@link
+ * ServiceAccountKeyRuntimeConfigurationProvider}.
  */
 public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
   private final Project project;
@@ -174,54 +169,28 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
    * @return true if adding variables succeeded, false in case of any error.
    */
   @VisibleForTesting
-  public boolean addEnvironmentVariablesToConfiguration(
+  boolean addEnvironmentVariablesToConfiguration(
       Set<RunnerAndConfigurationSettings> configurations) {
-    String executorId = DefaultRunExecutor.getRunExecutorInstance().getId();
     boolean result = true;
     for (RunnerAndConfigurationSettings configurationSettings : configurations) {
-      result = result && addEnvironmentVariablesToConfiguration(executorId, configurationSettings);
-    }
-
-    return result;
-  }
-
-  /**
-   * Adds the environment variables for the Google Cloud Libraries to the list of environment
-   * variables for {@code configuration} if they don't exist. If they exist, it replaces them.
-   *
-   * @return true if adding variables succeeded, false in case of any error.
-   */
-  private boolean addEnvironmentVariablesToConfiguration(
-      String executorId, RunnerAndConfigurationSettings configuration) {
-    ProgramRunner runner = ProgramRunnerUtil.getRunner(executorId, configuration);
-    System.out.println(
-        "runner for exId: "
-            + executorId
-            + ", config: "
-            + configuration
-            + ", class: "
-            + configuration.getClass());
-    if (runner == null) {
-      setErrorText(
-          GoogleCloudApisMessageBundle.message(
-              "cloud.apis.service.account.key.dialog.update.configuration.error",
-              configuration.getName()),
-          mainPanel);
-      return false;
-    }
-
-    if (configuration.getType() instanceof ApplicationConfigurationType) {
-      System.out.println("this is main app type.");
-      RunConfiguration baseConfiguration = configuration.getConfiguration();
-      System.out.println("this is config data: " + baseConfiguration);
-      if (baseConfiguration instanceof ApplicationConfiguration) {
-        System.out.println("env: " + ((ApplicationConfiguration) baseConfiguration).getEnvs());
-        ((ApplicationConfiguration) baseConfiguration)
-            .setEnvs(ImmutableMap.of("TEST", "Ivan Porty"));
+      for (Map.Entry<
+              ServiceAccountKeyRuntimeConfigurationProvider, List<RunnerAndConfigurationSettings>>
+          nextProviderEntry : runtimeConfigurationProviders.entrySet()) {
+        if (nextProviderEntry.getValue().contains(configurationSettings)) {
+          Optional<String> errorMessage =
+              nextProviderEntry
+                  .getKey()
+                  .addEnvironmentVariablesToConfiguration(
+                      configurationSettings, commonPanel.getEnvironmentVariables());
+          if (errorMessage.isPresent()) {
+            setErrorText(errorMessage.get(), mainPanel);
+            result = false;
+          }
+        }
       }
     }
 
-    return true;
+    return result;
   }
 
   @VisibleForTesting
