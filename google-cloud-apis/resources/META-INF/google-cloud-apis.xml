@@ -24,7 +24,7 @@
         </component>
     </project-components>
     <extensionPoints>
-        <extensionPoint name="serviceAccountRuntimeConfiguration"
+        <extensionPoint qualifiedName="com.google.gct.cloudapis.serviceAccountRuntimeConfiguration"
                         interface="com.google.cloud.tools.intellij.cloudapis.ServiceAccountKeyRuntimeConfigurationProvider"/>
     </extensionPoints>
     <extensions defaultExtensionNs="com.intellij">
@@ -32,8 +32,6 @@
                 serviceImplementation="com.google.cloud.tools.intellij.cloudapis.CloudLibrariesService"/>
         <applicationService
                 serviceImplementation="com.google.cloud.tools.intellij.cloudapis.CloudApiMavenService"/>
-        <serviceAccountRuntimeConfiguration
-                implementation="com.google.cloud.tools.intellij.cloudapis.JavaApplicationServiceAccountKeyRuntimeConfigurationProvider"/>
         <localInspection language="XML" shortName="DependencyVersionWithBom"
                          bundle="messages.CloudApisBundle"
                          hasStaticDescription="true"
@@ -51,6 +49,8 @@
                          implementationClass="com.google.cloud.tools.intellij.cloudapis.CloudDependencyWithNoBomInspection"/>
     </extensions>
     <extensions defaultExtensionNs="com.google.gct.cloudapis">
+        <serviceAccountRuntimeConfiguration
+                implementation="com.google.cloud.tools.intellij.cloudapis.JavaApplicationServiceAccountKeyRuntimeConfigurationProvider"/>
     </extensions>
     <actions>
         <group id="GoogleCloudTools.cloudapis">

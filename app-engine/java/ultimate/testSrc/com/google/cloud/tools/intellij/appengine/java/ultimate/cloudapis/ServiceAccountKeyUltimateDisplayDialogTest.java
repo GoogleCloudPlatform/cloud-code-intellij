@@ -16,50 +16,10 @@
 
 package com.google.cloud.tools.intellij.appengine.java.ultimate.cloudapis;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
-import com.google.cloud.tools.intellij.project.CloudProject;
-import com.google.cloud.tools.intellij.testing.CloudToolsRule;
-import com.google.cloud.tools.intellij.testing.TestFixture;
-import com.google.cloud.tools.intellij.testing.TestService;
-import com.intellij.debugger.impl.GenericDebuggerRunnerSettings;
-import com.intellij.execution.RunnerAndConfigurationSettings;
-import com.intellij.execution.RunnerRegistry;
-import com.intellij.execution.configurations.ConfigurationInfoProvider;
-import com.intellij.execution.configurations.ConfigurationPerRunnerSettings;
-import com.intellij.execution.configurations.RunConfiguration;
-import com.intellij.execution.configurations.RunProfile;
-import com.intellij.execution.configurations.RunnerSettings;
-import com.intellij.execution.runners.JavaPatchableProgramRunner;
-import com.intellij.execution.runners.ProgramRunner;
-import com.intellij.execution.util.EnvironmentVariable;
-import com.intellij.javaee.run.configuration.CommonStrategy;
-import com.intellij.javaee.run.configuration.JavaeeRunConfigurationCommonSettingsBean;
-import com.intellij.javaee.run.configuration.RunnerSpecificLocalConfigurationBit;
-import com.intellij.javaee.run.localRun.ScriptHelper;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import javax.swing.JTable;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.Mock;
-
 /** Tests for {@link AppEngineLocalRunServiceAccountKeyRuntimeConfigurationProvider}. */
 public class ServiceAccountKeyUltimateDisplayDialogTest {
 
-  @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
+  /*@Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
   @TestFixture private IdeaProjectTestFixture testFixture;
   @Mock @TestService private RunnerRegistry mockRunnerRegistry;
   @Mock private CloudProject mockCloudProject;
@@ -206,5 +166,5 @@ public class ServiceAccountKeyUltimateDisplayDialogTest {
     public ConfigurationPerRunnerSettings getConfigurationSettings() {
       return null;
     }
-  }
+  }*/
 }
