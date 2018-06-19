@@ -22,7 +22,6 @@ import com.google.cloud.tools.intellij.ui.BooleanTableModel;
 import com.google.common.collect.ImmutableMap;
 import com.intellij.CommonBundle;
 import com.intellij.execution.ProgramRunnerUtil;
-import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.application.ApplicationConfiguration;
 import com.intellij.execution.application.ApplicationConfigurationType;
@@ -42,9 +41,14 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -75,6 +79,11 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
   private BooleanTableModel<RunnerAndConfigurationSettings> runConfigurationTableModel;
   private AddVariablesAction addVariablesAction;
 
+  // map of extension point specified runtime configuration providers to the list of runtime
+  // configurations supplied by them.
+  private Map<ServiceAccountKeyRuntimeConfigurationProvider, List<RunnerAndConfigurationSettings>>
+      runtimeConfigurationProviders;
+
   ServiceAccountKeyDisplayDialog(
       @Nullable Project project, @NotNull CloudProject cloudProject, @NotNull String downloadPath) {
     super(project);
@@ -98,8 +107,6 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
             addVariablesAction.setEnabled(!runConfigurationTableModel.getSelectedItems().isEmpty());
           }
         });
-
-    ServiceAccountKeyRuntimeConfigurationProvider[] runtimeConfigurationProviders = Extensions.getExtensions(ServiceAccountKeyRuntimeConfigurationProvider.EP_NAME);
   }
 
   @Nullable
@@ -123,7 +130,7 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
 
   private void createUIComponents() {
     commonPanel = new ServiceAccountKeyDownloadedPanel(cloudProject.projectId(), downloadPath);
-    List<RunnerAndConfigurationSettings> configurationSettingsList = getStandardRunConfigurations();
+    List<RunnerAndConfigurationSettings> configurationSettingsList = getAllRunConfigurations();
 
     if (runConfigurationTableModel == null) {
       runConfigurationTableModel =
@@ -136,9 +143,24 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
     runConfigurationTable = new RunConfigurationTable(runConfigurationTableModel);
   }
 
-  private List<RunnerAndConfigurationSettings> getStandardRunConfigurations() {
-    RunManager runManager = RunManager.getInstance(project);
-    return runManager.getConfigurationSettingsList(ApplicationConfigurationType.getInstance());
+  private List<RunnerAndConfigurationSettings> getAllRunConfigurations() {
+    if (runtimeConfigurationProviders == null) {
+      // build initial map of providers to list of their configurations.
+      runtimeConfigurationProviders =
+          Stream.of(Extensions.getExtensions(ServiceAccountKeyRuntimeConfigurationProvider.EP_NAME))
+              .collect(
+                  Collectors.toMap(
+                      Function.identity(),
+                      configProvider ->
+                          configProvider.getRunConfigurationsForServiceAccount(project)));
+    }
+
+    // return flat list of all runtime configurations for UI table model.
+    return runtimeConfigurationProviders
+        .values()
+        .stream()
+        .flatMap(Collection::stream)
+        .collect(Collectors.toList());
   }
 
   private Set<RunnerAndConfigurationSettings> getSelectedConfigurations() {
