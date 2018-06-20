@@ -56,7 +56,7 @@ public class AppEngineGradleDeploymentSourceProviderTest {
   }
 
   @Test
-  public void createGradleSource_withAppEngineFacet_andGradleBuildDir_returnsGradleSource() {
+  public void getDeploymentSources_withAppEngineFacet_andGradleBuildDir_returnsGradleSource() {
     System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, PlatformUtils.IDEA_CE_PREFIX);
     initForGradleSources();
 
@@ -68,7 +68,7 @@ public class AppEngineGradleDeploymentSourceProviderTest {
   }
 
   @Test
-  public void createGradleSource_withAppEngineFacet_andGradleBuildDir_withNoGradle_returnsEmpty() {
+  public void getDeploymentSources_withAppEngineFacet_andGradleBuildDir_withNoGradle_returnsEmpty() {
     System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, PlatformUtils.IDEA_CE_PREFIX);
     addGradleBuildDir();
     addAppEngineStandardFacet();
@@ -80,7 +80,7 @@ public class AppEngineGradleDeploymentSourceProviderTest {
   }
 
   @Test
-  public void createGradleSource_withNoAppEngineFacet_returnsEmpty() {
+  public void getDeploymentSources_withNoAppEngineFacet_returnsEmpty() {
     System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, PlatformUtils.IDEA_CE_PREFIX);
     addGradleBuildDir();
     enableGradle();
@@ -92,7 +92,7 @@ public class AppEngineGradleDeploymentSourceProviderTest {
   }
 
   @Test
-  public void createGradleSource_withAppEngineFacet_andNoGradleBuildDir_returnsEmpty() {
+  public void getDeploymentSources_withAppEngineFacet_andNoGradleBuildDir_returnsEmpty() {
     System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, PlatformUtils.IDEA_CE_PREFIX);
     addAppEngineStandardFacet();
     enableGradle();
