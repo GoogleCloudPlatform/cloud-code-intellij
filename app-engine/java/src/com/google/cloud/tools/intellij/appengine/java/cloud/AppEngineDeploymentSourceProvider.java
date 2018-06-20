@@ -30,5 +30,9 @@ public interface AppEngineDeploymentSourceProvider {
   ExtensionPointName<AppEngineDeploymentSourceProvider> EP_NAME =
       ExtensionPointName.create("com.google.gct.core.appEngineDeploymentSourceProvider");
 
+  /**
+   * Extensions implement this to plug-in additional deployment sources with custom deployment
+   * source collection logic.
+   */
   List<DeploymentSource> getDeploymentSources(@NotNull Project project);
 }
