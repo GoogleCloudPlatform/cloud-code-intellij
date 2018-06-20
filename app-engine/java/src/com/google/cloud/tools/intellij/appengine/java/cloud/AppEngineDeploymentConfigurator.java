@@ -18,16 +18,16 @@ package com.google.cloud.tools.intellij.appengine.java.cloud;
 
 import com.google.cloud.tools.intellij.appengine.java.cloud.flexible.AppEngineFlexibleDeploymentEditor;
 import com.google.cloud.tools.intellij.appengine.java.cloud.standard.AppEngineStandardDeploymentEditor;
-import com.google.cloud.tools.intellij.appengine.java.util.AppEngineUtil;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.configuration.RemoteServer;
 import com.intellij.remoteServer.configuration.deployment.DeploymentConfigurator;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
-import com.intellij.util.PlatformUtils;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,16 +46,14 @@ public class AppEngineDeploymentConfigurator
   @NotNull
   @Override
   public List<DeploymentSource> getAvailableDeploymentSources() {
-    List<DeploymentSource> deploymentSources = new ArrayList<>();
+    AppEngineDeploymentSourceProvider[] deploymentSourceProviders =
+        Extensions.getExtensions(AppEngineDeploymentSourceProvider.EP_NAME);
 
-    deploymentSources.addAll(AppEngineUtil.createArtifactDeploymentSources(project));
-    deploymentSources.addAll(AppEngineUtil.createModuleDeploymentSources(project));
-
-    if (PlatformUtils.isIdeaCommunity()) {
-      deploymentSources.addAll(AppEngineUtil.createGradlePluginDeploymentSources(project));
-    }
-
-    return deploymentSources;
+    return Stream.of(deploymentSourceProviders)
+        .flatMap(
+            deploymentSourceProvider ->
+                deploymentSourceProvider.getDeploymentSources(project).stream())
+        .collect(Collectors.toList());
   }
 
   @NotNull
