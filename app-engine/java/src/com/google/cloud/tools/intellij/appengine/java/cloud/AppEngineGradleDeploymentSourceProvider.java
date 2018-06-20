@@ -39,7 +39,9 @@ public class AppEngineGradleDeploymentSourceProvider implements AppEngineDeploym
    * <p>Will create a Gradle plugin deployment source if the module has both the App Engine standard
    * the App Engine Gradle plugin facet.
    *
-   * <p>Will only collect deployment sources if the environment is IDEA Community.
+   * <p>Will only collect deployment sources if the environment is IDEA Community. This is because
+   * Gradle-based deployment sources work natively via artifact deployment sources with IDEA
+   * Ultimate making {@link GradlePluginDeploymentSource} unnecessary.
    *
    * @param project the current {@link Project}
    * @return a list of {@link GradlePluginDeploymentSource} containing the app-gradle-plugin based
