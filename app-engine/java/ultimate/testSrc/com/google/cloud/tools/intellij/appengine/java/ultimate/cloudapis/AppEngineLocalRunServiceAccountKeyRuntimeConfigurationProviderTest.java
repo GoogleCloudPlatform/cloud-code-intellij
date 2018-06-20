@@ -21,6 +21,7 @@ import static com.google.cloud.tools.intellij.cloudapis.ServiceAccountKeyDownloa
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
+import static org.gradle.internal.impldep.org.testng.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
@@ -34,7 +35,6 @@ import com.intellij.execution.RunnerRegistry;
 import com.intellij.execution.configurations.ConfigurationInfoProvider;
 import com.intellij.execution.configurations.ConfigurationPerRunnerSettings;
 import com.intellij.execution.configurations.RunConfiguration;
-import com.intellij.execution.configurations.RunProfile;
 import com.intellij.execution.configurations.RunnerSettings;
 import com.intellij.execution.runners.JavaPatchableProgramRunner;
 import com.intellij.execution.runners.ProgramRunner;
@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -75,15 +76,6 @@ public class AppEngineLocalRunServiceAccountKeyRuntimeConfigurationProviderTest 
     appEngineConfigProvider =
         spy(new AppEngineLocalRunServiceAccountKeyRuntimeConfigurationProvider());
 
-    runnerSpecificLocalConfigurationBit =
-        new RunnerSpecificLocalConfigurationBit(new TestConfigurationInfoProvider());
-    runnerSpecificLocalConfigurationBit.setEnvironmentVariables(new ArrayList<>());
-
-    when(mockRunnerAndConfigurationSettings.getConfigurationSettings(mockProgramRunner))
-        .thenReturn(runnerSpecificLocalConfigurationBit);
-    when(mockRunnerRegistry.getRunner(any(String.class), any(RunProfile.class)))
-        .thenReturn(mockProgramRunner);
-
     TestConfigurationInfoProvider configurationInfoProvider = new TestConfigurationInfoProvider();
     when(mockCommonStrategy.createStartupHelper(configurationInfoProvider))
         .thenReturn(mockScriptHelper);
@@ -91,6 +83,14 @@ public class AppEngineLocalRunServiceAccountKeyRuntimeConfigurationProviderTest 
         .thenReturn(mockScriptHelper);
     when(mockCommonStrategy.getSettingsBean())
         .thenReturn(new JavaeeRunConfigurationCommonSettingsBean());
+
+    runnerSpecificLocalConfigurationBit =
+        new RunnerSpecificLocalConfigurationBit(new TestConfigurationInfoProvider());
+    runnerSpecificLocalConfigurationBit.setEnvironmentVariables(new ArrayList<>());
+
+    when(mockRunnerAndConfigurationSettings.getConfigurationSettings(mockProgramRunner))
+        .thenReturn(runnerSpecificLocalConfigurationBit);
+    when(mockRunnerRegistry.getRunner(any(), any())).thenReturn(mockProgramRunner);
 
     doReturn(Collections.singletonList(mockRunnerAndConfigurationSettings))
         .when(appEngineConfigProvider)
@@ -101,10 +101,12 @@ public class AppEngineLocalRunServiceAccountKeyRuntimeConfigurationProviderTest 
   public void addEnvironmentVariablesToConfiguration_whenEnvVarsDoNotExistInConfig_add() {
     String gcpProjectId = "gcpProjectId";
     String serviceAccountKeyDownloadPath = "downloadPath";
-    appEngineConfigProvider.addEnvironmentVariablesToConfiguration(
-        mockRunnerAndConfigurationSettings,
-        getServiceAccountEnvironmentVariables(gcpProjectId, serviceAccountKeyDownloadPath));
+    Optional<String> errorMessage =
+        appEngineConfigProvider.addEnvironmentVariablesToConfiguration(
+            mockRunnerAndConfigurationSettings,
+            getServiceAccountEnvironmentVariables(gcpProjectId, serviceAccountKeyDownloadPath));
 
+    assertFalse(errorMessage.isPresent());
     List<EnvironmentVariable> actualEnvVars = runnerSpecificLocalConfigurationBit.getEnvVariables();
     assertNotNull(actualEnvVars);
     assertEquals(2, actualEnvVars.size());
@@ -129,10 +131,12 @@ public class AppEngineLocalRunServiceAccountKeyRuntimeConfigurationProviderTest 
 
     String gcpProjectId = "gcpProjectId";
     String serviceAccountKeyDownloadPath = "downloadPath";
-    appEngineConfigProvider.addEnvironmentVariablesToConfiguration(
-        mockRunnerAndConfigurationSettings,
-        getServiceAccountEnvironmentVariables(gcpProjectId, serviceAccountKeyDownloadPath));
+    Optional<String> errorMessage =
+        appEngineConfigProvider.addEnvironmentVariablesToConfiguration(
+            mockRunnerAndConfigurationSettings,
+            getServiceAccountEnvironmentVariables(gcpProjectId, serviceAccountKeyDownloadPath));
 
+    assertFalse(errorMessage.isPresent());
     List<EnvironmentVariable> actualEnvVars = runnerSpecificLocalConfigurationBit.getEnvVariables();
     assertNotNull(actualEnvVars);
     assertEquals(3, actualEnvVars.size());
@@ -157,7 +161,7 @@ public class AppEngineLocalRunServiceAccountKeyRuntimeConfigurationProviderTest 
                     && envVar.getValue().equals(environmentVariable.getValue())));
   }
 
-  public Set<EnvironmentVariable> getServiceAccountEnvironmentVariables(
+  private Set<EnvironmentVariable> getServiceAccountEnvironmentVariables(
       String gcpProjectId, String downloadPath) {
     Set<EnvironmentVariable> environmentVariables = new HashSet<>();
     environmentVariables.add(
