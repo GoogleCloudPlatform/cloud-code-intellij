@@ -44,9 +44,7 @@ public class AppEngineArtifactDeploymentSourceProvider
   /**
    * Collects a list of artifact deployment sources available for deployment to App Engine.
    *
-   * <p>Artifacts either target the standard or the flexible environment. All standard artifacts are
-   * added. Flexible artifacts are only added if there are no other standard artifacts associated
-   * with the same module.
+   * <p>Artifacts either target the standard or the flexible environment.
    *
    * @return a list of {@link AppEngineArtifactDeploymentSource}
    */
