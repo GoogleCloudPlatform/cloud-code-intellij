@@ -102,7 +102,7 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
   @Override
   protected Action[] createActions() {
     List<Action> actions = new ArrayList<>();
-    if (runConfigurationTableModel != null && runConfigurationTableModel.getRowCount() > 0) {
+    if (getAllRunConfigurations().size() > 0) {
       addVariablesAction = new AddVariablesAction();
       actions.add(addVariablesAction);
     }
@@ -151,7 +151,7 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
             Comparator.comparing(RunnerAndConfigurationSettings::getName),
             true);
 
-    runConfigurationTable.setModel(runConfigurationTableModel);
+    ((RunConfigurationTable) runConfigurationTable).setBooleanModel(runConfigurationTableModel);
 
     boolean runConfigurationDataAvailable = runConfigurationTableModel.getRowCount() != 0;
     runConfigurationUpdateLabel.setVisible(runConfigurationDataAvailable);
@@ -172,8 +172,7 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
    *
    * @return true if adding variables succeeded, false in case of any error.
    */
-  @VisibleForTesting
-  boolean addEnvironmentVariablesToConfiguration(
+  private boolean addEnvironmentVariablesToConfiguration(
       Set<RunnerAndConfigurationSettings> configurations) {
     boolean result = true;
     for (RunnerAndConfigurationSettings configurationSettings : configurations) {
@@ -229,8 +228,9 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
       super();
     }
 
-    RunConfigurationTable(BooleanTableModel<RunnerAndConfigurationSettings> tableModel) {
-      super(tableModel);
+    private void setBooleanModel(
+        @NotNull BooleanTableModel<RunnerAndConfigurationSettings> tableModel) {
+      setModel(tableModel);
       setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
       setDefaultRenderer(
           RunnerAndConfigurationSettings.class, new RunnerAndConfigurationSettingsRenderer());
