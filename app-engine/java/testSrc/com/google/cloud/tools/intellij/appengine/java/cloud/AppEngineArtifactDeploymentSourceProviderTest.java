@@ -50,6 +50,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 
+/** Tests for {@link AppEngineArtifactDeploymentSourceProvider} */
 public class AppEngineArtifactDeploymentSourceProviderTest {
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
   @TestFixture private IdeaProjectTestFixture testFixture;
