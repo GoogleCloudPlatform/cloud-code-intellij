@@ -37,7 +37,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /** Tests for {@link AppEngineGradleDeploymentSourceProvider}. */
-public class AppEngineGradleDeploymentProviderSourceTest {
+public class AppEngineGradleDeploymentSourceProviderTest {
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
 
   @Rule
