@@ -148,7 +148,6 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
                       Function.identity(),
                       configProvider ->
                           configProvider.getRunConfigurationsForServiceAccount(project)));
-      System.out.println("collected configs: " + runtimeConfigurationProviders);
     }
 
     // return flat list of all runtime configurations for UI table model.

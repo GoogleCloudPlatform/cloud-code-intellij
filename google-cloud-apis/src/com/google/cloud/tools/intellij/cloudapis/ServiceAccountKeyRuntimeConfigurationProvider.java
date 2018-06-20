@@ -33,6 +33,13 @@ public interface ServiceAccountKeyRuntimeConfigurationProvider {
   ExtensionPointName<ServiceAccountKeyRuntimeConfigurationProvider> EP_NAME =
       new ExtensionPointName<>("com.google.gct.cloudapis.serviceAccountRuntimeConfiguration");
 
+  /**
+   * Collects and returns list of run configurations where service account environment variables can
+   * be added.
+   *
+   * @param project IDE project to collect configurations from.
+   * @return List of run configurations.
+   */
   List<RunnerAndConfigurationSettings> getRunConfigurationsForServiceAccount(
       @NotNull Project project);
 
