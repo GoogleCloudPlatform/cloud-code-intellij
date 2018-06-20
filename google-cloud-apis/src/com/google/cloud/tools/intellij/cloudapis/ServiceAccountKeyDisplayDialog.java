@@ -88,20 +88,8 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
     init();
     setTitle(
         GoogleCloudApisMessageBundle.message("cloud.apis.service.account.key.downloaded.title"));
-    runConfigurationTable.setTableHeader(null);
 
-    if (runConfigurationTableModel.getRowCount() == 0) {
-      runConfigurationUpdateLabel.setVisible(false);
-      scrollPane.setVisible(false);
-      runConfigurationTable.setVisible(false);
-    }
-
-    runConfigurationTableModel.addTableModelListener(
-        e -> {
-          if (addVariablesAction != null) {
-            addVariablesAction.setEnabled(!runConfigurationTableModel.getSelectedItems().isEmpty());
-          }
-        });
+    initTableModel(getAllRunConfigurations());
   }
 
   @Nullable
@@ -114,7 +102,7 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
   @Override
   protected Action[] createActions() {
     List<Action> actions = new ArrayList<>();
-    if (runConfigurationTableModel.getRowCount() > 0) {
+    if (runConfigurationTableModel != null && runConfigurationTableModel.getRowCount() > 0) {
       addVariablesAction = new AddVariablesAction();
       actions.add(addVariablesAction);
     }
@@ -125,17 +113,9 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
 
   private void createUIComponents() {
     commonPanel = new ServiceAccountKeyDownloadedPanel(cloudProject.projectId(), downloadPath);
-    List<RunnerAndConfigurationSettings> configurationSettingsList = getAllRunConfigurations();
 
-    if (runConfigurationTableModel == null) {
-      runConfigurationTableModel =
-          new BooleanTableModel<>(
-              configurationSettingsList,
-              RunnerAndConfigurationSettings.class,
-              Comparator.comparing(RunnerAndConfigurationSettings::getName),
-              true);
-    }
-    runConfigurationTable = new RunConfigurationTable(runConfigurationTableModel);
+    runConfigurationTable = new RunConfigurationTable();
+    runConfigurationTable.setTableHeader(null);
   }
 
   private List<RunnerAndConfigurationSettings> getAllRunConfigurations() {
@@ -160,6 +140,30 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
 
   private Set<RunnerAndConfigurationSettings> getSelectedConfigurations() {
     return runConfigurationTableModel.getSelectedItems();
+  }
+
+  @VisibleForTesting
+  void initTableModel(List<RunnerAndConfigurationSettings> configurationSettingsList) {
+    runConfigurationTableModel =
+        new BooleanTableModel<>(
+            configurationSettingsList,
+            RunnerAndConfigurationSettings.class,
+            Comparator.comparing(RunnerAndConfigurationSettings::getName),
+            true);
+
+    runConfigurationTable.setModel(runConfigurationTableModel);
+
+    boolean runConfigurationDataAvailable = runConfigurationTableModel.getRowCount() != 0;
+    runConfigurationUpdateLabel.setVisible(runConfigurationDataAvailable);
+    scrollPane.setVisible(runConfigurationDataAvailable);
+    runConfigurationTable.setVisible(runConfigurationDataAvailable);
+
+    runConfigurationTableModel.addTableModelListener(
+        e -> {
+          if (addVariablesAction != null) {
+            addVariablesAction.setEnabled(!runConfigurationTableModel.getSelectedItems().isEmpty());
+          }
+        });
   }
 
   /**
@@ -194,7 +198,7 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
   }
 
   @VisibleForTesting
-  public JTable getRunConfigurationTable() {
+  JTable getRunConfigurationTable() {
     return runConfigurationTable;
   }
 
@@ -219,6 +223,11 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
 
   /** The custom {@link JBTable} for the table of existing Google App Engine run configurations. */
   private static final class RunConfigurationTable extends JBTable {
+
+    // for unit tests.
+    RunConfigurationTable() {
+      super();
+    }
 
     RunConfigurationTable(BooleanTableModel<RunnerAndConfigurationSettings> tableModel) {
       super(tableModel);

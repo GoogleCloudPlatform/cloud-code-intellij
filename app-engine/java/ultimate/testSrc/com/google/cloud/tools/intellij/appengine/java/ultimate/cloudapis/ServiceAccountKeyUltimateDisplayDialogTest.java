@@ -19,11 +19,7 @@ package com.google.cloud.tools.intellij.appengine.java.ultimate.cloudapis;
 /** Tests for {@link AppEngineLocalRunServiceAccountKeyRuntimeConfigurationProvider}. */
 public class ServiceAccountKeyUltimateDisplayDialogTest {
 
-  /*@Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
-  @TestFixture private IdeaProjectTestFixture testFixture;
-  @Mock @TestService private RunnerRegistry mockRunnerRegistry;
-  @Mock private CloudProject mockCloudProject;
-  @Mock private RunnerAndConfigurationSettings mockRunnerAndConfigurationSettings;
+  /*
   @Mock private RunConfiguration mockRunConfiguration;
   @Mock private JavaPatchableProgramRunner mockProgramRunner;
   @Mock private CommonStrategy mockCommonStrategy;
@@ -36,8 +32,6 @@ public class ServiceAccountKeyUltimateDisplayDialogTest {
         new RunnerSpecificLocalConfigurationBit(new TestConfigurationInfoProvider());
     runnerSpecificLocalConfigurationBit.setEnvironmentVariables(new ArrayList<>());
 
-    when(mockRunnerAndConfigurationSettings.getName()).thenReturn("name");
-    when(mockRunnerAndConfigurationSettings.getConfiguration()).thenReturn(mockRunConfiguration);
 
     when(mockRunnerAndConfigurationSettings.getConfigurationSettings(mockProgramRunner))
         .thenReturn(runnerSpecificLocalConfigurationBit);
@@ -53,29 +47,11 @@ public class ServiceAccountKeyUltimateDisplayDialogTest {
         .thenReturn(new JavaeeRunConfigurationCommonSettingsBean());
   }
 
-  @Test
-  public void runConfigurationTable_whenConfigurationsDoNotExist_Hidden() {
-    launchDialog(new ArrayList<>());
-    assertFalse(dialog.getRunConfigurationTable().isVisible());
-  }
 
-  @Test
-  public void runConfigurationTable_whenConfigurationsExist_Visible() {
-    launchDialog(Arrays.asList(mockRunnerAndConfigurationSettings));
-    assertTrue(dialog.getRunConfigurationTable().isVisible());
-  }
 
-  @Test
-  public void runConfigurationTable_verifyValues() {
-    launchDialog(Arrays.asList(mockRunnerAndConfigurationSettings));
 
-    JTable runConfigurationTable = dialog.getRunConfigurationTable();
-    assertEquals(1, runConfigurationTable.getRowCount());
-    assertEquals(2, runConfigurationTable.getColumnCount());
-    assertEquals(
-        mockRunnerAndConfigurationSettings, runConfigurationTable.getModel().getValueAt(0, 0));
-    assertEquals(true, runConfigurationTable.getModel().getValueAt(0, 1));
-  }
+
+
 
   @Test
   public void addEnvironmentVariablesToConfiguration_whenEnvVarsDoNotExistInConfig_add() {
@@ -131,16 +107,6 @@ public class ServiceAccountKeyUltimateDisplayDialogTest {
                     && envVar.getValue().equals(environmentVariable.getValue())));
   }
 
-  private void launchDialog(List<RunnerAndConfigurationSettings> configurationSettingsList) {
-    dialog.configurationSettingsList = configurationSettingsList;
-    when(mockCloudProject.projectId()).thenReturn("gcpProjectId");
-    ApplicationManager.getApplication()
-        .invokeAndWait(
-            () ->
-                dialog =
-                    new ServiceAccountKeyUltimateDisplayDialog(
-                        testFixture.getProject(), mockCloudProject, "downloadPath"));
-  }
 
   private class TestConfigurationInfoProvider implements ConfigurationInfoProvider {
     @NotNull

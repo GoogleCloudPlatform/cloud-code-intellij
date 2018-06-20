@@ -16,6 +16,70 @@
 
 package com.google.cloud.tools.intellij.cloudapis;
 
-public class ServiceAccountKeyDisplayDialogTest {
+import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.project.CloudProject;
+import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.TestFixture;
+import com.intellij.execution.RunnerAndConfigurationSettings;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import javax.swing.JTable;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.mockito.Mock;
+
+public class ServiceAccountKeyDisplayDialogTest {
+  @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
+
+  @TestFixture private IdeaProjectTestFixture testFixture;
+  @Mock private CloudProject mockCloudProject;
+  @Mock private RunnerAndConfigurationSettings mockRunnerAndConfigurationSettings;
+
+  private ServiceAccountKeyDisplayDialog dialog;
+
+  @Before
+  public void setUp() {
+    when(mockRunnerAndConfigurationSettings.getName()).thenReturn("name");
+  }
+
+  @Test
+  public void runConfigurationTable_whenConfigurationsDoNotExist_Hidden() {
+    launchDialog(new ArrayList<>());
+    assertThat(dialog.getRunConfigurationTable().isVisible()).isFalse();
+  }
+
+  @Test
+  public void runConfigurationTable_whenConfigurationsExist_Visible() {
+    launchDialog(Collections.singletonList(mockRunnerAndConfigurationSettings));
+    assertThat(dialog.getRunConfigurationTable().isVisible()).isTrue();
+  }
+
+  @Test
+  public void runConfigurationTable_verifyValues() {
+    launchDialog(Collections.singletonList(mockRunnerAndConfigurationSettings));
+
+    JTable runConfigurationTable = dialog.getRunConfigurationTable();
+    assertThat(runConfigurationTable.getRowCount()).isEqualTo(1);
+    assertThat(runConfigurationTable.getColumnCount()).isEqualTo(2);
+    assertThat(runConfigurationTable.getModel().getValueAt(0, 0))
+        .isEqualTo(mockRunnerAndConfigurationSettings);
+    assertThat((Boolean) runConfigurationTable.getModel().getValueAt(0, 1)).isTrue();
+  }
+
+  private void launchDialog(List<RunnerAndConfigurationSettings> configurationSettingsList) {
+    when(mockCloudProject.projectId()).thenReturn("gcpProjectId");
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () ->
+                dialog =
+                    new ServiceAccountKeyDisplayDialog(
+                        testFixture.getProject(), mockCloudProject, "downloadPath"));
+    dialog.initTableModel(configurationSettingsList);
+  }
 }
