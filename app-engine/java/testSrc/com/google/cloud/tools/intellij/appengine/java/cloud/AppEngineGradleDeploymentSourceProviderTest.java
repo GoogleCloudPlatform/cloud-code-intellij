@@ -68,7 +68,8 @@ public class AppEngineGradleDeploymentSourceProviderTest {
   }
 
   @Test
-  public void getDeploymentSources_withAppEngineFacet_andGradleBuildDir_withNoGradle_returnsEmpty() {
+  public void
+      getDeploymentSources_withAppEngineFacet_andGradleBuildDir_withNoGradle_returnsEmpty() {
     System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, PlatformUtils.IDEA_CE_PREFIX);
     addGradleBuildDir();
     addAppEngineStandardFacet();
