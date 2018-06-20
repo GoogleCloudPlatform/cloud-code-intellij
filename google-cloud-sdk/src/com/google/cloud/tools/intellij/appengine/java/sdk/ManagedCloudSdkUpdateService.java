@@ -68,8 +68,11 @@ public class ManagedCloudSdkUpdateService {
     schedule(sdkUpdateTask, getDelayBeforeFirstUpdate(), SDK_UPDATE_INTERVAL_MS);
   }
 
-  /** Called when managed SDK update operation (update or install) successfully completes. */
-  void notifySdkUpdate() {
+  /**
+   * Called when managed SDK update operation (update or install) completes, either with success or
+   * failure.
+   */
+  void notifySdkUpdateCompleted() {
     CloudSdkServiceUserSettings.getInstance().setLastAutomaticUpdateTimestamp(getClock().millis());
   }
 

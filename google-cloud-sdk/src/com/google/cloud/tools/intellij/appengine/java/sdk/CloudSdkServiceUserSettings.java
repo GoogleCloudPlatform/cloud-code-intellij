@@ -50,6 +50,10 @@ public class CloudSdkServiceUserSettings {
     return instance;
   }
 
+  /**
+   * The values for these properties persist between unit tests and if set, must be cleaned up
+   * between tests to avoid intermediate state and failures.
+   */
   @VisibleForTesting
   static void reset() {
     getInstance().propertiesComponent.unsetValue(SDK_TYPE_PROPERTY_NAME);

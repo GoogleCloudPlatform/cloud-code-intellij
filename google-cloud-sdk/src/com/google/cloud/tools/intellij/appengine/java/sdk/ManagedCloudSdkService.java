@@ -349,7 +349,7 @@ public class ManagedCloudSdkService implements CloudSdkService {
       updateStatus(SdkStatus.READY);
 
       if (result == ManagedSdkJobResult.PROCESSED) {
-        ManagedCloudSdkUpdateService.getInstance().notifySdkUpdate();
+        ManagedCloudSdkUpdateService.getInstance().notifySdkUpdateCompleted();
 
         String trackingEventAction;
         switch (jobType) {
@@ -398,6 +398,9 @@ public class ManagedCloudSdkService implements CloudSdkService {
         case UPDATE:
           // failed or interrupted update might still keep SDK itself installed.
           checkSdkStatusAfterFailedUpdate();
+          // notify updater we've attempted update and schedule next one for the next period to
+          // avoid frequently repeating same errors
+          ManagedCloudSdkUpdateService.getInstance().notifySdkUpdateCompleted();
 
           sendManagedSdkTrackingEvent(
               jobCancelled
