@@ -43,7 +43,7 @@ public class AppEngineModuleDeploymentSourceProvider implements AppEngineDeploym
    * applicable.
    *
    * <p>User browsable jar/war deployment sources are included only if there are no App Engine
-   * standard modules.
+   * standard modules - those that have an App Engine standard facet.
    *
    * @return a list of {@link ModuleDeploymentSource}
    */
