@@ -33,6 +33,11 @@ import java.util.Optional;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Run configuration extension point ({@link ServiceAccountKeyRuntimeConfigurationProvider})
+ * providing list of plain Java application (main() method based) run configurations and support for
+ * adding service account env variables to them.
+ */
 public class JavaApplicationServiceAccountKeyRuntimeConfigurationProvider
     implements ServiceAccountKeyRuntimeConfigurationProvider {
 
