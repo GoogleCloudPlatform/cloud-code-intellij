@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.java;
+package com.google.cloud.tools.intellij.appengine.java.cloud;
 
 import static java.util.stream.Collectors.toList;
 
-import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineArtifactDeploymentSource;
-import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeploymentSourceProvider;
-import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.java.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;

@@ -59,9 +59,11 @@
 
     <extensions defaultExtensionNs="com.google.gct.core">
         <appEngineDeploymentSourceProvider
-                implementation="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineModuleDeploymentSourceProvider"/>
+                implementation="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineArtifactDeploymentSourceProvider"/>
         <appEngineDeploymentSourceProvider
-                implementation="com.google.cloud.tools.intellij.appengine.java.AppEngineArtifactDeploymentSourceProvider"/>
+                implementation="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineMavenDeploymentSourceProvider"/>
+        <appEngineDeploymentSourceProvider
+                implementation="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineUserSpecifiedPathDeploymentSourceProvider"/>
         <appEngineDeploymentSourceProvider
                 implementation="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineGradleDeploymentSourceProvider"/>
     </extensions>

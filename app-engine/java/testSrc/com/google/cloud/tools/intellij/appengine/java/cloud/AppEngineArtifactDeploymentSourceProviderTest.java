@@ -20,7 +20,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.google.cloud.tools.intellij.appengine.java.AppEngineArtifactDeploymentSourceProvider;
 import com.google.cloud.tools.intellij.appengine.java.facet.flexible.AppEngineFlexibleFacet;
 import com.google.cloud.tools.intellij.appengine.java.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacet;
