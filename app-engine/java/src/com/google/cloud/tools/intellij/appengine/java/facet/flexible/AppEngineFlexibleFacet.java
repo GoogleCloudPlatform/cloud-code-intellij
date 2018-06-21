@@ -42,6 +42,11 @@ public class AppEngineFlexibleFacet extends Facet<AppEngineFlexibleFacetConfigur
     return FacetTypeRegistry.getInstance().findFacetType(AppEngineFlexibleFacetType.ID);
   }
 
+  /** Return {@code true} if the supplied module has the {@link AppEngineFlexibleFacet}. */
+  public static boolean hasFacet(@NotNull Module module) {
+    return getFacetByModule(module) != null;
+  }
+
   /**
    * Returns the {@link AppEngineFlexibleFacet} present in the supplied module, or {@code null} if
    * there isn't one.
