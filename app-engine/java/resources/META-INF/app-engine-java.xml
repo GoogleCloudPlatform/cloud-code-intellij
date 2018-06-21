@@ -27,6 +27,8 @@
     <extensionPoints>
         <extensionPoint name="forbiddenCodeHandler"
                         interface="com.google.cloud.tools.intellij.appengine.java.inspections.AppEngineForbiddenCodeHandler"/>
+        <extensionPoint name="appEngineDeploymentSourceProvider"
+                        interface="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeploymentSourceProvider"/>
     </extensionPoints>
 
     <actions>
@@ -53,6 +55,16 @@
             <implementation-class>com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardGradleModuleComponent</implementation-class>
         </component>
     </module-components>
+
+
+    <extensions defaultExtensionNs="com.google.gct.core">
+        <appEngineDeploymentSourceProvider
+                implementation="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineModuleDeploymentSourceProvider"/>
+        <appEngineDeploymentSourceProvider
+                implementation="com.google.cloud.tools.intellij.appengine.java.AppEngineArtifactDeploymentSourceProvider"/>
+        <appEngineDeploymentSourceProvider
+                implementation="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineGradleDeploymentSourceProvider"/>
+    </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
         <!--<configurationType implementation="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineServerCommunityConfigurationType"/>-->

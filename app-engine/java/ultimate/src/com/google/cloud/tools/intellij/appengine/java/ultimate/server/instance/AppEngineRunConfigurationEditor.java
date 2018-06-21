@@ -16,17 +16,19 @@
 
 package com.google.cloud.tools.intellij.appengine.java.ultimate.server.instance;
 
+import com.google.cloud.tools.intellij.appengine.java.AppEngineArtifactDeploymentSourceProvider;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineArtifactDeploymentSource;
-import com.google.cloud.tools.intellij.appengine.java.util.AppEngineUtil;
-import com.google.common.collect.Lists;
+import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeploymentSourceProvider;
 import com.intellij.javaee.run.configuration.CommonModel;
+import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Comparing;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.impl.run.BuildArtifactsBeforeRunTaskProvider;
+import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.remoteServer.impl.configuration.deployment.ArtifactDeploymentSourceImpl;
 import com.intellij.ui.IdeBorderFactory.PlainSmallWithoutIndent;
 import com.intellij.ui.ListCellRendererWrapper;
@@ -35,6 +37,8 @@ import com.intellij.ui.components.JBLabel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JList;
@@ -175,11 +179,20 @@ public class AppEngineRunConfigurationEditor extends SettingsEditor<CommonModel>
           }
         });
 
-    List<AppEngineArtifactDeploymentSource> deploymentSources = Lists.newArrayList();
-    deploymentSources.addAll(AppEngineUtil.createArtifactDeploymentSources(myProject));
+    AppEngineDeploymentSourceProvider[] extensions =
+        Extensions.getExtensions(AppEngineDeploymentSourceProvider.EP_NAME);
+    List<DeploymentSource> deploymentSources =
+        Stream.of(extensions)
+            .filter(extension -> extension instanceof AppEngineArtifactDeploymentSourceProvider)
+            .flatMap(
+                deploymentSourceProvider ->
+                    deploymentSourceProvider.getDeploymentSources(myProject).stream())
+            .collect(Collectors.toList());
 
     deploymentSources
         .stream()
+        .filter(deploymentSource -> deploymentSource instanceof AppEngineArtifactDeploymentSource)
+        .map(deploymentSource -> (AppEngineArtifactDeploymentSource) deploymentSource)
         .map(ArtifactDeploymentSourceImpl::getArtifact)
         .forEach(myArtifactComboBox::addItem);
   }
