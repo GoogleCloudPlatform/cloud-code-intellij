@@ -25,7 +25,7 @@
     </project-components>
     <extensionPoints>
         <extensionPoint qualifiedName="com.google.gct.cloudapis.serviceAccountRuntimeConfiguration"
-                        interface="com.google.cloud.tools.intellij.cloudapis.ServiceAccountKeyRuntimeConfigurationProvider"/>
+                        interface="com.google.cloud.tools.intellij.cloudapis.ServiceAccountKeyRunConfigurationProvider"/>
     </extensionPoints>
     <extensions defaultExtensionNs="com.intellij">
         <applicationService
@@ -50,7 +50,7 @@
     </extensions>
     <extensions defaultExtensionNs="com.google.gct.cloudapis">
         <serviceAccountRuntimeConfiguration
-                implementation="com.google.cloud.tools.intellij.cloudapis.JavaApplicationServiceAccountKeyRuntimeConfigurationProvider"/>
+                implementation="com.google.cloud.tools.intellij.cloudapis.JavaApplicationServiceAccountKeyRunConfigurationProvider"/>
     </extensions>
     <actions>
         <group id="GoogleCloudTools.cloudapis">

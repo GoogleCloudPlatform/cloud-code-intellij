@@ -29,8 +29,8 @@ import org.jetbrains.annotations.NotNull;
  * Application extension point that provides the option to extend list of supported runtime
  * configurations to add service account related environment variables to.
  */
-public interface ServiceAccountKeyRuntimeConfigurationProvider {
-  ExtensionPointName<ServiceAccountKeyRuntimeConfigurationProvider> EP_NAME =
+public interface ServiceAccountKeyRunConfigurationProvider {
+  ExtensionPointName<ServiceAccountKeyRunConfigurationProvider> EP_NAME =
       new ExtensionPointName<>("com.google.gct.cloudapis.serviceAccountRuntimeConfiguration");
 
   /**

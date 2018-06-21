@@ -57,8 +57,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 
-/** Unit tests for {@link AppEngineLocalRunServiceAccountKeyRuntimeConfigurationProvider} */
-public class AppEngineLocalRunServiceAccountKeyRuntimeConfigurationProviderTest {
+/** Unit tests for {@link AppEngineLocalRunServiceAccountKeyRunConfigurationProvider} */
+public class AppEngineLocalRunServiceAccountKeyRunConfigurationProviderTest {
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
 
   @Mock private Project mockProject;
@@ -69,12 +69,11 @@ public class AppEngineLocalRunServiceAccountKeyRuntimeConfigurationProviderTest 
   @Mock private ScriptHelper mockScriptHelper;
   private RunnerSpecificLocalConfigurationBit runnerSpecificLocalConfigurationBit;
 
-  private AppEngineLocalRunServiceAccountKeyRuntimeConfigurationProvider appEngineConfigProvider;
+  private AppEngineLocalRunServiceAccountKeyRunConfigurationProvider appEngineConfigProvider;
 
   @Before
   public void setUp() {
-    appEngineConfigProvider =
-        spy(new AppEngineLocalRunServiceAccountKeyRuntimeConfigurationProvider());
+    appEngineConfigProvider = spy(new AppEngineLocalRunServiceAccountKeyRunConfigurationProvider());
 
     TestConfigurationInfoProvider configurationInfoProvider = new TestConfigurationInfoProvider();
     when(mockCommonStrategy.createStartupHelper(configurationInfoProvider))
