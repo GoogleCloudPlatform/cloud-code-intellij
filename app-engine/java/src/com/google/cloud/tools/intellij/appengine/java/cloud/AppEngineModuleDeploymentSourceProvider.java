@@ -17,11 +17,10 @@
 package com.google.cloud.tools.intellij.appengine.java.cloud;
 
 import com.google.cloud.tools.intellij.appengine.java.cloud.flexible.UserSpecifiedPathDeploymentSource;
-import com.google.cloud.tools.intellij.appengine.java.facet.flexible.AppEngineFlexibleFacetType;
-import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacetType;
+import com.google.cloud.tools.intellij.appengine.java.facet.flexible.AppEngineFlexibleFacet;
+import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
 import com.google.common.collect.Lists;
-import com.intellij.facet.FacetManager;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -57,9 +56,10 @@ public class AppEngineModuleDeploymentSourceProvider implements AppEngineDeploym
     boolean hasStandardModules = false;
 
     for (Module module : ModuleManager.getInstance(project).getModules()) {
-      FacetManager facetManager = FacetManager.getInstance(module);
-      if (facetManager.getFacetByType(AppEngineStandardFacetType.ID) != null
-          || facetManager.getFacetByType(AppEngineFlexibleFacetType.ID) != null) {
+      boolean hasStandardFacet = AppEngineStandardFacet.hasFacet(module);
+      boolean hasFlexibleFacet = AppEngineFlexibleFacet.hasFacet(module);
+
+      if (hasStandardFacet || hasFlexibleFacet) {
         AppEngineEnvironment environment =
             projectService.getModuleAppEngineEnvironment(module).orElse(null);
 
@@ -69,10 +69,10 @@ public class AppEngineModuleDeploymentSourceProvider implements AppEngineDeploym
             moduleDeploymentSources.add(
                 createMavenBuildDeploymentSource(project, module, environment));
           }
+        }
 
-          if (environment.isStandard() || environment.isFlexCompat()) {
-            hasStandardModules = true;
-          }
+        if (hasStandardFacet) {
+          hasStandardModules = true;
         }
       }
     }

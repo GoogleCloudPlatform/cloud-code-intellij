@@ -86,14 +86,28 @@ public class AppEngineModuleDeploymentSourceProviderTest {
   }
 
   @Test
-  public void
-      getDeploymentSources_withStandardModules_andNoEnvironment_returnsUserSpecifiedSource() {
+  public void getDeploymentSources_withStandardAndFlexModules_doesNotReturnSource() {
+    ModuleTestUtils.addFacet(module1, AppEngineFlexibleFacetType.ID);
+    ModuleTestUtils.addFacet(module2, AppEngineStandardFacetType.ID);
+
+    when(projectService.getModuleAppEngineEnvironment(module1))
+        .thenReturn(Optional.of(AppEngineEnvironment.APP_ENGINE_FLEX));
+    when(projectService.getModuleAppEngineEnvironment(module2))
+        .thenReturn(Optional.of(AppEngineEnvironment.APP_ENGINE_STANDARD));
+
+    List<DeploymentSource> deploymentSources =
+        moduleDeploymentSourceProvider.getDeploymentSources(testFixture.getProject());
+
+    assertThat(deploymentSources).isEmpty();
+  }
+
+  @Test
+  public void getDeploymentSources_withStandardModules_andNoEnvironment_doesNotReturnSource() {
     ModuleTestUtils.addFacet(module1, AppEngineStandardFacetType.ID);
 
     List<DeploymentSource> deploymentSources =
         moduleDeploymentSourceProvider.getDeploymentSources(testFixture.getProject());
 
-    assertThat(deploymentSources.size()).isEqualTo(1);
-    assertThat(deploymentSources.get(0) instanceof UserSpecifiedPathDeploymentSource).isTrue();
+    assertThat(deploymentSources).isEmpty();
   }
 }
