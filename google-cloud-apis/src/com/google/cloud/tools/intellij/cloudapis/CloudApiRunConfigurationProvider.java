@@ -40,8 +40,7 @@ public interface CloudApiRunConfigurationProvider {
    * @param project IDE project to collect configurations from.
    * @return List of run configurations.
    */
-  List<RunnerAndConfigurationSettings> getRunConfigurationsForCloudApis(
-      @NotNull Project project);
+  List<RunnerAndConfigurationSettings> getRunConfigurationsForCloudApis(@NotNull Project project);
 
   /**
    * Adds the environment variables for the Google Cloud Libraries to the list of environment

@@ -126,8 +126,7 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
               .collect(
                   Collectors.toMap(
                       Function.identity(),
-                      configProvider ->
-                          configProvider.getRunConfigurationsForCloudApis(project)));
+                      configProvider -> configProvider.getRunConfigurationsForCloudApis(project)));
     }
 
     // return flat list of all runtime configurations for UI table model.
@@ -176,8 +175,7 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
       Set<RunnerAndConfigurationSettings> configurations) {
     boolean result = true;
     for (RunnerAndConfigurationSettings configurationSettings : configurations) {
-      for (Map.Entry<
-          CloudApiRunConfigurationProvider, List<RunnerAndConfigurationSettings>>
+      for (Map.Entry<CloudApiRunConfigurationProvider, List<RunnerAndConfigurationSettings>>
           nextProviderEntry : runtimeConfigurationProviders.entrySet()) {
         if (nextProviderEntry.getValue().contains(configurationSettings)) {
           Optional<String> errorMessage =

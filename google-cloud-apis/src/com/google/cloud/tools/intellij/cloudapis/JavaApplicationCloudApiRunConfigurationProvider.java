@@ -34,9 +34,9 @@ import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Run configuration extension point ({@link CloudApiRunConfigurationProvider}) providing
- * list of plain Java application (main() method based) run configurations and support for adding
- * service account env variables to them.
+ * Run configuration extension point ({@link CloudApiRunConfigurationProvider}) providing list of
+ * plain Java application (main() method based) run configurations and support for adding service
+ * account env variables to them.
  */
 public class JavaApplicationCloudApiRunConfigurationProvider
     implements CloudApiRunConfigurationProvider {
