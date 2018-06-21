@@ -35,6 +35,7 @@ import com.intellij.packaging.impl.artifacts.ArtifactUtil;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 
 /** An {@link AppEngineDeploymentSourceProvider} that collects artifact-based deployment sources. */
@@ -57,18 +58,22 @@ public class AppEngineArtifactDeploymentSourceProvider
       FacetManager facetManager = FacetManager.getInstance(module);
       if (facetManager.getFacetByType(AppEngineStandardFacetType.ID) != null
           || facetManager.getFacetByType(AppEngineFlexibleFacetType.ID) != null) {
-        final AppEngineEnvironment environment =
-            projectService
-                .getModuleAppEngineEnvironment(module)
-                .orElseThrow(() -> new RuntimeException("No environment."));
+        final Optional<AppEngineEnvironment> environmentOptional =
+            projectService.getModuleAppEngineEnvironment(module);
 
-        Collection<Artifact> artifacts = ArtifactUtil.getArtifactsContainingModuleOutput(module);
-        sources.addAll(
-            artifacts
-                .stream()
-                .filter(artifact -> doesArtifactMatchEnvironment(artifact, environment))
-                .map(artifact -> createArtifactDeploymentSource(project, artifact, environment))
-                .collect(toList()));
+        environmentOptional.ifPresent(
+            environment -> {
+              Collection<Artifact> artifacts =
+                  ArtifactUtil.getArtifactsContainingModuleOutput(module);
+              sources.addAll(
+                  artifacts
+                      .stream()
+                      .filter(artifact -> doesArtifactMatchEnvironment(artifact, environment))
+                      .map(
+                          artifact ->
+                              createArtifactDeploymentSource(project, artifact, environment))
+                      .collect(toList()));
+            });
       }
     }
 

@@ -61,18 +61,18 @@ public class AppEngineModuleDeploymentSourceProvider implements AppEngineDeploym
       if (facetManager.getFacetByType(AppEngineStandardFacetType.ID) != null
           || facetManager.getFacetByType(AppEngineFlexibleFacetType.ID) != null) {
         AppEngineEnvironment environment =
-            projectService
-                .getModuleAppEngineEnvironment(module)
-                .orElseThrow(() -> new RuntimeException("No environment."));
+            projectService.getModuleAppEngineEnvironment(module).orElse(null);
 
-        if (ModuleType.is(module, JavaModuleType.getModuleType())
-            && projectService.isJarOrWarMavenBuild(module)) {
-          moduleDeploymentSources.add(
-              createMavenBuildDeploymentSource(project, module, environment));
-        }
+        if (environment != null) {
+          if (ModuleType.is(module, JavaModuleType.getModuleType())
+              && projectService.isJarOrWarMavenBuild(module)) {
+            moduleDeploymentSources.add(
+                createMavenBuildDeploymentSource(project, module, environment));
+          }
 
-        if (environment.isStandard() || environment.isFlexCompat()) {
-          hasStandardModules = true;
+          if (environment.isStandard() || environment.isFlexCompat()) {
+            hasStandardModules = true;
+          }
         }
       }
     }

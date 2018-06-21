@@ -84,4 +84,16 @@ public class AppEngineModuleDeploymentSourceProviderTest {
     assertThat(deploymentSources.size()).isEqualTo(1);
     assertThat(deploymentSources.get(0) instanceof UserSpecifiedPathDeploymentSource).isTrue();
   }
+
+  @Test
+  public void
+      getDeploymentSources_withStandardModules_andNoEnvironment_returnsUserSpecifiedSource() {
+    ModuleTestUtils.addFacet(module1, AppEngineStandardFacetType.ID);
+
+    List<DeploymentSource> deploymentSources =
+        moduleDeploymentSourceProvider.getDeploymentSources(testFixture.getProject());
+
+    assertThat(deploymentSources.size()).isEqualTo(1);
+    assertThat(deploymentSources.get(0) instanceof UserSpecifiedPathDeploymentSource).isTrue();
+  }
 }
