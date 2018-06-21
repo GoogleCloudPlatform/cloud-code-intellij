@@ -105,7 +105,7 @@ public class AppEngineArtifactDeploymentSourceProviderTest {
   }
 
   private void assertDeploymentSourcesPresent(
-      AppEngineEnvironment environmentModule1, AppEngineEnvironment environmentModule2) {
+      AppEngineEnvironment module1Environment, AppEngineEnvironment module2Environment) {
     List<DeploymentSource> deploymentSources =
         artifactDeploymentSourceProvider.getDeploymentSources(testFixture.getProject());
 
@@ -117,9 +117,9 @@ public class AppEngineArtifactDeploymentSourceProviderTest {
     assertThat(deploymentSource1 instanceof AppEngineArtifactDeploymentSource).isTrue();
     assertThat(deploymentSource2 instanceof AppEngineArtifactDeploymentSource).isTrue();
     assertThat(((AppEngineArtifactDeploymentSource) deploymentSource1).getEnvironment())
-        .isEqualTo(environmentModule1);
+        .isEqualTo(module1Environment);
     assertThat(((AppEngineArtifactDeploymentSource) deploymentSource2).getEnvironment())
-        .isEqualTo(environmentModule2);
+        .isEqualTo(module2Environment);
   }
 
   /**
