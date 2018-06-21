@@ -34,8 +34,8 @@ import org.jetbrains.annotations.NotNull;
  * credential environment variables for local run.
  */
 public final class ServiceAccountKeyDownloadedPanel {
-  private static final String CLOUD_PROJECT_ENV_VAR_KEY = "GOOGLE_CLOUD_PROJECT";
-  private static final String CREDENTIAL_ENV_VAR_KEY = "GOOGLE_APPLICATION_CREDENTIALS";
+  public static final String CLOUD_PROJECT_ENV_VAR_KEY = "GOOGLE_CLOUD_PROJECT";
+  public static final String CREDENTIAL_ENV_VAR_KEY = "GOOGLE_APPLICATION_CREDENTIALS";
   private static final String ENV_VAR_DISPLAY_FORMAT = "%s=%s";
 
   private final String gcpProjectId;
