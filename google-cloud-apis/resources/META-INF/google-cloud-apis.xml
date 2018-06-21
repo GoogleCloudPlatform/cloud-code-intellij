@@ -24,8 +24,8 @@
         </component>
     </project-components>
     <extensionPoints>
-        <extensionPoint qualifiedName="com.google.gct.cloudapis.serviceAccountRunConfiguration"
-                        interface="com.google.cloud.tools.intellij.cloudapis.ServiceAccountKeyRunConfigurationProvider"/>
+        <extensionPoint qualifiedName="com.google.gct.cloudapis.cloudApiRunConfiguration"
+                        interface="com.google.cloud.tools.intellij.cloudapis.CloudApiRunConfigurationProvider"/>
     </extensionPoints>
     <extensions defaultExtensionNs="com.intellij">
         <applicationService
@@ -49,8 +49,8 @@
                          implementationClass="com.google.cloud.tools.intellij.cloudapis.CloudDependencyWithNoBomInspection"/>
     </extensions>
     <extensions defaultExtensionNs="com.google.gct.cloudapis">
-        <serviceAccountRunConfiguration
-                implementation="com.google.cloud.tools.intellij.cloudapis.JavaApplicationServiceAccountKeyRunConfigurationProvider"/>
+        <cloudApiRunConfiguration
+                implementation="com.google.cloud.tools.intellij.cloudapis.JavaApplicationCloudApiRunConfigurationProvider"/>
     </extensions>
     <actions>
         <group id="GoogleCloudTools.cloudapis">

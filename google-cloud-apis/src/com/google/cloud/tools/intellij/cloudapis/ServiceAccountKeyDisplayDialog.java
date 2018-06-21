@@ -60,7 +60,7 @@ import org.jetbrains.annotations.Nullable;
  * Libraries , (2) provides information on how to set the environment variables for local run and
  * (3) allows the user to select set of run configurations to automatically update with these
  * environment variables. Set of configurations is defined by extension point {@link
- * ServiceAccountKeyRunConfigurationProvider}.
+ * CloudApiRunConfigurationProvider}.
  */
 public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
   private final Project project;
@@ -76,7 +76,7 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
 
   // map of extension point specified runtime configuration providers to the list of runtime
   // configurations supplied by them.
-  private Map<ServiceAccountKeyRunConfigurationProvider, List<RunnerAndConfigurationSettings>>
+  private Map<CloudApiRunConfigurationProvider, List<RunnerAndConfigurationSettings>>
       runtimeConfigurationProviders;
 
   ServiceAccountKeyDisplayDialog(
@@ -122,12 +122,12 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
     if (runtimeConfigurationProviders == null) {
       // build initial map of providers to list of their configurations.
       runtimeConfigurationProviders =
-          Stream.of(Extensions.getExtensions(ServiceAccountKeyRunConfigurationProvider.EP_NAME))
+          Stream.of(Extensions.getExtensions(CloudApiRunConfigurationProvider.EP_NAME))
               .collect(
                   Collectors.toMap(
                       Function.identity(),
                       configProvider ->
-                          configProvider.getRunConfigurationsForServiceAccount(project)));
+                          configProvider.getRunConfigurationsForCloudApis(project)));
     }
 
     // return flat list of all runtime configurations for UI table model.
@@ -177,7 +177,7 @@ public class ServiceAccountKeyDisplayDialog extends DialogWrapper {
     boolean result = true;
     for (RunnerAndConfigurationSettings configurationSettings : configurations) {
       for (Map.Entry<
-              ServiceAccountKeyRunConfigurationProvider, List<RunnerAndConfigurationSettings>>
+          CloudApiRunConfigurationProvider, List<RunnerAndConfigurationSettings>>
           nextProviderEntry : runtimeConfigurationProviders.entrySet()) {
         if (nextProviderEntry.getValue().contains(configurationSettings)) {
           Optional<String> errorMessage =

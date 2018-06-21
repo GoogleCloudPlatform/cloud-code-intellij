@@ -18,7 +18,7 @@ package com.google.cloud.tools.intellij.appengine.java.ultimate.cloudapis;
 
 import com.google.cloud.tools.intellij.appengine.java.ultimate.server.run.AppEngineLocalServerUltimateConfigurationType;
 import com.google.cloud.tools.intellij.cloudapis.GoogleCloudApisMessageBundle;
-import com.google.cloud.tools.intellij.cloudapis.ServiceAccountKeyRunConfigurationProvider;
+import com.google.cloud.tools.intellij.cloudapis.CloudApiRunConfigurationProvider;
 import com.intellij.execution.ProgramRunnerUtil;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
@@ -35,15 +35,15 @@ import java.util.stream.IntStream;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Extension point based on {@link ServiceAccountKeyRunConfigurationProvider}, extending list of
- * runtime targets where service key account environment variables can be added with all available
- * `App Engine Local Server Run` configurations available in IDEA Ultimate only.
+ * Extension point based on {@link CloudApiRunConfigurationProvider}, extending list of runtime
+ * targets where service key account environment variables can be added with all available `App
+ * Engine Local Server Run` configurations available in IDEA Ultimate only.
  */
-public class AppEngineLocalRunServiceAccountKeyRunConfigurationProvider
-    implements ServiceAccountKeyRunConfigurationProvider {
+public class AppEngineLocalRunCloudApiRunConfigurationProvider
+    implements CloudApiRunConfigurationProvider {
 
   @Override
-  public List<RunnerAndConfigurationSettings> getRunConfigurationsForServiceAccount(
+  public List<RunnerAndConfigurationSettings> getRunConfigurationsForCloudApis(
       @NotNull Project project) {
     return RunManager.getInstance(project)
         .getConfigurationSettingsList(AppEngineLocalServerUltimateConfigurationType.getInstance());

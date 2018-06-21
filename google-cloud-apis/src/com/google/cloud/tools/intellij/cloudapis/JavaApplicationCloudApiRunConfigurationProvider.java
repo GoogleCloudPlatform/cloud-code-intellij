@@ -34,15 +34,15 @@ import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Run configuration extension point ({@link ServiceAccountKeyRunConfigurationProvider}) providing
+ * Run configuration extension point ({@link CloudApiRunConfigurationProvider}) providing
  * list of plain Java application (main() method based) run configurations and support for adding
  * service account env variables to them.
  */
-public class JavaApplicationServiceAccountKeyRunConfigurationProvider
-    implements ServiceAccountKeyRunConfigurationProvider {
+public class JavaApplicationCloudApiRunConfigurationProvider
+    implements CloudApiRunConfigurationProvider {
 
   @Override
-  public List<RunnerAndConfigurationSettings> getRunConfigurationsForServiceAccount(
+  public List<RunnerAndConfigurationSettings> getRunConfigurationsForCloudApis(
       @NotNull Project project) {
     RunManager runManager = RunManager.getInstance(project);
     return runManager.getConfigurationSettingsList(ApplicationConfigurationType.getInstance());

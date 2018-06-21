@@ -27,27 +27,27 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Application extension point that provides the option to extend list of supported runtime
- * configurations to add service account related environment variables to.
+ * configurations to add cloud API / service account related environment variables to.
  */
-public interface ServiceAccountKeyRunConfigurationProvider {
-  ExtensionPointName<ServiceAccountKeyRunConfigurationProvider> EP_NAME =
-      new ExtensionPointName<>("com.google.gct.cloudapis.serviceAccountRunConfiguration");
+public interface CloudApiRunConfigurationProvider {
+  ExtensionPointName<CloudApiRunConfigurationProvider> EP_NAME =
+      new ExtensionPointName<>("com.google.gct.cloudapis.cloudApiRunConfiguration");
 
   /**
-   * Collects and returns list of run configurations where service account environment variables can
-   * be added.
+   * Collects and returns list of run configurations where cloud API / service account environment
+   * variables can be added.
    *
    * @param project IDE project to collect configurations from.
    * @return List of run configurations.
    */
-  List<RunnerAndConfigurationSettings> getRunConfigurationsForServiceAccount(
+  List<RunnerAndConfigurationSettings> getRunConfigurationsForCloudApis(
       @NotNull Project project);
 
   /**
    * Adds the environment variables for the Google Cloud Libraries to the list of environment
    * variables for {@code configuration} if they don't exist. If they exist, it replaces them.
    * Configuration is guaranteed to be one from the list returned by {@link
-   * #getRunConfigurationsForServiceAccount(Project)} method of this instance.
+   * #getRunConfigurationsForCloudApis(Project)} method of this instance.
    *
    * @return Empty optional without error message in case of success, error message in case of any
    *     error.
