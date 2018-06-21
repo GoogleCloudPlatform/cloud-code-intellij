@@ -31,7 +31,7 @@
         implementation="com.google.cloud.tools.intellij.appengine.java.ultimate.impl.AppEngineJavaeeSupportContributor"/>
   </extensions>
   <extensions defaultExtensionNs="com.google.gct.cloudapis">
-    <serviceAccountRuntimeConfiguration
+    <serviceAccountRunConfiguration
             implementation="com.google.cloud.tools.intellij.appengine.java.ultimate.cloudapis.AppEngineLocalRunServiceAccountKeyRunConfigurationProvider"/>
   </extensions>
   <actions>

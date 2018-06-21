@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface ServiceAccountKeyRunConfigurationProvider {
   ExtensionPointName<ServiceAccountKeyRunConfigurationProvider> EP_NAME =
-      new ExtensionPointName<>("com.google.gct.cloudapis.serviceAccountRuntimeConfiguration");
+      new ExtensionPointName<>("com.google.gct.cloudapis.serviceAccountRunConfiguration");
 
   /**
    * Collects and returns list of run configurations where service account environment variables can
