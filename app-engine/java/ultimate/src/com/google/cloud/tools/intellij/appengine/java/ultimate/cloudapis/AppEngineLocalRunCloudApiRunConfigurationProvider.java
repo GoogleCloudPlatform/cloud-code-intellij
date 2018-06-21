@@ -17,8 +17,8 @@
 package com.google.cloud.tools.intellij.appengine.java.ultimate.cloudapis;
 
 import com.google.cloud.tools.intellij.appengine.java.ultimate.server.run.AppEngineLocalServerUltimateConfigurationType;
-import com.google.cloud.tools.intellij.cloudapis.GoogleCloudApisMessageBundle;
 import com.google.cloud.tools.intellij.cloudapis.CloudApiRunConfigurationProvider;
+import com.google.cloud.tools.intellij.cloudapis.GoogleCloudApisMessageBundle;
 import com.intellij.execution.ProgramRunnerUtil;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
