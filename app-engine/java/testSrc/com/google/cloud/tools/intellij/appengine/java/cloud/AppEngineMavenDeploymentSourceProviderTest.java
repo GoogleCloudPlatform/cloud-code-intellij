@@ -21,6 +21,7 @@ import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
+import com.google.cloud.tools.intellij.appengine.java.project.MavenProjectService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.MavenTestUtils;
 import com.google.cloud.tools.intellij.testing.ModuleTestUtils;
@@ -47,7 +48,8 @@ public class AppEngineMavenDeploymentSourceProviderTest {
 
   @TestModule private Module module;
 
-  private @TestService @Mock AppEngineProjectService projectService;
+  private @TestService @Mock MavenProjectService mavenProjectService;
+  private @TestService @Mock AppEngineProjectService appEngineProjectService;
 
   private AppEngineMavenDeploymentSourceProvider mavenDeploymentSourceProvider;
   private MavenModuleBuilder mavenModuleBuilder;
@@ -80,7 +82,8 @@ public class AppEngineMavenDeploymentSourceProviderTest {
                                   .createNewMavenModule(
                                       mavenModuleBuilder, testFixture.getProject());
 
-                          when(projectService.isJarOrWarMavenBuild(mavenModule)).thenReturn(true);
+                          when(mavenProjectService.isJarOrWarMavenBuild(mavenModule))
+                              .thenReturn(true);
 
                           List<DeploymentSource> mavenSources =
                               addStandardFacetAndReturnSources(mavenModule);
@@ -109,7 +112,8 @@ public class AppEngineMavenDeploymentSourceProviderTest {
                                   .createNewMavenModule(
                                       mavenModuleBuilder, testFixture.getProject());
 
-                          when(projectService.isJarOrWarMavenBuild(mavenModule)).thenReturn(true);
+                          when(mavenProjectService.isJarOrWarMavenBuild(mavenModule))
+                              .thenReturn(true);
 
                           List<DeploymentSource> mavenSources =
                               mavenDeploymentSourceProvider.getDeploymentSources(
@@ -125,7 +129,7 @@ public class AppEngineMavenDeploymentSourceProviderTest {
 
   private List<DeploymentSource> addStandardFacetAndReturnSources(Module targetModule) {
     ModuleTestUtils.addFacet(targetModule, AppEngineStandardFacetType.ID);
-    when(projectService.getModuleAppEngineEnvironment(targetModule))
+    when(appEngineProjectService.getModuleAppEngineEnvironment(targetModule))
         .thenReturn(Optional.of(AppEngineEnvironment.APP_ENGINE_STANDARD));
 
     return mavenDeploymentSourceProvider.getDeploymentSources(testFixture.getProject());

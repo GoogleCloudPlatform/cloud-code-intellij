@@ -20,6 +20,7 @@ import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
+import com.google.cloud.tools.intellij.appengine.java.project.MavenProjectService;
 import com.google.common.collect.Sets;
 import com.intellij.facet.Facet;
 import com.intellij.facet.ui.FacetEditorContext;
@@ -154,9 +155,10 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
    * explicitly disabled for Maven / Gradle projects to avoid dependency conflicts.
    */
   private boolean isManagedLibrariesEnabled() {
-    AppEngineProjectService projectService = AppEngineProjectService.getInstance();
-    return !projectService.isMavenModule(context.getModule())
-        && !projectService.isGradleModule(context.getModule());
+    MavenProjectService mavenProjectService = MavenProjectService.getInstance();
+    AppEngineProjectService appEngineProjectService = AppEngineProjectService.getInstance();
+    return !mavenProjectService.isMavenModule(context.getModule())
+        && !appEngineProjectService.isGradleModule(context.getModule());
   }
 
   public class LibraryModificationListener implements Listener {
