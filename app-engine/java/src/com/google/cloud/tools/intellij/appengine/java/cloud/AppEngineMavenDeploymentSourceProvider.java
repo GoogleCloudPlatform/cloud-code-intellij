@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.java.cloud;
 
-import com.google.cloud.tools.intellij.appengine.java.cloud.flexible.UserSpecifiedPathDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.java.facet.flexible.AppEngineFlexibleFacet;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
@@ -24,36 +23,27 @@ import com.google.common.collect.Lists;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.module.ModulePointer;
 import com.intellij.openapi.module.ModulePointerManager;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.project.Project;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
-import com.intellij.remoteServer.configuration.deployment.ModuleDeploymentSource;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
-/** An {@link AppEngineDeploymentSourceProvider} that collects module-based deployment sources. */
-public class AppEngineModuleDeploymentSourceProvider implements AppEngineDeploymentSourceProvider {
+/** An {@link AppEngineDeploymentSourceProvider} that collects maven deployment sources. */
+public class AppEngineMavenDeploymentSourceProvider implements AppEngineDeploymentSourceProvider {
 
   /**
-   * Collects a list of module deployment sources available for deployment to App Engine:
+   * Collects Maven based deployment sources for both flexible and standard App Engine projects if
+   * the module has Maven support.
    *
-   * <p>Maven based deployment sources are included for both flexible and standard projects if
-   * applicable.
-   *
-   * <p>User browsable jar/war deployment sources are included only if there are no App Engine
-   * standard modules - those that have an App Engine standard facet.
-   *
-   * @return a list of {@link ModuleDeploymentSource}
+   * @return a list of maven-based {@link DeploymentSource}
    */
   @Override
   public List<DeploymentSource> getDeploymentSources(@NotNull Project project) {
     AppEngineProjectService projectService = AppEngineProjectService.getInstance();
 
-    List<DeploymentSource> moduleDeploymentSources = Lists.newArrayList();
-
-    boolean hasStandardModules = false;
+    List<DeploymentSource> mavenDeploymentSources = Lists.newArrayList();
 
     for (Module module : ModuleManager.getInstance(project).getModules()) {
       boolean hasStandardFacet = AppEngineStandardFacet.hasFacet(module);
@@ -66,36 +56,19 @@ public class AppEngineModuleDeploymentSourceProvider implements AppEngineDeploym
         if (environment != null) {
           if (ModuleType.is(module, JavaModuleType.getModuleType())
               && projectService.isJarOrWarMavenBuild(module)) {
-            moduleDeploymentSources.add(
+            mavenDeploymentSources.add(
                 createMavenBuildDeploymentSource(project, module, environment));
           }
-        }
-
-        if (hasStandardFacet) {
-          hasStandardModules = true;
         }
       }
     }
 
-    if (!hasStandardModules) {
-      moduleDeploymentSources.add(createUserSpecifiedPathDeploymentSource(project));
-    }
-
-    return moduleDeploymentSources;
+    return mavenDeploymentSources;
   }
 
   private static MavenBuildDeploymentSource createMavenBuildDeploymentSource(
       @NotNull Project project, @NotNull Module module, @NotNull AppEngineEnvironment environment) {
     return new MavenBuildDeploymentSource(
         ModulePointerManager.getInstance(project).create(module), project, environment);
-  }
-
-  private static UserSpecifiedPathDeploymentSource createUserSpecifiedPathDeploymentSource(
-      @NotNull Project project) {
-    ModulePointer modulePointer =
-        ModulePointerManager.getInstance(project)
-            .create(UserSpecifiedPathDeploymentSource.moduleName);
-
-    return new UserSpecifiedPathDeploymentSource(modulePointer);
   }
 }

@@ -16,9 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.java.ultimate.server.instance;
 
-import com.google.cloud.tools.intellij.appengine.java.AppEngineArtifactDeploymentSourceProvider;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineArtifactDeploymentSource;
+import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineArtifactDeploymentSourceProvider;
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeploymentSourceProvider;
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.openapi.extensions.Extensions;

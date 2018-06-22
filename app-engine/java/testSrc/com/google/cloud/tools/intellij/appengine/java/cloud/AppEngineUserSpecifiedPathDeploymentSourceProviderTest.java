@@ -14,55 +14,43 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.java;
+package com.google.cloud.tools.intellij.appengine.java.cloud;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
-import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineEnvironment;
-import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineModuleDeploymentSourceProvider;
 import com.google.cloud.tools.intellij.appengine.java.cloud.flexible.UserSpecifiedPathDeploymentSource;
 import com.google.cloud.tools.intellij.appengine.java.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacetType;
-import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.ModuleTestUtils;
 import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.google.cloud.tools.intellij.testing.TestModule;
-import com.google.cloud.tools.intellij.testing.TestService;
 import com.intellij.openapi.module.Module;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import java.util.List;
-import java.util.Optional;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mock;
 
-/** Tests for {@link AppEngineModuleDeploymentSourceProvider}. */
-public class AppEngineModuleDeploymentSourceProviderTest {
+/** Tests for {@link AppEngineUserSpecifiedPathDeploymentSourceProvider}. */
+public class AppEngineUserSpecifiedPathDeploymentSourceProviderTest {
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
   @TestFixture private IdeaProjectTestFixture testFixture;
 
   @TestModule private Module module1;
   @TestModule private Module module2;
 
-  @TestService @Mock AppEngineProjectService projectService;
-
-  private AppEngineModuleDeploymentSourceProvider moduleDeploymentSourceProvider;
+  private AppEngineUserSpecifiedPathDeploymentSourceProvider moduleDeploymentSourceProvider;
 
   @Before
   public void setUp() {
-    moduleDeploymentSourceProvider = new AppEngineModuleDeploymentSourceProvider();
+    moduleDeploymentSourceProvider = new AppEngineUserSpecifiedPathDeploymentSourceProvider();
   }
 
   @Test
   public void getDeploymentSources_withAppEngineStandardModules_doesNotReturnUserSpecifiedSource() {
     ModuleTestUtils.addFacet(module1, AppEngineStandardFacetType.ID);
-    when(projectService.getModuleAppEngineEnvironment(module1))
-        .thenReturn(Optional.of(AppEngineEnvironment.APP_ENGINE_STANDARD));
 
     List<DeploymentSource> deploymentSources =
         moduleDeploymentSourceProvider.getDeploymentSources(testFixture.getProject());
@@ -75,9 +63,6 @@ public class AppEngineModuleDeploymentSourceProviderTest {
     ModuleTestUtils.addFacet(module1, AppEngineFlexibleFacetType.ID);
     ModuleTestUtils.addFacet(module2, AppEngineFlexibleFacetType.ID);
 
-    when(projectService.getModuleAppEngineEnvironment(any()))
-        .thenReturn(Optional.of(AppEngineEnvironment.APP_ENGINE_FLEX));
-
     List<DeploymentSource> deploymentSources =
         moduleDeploymentSourceProvider.getDeploymentSources(testFixture.getProject());
 
@@ -89,11 +74,6 @@ public class AppEngineModuleDeploymentSourceProviderTest {
   public void getDeploymentSources_withStandardAndFlexModules_doesNotReturnSource() {
     ModuleTestUtils.addFacet(module1, AppEngineFlexibleFacetType.ID);
     ModuleTestUtils.addFacet(module2, AppEngineStandardFacetType.ID);
-
-    when(projectService.getModuleAppEngineEnvironment(module1))
-        .thenReturn(Optional.of(AppEngineEnvironment.APP_ENGINE_FLEX));
-    when(projectService.getModuleAppEngineEnvironment(module2))
-        .thenReturn(Optional.of(AppEngineEnvironment.APP_ENGINE_STANDARD));
 
     List<DeploymentSource> deploymentSources =
         moduleDeploymentSourceProvider.getDeploymentSources(testFixture.getProject());
