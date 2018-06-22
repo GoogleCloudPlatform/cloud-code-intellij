@@ -60,8 +60,6 @@ import java.util.Optional;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.idea.maven.project.MavenProject;
-import org.jetbrains.idea.maven.project.MavenProjectsManager;
 import org.jetbrains.plugins.gradle.util.GradleConstants;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.scanner.ScannerException;
@@ -155,27 +153,8 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   }
 
   @Override
-  public boolean isMavenModule(@NotNull Module module) {
-    MavenProjectsManager projectsManager = MavenProjectsManager.getInstance(module.getProject());
-    MavenProject mavenProject = projectsManager.findProject(module);
-
-    return mavenProject != null && projectsManager.isMavenizedModule(module);
-  }
-
-  @Override
   public boolean isGradleModule(@NotNull Module module) {
     return ExternalSystemApiUtil.isExternalSystemAwareModule(GradleConstants.SYSTEM_ID, module);
-  }
-
-  @Override
-  public boolean isJarOrWarMavenBuild(@NotNull Module module) {
-    MavenProjectsManager projectsManager = MavenProjectsManager.getInstance(module.getProject());
-    MavenProject mavenProject = projectsManager.findProject(module);
-
-    return mavenProject != null
-        && isMavenModule(module)
-        && ("jar".equalsIgnoreCase(mavenProject.getPackaging())
-            || "war".equalsIgnoreCase(mavenProject.getPackaging()));
   }
 
   @Nullable
