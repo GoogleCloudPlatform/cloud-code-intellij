@@ -29,6 +29,8 @@
                         interface="com.google.cloud.tools.intellij.appengine.java.inspections.AppEngineForbiddenCodeHandler"/>
         <extensionPoint name="appEngineDeploymentSourceProvider"
                         interface="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeploymentSourceProvider"/>
+        <extensionPoint name="appEngineStandardLibraryManager"
+                        interface="com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardLibraryManager"/>
     </extensionPoints>
 
     <actions>
@@ -66,6 +68,11 @@
                 implementation="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineUserSpecifiedPathDeploymentSourceProvider"/>
         <appEngineDeploymentSourceProvider
                 implementation="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineGradleDeploymentSourceProvider"/>
+
+        <appEngineStandardLibraryManager
+                implementation="com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardMavenLibraryManager"/>
+        <appEngineStandardLibraryManager
+                implementation="com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardGradleLibraryManager"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
