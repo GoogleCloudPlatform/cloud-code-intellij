@@ -116,6 +116,11 @@ public class AppEngineStandardLibraryPanel {
   }
 
   @VisibleForTesting
+  JPanel getLibraryPanel() {
+    return libraryPanel;
+  }
+
+  @VisibleForTesting
   JCheckBox getLibraryCheckbox(String name) {
     return libraries
         .stream()

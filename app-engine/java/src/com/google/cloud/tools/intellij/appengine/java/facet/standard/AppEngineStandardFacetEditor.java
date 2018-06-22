@@ -19,13 +19,14 @@ package com.google.cloud.tools.intellij.appengine.java.facet.standard;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
-import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
-import com.google.cloud.tools.intellij.appengine.java.project.MavenProjectService;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
 import com.intellij.facet.Facet;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.extensions.Extensions;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.roots.DependencyScope;
 import com.intellij.openapi.roots.ExportableOrderEntry;
 import com.intellij.openapi.roots.ModifiableRootModel;
@@ -38,6 +39,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import org.jetbrains.annotations.NotNull;
@@ -146,6 +148,11 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
         .ping();
   }
 
+  @VisibleForTesting
+  public AppEngineStandardLibraryPanel getAppEngineStandardLibraryPanel() {
+    return appEngineStandardLibraryPanel;
+  }
+
   private void createUIComponents() {
     appEngineStandardLibraryPanel = new AppEngineStandardLibraryPanel(isManagedLibrariesEnabled());
   }
@@ -153,12 +160,19 @@ public class AppEngineStandardFacetEditor extends FacetEditorTab {
   /**
    * Currently, managed AE standard library support is enabled only for native IJ projects and
    * explicitly disabled for Maven / Gradle projects to avoid dependency conflicts.
+   *
+   * <p>Checks every {@link AppEngineStandardLibraryManager#isSupported(Module)} extension and
+   * returns {@code true} only if all are supported.
    */
   private boolean isManagedLibrariesEnabled() {
-    MavenProjectService mavenProjectService = MavenProjectService.getInstance();
-    AppEngineProjectService appEngineProjectService = AppEngineProjectService.getInstance();
-    return !mavenProjectService.isMavenModule(context.getModule())
-        && !appEngineProjectService.isGradleModule(context.getModule());
+    AppEngineStandardLibraryManager[] libraryManagers =
+        Extensions.getExtensions(AppEngineStandardLibraryManager.EP_NAME);
+
+    boolean isAnyUnsupported =
+        Stream.of(libraryManagers)
+            .anyMatch(libraryManager -> !libraryManager.isSupported(context.getModule()));
+
+    return !isAnyUnsupported;
   }
 
   public class LibraryModificationListener implements Listener {
