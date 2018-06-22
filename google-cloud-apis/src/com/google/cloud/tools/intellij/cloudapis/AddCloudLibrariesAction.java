@@ -20,6 +20,7 @@ import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
+import com.google.cloud.tools.intellij.appengine.java.project.MavenProjectService;
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;
@@ -125,7 +126,7 @@ public final class AddCloudLibrariesAction extends DumbAwareAction {
         return CloudLibrariesModuleSupportType.APPENGINE_JAVA8_REQUIRED;
     }
 
-    return AppEngineProjectService.getInstance().isMavenModule(module)
+    return MavenProjectService.getInstance().isMavenModule(module)
         ? CloudLibrariesModuleSupportType.SUPPORTED
         : CloudLibrariesModuleSupportType.MAVEN_REQUIRED;
   }

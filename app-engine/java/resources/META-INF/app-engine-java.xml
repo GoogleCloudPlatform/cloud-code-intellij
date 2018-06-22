@@ -99,6 +99,7 @@
         <applicationService
                 serviceInterface="com.google.cloud.tools.intellij.appengine.java.application.AppEngineAdminService"
                 serviceImplementation="com.google.cloud.tools.intellij.appengine.java.application.GoogleApiClientAppEngineAdminService"/>
+        <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.java.project.MavenProjectService"/>
 
         <!-- App Engine Cloud and Deployment Sources Configuration-->
         <remoteServer.type

@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.appengine.java.cloud;
 import com.google.cloud.tools.intellij.appengine.java.facet.flexible.AppEngineFlexibleFacet;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
+import com.google.cloud.tools.intellij.appengine.java.project.MavenProjectService;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
@@ -41,7 +42,8 @@ public class AppEngineMavenDeploymentSourceProvider implements AppEngineDeployme
    */
   @Override
   public List<DeploymentSource> getDeploymentSources(@NotNull Project project) {
-    AppEngineProjectService projectService = AppEngineProjectService.getInstance();
+    AppEngineProjectService appEngineProjectService = AppEngineProjectService.getInstance();
+    MavenProjectService mavenProjectService = MavenProjectService.getInstance();
 
     List<DeploymentSource> mavenDeploymentSources = Lists.newArrayList();
 
@@ -51,11 +53,11 @@ public class AppEngineMavenDeploymentSourceProvider implements AppEngineDeployme
 
       if (hasStandardFacet || hasFlexibleFacet) {
         AppEngineEnvironment environment =
-            projectService.getModuleAppEngineEnvironment(module).orElse(null);
+            appEngineProjectService.getModuleAppEngineEnvironment(module).orElse(null);
 
         if (environment != null) {
           if (ModuleType.is(module, JavaModuleType.getModuleType())
-              && projectService.isJarOrWarMavenBuild(module)) {
+              && mavenProjectService.isJarOrWarMavenBuild(module)) {
             mavenDeploymentSources.add(
                 createMavenBuildDeploymentSource(project, module, environment));
           }
