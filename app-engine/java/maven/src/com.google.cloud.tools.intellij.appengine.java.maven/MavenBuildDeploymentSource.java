@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.java.cloud;
+package com.google.cloud.tools.intellij.appengine.java.maven;
 
+import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeployable;
+import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
 import com.intellij.openapi.module.ModulePointer;
 import com.intellij.openapi.project.Project;

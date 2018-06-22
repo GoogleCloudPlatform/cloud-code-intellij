@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.java.cloud;
+package com.google.cloud.tools.intellij.appengine.java.maven;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
-import com.google.cloud.tools.intellij.appengine.java.project.MavenProjectService;
+import com.google.cloud.tools.intellij.appengine.java.maven.project.MavenProjectService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.MavenTestUtils;
 import com.google.cloud.tools.intellij.testing.ModuleTestUtils;

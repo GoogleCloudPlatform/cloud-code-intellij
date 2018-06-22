@@ -63,14 +63,10 @@
         <appEngineDeploymentSourceProvider
                 implementation="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineArtifactDeploymentSourceProvider"/>
         <appEngineDeploymentSourceProvider
-                implementation="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineMavenDeploymentSourceProvider"/>
-        <appEngineDeploymentSourceProvider
                 implementation="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineUserSpecifiedPathDeploymentSourceProvider"/>
         <appEngineDeploymentSourceProvider
                 implementation="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineGradleDeploymentSourceProvider"/>
 
-        <appEngineStandardLibraryManager
-                implementation="com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardMavenLibraryManager"/>
         <appEngineStandardLibraryManager
                 implementation="com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardGradleLibraryManager"/>
     </extensions>
@@ -99,15 +95,12 @@
         <applicationService
                 serviceInterface="com.google.cloud.tools.intellij.appengine.java.application.AppEngineAdminService"
                 serviceImplementation="com.google.cloud.tools.intellij.appengine.java.application.GoogleApiClientAppEngineAdminService"/>
-        <applicationService serviceImplementation="com.google.cloud.tools.intellij.appengine.java.project.MavenProjectService"/>
 
         <!-- App Engine Cloud and Deployment Sources Configuration-->
         <remoteServer.type
                 implementation="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineCloudType"/>
         <remoteServer.deploymentSource.type
                 implementation="com.google.cloud.tools.intellij.appengine.java.cloud.flexible.UserSpecifiedPathDeploymentSourceType"/>
-        <remoteServer.deploymentSource.type
-                implementation="com.google.cloud.tools.intellij.appengine.java.cloud.MavenBuildDeploymentSourceType"/>
         <remoteServer.deploymentSource.type
                 implementation="com.google.cloud.tools.intellij.appengine.java.cloud.GradlePluginDeploymentSourceType"/>
         <remoteServer.deploymentSource.type
