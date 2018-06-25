@@ -25,9 +25,11 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
 import java.io.IOException;
+import java.util.function.Consumer;
 import org.jdom.JDOMException;
 import org.jetbrains.idea.maven.model.MavenId;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
+import org.jetbrains.idea.maven.server.MavenServerManager;
 import org.jetbrains.idea.maven.wizards.MavenModuleBuilder;
 
 /** Utilities for setting up and working with Maven components in tests. */
@@ -41,22 +43,25 @@ public class MavenTestUtils {
     return INSTANCE;
   }
 
-  /** Creates a new {@link MavenModuleBuilder} that can be used to create Maven modules in tests. */
-  public MavenModuleBuilder initMavenModuleBuilder(Project project) {
-    MavenModuleBuilder moduleBuilder = new MavenModuleBuilder();
-    MavenId mavenId = new MavenId("org.foo", "module", "1.0");
+  /** Runs the supplied {@link Consumer mavenModuleConsumer} with a newly created Maven module. */
+  public void runWithMavenModule(Project project, Consumer<Module> mavenModuleConsumer) {
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              try {
+                Module mavenModule =
+                    MavenTestUtils.getInstance()
+                        .createNewMavenModule(initMavenModuleBuilder(project), project);
 
-    String root = project.getBasePath();
-    moduleBuilder.setName("module");
-    moduleBuilder.setModuleFilePath(root + "/module.iml");
-    moduleBuilder.setContentEntryPath(root);
-    moduleBuilder.setProjectId(mavenId);
-
-    return moduleBuilder;
+                mavenModuleConsumer.accept(mavenModule);
+              } finally {
+                MavenServerManager.getInstance().shutdown(true);
+              }
+            });
   }
 
   /** Creates a new Maven module for use in tests. */
-  public Module createNewMavenModule(MavenModuleBuilder moduleBuilder, Project project) {
+  private Module createNewMavenModule(MavenModuleBuilder moduleBuilder, Project project) {
     return ApplicationManager.getApplication()
         .runWriteAction(
             (Computable<Module>)
@@ -77,6 +82,20 @@ public class MavenTestUtils {
                   resolveDependenciesAndImport(project);
                   return module;
                 });
+  }
+
+  /** Creates a new {@link MavenModuleBuilder} that can be used to create Maven modules in tests. */
+  private MavenModuleBuilder initMavenModuleBuilder(Project project) {
+    MavenModuleBuilder moduleBuilder = new MavenModuleBuilder();
+    MavenId mavenId = new MavenId("org.foo", "module", "1.0");
+
+    String root = project.getBasePath();
+    moduleBuilder.setName("module");
+    moduleBuilder.setModuleFilePath(root + "/module.iml");
+    moduleBuilder.setContentEntryPath(root);
+    moduleBuilder.setProjectId(mavenId);
+
+    return moduleBuilder;
   }
 
   private void resolveDependenciesAndImport(Project project) {

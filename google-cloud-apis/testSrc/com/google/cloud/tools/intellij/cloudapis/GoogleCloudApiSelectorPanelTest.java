@@ -68,8 +68,6 @@ import org.jetbrains.idea.maven.dom.model.MavenDomDependency;
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
-import org.jetbrains.idea.maven.server.MavenServerManager;
-import org.jetbrains.idea.maven.wizards.MavenModuleBuilder;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -135,12 +133,8 @@ public final class GoogleCloudApiSelectorPanelTest {
   @Mock @TestService private PluginInfoService pluginInfoService;
   @Mock @TestService CloudApiMavenService mavenService;
 
-  private MavenModuleBuilder moduleBuilder;
-
   @Before
   public void setUp() {
-    moduleBuilder = MavenTestUtils.getInstance().initMavenModuleBuilder(testFixture.getProject());
-
     // TODO: remove after Batik fix is available in IDEA itself - happens when SVG icons are used.
     // See b4df0c72ee3e88bf3cf48fde0a1e19fb948757fe in IJ Community Git.
     ThreadTracker.longRunningThreadCreated(
@@ -427,37 +421,30 @@ public final class GoogleCloudApiSelectorPanelTest {
 
     when(mavenService.getAllBomVersions()).thenReturn(ImmutableList.of("v1", "v2", "v3"));
 
-    try {
-      ApplicationManager.getApplication()
-          .invokeAndWait(
-              () -> {
-                Module module =
-                    MavenTestUtils.getInstance()
-                        .createNewMavenModule(moduleBuilder, testFixture.getProject());
+    MavenTestUtils.getInstance()
+        .runWithMavenModule(
+            testFixture.getProject(),
+            module -> {
+              String preconfigureBomVersion = "v0-alpha";
+              writeBomDependency(module, preconfigureBomVersion);
+              CloudLibraryProjectState.getInstance(testFixture.getProject())
+                  .syncCloudLibrariesBom();
 
-                String preconfigureBomVersion = "v0-alpha";
-                writeBomDependency(module, preconfigureBomVersion);
-                CloudLibraryProjectState.getInstance(testFixture.getProject())
-                    .syncCloudLibrariesBom();
+              GoogleCloudApiSelectorPanel panel =
+                  new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
 
-                GoogleCloudApiSelectorPanel panel =
-                    new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
+              // Set the selected module to the one with the preconfigured BOM
+              panel.getModulesComboBox().setSelectedItem(module);
 
-                // Set the selected module to the one with the preconfigured BOM
-                panel.getModulesComboBox().setSelectedItem(module);
+              JComboBox<String> bomComboBox = panel.getBomComboBox();
+              assertThat(bomComboBox.getItemCount()).isEqualTo(4);
+              assertThat(bomComboBox.getItemAt(0)).isEqualTo("v3");
+              assertThat(bomComboBox.getItemAt(1)).isEqualTo("v2");
+              assertThat(bomComboBox.getItemAt(2)).isEqualTo("v1");
+              assertThat(bomComboBox.getItemAt(3)).isEqualTo("v0-alpha");
 
-                JComboBox<String> bomComboBox = panel.getBomComboBox();
-                assertThat(bomComboBox.getItemCount()).isEqualTo(4);
-                assertThat(bomComboBox.getItemAt(0)).isEqualTo("v3");
-                assertThat(bomComboBox.getItemAt(1)).isEqualTo("v2");
-                assertThat(bomComboBox.getItemAt(2)).isEqualTo("v1");
-                assertThat(bomComboBox.getItemAt(3)).isEqualTo("v0-alpha");
-
-                assertThat(bomComboBox.getSelectedItem()).isEqualTo(preconfigureBomVersion);
-              });
-    } finally {
-      MavenServerManager.getInstance().shutdown(true);
-    }
+              assertThat(bomComboBox.getSelectedItem()).isEqualTo(preconfigureBomVersion);
+            });
   }
 
   @Test
@@ -467,36 +454,29 @@ public final class GoogleCloudApiSelectorPanelTest {
 
     when(mavenService.getAllBomVersions()).thenReturn(ImmutableList.of("v0", "v1", "v2"));
 
-    try {
-      ApplicationManager.getApplication()
-          .invokeAndWait(
-              () -> {
-                Module module =
-                    MavenTestUtils.getInstance()
-                        .createNewMavenModule(moduleBuilder, testFixture.getProject());
+    MavenTestUtils.getInstance()
+        .runWithMavenModule(
+            testFixture.getProject(),
+            module -> {
+              String preconfigureBomVersion = "v1";
+              writeBomDependency(module, preconfigureBomVersion);
+              CloudLibraryProjectState.getInstance(testFixture.getProject())
+                  .syncCloudLibrariesBom();
 
-                String preconfigureBomVersion = "v1";
-                writeBomDependency(module, preconfigureBomVersion);
-                CloudLibraryProjectState.getInstance(testFixture.getProject())
-                    .syncCloudLibrariesBom();
+              GoogleCloudApiSelectorPanel panel =
+                  new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
 
-                GoogleCloudApiSelectorPanel panel =
-                    new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
+              // Set the selected module to the one with the preconfigured BOM
+              panel.getModulesComboBox().setSelectedItem(module);
 
-                // Set the selected module to the one with the preconfigured BOM
-                panel.getModulesComboBox().setSelectedItem(module);
+              JComboBox<String> bomComboBox = panel.getBomComboBox();
+              assertThat(bomComboBox.getItemCount()).isEqualTo(3);
+              assertThat(bomComboBox.getItemAt(0)).isEqualTo("v2");
+              assertThat(bomComboBox.getItemAt(1)).isEqualTo("v1");
+              assertThat(bomComboBox.getItemAt(2)).isEqualTo("v0");
 
-                JComboBox<String> bomComboBox = panel.getBomComboBox();
-                assertThat(bomComboBox.getItemCount()).isEqualTo(3);
-                assertThat(bomComboBox.getItemAt(0)).isEqualTo("v2");
-                assertThat(bomComboBox.getItemAt(1)).isEqualTo("v1");
-                assertThat(bomComboBox.getItemAt(2)).isEqualTo("v0");
-
-                assertThat(bomComboBox.getSelectedItem()).isEqualTo(preconfigureBomVersion);
-              });
-    } finally {
-      MavenServerManager.getInstance().shutdown(true);
-    }
+              assertThat(bomComboBox.getSelectedItem()).isEqualTo(preconfigureBomVersion);
+            });
   }
 
   @Test
@@ -506,34 +486,27 @@ public final class GoogleCloudApiSelectorPanelTest {
 
     when(mavenService.getAllBomVersions()).thenReturn(ImmutableList.of());
 
-    try {
-      ApplicationManager.getApplication()
-          .invokeAndWait(
-              () -> {
-                Module module =
-                    MavenTestUtils.getInstance()
-                        .createNewMavenModule(moduleBuilder, testFixture.getProject());
+    MavenTestUtils.getInstance()
+        .runWithMavenModule(
+            testFixture.getProject(),
+            module -> {
+              String preconfigureBomVersion = "v1";
+              writeBomDependency(module, preconfigureBomVersion);
+              CloudLibraryProjectState.getInstance(testFixture.getProject())
+                  .syncCloudLibrariesBom();
 
-                String preconfigureBomVersion = "v1";
-                writeBomDependency(module, preconfigureBomVersion);
-                CloudLibraryProjectState.getInstance(testFixture.getProject())
-                    .syncCloudLibrariesBom();
+              GoogleCloudApiSelectorPanel panel =
+                  new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
 
-                GoogleCloudApiSelectorPanel panel =
-                    new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
+              // Set the selected module to the one with the preconfigured BOM
+              panel.getModulesComboBox().setSelectedItem(module);
 
-                // Set the selected module to the one with the preconfigured BOM
-                panel.getModulesComboBox().setSelectedItem(module);
+              JComboBox<String> bomComboBox = panel.getBomComboBox();
+              assertThat(bomComboBox.getItemCount()).isEqualTo(1);
+              assertThat(bomComboBox.getItemAt(0)).isEqualTo("v1");
 
-                JComboBox<String> bomComboBox = panel.getBomComboBox();
-                assertThat(bomComboBox.getItemCount()).isEqualTo(1);
-                assertThat(bomComboBox.getItemAt(0)).isEqualTo("v1");
-
-                assertThat(bomComboBox.getSelectedItem()).isEqualTo(preconfigureBomVersion);
-              });
-    } finally {
-      MavenServerManager.getInstance().shutdown(true);
-    }
+              assertThat(bomComboBox.getSelectedItem()).isEqualTo(preconfigureBomVersion);
+            });
   }
 
   @Test

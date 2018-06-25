@@ -21,22 +21,19 @@ import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacetType;
-import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.java.maven.project.MavenProjectService;
+import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.MavenTestUtils;
 import com.google.cloud.tools.intellij.testing.ModuleTestUtils;
 import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.google.cloud.tools.intellij.testing.TestModule;
 import com.google.cloud.tools.intellij.testing.TestService;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.remoteServer.configuration.deployment.DeploymentSource;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import java.util.List;
 import java.util.Optional;
-import org.jetbrains.idea.maven.server.MavenServerManager;
-import org.jetbrains.idea.maven.wizards.MavenModuleBuilder;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -53,13 +50,10 @@ public class AppEngineMavenDeploymentSourceProviderTest {
   private @TestService @Mock AppEngineProjectService appEngineProjectService;
 
   private AppEngineMavenDeploymentSourceProvider mavenDeploymentSourceProvider;
-  private MavenModuleBuilder mavenModuleBuilder;
 
   @Before
   public void setUp() {
     mavenDeploymentSourceProvider = new AppEngineMavenDeploymentSourceProvider();
-    mavenModuleBuilder =
-        MavenTestUtils.getInstance().initMavenModuleBuilder(testFixture.getProject());
   }
 
   @Test
@@ -71,60 +65,31 @@ public class AppEngineMavenDeploymentSourceProviderTest {
 
   @Test
   public void getSources_withMavenizedModule_returnsMavenSources() {
-    ApplicationManager.getApplication()
-        .invokeAndWait(
-            () -> {
-              try {
-                ApplicationManager.getApplication()
-                    .runWriteAction(
-                        () -> {
-                          Module mavenModule =
-                              MavenTestUtils.getInstance()
-                                  .createNewMavenModule(
-                                      mavenModuleBuilder, testFixture.getProject());
+    MavenTestUtils.getInstance()
+        .runWithMavenModule(
+            testFixture.getProject(),
+            mavenModule -> {
+              when(mavenProjectService.isJarOrWarMavenBuild(mavenModule)).thenReturn(true);
 
-                          when(mavenProjectService.isJarOrWarMavenBuild(mavenModule))
-                              .thenReturn(true);
+              List<DeploymentSource> mavenSources = addStandardFacetAndReturnSources(mavenModule);
 
-                          List<DeploymentSource> mavenSources =
-                              addStandardFacetAndReturnSources(mavenModule);
-
-                          assertThat(mavenSources.size()).isEqualTo(1);
-                          assertThat(mavenSources.get(0))
-                              .isInstanceOf(MavenBuildDeploymentSource.class);
-                        });
-              } finally {
-                MavenServerManager.getInstance().shutdown(true);
-              }
+              assertThat(mavenSources.size()).isEqualTo(1);
+              assertThat(mavenSources.get(0)).isInstanceOf(MavenBuildDeploymentSource.class);
             });
   }
 
   @Test
   public void getSources_withMavenizedModule_andNoAppEngineModules_returnsEmptySources() {
-    ApplicationManager.getApplication()
-        .invokeAndWait(
-            () -> {
-              try {
-                ApplicationManager.getApplication()
-                    .runWriteAction(
-                        () -> {
-                          Module mavenModule =
-                              MavenTestUtils.getInstance()
-                                  .createNewMavenModule(
-                                      mavenModuleBuilder, testFixture.getProject());
+    MavenTestUtils.getInstance()
+        .runWithMavenModule(
+            testFixture.getProject(),
+            mavenModule -> {
+              when(mavenProjectService.isJarOrWarMavenBuild(mavenModule)).thenReturn(true);
 
-                          when(mavenProjectService.isJarOrWarMavenBuild(mavenModule))
-                              .thenReturn(true);
+              List<DeploymentSource> mavenSources =
+                  mavenDeploymentSourceProvider.getDeploymentSources(testFixture.getProject());
 
-                          List<DeploymentSource> mavenSources =
-                              mavenDeploymentSourceProvider.getDeploymentSources(
-                                  testFixture.getProject());
-
-                          assertThat(mavenSources).isEmpty();
-                        });
-              } finally {
-                MavenServerManager.getInstance().shutdown(true);
-              }
+              assertThat(mavenSources).isEmpty();
             });
   }
 

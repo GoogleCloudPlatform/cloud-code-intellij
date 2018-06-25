@@ -20,8 +20,8 @@ import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeploymentS
 import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineEnvironment;
 import com.google.cloud.tools.intellij.appengine.java.facet.flexible.AppEngineFlexibleFacet;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacet;
-import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.java.maven.project.MavenProjectService;
+import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
