@@ -19,7 +19,6 @@ package com.google.cloud.tools.intellij.appengine.java.facet.standard;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
-import com.google.cloud.tools.intellij.testing.MavenTestUtils;
 import com.google.cloud.tools.intellij.testing.ModuleTestUtils;
 import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.google.cloud.tools.intellij.testing.TestModule;
@@ -28,8 +27,6 @@ import com.intellij.facet.impl.DefaultFacetsProvider;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.ide.util.projectWizard.ModuleBuilder;
 import com.intellij.ide.util.projectWizard.WizardContext;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.externalSystem.ExternalSystemModulePropertyManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModifiableRootModel;
@@ -44,10 +41,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.idea.maven.server.MavenServerManager;
-import org.jetbrains.idea.maven.wizards.MavenModuleBuilder;
-import org.jetbrains.plugins.gradle.util.GradleConstants;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -59,13 +52,6 @@ public class AppEngineStandardFacetEditorTest {
   @TestModule private Module module;
 
   private AppEngineStandardFacetEditor standardFacetEditor;
-  private MavenModuleBuilder mavenModuleBuilder;
-
-  @Before
-  public void setUp() {
-    mavenModuleBuilder =
-        MavenTestUtils.getInstance().initMavenModuleBuilder(testFixture.getProject());
-  }
 
   @Test
   public void getLibraryPanel_withNoBuildSystem_isVisible() {
@@ -75,49 +61,6 @@ public class AppEngineStandardFacetEditorTest {
 
     assertThat(standardFacetEditor.getAppEngineStandardLibraryPanel().getLibraryPanel().isVisible())
         .isTrue();
-  }
-
-  @Test
-  public void getLibraryPanel_withGradle_isNotVisible() {
-    ModuleTestUtils.addFacet(module, AppEngineStandardFacetType.ID);
-    ExternalSystemModulePropertyManager.getInstance(module)
-        .setExternalId(GradleConstants.SYSTEM_ID);
-
-    standardFacetEditor = createEditor(module);
-
-    assertThat(standardFacetEditor.getAppEngineStandardLibraryPanel().getLibraryPanel().isVisible())
-        .isFalse();
-  }
-
-  @Test
-  public void getLibraryPanel_withMaven_isNotVisible() {
-    ApplicationManager.getApplication()
-        .invokeAndWait(
-            () -> {
-              try {
-                ApplicationManager.getApplication()
-                    .runWriteAction(
-                        () -> {
-                          Module mavenModule =
-                              MavenTestUtils.getInstance()
-                                  .createNewMavenModule(
-                                      mavenModuleBuilder, testFixture.getProject());
-
-                          ModuleTestUtils.addFacet(mavenModule, AppEngineStandardFacetType.ID);
-
-                          standardFacetEditor = createEditor(mavenModule);
-
-                          assertThat(
-                                  standardFacetEditor
-                                      .getAppEngineStandardLibraryPanel()
-                                      .getLibraryPanel()
-                                      .isVisible())
-                              .isFalse();
-                        });
-              } finally {
-                MavenServerManager.getInstance().shutdown(true);
-              }
-            });
   }
 
   private AppEngineStandardFacetEditor createEditor(Module module) {

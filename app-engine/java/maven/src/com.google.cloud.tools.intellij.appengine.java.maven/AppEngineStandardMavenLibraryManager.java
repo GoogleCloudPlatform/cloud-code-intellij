@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.java.facet.standard;
+package com.google.cloud.tools.intellij.appengine.java.maven;
 
-import com.google.cloud.tools.intellij.appengine.java.project.MavenProjectService;
+import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardLibraryManager;
+import com.google.cloud.tools.intellij.appengine.java.maven.project.MavenProjectService;
 import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
 

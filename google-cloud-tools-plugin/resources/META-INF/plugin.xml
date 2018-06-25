@@ -46,7 +46,7 @@
   <depends optional="true" config-file="app-engine-java-gradle.xml">org.jetbrains.plugins.gradle</depends>
   <depends optional="true" config-file="javaee-integration.xml">com.intellij.javaee</depends>
   <depends optional="true" config-file="gwt-integration.xml">com.intellij.gwt</depends>
-  <depends optional="true" config-file="google-cloud-apis.xml">org.jetbrains.idea.maven</depends>
+  <depends optional="true" config-file="google-cloud-maven.xml">org.jetbrains.idea.maven</depends>
   <xi:include href="/META-INF/google-cloud-core.xml" xpointer="xpointer(/idea-plugin/*)"/>
   <xi:include href="/META-INF/google-cloud-storage.xml" xpointer="xpointer(/idea-plugin/*)"/>
   <xi:include href="/META-INF/google-cloud-repos.xml" xpointer="xpointer(/idea-plugin/*)"/>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.java.project;
+package com.google.cloud.tools.intellij.appengine.java.maven.project;
 
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.module.Module;
