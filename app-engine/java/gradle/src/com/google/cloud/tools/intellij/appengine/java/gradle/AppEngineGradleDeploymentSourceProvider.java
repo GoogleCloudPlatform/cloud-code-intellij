@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.java.cloud;
+package com.google.cloud.tools.intellij.appengine.java.gradle;
 
+import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeploymentSourceProvider;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardGradleModuleComponent;
-import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
+import com.google.cloud.tools.intellij.appengine.java.gradle.project.GradleProjectService;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.module.ModuleManager;
@@ -53,7 +54,7 @@ public class AppEngineGradleDeploymentSourceProvider implements AppEngineDeploym
       return ImmutableList.of();
     }
 
-    AppEngineProjectService projectService = AppEngineProjectService.getInstance();
+    GradleProjectService projectService = GradleProjectService.getInstance();
     List<DeploymentSource> moduleDeploymentSources = Lists.newArrayList();
 
     Stream.of(ModuleManager.getInstance(project).getModules())

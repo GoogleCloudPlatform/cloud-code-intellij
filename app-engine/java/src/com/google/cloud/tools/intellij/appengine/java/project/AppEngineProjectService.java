@@ -95,9 +95,6 @@ public abstract class AppEngineProjectService {
 
   public abstract boolean hasAppEngineFlexFacet(@NotNull Module module);
 
-  /** Determines if the module is backed by gradle. */
-  public abstract boolean isGradleModule(@NotNull Module module);
-
   public abstract Optional<String> getServiceNameFromAppYaml(@NotNull String appYamlPath)
       throws MalformedYamlFileException;
 

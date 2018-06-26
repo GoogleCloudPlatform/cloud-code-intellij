@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.java.facet.standard;
+package com.google.cloud.tools.intellij.appengine.java.gradle;
 
-import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
+import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardLibraryManager;
+import com.google.cloud.tools.intellij.appengine.java.gradle.project.GradleProjectService;
 import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,6 +31,6 @@ public class AppEngineStandardGradleLibraryManager implements AppEngineStandardL
    */
   @Override
   public boolean isSupported(@NotNull Module module) {
-    return !AppEngineProjectService.getInstance().isGradleModule(module);
+    return !GradleProjectService.getInstance().isGradleModule(module);
   }
 }
