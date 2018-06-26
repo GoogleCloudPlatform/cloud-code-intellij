@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.java.cloud;
+package com.google.cloud.tools.intellij.appengine.java.gradle;
 
 import static com.google.common.truth.Truth.assertThat;
 

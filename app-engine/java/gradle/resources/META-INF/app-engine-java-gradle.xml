@@ -22,7 +22,21 @@
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
+        <applicationService
+                serviceImplementation="com.google.cloud.tools.intellij.appengine.java.gradle.project.GradleProjectService"/>
+
         <externalProjectDataService
                 implementation="com.google.cloud.tools.intellij.appengine.java.gradle.AppEngineGradleProjectDataService"/>
+
+        <remoteServer.deploymentSource.type
+                implementation="com.google.cloud.tools.intellij.appengine.java.gradle.GradlePluginDeploymentSourceType"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="com.google.gct.core">
+        <appEngineDeploymentSourceProvider
+                implementation="com.google.cloud.tools.intellij.appengine.java.gradle.AppEngineGradleDeploymentSourceProvider"/>
+
+        <appEngineStandardLibraryManager
+                implementation="com.google.cloud.tools.intellij.appengine.java.gradle.AppEngineStandardGradleLibraryManager"/>
     </extensions>
 </idea-plugin>

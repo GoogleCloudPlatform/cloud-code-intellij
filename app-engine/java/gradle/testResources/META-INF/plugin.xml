@@ -20,6 +20,5 @@
 
     <xi:include href="/META-INF/google-cloud-core.xml" xpointer="xpointer(/idea-plugin/*)"/>
     <xi:include href="/META-INF/app-engine-java.xml" xpointer="xpointer(/idea-plugin/*)"/>
-    <xi:include href="/META-INF/gwt-integration.xml" xpointer="xpointer(/idea-plugin/*)"/>
-    <xi:include href="/META-INF/javaee-integration.xml" xpointer="xpointer(/idea-plugin/*)"/>
+    <xi:include href="/META-INF/app-engine-java-gradle.xml" xpointer="xpointer(/idea-plugin/*)"/>
 </idea-plugin>

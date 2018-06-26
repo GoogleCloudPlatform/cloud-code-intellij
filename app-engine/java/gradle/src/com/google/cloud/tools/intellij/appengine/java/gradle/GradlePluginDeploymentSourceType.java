@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.java.cloud;
+package com.google.cloud.tools.intellij.appengine.java.gradle;
 
+import com.google.cloud.tools.intellij.appengine.java.cloud.BuildDeploymentSourceType;
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardGradleModuleComponent;
 import com.google.common.collect.ImmutableList;
 import com.intellij.execution.BeforeRunTask;

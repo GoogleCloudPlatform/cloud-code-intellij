@@ -30,7 +30,6 @@ import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.ide.fileTemplates.FileTemplateUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -60,7 +59,6 @@ import java.util.Optional;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.plugins.gradle.util.GradleConstants;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.scanner.ScannerException;
 
@@ -150,11 +148,6 @@ public class DefaultAppEngineProjectService extends AppEngineProjectService {
   @Override
   public boolean hasAppEngineFlexFacet(@NotNull Module module) {
     return FacetManager.getInstance(module).getFacetByType(AppEngineFlexibleFacetType.ID) != null;
-  }
-
-  @Override
-  public boolean isGradleModule(@NotNull Module module) {
-    return ExternalSystemApiUtil.isExternalSystemAwareModule(GradleConstants.SYSTEM_ID, module);
   }
 
   @Nullable

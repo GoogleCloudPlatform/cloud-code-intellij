@@ -64,11 +64,6 @@
                 implementation="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineArtifactDeploymentSourceProvider"/>
         <appEngineDeploymentSourceProvider
                 implementation="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineUserSpecifiedPathDeploymentSourceProvider"/>
-        <appEngineDeploymentSourceProvider
-                implementation="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineGradleDeploymentSourceProvider"/>
-
-        <appEngineStandardLibraryManager
-                implementation="com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardGradleLibraryManager"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -99,10 +94,9 @@
         <!-- App Engine Cloud and Deployment Sources Configuration-->
         <remoteServer.type
                 implementation="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineCloudType"/>
+
         <remoteServer.deploymentSource.type
                 implementation="com.google.cloud.tools.intellij.appengine.java.cloud.flexible.UserSpecifiedPathDeploymentSourceType"/>
-        <remoteServer.deploymentSource.type
-                implementation="com.google.cloud.tools.intellij.appengine.java.cloud.GradlePluginDeploymentSourceType"/>
         <remoteServer.deploymentSource.type
                 implementation="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineArtifactDeploymentSourceType"/>
 
