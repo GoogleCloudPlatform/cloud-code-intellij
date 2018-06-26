@@ -19,8 +19,6 @@ package com.google.cloud.tools.intellij.appengine.java.ultimate.impl;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
@@ -29,6 +27,7 @@ import com.intellij.javaee.web.WebRoot;
 import com.intellij.javaee.web.facet.WebFacet;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.roots.ModifiableRootModel;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,8 +57,9 @@ public class AppEngineStandardUltimateWebIntegrationTest {
     webIntegration = new AppEngineStandardUltimateWebIntegration();
     webRoots.add(mockWebRoot);
 
+    when(mockVirtualFile1.getFileSystem()).thenReturn(LocalFileSystem.getInstance());
     when(mockVirtualFile1.createChildDirectory(
-            any(), eq(AppEngineStandardUltimateWebIntegration.WEB_INF)))
+            LocalFileSystem.getInstance(), AppEngineStandardUltimateWebIntegration.WEB_INF))
         .thenReturn(mockVirtualFile3);
     when(mockVirtualFile1.findChild(AppEngineStandardUltimateWebIntegration.WEB_INF))
         .thenReturn(mockVirtualFile2);
