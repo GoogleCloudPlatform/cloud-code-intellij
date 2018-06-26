@@ -57,6 +57,7 @@ public class AppEngineStandardUltimateWebIntegrationTest {
     webIntegration = new AppEngineStandardUltimateWebIntegration();
     webRoots.add(mockWebRoot);
 
+    when(mockVirtualFile1.getFileSystem()).thenReturn(LocalFileSystem.getInstance());
     when(mockVirtualFile1.createChildDirectory(
             LocalFileSystem.getInstance(), AppEngineStandardUltimateWebIntegration.WEB_INF))
         .thenReturn(mockVirtualFile3);
