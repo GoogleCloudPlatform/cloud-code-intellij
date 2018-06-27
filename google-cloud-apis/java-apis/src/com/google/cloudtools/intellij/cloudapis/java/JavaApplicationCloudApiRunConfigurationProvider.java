@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.cloudapis;
+package com.google.cloudtools.intellij.cloudapis.java;
 
+import com.google.cloud.tools.intellij.cloudapis.CloudApiRunConfigurationProvider;
 import com.intellij.execution.ProgramRunnerUtil;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
@@ -57,9 +58,8 @@ public class JavaApplicationCloudApiRunConfigurationProvider
 
     if (runner == null) {
       return Optional.of(
-          GoogleCloudApisMessageBundle.message(
-              "cloud.apis.service.account.key.dialog.update.configuration.error",
-              configuration.getName()));
+          JavaCloudApisMessageBundle.message(
+              "cloud.apis.service.account.java.configuration.error", configuration.getName()));
     }
 
     if (configuration.getType() instanceof ApplicationConfigurationType) {
@@ -78,9 +78,8 @@ public class JavaApplicationCloudApiRunConfigurationProvider
     } else {
       // unsupported configuration type, should not happen.
       return Optional.of(
-          GoogleCloudApisMessageBundle.message(
-              "cloud.apis.service.account.key.dialog.update.configuration.error",
-              configuration.getName()));
+          JavaCloudApisMessageBundle.message(
+              "cloud.apis.service.account.java.configuration.error", configuration.getName()));
     }
 
     return Optional.empty();

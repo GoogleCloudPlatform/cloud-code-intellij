@@ -51,6 +51,8 @@ dependencies {
     compile(project(':google-cloud-storage'))
     compile(project(':google-cloud-repos'))
     compile(project(':google-cloud-apis'))
+    compile(project(':google-cloud-apis:java-apis'))
+    compile(project(':google-cloud-apis:java-apis:maven-apis'))
     compile(project(':app-engine:java'))
     compile(project(':app-engine:java:maven'))
     compile(project(':app-engine:java:gradle'))
