@@ -114,9 +114,9 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
       if (webRootDir != null) {
         return VfsUtil.createDirectoryIfMissing(webRootDir, WEB_INF);
       } else {
-        // There is a webroot, but the directory does not exist
-        VirtualFile dir = VfsUtil.createDirectories(webRoots.get(0).getDirectoryUrl().substring(7));
-        return VfsUtil.createDirectoryIfMissing(dir, WEB_INF);
+        // There is a webroot, but the directory does not exist, so create it
+        webRootDir = VfsUtil.createDirectories(webRoots.get(0).getPresentableUrl());
+        return VfsUtil.createDirectoryIfMissing(webRootDir, WEB_INF);
       }
     } catch (IOException ioe) {
       LOG.info(ioe);
