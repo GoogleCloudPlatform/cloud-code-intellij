@@ -14,9 +14,11 @@
   ~ limitations under the License.
   -->
 
-<!-- plugin.xml that aggregates all maven-integration dependent modules -->
-<idea-plugin xmlns:xi="http://www.w3.org/2001/XInclude">
-    <xi:include href="/META-INF/app-engine-java-maven.xml" xpointer="xpointer(/idea-plugin/*)"/>
-    <xi:include href="/META-INF/google-cloud-apis.xml" xpointer="xpointer(/idea-plugin/*)"/>
-    <!--<xi:include href="/META-INF/cloud-apis-java-maven.xml" xpointer="xpointer(/idea-plugin/*)"/>-->
+<idea-plugin>
+    <depends>com.intellij.modules.java</depends>
+
+    <extensions defaultExtensionNs="com.google.gct.cloudapis">
+        <cloudApiRunConfiguration
+                implementation="com.google.cloudtools.intellij.cloudapis.java.JavaApplicationCloudApiRunConfigurationProvider"/>
+    </extensions>
 </idea-plugin>

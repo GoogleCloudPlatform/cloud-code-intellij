@@ -23,6 +23,7 @@ sourceSets.test.resources.srcDirs = ['testResources']
 
 dependencies {
     compile(project(':google-cloud-core'))
+    compile(project(':google-cloud-apis'))
     compile ('com.google.cloud.tools:appengine-plugins-core:' + toolsLibVersion) {
         exclude group: 'com.google.guava', module: 'guava'
         exclude group: 'org.yaml', module: 'snakeyaml'
