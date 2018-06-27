@@ -26,8 +26,4 @@ intellij {
 }
 
 dependencies {
-    compile(project(':google-cloud-core'))
-
-    testCompile files("${System.properties['java.home']}/../lib/tools.jar")
-    testCompile(project(':common-test-lib'))
 }

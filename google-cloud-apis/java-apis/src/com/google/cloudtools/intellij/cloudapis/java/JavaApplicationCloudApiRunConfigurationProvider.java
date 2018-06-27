@@ -59,8 +59,7 @@ public class JavaApplicationCloudApiRunConfigurationProvider
     if (runner == null) {
       return Optional.of(
           JavaCloudApisMessageBundle.message(
-              "cloud.apis.service.account.java.configuration.error",
-              configuration.getName()));
+              "cloud.apis.service.account.java.configuration.error", configuration.getName()));
     }
 
     if (configuration.getType() instanceof ApplicationConfigurationType) {
@@ -80,8 +79,7 @@ public class JavaApplicationCloudApiRunConfigurationProvider
       // unsupported configuration type, should not happen.
       return Optional.of(
           JavaCloudApisMessageBundle.message(
-              "cloud.apis.service.account.java.configuration.error",
-              configuration.getName()));
+              "cloud.apis.service.account.java.configuration.error", configuration.getName()));
     }
 
     return Optional.empty();

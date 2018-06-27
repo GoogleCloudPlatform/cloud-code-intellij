@@ -28,8 +28,3 @@ dependencies {
     compile(project(':google-cloud-apis'))
 }
 
-configurations {
-    // these are already obtained from google-api-java-client-min-repackaged
-    compile.exclude group: 'com.google.api-client', module: 'google-api-client'
-    compile.exclude group: 'com.google.http-client', module: 'google-http-client'
-}
