@@ -17,8 +17,7 @@
 package com.google.cloud.tools.intellij.cloudapis;
 
 import com.google.cloud.tools.intellij.GctFeature;
-import com.google.cloud.tools.intellij.cloudapis.maven.CloudApiMavenService;
-import com.google.cloud.tools.intellij.cloudapis.maven.CloudLibraryMavenProjectState;
+import com.google.cloud.tools.intellij.cloudapis.maven.BomComboBox;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
@@ -26,7 +25,6 @@ import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.intellij.application.options.ModulesComboBox;
 import com.intellij.openapi.application.ApplicationManager;
@@ -34,11 +32,9 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.BooleanTableCellEditor;
 import com.intellij.ui.BooleanTableCellRenderer;
 import com.intellij.ui.JBSplitter;
-import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.TableUtil;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
@@ -61,7 +57,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -97,8 +92,6 @@ final class GoogleCloudApiSelectorPanel {
   private static final boolean SHOULD_ENABLE_API_DEFAULT = true;
   private static int CLOUD_LIBRARY_COL = 0;
   private static int CLOUD_LIBRARY_SELECT_COL = 1;
-
-  private static final int NUM_BOM_VERSIONS_TO_SHOW = 5;
 
   GoogleCloudApiSelectorPanel(List<CloudLibrary> libraries, Project project) {
     this.libraries = libraries;
@@ -231,8 +224,7 @@ final class GoogleCloudApiSelectorPanel {
     modulesComboBox = new ModulesComboBox();
     modulesComboBox.fillModules(project);
 
-    bomComboBox = new ComboBox<>();
-    bomComboBox.setRenderer(new BomVersionRenderer());
+    bomComboBox = new BomComboBox();
 
     ApplicationManager.getApplication()
         .runReadAction(
@@ -279,57 +271,19 @@ final class GoogleCloudApiSelectorPanel {
     detailsPanel.setManagementUIEnabled(addLibrary && projectSelector.getSelectedProject() != null);
   }
 
-  /**
-   * Populates the BOM {@link JComboBox} with the fetched versions. If there is already a
-   * preconfigured BOM in the corresponding module's pom.xml, then its version will be preselected.
-   * If there are no versions returned and there is no preconfigured BOM, then the BOM UX is hidden.
-   *
-   * <p>Sorts the displayable versions in reverse order, and limits the number shown to some value
-   * N.
-   */
-  // TODO (eshaul): make async with loader icons
+  // TODO placeholder, remove when UI extension components are finalized.
   private void populateBomVersions() {
-    List<String> availableBomVersions =
-        Lists.newArrayList(CloudApiMavenService.getInstance().getAllBomVersions());
-
-    Optional<String> configuredBomVersion =
-        CloudLibraryMavenProjectState.getInstance(project)
-            .getCloudLibraryBomVersion(modulesComboBox.getSelectedModule());
-
-    if (availableBomVersions.isEmpty() && !configuredBomVersion.isPresent()) {
+    boolean bomAvailable =
+        ((BomComboBox) bomComboBox)
+            .populateBomVersions(project, modulesComboBox.getSelectedModule());
+    if (!bomAvailable) {
       hideBomUI();
-    } else {
-      sortBomList(availableBomVersions);
-
-      if (availableBomVersions.size() > NUM_BOM_VERSIONS_TO_SHOW) {
-        availableBomVersions = availableBomVersions.subList(0, NUM_BOM_VERSIONS_TO_SHOW);
-      }
-
-      // If there is a preconfigured BOM not already in the list, add it to the list, and re-sort
-      if (configuredBomVersion.isPresent()
-          && availableBomVersions.indexOf(configuredBomVersion.get()) == -1) {
-        availableBomVersions.add(configuredBomVersion.get());
-        sortBomList(availableBomVersions);
-      }
-
-      bomComboBox.removeAllItems();
-      availableBomVersions.forEach(bomComboBox::addItem);
-
-      // If there is a preconfigured BOM, select it by default
-      if (configuredBomVersion.isPresent()) {
-        bomComboBox.setSelectedIndex(availableBomVersions.indexOf(configuredBomVersion.get()));
-      }
     }
   }
 
   private void hideBomUI() {
     bomComboBox.setVisible(false);
     bomSelectorLabel.setVisible(false);
-  }
-
-  /** Sorts the list of BOM version in reverse order */
-  private void sortBomList(List<String> boms) {
-    boms.sort(Comparator.reverseOrder());
   }
 
   /** The custom {@link JBTable} for the table of supported Cloud libraries. */
@@ -458,16 +412,6 @@ final class GoogleCloudApiSelectorPanel {
     @Override
     public void removeTableModelListener(TableModelListener l) {
       listeners.remove(l);
-    }
-  }
-
-  private static class BomVersionRenderer extends ListCellRendererWrapper<String> {
-
-    private static final String BOM_VERSION_DISPLAY_FORMAT = "(BOM) %s";
-
-    @Override
-    public void customize(JList list, String value, int index, boolean selected, boolean hasFocus) {
-      setText(String.format(BOM_VERSION_DISPLAY_FORMAT, value));
     }
   }
 }
