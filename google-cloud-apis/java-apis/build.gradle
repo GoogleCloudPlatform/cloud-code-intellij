@@ -21,16 +21,15 @@ sourceSets.main.resources.srcDirs = ['resources', 'src']
 sourceSets.test.java.srcDirs = ['testSrc']
 sourceSets.test.resources.srcDirs = ['testResources']
 
-dependencies {
-    compile(project(':google-cloud-core'))
-    compile(project(':google-cloud-apis'))
-    compile ('com.google.cloud.tools:appengine-plugins-core:' + toolsLibVersion) {
-        exclude group: 'com.google.guava', module: 'guava'
-        exclude group: 'org.yaml', module: 'snakeyaml'
-    }
-    compileOnly 'com.google.auto.value:auto-value:1.4.1'
-    apt         'com.google.auto.value:auto-value:1.4.1'
+intellij {
+}
 
-    testCompile files("${System.properties['java.home']}/../lib/tools.jar")
-    testCompile(project(':common-test-lib'))
+dependencies {
+    compile(project(':google-cloud-apis'))
+}
+
+configurations {
+    // these are already obtained from google-api-java-client-min-repackaged
+    compile.exclude group: 'com.google.api-client', module: 'google-api-client'
+    compile.exclude group: 'com.google.http-client', module: 'google-http-client'
 }

@@ -22,6 +22,7 @@ sourceSets.test.java.srcDirs = ['testSrc']
 sourceSets.test.resources.srcDirs = ['testResources']
 
 intellij {
+    'maven'
 }
 
 dependencies {
