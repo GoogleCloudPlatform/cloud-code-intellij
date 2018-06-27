@@ -23,8 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.PropertyKey;
 
 public class MavenCloudApisMessageBundle {
-  @NonNls
-  private static final String BUNDLE_NAME = "messages.MavenCloudApisBundle";
+  @NonNls private static final String BUNDLE_NAME = "messages.MavenCloudApisBundle";
 
   /** Prevents instantiation. */
   private MavenCloudApisMessageBundle() {}

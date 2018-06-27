@@ -17,13 +17,13 @@
 package com.google.cloud.tools.intellij.cloudapis;
 
 import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
+import com.google.cloud.tools.intellij.cloudapis.maven.CloudApiMavenService;
+import com.google.cloud.tools.intellij.cloudapis.maven.CloudApiMavenService.LibraryVersionFromBomException;
+import com.google.cloud.tools.intellij.cloudapis.maven.CloudLibraryUtils;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.cloud.tools.libraries.json.CloudLibraryClientMavenCoordinates;
-import com.google.cloud.tools.intellij.cloudapis.maven.CloudApiMavenService;
-import com.google.cloud.tools.intellij.cloudapis.maven.CloudApiMavenService.LibraryVersionFromBomException;
-import com.google.cloud.tools.intellij.cloudapis.maven.CloudLibraryUtils;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.intellij.icons.AllIcons.General;
