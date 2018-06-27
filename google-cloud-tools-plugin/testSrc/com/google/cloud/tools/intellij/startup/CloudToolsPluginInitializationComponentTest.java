@@ -16,9 +16,8 @@
 
 package com.google.cloud.tools.intellij.startup;
 
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -28,39 +27,41 @@ import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
 import com.google.cloud.tools.intellij.service.ApplicationPluginInfoService;
 import com.google.cloud.tools.intellij.service.PluginConfigurationService;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
-import com.google.cloud.tools.intellij.testing.BasePluginTestCase;
+import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.TestService;
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
+import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 /** Tests to validate initialization on supported platforms */
-@RunWith(MockitoJUnitRunner.class)
-public class CloudToolsPluginInitializationComponentTest extends BasePluginTestCase {
+public class CloudToolsPluginInitializationComponentTest {
+
+  @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
 
   private static final String PLUGIN_ID_STRING = "com.google.gct.core";
-  @Mock PluginInfoService pluginInfoService;
-  @Mock PluginConfigurationService pluginConfigurationService;
-  @Mock ActionManager actionManager;
-  @Mock ApplicationPluginInfoService applicationInfoService;
-  @Mock IntegratedGoogleLoginService googleLoginService;
+  @Mock Disposable disposable;
+  @Mock @TestService PluginInfoService pluginInfoService;
+  @Mock @TestService PluginConfigurationService pluginConfigurationService;
+  @Mock @TestService ApplicationPluginInfoService applicationInfoService;
+  @Mock @TestService IntegratedGoogleLoginService googleLoginService;
 
+  private Application application;
   CloudToolsPluginInitializationComponent testComponent;
 
   @Before
   public void registerMockServices() {
-    registerService(PluginInfoService.class, pluginInfoService);
-    registerService(PluginConfigurationService.class, pluginConfigurationService);
-    registerService(ActionManager.class, actionManager);
-    registerService(ApplicationPluginInfoService.class, applicationInfoService);
-    registerService(IntegratedGoogleLoginService.class, googleLoginService);
-
     testComponent = new CloudToolsPluginInitializationComponent();
+    application = ApplicationManager.getApplication();
+  }
+
+  @After
+  public void tearDown() {
+    ApplicationManager.setApplication(application, disposable);
   }
 
   @Test
@@ -82,7 +83,7 @@ public class CloudToolsPluginInitializationComponentTest extends BasePluginTestC
   public void testInitComponent_usageTrackingIsEnabled() {
     Application mockApplication = spy(ApplicationManager.getApplication());
     when(mockApplication.isUnitTestMode()).thenReturn(false);
-    ApplicationManager.setApplication(mockApplication, mock(Disposable.class));
+    ApplicationManager.setApplication(mockApplication, disposable);
     testComponent = spy(new CloudToolsPluginInitializationComponent());
     doNothing().when(testComponent).configureUsageTracking();
     testComponent.initComponent();
@@ -93,7 +94,7 @@ public class CloudToolsPluginInitializationComponentTest extends BasePluginTestC
   public void testInitComponent_usageTrackingIsDisabled() {
     Application mockApplication = spy(ApplicationManager.getApplication());
     when(mockApplication.isUnitTestMode()).thenReturn(true);
-    ApplicationManager.setApplication(mockApplication, mock(Disposable.class));
+    ApplicationManager.setApplication(mockApplication, disposable);
     testComponent = spy(new CloudToolsPluginInitializationComponent());
     testComponent.initComponent();
     verify(testComponent, never()).configureUsageTracking();
