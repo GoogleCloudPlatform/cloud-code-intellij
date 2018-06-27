@@ -77,11 +77,17 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
   }
 
   /**
-   * Returns the first WEB-INF folder determined in this order or null if none can be found. 1. If a
-   * WEB-INF folder exists as one of {@code module}'s web resource directories, returns the first
-   * one 2. If a WEB-INF folder is a child of one or more of the web resource directories, returns
-   * the first one 3. Creates a WEB-INF folder in the first web resource directory
+   * Locates a parent directory for placing the generated appengine-web.xml according to the
+   * following strategy:
+   *
+   * <p>Returns the first WEB-INF folder determined in this order or null if none can be found. 1.
+   * If a WEB-INF folder exists as one of {@code module}'s web resource directories, returns the
+   * first one 2. If a WEB-INF folder is a child of one or more of the web resource directories,
+   * returns the first one 3. Creates a WEB-INF folder in the first web resource directory 4. If the
+   * web resource directory is specified but does not exist, create it with a WEB-INF child and
+   * return it
    */
+  // todo refactor this logic
   @Override
   public VirtualFile suggestParentDirectoryForAppEngineWebXml(
       @NotNull Module module, @NotNull ModifiableRootModel rootModel) {
@@ -94,6 +100,7 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
     if (webRoots.isEmpty()) {
       return null;
     }
+
 
     for (WebRoot webRoot : webRoots) {
       VirtualFile webRootDir = webRoot.getFile();
@@ -110,6 +117,7 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
     }
 
     try {
+      // todo this is technically incorrect - it shouldn't just get the first, it should get the first that isn't null
       VirtualFile webRootDir = webRoots.get(0).getFile();
       if (webRootDir != null) {
         return VfsUtil.createDirectoryIfMissing(webRootDir, WEB_INF);
