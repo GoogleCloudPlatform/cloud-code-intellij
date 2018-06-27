@@ -20,5 +20,6 @@
   <xi:include href="/META-INF/google-cloud-core.xml" xpointer="xpointer(/idea-plugin/*)"/>
   <xi:include href="/META-INF/app-engine-java.xml" xpointer="xpointer(/idea-plugin/*)"/>
   <xi:include href="/META-INF/google-cloud-apis.xml" xpointer="xpointer(/idea-plugin/*)"/>
+  <!-- TODO remove dependency once Maven module is complete -->
   <xi:include href="/META-INF/cloud-apis-java-maven.xml" xpointer="xpointer(/idea-plugin/*)"/>
 </idea-plugin>
