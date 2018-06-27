@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.cloudapis;
+package com.google.cloud.tools.intellij.cloudapis.maven;
 
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.cloud.tools.libraries.json.CloudLibraryClientMavenCoordinates;
@@ -51,13 +51,13 @@ import org.jetbrains.idea.maven.aether.ArtifactRepositoryManager;
 
 /** Aether-based application service providing Cloud API Maven functionality. */
 public class CloudApiMavenService {
-  private static final Logger logger = Logger.getInstance(CloudApiManager.class);
+  private static final Logger logger = Logger.getInstance(CloudApiMavenService.class);
 
   private final RepositorySystem SYSTEM;
   private final RepositorySystemSession SESSION;
 
-  static final String GOOGLE_CLOUD_JAVA_BOM_GROUP = "com.google.cloud";
-  static final String GOOGLE_CLOUD_JAVA_BOM_ARTIFACT = "google-cloud-bom";
+  public static final String GOOGLE_CLOUD_JAVA_BOM_GROUP = "com.google.cloud";
+  public static final String GOOGLE_CLOUD_JAVA_BOM_ARTIFACT = "google-cloud-bom";
   static final String GOOGLE_CLOUD_JAVA_BOM_TYPE = "pom";
   static final String GOOGLE_CLOUD_JAVA_BOM_SCOPE = "import";
   private static final String GOOGLE_CLOUD_JAVA_BOM_ALL_VERSIONS_CONSTRAINT = "[0,)";
@@ -65,7 +65,7 @@ public class CloudApiMavenService {
   private static final RemoteRepository MAVEN_CENTRAL_REPOSITORY =
       ArtifactRepositoryManager.createRemoteRepository("central", "http://repo1.maven.org/maven2/");
 
-  static CloudApiMavenService getInstance() {
+  public static CloudApiMavenService getInstance() {
     return ServiceManager.getService(CloudApiMavenService.class);
   }
 
@@ -79,7 +79,7 @@ public class CloudApiMavenService {
    *
    * @return returns the versions of the BOMs
    */
-  List<String> getAllBomVersions() {
+  public List<String> getAllBomVersions() {
     try {
       return executeBomVersionRangeRequest()
           .getVersions()
@@ -117,7 +117,7 @@ public class CloudApiMavenService {
    * @return the optional version of the library found in the given BOM
    * @throws LibraryVersionFromBomException if the library version can be fetched for the given BOM
    */
-  Optional<String> getManagedDependencyVersion(
+  public Optional<String> getManagedDependencyVersion(
       CloudLibraryClientMavenCoordinates libraryMavenCoordinates, String bomVersion)
       throws LibraryVersionFromBomException {
     Artifact bomArtifact = new DefaultArtifact(toBomCoordinates(bomVersion));
@@ -207,9 +207,9 @@ public class CloudApiMavenService {
   /**
    * Exception indicating failure when fetching a Cloud library's version from a given BOM version.
    */
-  static class LibraryVersionFromBomException extends Exception {
+  public static class LibraryVersionFromBomException extends Exception {
 
-    LibraryVersionFromBomException(String message) {
+    public LibraryVersionFromBomException(String message) {
       super(message);
     }
 

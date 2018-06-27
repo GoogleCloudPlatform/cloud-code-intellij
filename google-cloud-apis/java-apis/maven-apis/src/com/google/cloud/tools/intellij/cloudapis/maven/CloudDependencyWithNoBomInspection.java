@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.cloudapis;
+package com.google.cloud.tools.intellij.cloudapis.maven;
 
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
@@ -52,7 +52,7 @@ public class CloudDependencyWithNoBomInspection extends CloudBomInspection {
   @Nullable
   @Override
   public String getStaticDescription() {
-    return GoogleCloudApisMessageBundle.message(
+    return MavenCloudApisMessageBundle.message(
         "cloud.libraries.with.no.bom.inspection.description");
   }
 
@@ -74,7 +74,7 @@ public class CloudDependencyWithNoBomInspection extends CloudBomInspection {
     holder.createProblem(
         dependency,
         HighlightSeverity.GENERIC_SERVER_ERROR_OR_WARNING,
-        GoogleCloudApisMessageBundle.message(
+        MavenCloudApisMessageBundle.message(
             "cloud.libraries.with.no.bom.inspection.problem.description"),
         new AddBomAndStripVersionQuickFix(module));
   }
@@ -95,7 +95,7 @@ public class CloudDependencyWithNoBomInspection extends CloudBomInspection {
     @NotNull
     @Override
     public String getFamilyName() {
-      return GoogleCloudApisMessageBundle.message("cloud.libraries.with.no.bom.quickfix.title");
+      return MavenCloudApisMessageBundle.message("cloud.libraries.with.no.bom.quickfix.title");
     }
 
     @Override

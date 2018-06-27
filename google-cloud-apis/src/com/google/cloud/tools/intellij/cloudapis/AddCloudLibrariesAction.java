@@ -21,6 +21,7 @@ import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineSt
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.java.maven.project.MavenProjectService;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
+import com.google.cloud.tools.intellij.cloudapis.maven.CloudLibraryDependencyWriter;
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;

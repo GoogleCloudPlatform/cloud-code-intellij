@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.cloudapis;
+package com.google.cloud.tools.intellij.cloudapis.maven;
 
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.annotations.VisibleForTesting;
@@ -61,7 +61,7 @@ public class CloudLibraryProjectState implements ProjectComponent {
     this.project = project;
   }
 
-  static CloudLibraryProjectState getInstance(Project project) {
+  public static CloudLibraryProjectState getInstance(Project project) {
     return project.getComponent(CloudLibraryProjectState.class);
   }
 
@@ -92,7 +92,7 @@ public class CloudLibraryProjectState implements ProjectComponent {
     return moduleLibraryMap.getOrDefault(module, ImmutableSet.of());
   }
 
-  Optional<String> getCloudLibraryBomVersion(Module module) {
+  public Optional<String> getCloudLibraryBomVersion(Module module) {
     return moduleBomVersionMap.getOrDefault(module, Optional.empty());
   }
 
@@ -107,7 +107,7 @@ public class CloudLibraryProjectState implements ProjectComponent {
             .collect(Collectors.toMap(Function.identity(), this::loadManagedLibraries));
   }
 
-  void syncCloudLibrariesBom() {
+  public void syncCloudLibrariesBom() {
     moduleBomVersionMap =
         Stream.of(ModuleManager.getInstance(project).getModules())
             .collect(Collectors.toMap(Function.identity(), this::loadCloudLibraryBomVersion));

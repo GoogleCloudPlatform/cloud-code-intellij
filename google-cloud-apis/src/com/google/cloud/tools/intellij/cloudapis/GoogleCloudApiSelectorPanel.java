@@ -21,6 +21,8 @@ import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
+import com.google.cloud.tools.intellij.cloudapis.maven.CloudApiMavenService;
+import com.google.cloud.tools.intellij.cloudapis.maven.CloudLibraryProjectState;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
