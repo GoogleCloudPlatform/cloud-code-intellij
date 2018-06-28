@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.cloudapis;
+package com.google.cloud.tools.intellij.cloudapis.maven;
 
 import com.google.cloud.tools.libraries.CloudLibraries;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
@@ -28,12 +28,12 @@ import java.util.List;
 public class CloudLibrariesService {
   private static final Logger logger = Logger.getInstance(CloudLibrariesService.class);
 
-  static CloudLibrariesService getInstance() {
+  public static CloudLibrariesService getInstance() {
     return ServiceManager.getService(CloudLibrariesService.class);
   }
 
   /** Returns an immutable list of {@link CloudLibrary libraries}. */
-  List<CloudLibrary> getCloudLibraries() {
+  public List<CloudLibrary> getCloudLibraries() {
     try {
       return ImmutableList.copyOf(CloudLibraries.getCloudLibraries());
     } catch (IOException e) {

@@ -22,7 +22,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.GctFeature;
-import com.google.cloud.tools.intellij.cloudapis.CloudApiMavenService.LibraryVersionFromBomException;
+import com.google.cloud.tools.intellij.cloudapis.maven.CloudApiMavenService;
+import com.google.cloud.tools.intellij.cloudapis.maven.CloudApiMavenService.LibraryVersionFromBomException;
+import com.google.cloud.tools.intellij.cloudapis.maven.CloudLibraryMavenProjectState;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
@@ -427,7 +429,7 @@ public final class GoogleCloudApiSelectorPanelTest {
             module -> {
               String preconfigureBomVersion = "v0-alpha";
               writeBomDependency(module, preconfigureBomVersion);
-              CloudLibraryProjectState.getInstance(testFixture.getProject())
+              CloudLibraryMavenProjectState.getInstance(testFixture.getProject())
                   .syncCloudLibrariesBom();
 
               GoogleCloudApiSelectorPanel panel =
@@ -460,7 +462,7 @@ public final class GoogleCloudApiSelectorPanelTest {
             module -> {
               String preconfigureBomVersion = "v1";
               writeBomDependency(module, preconfigureBomVersion);
-              CloudLibraryProjectState.getInstance(testFixture.getProject())
+              CloudLibraryMavenProjectState.getInstance(testFixture.getProject())
                   .syncCloudLibrariesBom();
 
               GoogleCloudApiSelectorPanel panel =
@@ -492,7 +494,7 @@ public final class GoogleCloudApiSelectorPanelTest {
             module -> {
               String preconfigureBomVersion = "v1";
               writeBomDependency(module, preconfigureBomVersion);
-              CloudLibraryProjectState.getInstance(testFixture.getProject())
+              CloudLibraryMavenProjectState.getInstance(testFixture.getProject())
                   .syncCloudLibrariesBom();
 
               GoogleCloudApiSelectorPanel panel =

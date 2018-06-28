@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.cloudapis;
 
 import com.google.api.services.iam.v1.model.Role;
+import com.google.cloud.tools.intellij.cloudapis.maven.CloudLibrariesService;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.collect.Sets;

@@ -17,37 +17,10 @@
 <idea-plugin>
     <depends>org.jetbrains.idea.maven</depends>
 
-    <project-components>
-        <component>
-            <implementation-class>com.google.cloud.tools.intellij.cloudapis.CloudLibraryProjectState
-            </implementation-class>
-        </component>
-    </project-components>
     <extensionPoints>
         <extensionPoint qualifiedName="com.google.gct.cloudapis.cloudApiRunConfiguration"
                         interface="com.google.cloud.tools.intellij.cloudapis.CloudApiRunConfigurationProvider"/>
     </extensionPoints>
-    <extensions defaultExtensionNs="com.intellij">
-        <applicationService
-                serviceImplementation="com.google.cloud.tools.intellij.cloudapis.CloudLibrariesService"/>
-        <applicationService
-                serviceImplementation="com.google.cloud.tools.intellij.cloudapis.CloudApiMavenService"/>
-        <localInspection language="XML" shortName="DependencyVersionWithBom"
-                         bundle="messages.CloudApisBundle"
-                         hasStaticDescription="true"
-                         key="cloud.libraries.version.with.bom.inspection.display.name"
-                         groupKey="cloud.libraries.bom.inspection.group.name"
-                         enabledByDefault="true" level="WARNING"
-                         implementationClass="com.google.cloud.tools.intellij.cloudapis.CloudDependencyVersionWithBomInspection"/>
-
-        <localInspection language="XML" shortName="DependencyWithNoBom"
-                         bundle="messages.CloudApisBundle"
-                         hasStaticDescription="true"
-                         key="cloud.libraries.with.no.bom.inspection.display.name"
-                         groupKey="cloud.libraries.bom.inspection.group.name"
-                         enabledByDefault="true" level="WARNING"
-                         implementationClass="com.google.cloud.tools.intellij.cloudapis.CloudDependencyWithNoBomInspection"/>
-    </extensions>
     <actions>
         <group id="GoogleCloudTools.cloudapis">
             <action id="GoogleCloudTools.AddCloudLibraries"

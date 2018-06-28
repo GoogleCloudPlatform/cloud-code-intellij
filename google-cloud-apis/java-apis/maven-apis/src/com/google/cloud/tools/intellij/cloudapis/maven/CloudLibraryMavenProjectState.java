@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.cloudapis;
+package com.google.cloud.tools.intellij.cloudapis.maven;
 
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.annotations.VisibleForTesting;
@@ -47,7 +47,7 @@ import org.jetbrains.idea.maven.project.MavenProjectsManager.Listener;
  * A {@link ProjectComponent} that maintains, in memory, the current set of {@link CloudLibrary}
  * that are configured on the user's project.
  */
-public class CloudLibraryProjectState implements ProjectComponent {
+public class CloudLibraryMavenProjectState implements ProjectComponent {
 
   private final Project project;
 
@@ -57,12 +57,12 @@ public class CloudLibraryProjectState implements ProjectComponent {
 
   private List<CloudLibrary> allLibraries;
 
-  private CloudLibraryProjectState(Project project) {
+  private CloudLibraryMavenProjectState(Project project) {
     this.project = project;
   }
 
-  static CloudLibraryProjectState getInstance(Project project) {
-    return project.getComponent(CloudLibraryProjectState.class);
+  public static CloudLibraryMavenProjectState getInstance(Project project) {
+    return project.getComponent(CloudLibraryMavenProjectState.class);
   }
 
   /**
@@ -92,7 +92,7 @@ public class CloudLibraryProjectState implements ProjectComponent {
     return moduleLibraryMap.getOrDefault(module, ImmutableSet.of());
   }
 
-  Optional<String> getCloudLibraryBomVersion(Module module) {
+  public Optional<String> getCloudLibraryBomVersion(Module module) {
     return moduleBomVersionMap.getOrDefault(module, Optional.empty());
   }
 
@@ -107,7 +107,7 @@ public class CloudLibraryProjectState implements ProjectComponent {
             .collect(Collectors.toMap(Function.identity(), this::loadManagedLibraries));
   }
 
-  void syncCloudLibrariesBom() {
+  public void syncCloudLibrariesBom() {
     moduleBomVersionMap =
         Stream.of(ModuleManager.getInstance(project).getModules())
             .collect(Collectors.toMap(Function.identity(), this::loadCloudLibraryBomVersion));
