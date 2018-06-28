@@ -37,20 +37,31 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 
-/** Tests for {@link AppEngineStandardUltimateWebIntegration}. */
+/**
+ * Tests for {@link AppEngineStandardUltimateWebIntegration}.
+ */
 public class AppEngineStandardUltimateWebIntegrationTest {
 
-  @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
+  @Rule
+  public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
 
   private AppEngineStandardUltimateWebIntegration webIntegration;
-  @Mock private Module mockModule;
-  @Mock private ModifiableRootModel mockModifiableRootModel;
-  @Mock private WebFacet mockWebFacet;
-  @Mock private FacetManager mockFacetManager;
-  @Mock private WebRoot mockWebRoot;
-  @Mock private VirtualFile mockWebRootDir;
-  @Mock private VirtualFile mockExistingWebInfDir;
-  @Mock private VirtualFile mockNewWebInfDir;
+  @Mock
+  private Module mockModule;
+  @Mock
+  private ModifiableRootModel mockModifiableRootModel;
+  @Mock
+  private WebFacet mockWebFacet;
+  @Mock
+  private FacetManager mockFacetManager;
+  @Mock
+  private WebRoot mockWebRoot;
+  @Mock
+  private VirtualFile mockWebRootDir;
+  @Mock
+  private VirtualFile mockExistingWebInfDir;
+  @Mock
+  private VirtualFile mockNewWebInfDir;
 
   @TestDirectory(name = "WEB-INF")
   File testWebInf;
@@ -64,7 +75,7 @@ public class AppEngineStandardUltimateWebIntegrationTest {
 
     when(mockWebRootDir.getFileSystem()).thenReturn(LocalFileSystem.getInstance());
     when(mockWebRootDir.createChildDirectory(
-            LocalFileSystem.getInstance(), AppEngineStandardUltimateWebIntegration.WEB_INF))
+        LocalFileSystem.getInstance(), AppEngineStandardUltimateWebIntegration.WEB_INF))
         .thenReturn(mockNewWebInfDir);
     when(mockWebRootDir.findChild(AppEngineStandardUltimateWebIntegration.WEB_INF))
         .thenReturn(mockExistingWebInfDir);
@@ -126,7 +137,8 @@ public class AppEngineStandardUltimateWebIntegrationTest {
         webIntegration.suggestParentDirectoryForAppEngineWebXml(
             mockModule, mockModifiableRootModel);
 
-    assertThat(suggestedDirectory.getPath().endsWith(testWebInf.getAbsolutePath())).isTrue();
+    assertThat(new File(suggestedDirectory.getPath()).getAbsolutePath()
+        .endsWith(testWebInf.getAbsolutePath())).isTrue();
   }
 
   @Test

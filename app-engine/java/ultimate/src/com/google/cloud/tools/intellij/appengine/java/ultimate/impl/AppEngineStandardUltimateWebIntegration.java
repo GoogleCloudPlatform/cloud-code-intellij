@@ -125,6 +125,7 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
           webRoots.stream().map(WebRoot::getFile).filter(Objects::nonNull).findFirst();
 
       if (!webRootDir.isPresent()) {
+        // There is at least one web-root path, but none that exist, select the first and create it
         String presentableUrl = webRoots.get(0).getPresentableUrl();
         if (presentableUrl != null) {
           webRootDir = Optional.ofNullable(VfsUtil.createDirectories(presentableUrl));
