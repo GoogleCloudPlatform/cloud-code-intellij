@@ -47,7 +47,7 @@ import org.jetbrains.idea.maven.project.MavenProjectsManager.Listener;
  * A {@link ProjectComponent} that maintains, in memory, the current set of {@link CloudLibrary}
  * that are configured on the user's project.
  */
-public class CloudLibraryProjectState implements ProjectComponent {
+public class CloudLibraryMavenProjectState implements ProjectComponent {
 
   private final Project project;
 
@@ -57,12 +57,12 @@ public class CloudLibraryProjectState implements ProjectComponent {
 
   private List<CloudLibrary> allLibraries;
 
-  private CloudLibraryProjectState(Project project) {
+  private CloudLibraryMavenProjectState(Project project) {
     this.project = project;
   }
 
-  public static CloudLibraryProjectState getInstance(Project project) {
-    return project.getComponent(CloudLibraryProjectState.class);
+  public static CloudLibraryMavenProjectState getInstance(Project project) {
+    return project.getComponent(CloudLibraryMavenProjectState.class);
   }
 
   /**

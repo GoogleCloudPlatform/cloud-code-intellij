@@ -18,7 +18,7 @@ package com.google.cloud.tools.intellij.cloudapis;
 
 import com.google.cloud.tools.intellij.GctFeature;
 import com.google.cloud.tools.intellij.cloudapis.maven.CloudApiMavenService;
-import com.google.cloud.tools.intellij.cloudapis.maven.CloudLibraryProjectState;
+import com.google.cloud.tools.intellij.cloudapis.maven.CloudLibraryMavenProjectState;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
@@ -293,7 +293,7 @@ final class GoogleCloudApiSelectorPanel {
         Lists.newArrayList(CloudApiMavenService.getInstance().getAllBomVersions());
 
     Optional<String> configuredBomVersion =
-        CloudLibraryProjectState.getInstance(project)
+        CloudLibraryMavenProjectState.getInstance(project)
             .getCloudLibraryBomVersion(modulesComboBox.getSelectedModule());
 
     if (availableBomVersions.isEmpty() && !configuredBomVersion.isPresent()) {

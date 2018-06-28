@@ -57,7 +57,7 @@ abstract class CloudBomInspection extends DomElementsInspection<MavenDomProjectM
     }
 
     Set<CloudLibrary> cloudLibraries =
-        CloudLibraryProjectState.getInstance(module.getProject()).getCloudLibraries(module);
+        CloudLibraryMavenProjectState.getInstance(module.getProject()).getCloudLibraries(module);
 
     if (cloudLibraries.isEmpty()) {
       return;

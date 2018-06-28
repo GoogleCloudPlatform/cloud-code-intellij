@@ -19,7 +19,7 @@
 
     <project-components>
         <component>
-            <implementation-class>com.google.cloud.tools.intellij.cloudapis.maven.CloudLibraryProjectState
+            <implementation-class>com.google.cloud.tools.intellij.cloudapis.maven.CloudLibraryMavenProjectState
             </implementation-class>
         </component>
     </project-components>

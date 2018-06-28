@@ -149,16 +149,16 @@ public final class CloudLibraryDependencyWriter {
    */
   private static void addBomToMavenModule(
       Module module, MavenDomProjectModel model, String bomVersion) {
-    CloudLibraryProjectState cloudLibraryProjectState =
-        CloudLibraryProjectState.getInstance(module.getProject());
+    CloudLibraryMavenProjectState cloudLibraryMavenProjectState =
+        CloudLibraryMavenProjectState.getInstance(module.getProject());
     Optional<String> bomDependencyOptional =
-        cloudLibraryProjectState.getCloudLibraryBomVersion(module);
+        cloudLibraryMavenProjectState.getCloudLibraryBomVersion(module);
 
     if (!bomDependencyOptional.isPresent()) {
       writeNewBom(model, bomVersion);
     } else {
       // update the version
-      cloudLibraryProjectState
+      cloudLibraryMavenProjectState
           .loadCloudLibraryBom(module)
           .map(MavenDomDependency::getVersion)
           .ifPresent(

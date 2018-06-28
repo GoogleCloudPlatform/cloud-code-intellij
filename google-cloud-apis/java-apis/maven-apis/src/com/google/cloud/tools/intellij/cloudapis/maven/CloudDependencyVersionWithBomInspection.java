@@ -55,7 +55,7 @@ public class CloudDependencyVersionWithBomInspection extends CloudBomInspection 
   /** Only apply the inspection if there is a BOM defined. */
   @Override
   boolean shouldApplyInspection(Module module) {
-    return CloudLibraryProjectState.getInstance(module.getProject())
+    return CloudLibraryMavenProjectState.getInstance(module.getProject())
         .getCloudLibraryBomVersion(module)
         .isPresent();
   }
