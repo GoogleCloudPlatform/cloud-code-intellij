@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.cloudapis;
+package com.google.cloud.tools.intellij.cloudapis.maven;
 
 import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
@@ -46,7 +46,7 @@ import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
 /** A helper class that adds dependencies of Cloud libraries to a given module. */
 // TODO (eshaul) refactor this into a mockable service with non-static methods
-final class CloudLibraryDependencyWriter {
+public final class CloudLibraryDependencyWriter {
 
   private static final NotificationGroup NOTIFICATION_GROUP =
       new NotificationGroup(
@@ -73,7 +73,7 @@ final class CloudLibraryDependencyWriter {
    * @param module the {@link Module} to add the libraries to
    * @param bomVersion the version of the BOM to write. May be null
    */
-  static void addLibraries(
+  public static void addLibraries(
       @NotNull Set<CloudLibrary> libraries, @NotNull Module module, @Nullable String bomVersion) {
     if (libraries.isEmpty()) {
       return;
@@ -149,16 +149,16 @@ final class CloudLibraryDependencyWriter {
    */
   private static void addBomToMavenModule(
       Module module, MavenDomProjectModel model, String bomVersion) {
-    CloudLibraryProjectState cloudLibraryProjectState =
-        CloudLibraryProjectState.getInstance(module.getProject());
+    CloudLibraryMavenProjectState cloudLibraryMavenProjectState =
+        CloudLibraryMavenProjectState.getInstance(module.getProject());
     Optional<String> bomDependencyOptional =
-        cloudLibraryProjectState.getCloudLibraryBomVersion(module);
+        cloudLibraryMavenProjectState.getCloudLibraryBomVersion(module);
 
     if (!bomDependencyOptional.isPresent()) {
       writeNewBom(model, bomVersion);
     } else {
       // update the version
-      cloudLibraryProjectState
+      cloudLibraryMavenProjectState
           .loadCloudLibraryBom(module)
           .map(MavenDomDependency::getVersion)
           .ifPresent(
@@ -232,10 +232,10 @@ final class CloudLibraryDependencyWriter {
     }
 
     String title =
-        GoogleCloudApisMessageBundle.message("cloud.libraries.depwriter.maven.ignored.deps.title");
+        MavenCloudApisMessageBundle.message("cloud.libraries.depwriter.maven.ignored.deps.title");
     String mavenIdString = joinMavenIds(ignoredMavenIds);
     String message =
-        GoogleCloudApisMessageBundle.message(
+        MavenCloudApisMessageBundle.message(
             "cloud.libraries.depwriter.maven.ignored.deps.message", mavenIdString);
     Notification notification =
         NOTIFICATION_GROUP.createNotification(
@@ -257,10 +257,10 @@ final class CloudLibraryDependencyWriter {
     }
 
     String title =
-        GoogleCloudApisMessageBundle.message("cloud.libraries.depwriter.maven.added.deps.title");
+        MavenCloudApisMessageBundle.message("cloud.libraries.depwriter.maven.added.deps.title");
     String mavenIdString = joinMavenIds(addedMavenIds);
     String message =
-        GoogleCloudApisMessageBundle.message(
+        MavenCloudApisMessageBundle.message(
             "cloud.libraries.depwriter.maven.added.deps.message", mavenIdString);
     Notification notification =
         NOTIFICATION_GROUP.createNotification(

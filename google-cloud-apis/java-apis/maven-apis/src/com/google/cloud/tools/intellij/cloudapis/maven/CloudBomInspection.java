@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.cloudapis;
+package com.google.cloud.tools.intellij.cloudapis.maven;
 
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.intellij.openapi.diagnostic.Logger;
@@ -57,7 +57,7 @@ abstract class CloudBomInspection extends DomElementsInspection<MavenDomProjectM
     }
 
     Set<CloudLibrary> cloudLibraries =
-        CloudLibraryProjectState.getInstance(module.getProject()).getCloudLibraries(module);
+        CloudLibraryMavenProjectState.getInstance(module.getProject()).getCloudLibraries(module);
 
     if (cloudLibraries.isEmpty()) {
       return;

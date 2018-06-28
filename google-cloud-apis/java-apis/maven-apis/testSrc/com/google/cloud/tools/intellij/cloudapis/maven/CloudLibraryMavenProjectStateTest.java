@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.cloudapis;
+package com.google.cloud.tools.intellij.cloudapis.maven;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.when;
@@ -51,8 +51,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 
-/** Tests for {@link CloudLibraryProjectState}. */
-public class CloudLibraryProjectStateTest {
+/** Tests for {@link CloudLibraryMavenProjectState}. */
+public class CloudLibraryMavenProjectStateTest {
 
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
   @TestFixture private IdeaProjectTestFixture testFixture;
@@ -74,11 +74,11 @@ public class CloudLibraryProjectStateTest {
           "Icon Link 1",
           ImmutableList.of(JAVA_CLIENT));
 
-  private CloudLibraryProjectState state;
+  private CloudLibraryMavenProjectState state;
 
   @Before
   public void setUp() {
-    state = CloudLibraryProjectState.getInstance(testFixture.getProject());
+    state = CloudLibraryMavenProjectState.getInstance(testFixture.getProject());
   }
 
   @After

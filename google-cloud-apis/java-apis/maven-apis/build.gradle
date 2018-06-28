@@ -22,8 +22,16 @@ sourceSets.test.java.srcDirs = ['testSrc']
 sourceSets.test.resources.srcDirs = ['testResources']
 
 intellij {
-    'maven'
+    plugins 'properties','maven', 'yaml'
 }
 
 dependencies {
+    compile(project(':google-cloud-core'))
+    compile ('com.google.cloud.tools:appengine-plugins-core:' + toolsLibVersion) {
+        exclude group: 'com.google.guava', module: 'guava'
+        exclude group: 'org.yaml', module: 'snakeyaml'
+    }
+
+    testCompile files("${System.properties['java.home']}/../lib/tools.jar")
+    testCompile(project(':common-test-lib'))
 }

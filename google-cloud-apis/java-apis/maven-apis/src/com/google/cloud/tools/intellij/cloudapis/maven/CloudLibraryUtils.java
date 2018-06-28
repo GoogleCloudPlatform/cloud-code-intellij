@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.cloudapis;
+package com.google.cloud.tools.intellij.cloudapis.maven;
 
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.cloud.tools.libraries.json.CloudLibraryClient;
@@ -22,7 +22,7 @@ import com.google.cloud.tools.libraries.json.CloudLibraryClientMavenCoordinates;
 import java.util.Optional;
 
 /** Holds utility methods that work with {@link CloudLibrary} classes. */
-final class CloudLibraryUtils {
+public final class CloudLibraryUtils {
 
   private static final String JAVA_CLIENT_LANGUAGE = "java";
 
@@ -35,7 +35,7 @@ final class CloudLibraryUtils {
    *
    * @param library the {@link CloudLibrary} to return the first Java client for
    */
-  static Optional<CloudLibraryClient> getFirstJavaClient(CloudLibrary library) {
+  public static Optional<CloudLibraryClient> getFirstJavaClient(CloudLibrary library) {
     if (library.getClients() == null) {
       return Optional.empty();
     }

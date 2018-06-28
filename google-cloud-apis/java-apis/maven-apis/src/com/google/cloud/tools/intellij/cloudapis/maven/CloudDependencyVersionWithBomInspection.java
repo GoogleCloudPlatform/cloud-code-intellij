@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.cloudapis;
+package com.google.cloud.tools.intellij.cloudapis.maven;
 
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
@@ -48,14 +48,14 @@ public class CloudDependencyVersionWithBomInspection extends CloudBomInspection 
   @Nullable
   @Override
   public String getStaticDescription() {
-    return GoogleCloudApisMessageBundle.getString(
+    return MavenCloudApisMessageBundle.getString(
         "cloud.libraries.version.with.bom.inspection.description");
   }
 
   /** Only apply the inspection if there is a BOM defined. */
   @Override
   boolean shouldApplyInspection(Module module) {
-    return CloudLibraryProjectState.getInstance(module.getProject())
+    return CloudLibraryMavenProjectState.getInstance(module.getProject())
         .getCloudLibraryBomVersion(module)
         .isPresent();
   }
@@ -71,7 +71,7 @@ public class CloudDependencyVersionWithBomInspection extends CloudBomInspection 
       holder.createProblem(
           dependency.getVersion(),
           HighlightSeverity.GENERIC_SERVER_ERROR_OR_WARNING,
-          GoogleCloudApisMessageBundle.message(
+          MavenCloudApisMessageBundle.message(
               "cloud.libraries.version.with.bom.inspection.problem.description"),
           new StripDependencyVersionQuickFix());
     }
@@ -93,8 +93,7 @@ public class CloudDependencyVersionWithBomInspection extends CloudBomInspection 
     @NotNull
     @Override
     public String getFamilyName() {
-      return GoogleCloudApisMessageBundle.message(
-          "cloud.libraries.version.with.bom.quickfix.title");
+      return MavenCloudApisMessageBundle.message("cloud.libraries.version.with.bom.quickfix.title");
     }
 
     @Override
