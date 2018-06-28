@@ -19,6 +19,8 @@ sourceSets.main.resources.srcDirs = ['resources', 'src']
 sourceSets.test.java.srcDirs = ['testSrc']
 sourceSets.test.resources.srcDirs = ['testResources', 'testData']
 
+archivesBaseName = 'app-engine-java'
+
 intellij {
     plugins 'Groovy', 'git4idea', 'properties', 'junit', 'yaml'
 }
