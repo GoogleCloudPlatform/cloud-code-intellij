@@ -21,6 +21,10 @@ import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Default {@link CloudApiUiPresenter} implementation giving access to base cloud API UI for
+ * extension points.
+ */
 public class DefaultCloudApiUiPresenter implements CloudApiUiPresenter {
 
   private GoogleCloudApiSelectorPanel cloudApiSelectorPanel;
@@ -40,6 +44,10 @@ public class DefaultCloudApiUiPresenter implements CloudApiUiPresenter {
     cloudApiSelectorPanel.getVersionLabel().setIcon(icon);
   }
 
+  /**
+   * Inits the presenter, creates all extension points and adds necessary event listeners and
+   * handlers.
+   */
   void init(GoogleCloudApiSelectorPanel cloudApiSelectorPanel) {
     this.cloudApiSelectorPanel = cloudApiSelectorPanel;
 

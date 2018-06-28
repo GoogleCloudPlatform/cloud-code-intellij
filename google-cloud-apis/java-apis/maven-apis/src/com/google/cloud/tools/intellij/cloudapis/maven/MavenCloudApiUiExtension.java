@@ -31,7 +31,10 @@ import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/** UI extension to support additional components and events for Maven Cloud API integration. */
+/**
+ * {@link CloudApiUiExtension} to support additional components and events for Maven Cloud API
+ * integration.
+ */
 public class MavenCloudApiUiExtension implements CloudApiUiExtension {
 
   private CloudApiUiPresenter uiPresenter;

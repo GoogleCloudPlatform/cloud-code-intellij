@@ -21,14 +21,36 @@ import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Extension point for Cloud APIs, allowing access to UI and getting updates on cloud library
+ * selection, module selection, and final library selection confirmation. See also {@link
+ * CloudApiUiPresenter}.
+ */
 // TODO: move to core cloud API once dependency is inverted.
 public interface CloudApiUiExtension {
   ExtensionPointName<CloudApiUiExtension> EP_NAME =
       new ExtensionPointName<>("com.google.gct.cloudapis.cloudApiUiExtension");
 
+  /**
+   * Called when add cloud libraries dialog is created and opened and base UI is ready. At this
+   * point extension point is active.
+   *
+   * @param uiPresenter Presenter to access cloud API base UI.
+   */
   void init(@NotNull CloudApiUiPresenter uiPresenter);
 
+  /**
+   * Callback on change in currently selected cloud library.
+   *
+   * @param currentCloudLibrary Cloud library selected or null if user de-selected library.
+   * @param currentBomVersion BOM version. TODO:// to be removed, move to maven module.
+   */
   void onCurrentCloudLibrarySelected(CloudLibrary currentCloudLibrary, String currentBomVersion);
 
+  /**
+   * Callback on module selection change.
+   *
+   * @param module Currently selected module.
+   */
   void onModuleSelected(Module module);
 }
