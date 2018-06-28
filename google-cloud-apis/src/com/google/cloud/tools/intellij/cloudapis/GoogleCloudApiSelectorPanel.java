@@ -214,6 +214,10 @@ final class GoogleCloudApiSelectorPanel {
     return bomComboBox;
   }
 
+  JLabel getVersionLabel() {
+    return detailsPanel.getVersionLabel();
+  }
+
   /**
    * Initializes some UI components in this panel that require special set-up.
    *

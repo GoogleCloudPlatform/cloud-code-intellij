@@ -60,7 +60,7 @@ public class BomComboBox extends JComboBox<String> {
         Lists.newArrayList(CloudApiMavenService.getInstance().getAllBomVersions());
 
     Optional<String> configuredBomVersion =
-        CloudLibraryProjectState.getInstance(project).getCloudLibraryBomVersion(module);
+        CloudLibraryMavenProjectState.getInstance(project).getCloudLibraryBomVersion(module);
 
     if (availableBomVersions.isEmpty() && !configuredBomVersion.isPresent()) {
       return false;

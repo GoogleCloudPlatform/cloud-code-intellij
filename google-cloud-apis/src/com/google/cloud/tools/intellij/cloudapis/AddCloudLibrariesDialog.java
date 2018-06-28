@@ -57,6 +57,10 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
         cloudProject -> setOKActionEnabled(isReadyToSubmit()));
 
     init();
+
+    // initialize presenter for this dialog and init the extensions if present.
+    DefaultCloudApiUiPresenter cloudApiUiPresenter = new DefaultCloudApiUiPresenter();
+    cloudApiUiPresenter.init(cloudApiSelectorPanel);
   }
 
   @Override

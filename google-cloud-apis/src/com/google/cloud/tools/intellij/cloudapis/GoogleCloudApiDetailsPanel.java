@@ -19,12 +19,10 @@ package com.google.cloud.tools.intellij.cloudapis;
 import static com.google.cloud.tools.intellij.cloudapis.maven.MavenCloudApiUiExtension.makeLink;
 
 import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
-import com.google.cloud.tools.intellij.cloudapis.maven.MavenCloudApiUiExtension;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Lists;
 import com.intellij.icons.AllIcons.General;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
@@ -33,17 +31,18 @@ import com.intellij.util.SVGLoader;
 import java.awt.Image;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** The form-bound class for the Cloud API details panel. */
@@ -109,6 +108,14 @@ public final class GoogleCloudApiDetailsPanel {
     // If the checkbox is disabled it should always be unchecked.
     // Otherwise, it should be checked according to the saved value
     enableApiCheckbox.setSelected(enabled && currentCloudApiManagementSpec.shouldEnable());
+  }
+
+  void addCloudLibraryDocumentationLink(@NotNull String link) {
+    linksTextPane.setText(linksTextPane.getText() + LINKS_SEPARATOR + link);
+  }
+
+  public CloudLibrary getCurrentCloudLibrary() {
+    return currentCloudLibrary;
   }
 
   /** Returns the {@link JLabel} that holds the library's icon. */
@@ -211,14 +218,7 @@ public final class GoogleCloudApiDetailsPanel {
             GoogleCloudApisMessageBundle.message("cloud.libraries.documentation.link"),
             currentCloudLibrary.getDocumentation());
 
-    List<Optional<String>> additionalLinks = Lists.newArrayList();
-    MavenCloudApiUiExtension.onCurrentCloudLibrarySelected(
-        currentCloudLibrary, currentBomVersion, versionLabel, additionalLinks::add);
-
-    linksTextPane.setText(
-        joinLinks(
-            Stream.concat(Stream.of(docsLink), additionalLinks.stream())
-                .collect(Collectors.toList())));
+    linksTextPane.setText(joinLinks(Collections.singletonList(docsLink)));
 
     managementWarningTextPane.setText(
         GoogleCloudApisMessageBundle.message("cloud.apis.management.section.info.text"));
@@ -277,8 +277,7 @@ public final class GoogleCloudApiDetailsPanel {
             .filter(Optional::isPresent)
             .map(Optional::get)
             .collect(Collectors.joining(LINKS_SEPARATOR));
-    return String.format(
-        "<html><body><p style=\"margin-top: 0\">%s</p></body></html>", joinedLinks);
+    return String.format("<html><body><p style=\"margin-top: 0\">%s", joinedLinks);
   }
 
   /**
