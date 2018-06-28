@@ -17,6 +17,8 @@
 package com.google.cloud.tools.intellij.cloudapis.maven;
 
 import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
+import com.google.cloud.tools.intellij.cloudapis.CloudApiUiExtension;
+import com.google.cloud.tools.intellij.cloudapis.CloudApiUiPresenter;
 import com.google.cloud.tools.intellij.cloudapis.maven.CloudApiMavenService.LibraryVersionFromBomException;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
@@ -121,11 +123,12 @@ public class MavenCloudApiUiExtension implements CloudApiUiExtension {
                               if (versionOptional.isPresent()) {
                                 ApplicationManager.getApplication()
                                     .invokeAndWait(
-                                        () -> uiPresenter.updateCloudLibraryVersionLabel(
-                                            MavenCloudApisMessageBundle.message(
-                                                "cloud.libraries.version.label",
-                                                versionOptional.get()),
-                                            null),
+                                        () ->
+                                            uiPresenter.updateCloudLibraryVersionLabel(
+                                                MavenCloudApisMessageBundle.message(
+                                                    "cloud.libraries.version.label",
+                                                    versionOptional.get()),
+                                                null),
                                         ModalityState.any());
 
                                 uiPresenter.updateCloudLibraryVersionLabel(null, null);

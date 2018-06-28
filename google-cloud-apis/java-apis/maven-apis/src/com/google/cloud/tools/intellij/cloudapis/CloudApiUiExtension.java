@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.cloudapis.maven;
+package com.google.cloud.tools.intellij.cloudapis;
 
 import com.google.cloud.tools.libraries.json.CloudLibrary;
+import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
 
 // TODO: move to core cloud API once dependency is inverted.
 public interface CloudApiUiExtension {
+  ExtensionPointName<CloudApiUiExtension> EP_NAME =
+      new ExtensionPointName<>("com.google.gct.cloudapis.cloudApiUiExtension");
+
   void init(@NotNull CloudApiUiPresenter uiPresenter);
+
   void onCurrentCloudLibrarySelected(CloudLibrary currentCloudLibrary, String currentBomVersion);
+
   void onModuleSelected(Module module);
 }

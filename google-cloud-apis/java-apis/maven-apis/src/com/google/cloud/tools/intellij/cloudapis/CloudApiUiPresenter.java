@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.cloudapis.maven;
+package com.google.cloud.tools.intellij.cloudapis;
 
 import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;

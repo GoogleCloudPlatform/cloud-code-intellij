@@ -31,7 +31,6 @@ import com.intellij.util.SVGLoader;
 import java.awt.Image;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -42,6 +41,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
+import org.fest.util.Lists;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,6 +64,8 @@ public final class GoogleCloudApiDetailsPanel {
   private CloudLibrary currentCloudLibrary;
   private String currentBomVersion;
   private CloudApiManagementSpec currentCloudApiManagementSpec;
+
+  private final List<Optional<String>> links = Lists.newArrayList();
 
   /** Returns the {@link JPanel} that holds the UI elements in this panel. */
   JPanel getPanel() {
@@ -111,7 +113,8 @@ public final class GoogleCloudApiDetailsPanel {
   }
 
   void addCloudLibraryDocumentationLink(@NotNull String link) {
-    linksTextPane.setText(linksTextPane.getText() + LINKS_SEPARATOR + link);
+    links.add(Optional.of(link));
+    linksTextPane.setText(joinLinks(links));
   }
 
   public CloudLibrary getCurrentCloudLibrary() {
@@ -213,12 +216,14 @@ public final class GoogleCloudApiDetailsPanel {
     descriptionTextPane.setSize(
         descriptionTextPane.getWidth(), descriptionTextPane.getPreferredSize().height);
 
+    links.clear();
     Optional<String> docsLink =
         makeLink(
             GoogleCloudApisMessageBundle.message("cloud.libraries.documentation.link"),
             currentCloudLibrary.getDocumentation());
 
-    linksTextPane.setText(joinLinks(Collections.singletonList(docsLink)));
+    links.add(docsLink);
+    linksTextPane.setText(joinLinks(links));
 
     managementWarningTextPane.setText(
         GoogleCloudApisMessageBundle.message("cloud.apis.management.section.info.text"));
