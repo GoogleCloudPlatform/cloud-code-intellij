@@ -58,11 +58,14 @@ import com.intellij.util.containers.ContainerUtil;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** @author nik */
 public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWebIntegration {
+
   public static final String WEB_INF = "WEB-INF";
 
   private static final Logger LOG =
@@ -77,17 +80,19 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
   }
 
   /**
-   * Locates a parent directory for placing the generated appengine-web.xml according to the
-   * following strategy:
+   * Locates a parent WEB-INF directory for placing the generated appengine-web.xml, according to
+   * the following strategy in order, or null if none can be found:
    *
-   * <p>Returns the first WEB-INF folder determined in this order or null if none can be found. 1.
-   * If a WEB-INF folder exists as one of {@code module}'s web resource directories, returns the
-   * first one 2. If a WEB-INF folder is a child of one or more of the web resource directories,
-   * returns the first one 3. Creates a WEB-INF folder in the first web resource directory 4. If the
-   * web resource directory is specified but does not exist, create it with a WEB-INF child and
-   * return it
+   * <p>1. If a WEB-INF folder exists as one of the module's web resource directories, returns the
+   * first one
+   *
+   * <p>2. If a WEB-INF folder is a child of one the web resource directories, returns the first one
+   *
+   * <p>3. Creates a WEB-INF folder in the first web resource directory that exists
+   *
+   * <p>4. If there is at least one web resource directory path, but none exist, recursively creates
+   * a WEB-INF in the first one
    */
-  // todo refactor this logic
   @Override
   public VirtualFile suggestParentDirectoryForAppEngineWebXml(
       @NotNull Module module, @NotNull ModifiableRootModel rootModel) {
@@ -100,7 +105,6 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
     if (webRoots.isEmpty()) {
       return null;
     }
-
 
     for (WebRoot webRoot : webRoots) {
       VirtualFile webRootDir = webRoot.getFile();
@@ -117,17 +121,24 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
     }
 
     try {
-      // todo this is technically incorrect - it shouldn't just get the first, it should get the first that isn't null
-      VirtualFile webRootDir = webRoots.get(0).getFile();
-      if (webRootDir != null) {
-        return VfsUtil.createDirectoryIfMissing(webRootDir, WEB_INF);
+      Optional<VirtualFile> webRootDir =
+          webRoots.stream().map(WebRoot::getFile).filter(Objects::nonNull).findFirst();
+
+      if (webRootDir.isPresent()) {
+        return VfsUtil.createDirectoryIfMissing(webRootDir.get(), WEB_INF);
       } else {
-        // There is a webroot, but the directory does not exist, so create it
-        webRootDir = VfsUtil.createDirectories(webRoots.get(0).getPresentableUrl());
-        return VfsUtil.createDirectoryIfMissing(webRootDir, WEB_INF);
+        // There is at least one web-root path, but none that exist, select the first and create it
+        String presentableUrl = webRoots.get(0).getPresentableUrl();
+        if (presentableUrl != null) {
+          VirtualFile newWebRoot = VfsUtil.createDirectories(presentableUrl);
+
+          if (newWebRoot != null) {
+            return VfsUtil.createDirectoryIfMissing(newWebRoot, WEB_INF);
+          }
+        }
       }
     } catch (IOException ioe) {
-      LOG.info(ioe);
+      LOG.warn(ioe);
     }
 
     return null;
