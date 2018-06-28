@@ -59,10 +59,14 @@
       <module name="google-cloud-tools-plugin_test" target="1.8" />
       <module name="gradle_main" target="1.8" />
       <module name="gradle_test" target="1.8" />
+      <module name="java-apis_main" target="1.8" />
+      <module name="java-apis_test" target="1.8" />
       <module name="java-ultimate_main" target="1.8" />
       <module name="java-ultimate_test" target="1.8" />
       <module name="java_main" target="1.8" />
       <module name="java_test" target="1.8" />
+      <module name="maven-apis_main" target="1.8" />
+      <module name="maven-apis_test" target="1.8" />
       <module name="maven_main" target="1.8" />
       <module name="maven_test" target="1.8" />
       <module name="stackdriver-debugger_main" target="1.8" />
