@@ -20,6 +20,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.TestDirectory;
 import com.intellij.facet.FacetManager;
 import com.intellij.javaee.web.WebRoot;
 import com.intellij.javaee.web.facet.WebFacet;
@@ -27,6 +28,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -50,7 +52,8 @@ public class AppEngineStandardUltimateWebIntegrationTest {
   @Mock private VirtualFile mockExistingWebInfDir;
   @Mock private VirtualFile mockNewWebInfDir;
 
-  private static final String WEB_ROOT_PATH = "/path/to/web/root";
+  @TestDirectory(name = "WEB-INF")
+  File testWebInf;
 
   private List<WebRoot> webRoots = new ArrayList<>();
 
@@ -115,13 +118,15 @@ public class AppEngineStandardUltimateWebIntegrationTest {
   @Test
   public void testSuggestParentDirectory_withInvalidWebRoot_andWebRootPath_returnsNewWebInf() {
     when(mockWebRoot.getFile()).thenReturn(null);
-    when(mockWebRoot.getPresentableUrl()).thenReturn(WEB_ROOT_PATH);
+
+    String testWebInfParentDir = testWebInf.getParent();
+    when(mockWebRoot.getPresentableUrl()).thenReturn(testWebInfParentDir);
 
     VirtualFile suggestedDirectory =
         webIntegration.suggestParentDirectoryForAppEngineWebXml(
             mockModule, mockModifiableRootModel);
 
-    assertThat(suggestedDirectory.getPath().endsWith(WEB_ROOT_PATH + "/WEB-INF")).isTrue();
+    assertThat(suggestedDirectory.getPath().endsWith(testWebInf.getAbsolutePath())).isTrue();
   }
 
   @Test
