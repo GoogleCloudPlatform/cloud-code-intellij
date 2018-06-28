@@ -17,13 +17,10 @@
 package com.google.cloud.tools.intellij.cloudapis;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.GctFeature;
 import com.google.cloud.tools.intellij.cloudapis.maven.CloudApiMavenService;
-import com.google.cloud.tools.intellij.cloudapis.maven.CloudApiMavenService.LibraryVersionFromBomException;
 import com.google.cloud.tools.intellij.cloudapis.maven.CloudLibraryMavenProjectState;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
@@ -40,7 +37,6 @@ import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.intellij.icons.AllIcons.General;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -54,7 +50,6 @@ import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -327,126 +322,6 @@ public final class GoogleCloudApiSelectorPanelTest {
 
     assertThat(panel.getBomSelectorLabel().isVisible()).isFalse();
     assertThat(panel.getBomComboBox().isVisible()).isFalse();
-  }
-
-  @Test
-  public void getPanel_withVersionReturnedFromBomQuery_displaysVersionFromBom()
-      throws LibraryVersionFromBomException {
-    // TODO (eshaul): remove once feature is released
-    when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
-
-    String libVersion = "9.9-alpha";
-    when(mavenService.getManagedDependencyVersion(any(), anyString()))
-        .thenReturn(Optional.of(libVersion));
-
-    CloudLibrary cloudLibrary = LIBRARY_1.toCloudLibrary();
-    GoogleCloudApiSelectorPanel panel =
-        new GoogleCloudApiSelectorPanel(ImmutableList.of(cloudLibrary), testFixture.getProject());
-    new GoogleCloudApiSelectorPanel(ImmutableList.of(cloudLibrary), testFixture.getProject());
-
-    panel
-        .getDetailsPanel()
-        .setCloudLibrary(cloudLibrary, BOM_VERSION, panel.getApiManagementMap().get(cloudLibrary));
-
-    assertThat(panel.getDetailsPanel().getVersionLabel().getText())
-        .isEqualTo("Version: " + libVersion);
-  }
-
-  @Test
-  public void getPanel_withNoVersionReturnedFromBomQuery_fallsBackToAndDisplaysStaticVersion() {
-    // TODO (eshaul): remove once feature is released
-    when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
-
-    CloudLibrary cloudLibrary = LIBRARY_1.toCloudLibrary();
-    GoogleCloudApiSelectorPanel panel =
-        new GoogleCloudApiSelectorPanel(ImmutableList.of(cloudLibrary), testFixture.getProject());
-
-    panel
-        .getDetailsPanel()
-        .setCloudLibrary(
-            cloudLibrary, null /*bomVersion*/, panel.getApiManagementMap().get(cloudLibrary));
-
-    assertThat(panel.getDetailsPanel().getVersionLabel().getText())
-        .isEqualTo("Version: " + JAVA_CLIENT_MAVEN_COORDS_1.version());
-  }
-
-  @Test
-  public void getPanel_withBomAndNoDependencyVersion_displaysVersionNotFoundMessage()
-      throws LibraryVersionFromBomException {
-    // TODO (eshaul): remove once feature is released
-    when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
-
-    when(mavenService.getManagedDependencyVersion(any(), anyString())).thenReturn(Optional.empty());
-
-    CloudLibrary cloudLibrary = LIBRARY_1.toCloudLibrary();
-    GoogleCloudApiSelectorPanel panel =
-        new GoogleCloudApiSelectorPanel(ImmutableList.of(cloudLibrary), testFixture.getProject());
-
-    panel
-        .getDetailsPanel()
-        .setCloudLibrary(cloudLibrary, BOM_VERSION, panel.getApiManagementMap().get(cloudLibrary));
-
-    assertThat(panel.getDetailsPanel().getVersionLabel().getText())
-        .isEqualTo(
-            "Version: Library was not found in version "
-                + BOM_VERSION
-                + " of the Google Cloud Java Libraries");
-    assertThat(panel.getDetailsPanel().getVersionLabel().getIcon()).isEqualTo(General.Error);
-  }
-
-  @Test
-  public void getPanel_whenFetchingDependencyVersionFromBomThrowsException_displaysErrorMessage()
-      throws LibraryVersionFromBomException {
-    // TODO (eshaul): remove once feature is released
-    when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
-
-    when(mavenService.getManagedDependencyVersion(any(), anyString()))
-        .thenThrow(new LibraryVersionFromBomException("Bom not found"));
-
-    CloudLibrary cloudLibrary = LIBRARY_1.toCloudLibrary();
-    GoogleCloudApiSelectorPanel panel =
-        new GoogleCloudApiSelectorPanel(ImmutableList.of(cloudLibrary), testFixture.getProject());
-
-    panel
-        .getDetailsPanel()
-        .setCloudLibrary(cloudLibrary, BOM_VERSION, panel.getApiManagementMap().get(cloudLibrary));
-
-    assertThat(panel.getDetailsPanel().getVersionLabel().getText())
-        .isEqualTo("Version: Error occurred fetching library version");
-    assertThat(panel.getDetailsPanel().getVersionLabel().getIcon()).isEqualTo(General.Error);
-  }
-
-  @Test
-  public void getPanel_withBomInPom_notPartOfAvailableBoms_addsAndPreselectsConfiguredVersion() {
-    // TODO (eshaul): remove once feature is released
-    when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
-
-    when(mavenService.getAllBomVersions()).thenReturn(ImmutableList.of("v1", "v2", "v3"));
-
-    MavenTestUtils.getInstance()
-        .runWithMavenModule(
-            testFixture.getProject(),
-            module -> {
-              String preconfigureBomVersion = "v0-alpha";
-              writeBomDependency(module, preconfigureBomVersion);
-              CloudLibraryMavenProjectState.getInstance(testFixture.getProject())
-                  .syncCloudLibrariesBom();
-
-              GoogleCloudApiSelectorPanel panel =
-                  new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
-
-              // Set the selected module to the one with the preconfigured BOM
-              panel.getModulesComboBox().setSelectedItem(module);
-
-              JComboBox<String> bomComboBox = panel.getBomComboBox();
-              assertThat(bomComboBox.getItemCount()).isEqualTo(4);
-              assertThat(bomComboBox.getItemAt(0)).isEqualTo("v3");
-              assertThat(bomComboBox.getItemAt(1)).isEqualTo("v2");
-              assertThat(bomComboBox.getItemAt(2)).isEqualTo("v1");
-              assertThat(bomComboBox.getItemAt(3)).isEqualTo("v0-alpha");
-
-              assertThat(bomComboBox.getSelectedItem()).isEqualTo(preconfigureBomVersion);
-            });
   }
 
   @Test
@@ -795,11 +670,13 @@ public final class GoogleCloudApiSelectorPanelTest {
     assertThat(panel.getNameLabel().getText()).isEqualTo(library.name());
     assertThat(panel.getDescriptionTextPane().getText()).isEqualTo(library.description());
 
+    // TODO to be refactored into maven extension tests for versions.
+    /*
     String expectedVersion =
         client.mavenCoordinates().version().isEmpty()
             ? ""
             : "Version: " + client.mavenCoordinates().version();
-    assertThat(panel.getVersionLabel().getText()).isEqualTo(expectedVersion);
+    assertThat(panel.getVersionLabel().getText()).isEqualTo(expectedVersion); */
 
     Map<String, String> actualUrlMap = buildActualUrlMap(panel.getLinksTextPane().getText());
     Map<String, String> expectedUrlMap = buildExpectedUrlMap(library, client);
@@ -844,12 +721,14 @@ public final class GoogleCloudApiSelectorPanelTest {
     if (!library.documentation().isEmpty()) {
       mapBuilder.put("Documentation", library.documentation());
     }
+    // TODO: to be refactored to maven module tests for links.
+    /*
     if (!client.source().isEmpty()) {
       mapBuilder.put("Source", client.source());
     }
     if (!client.apireference().isEmpty()) {
       mapBuilder.put("API Reference", client.apireference());
-    }
+    }*/
     return mapBuilder.build();
   }
 
