@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-include 'google-cloud-tools-plugin'
-include 'common-test-lib'
-include 'google-cloud-core'
-include 'google-cloud-storage'
-include 'google-cloud-repos'
-include 'google-cloud-apis'
-include 'google-cloud-apis:java-apis'
-include 'google-cloud-apis:java-apis:maven-apis'
-include 'stackdriver-debugger'
-include 'app-engine:java'
-include 'app-engine:java:maven'
-include 'app-engine:java:gradle'
-include 'app-engine:java:ultimate'
-include 'google-cloud-sdk'
 
+// Use IntelliJ src structure for now
+sourceSets.main.java.srcDirs = ['src']
+// 'src' is included in resources to export .form files to upstream modules.
+sourceSets.main.resources.srcDirs = ['resources', 'src']
+sourceSets.test.java.srcDirs = ['testSrc']
+sourceSets.test.resources.srcDirs = ['testResources']
+
+intellij {
+    'maven'
+}
+
+dependencies {
+}
