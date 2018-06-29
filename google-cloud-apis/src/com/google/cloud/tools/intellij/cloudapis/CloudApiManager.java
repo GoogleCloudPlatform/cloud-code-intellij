@@ -52,7 +52,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
-import git4idea.DialogManager;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -463,7 +462,7 @@ class CloudApiManager {
             () -> {
               ServiceAccountKeyDisplayDialog keyDialog =
                   new ServiceAccountKeyDisplayDialog(project, cloudProject, downloadDir.toString());
-              DialogManager.show(keyDialog);
+              keyDialog.show();
             });
   }
 

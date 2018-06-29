@@ -16,16 +16,13 @@
 
 package com.google.cloud.tools.intellij.cloudapis;
 
+import static com.google.cloud.tools.intellij.cloudapis.maven.MavenCloudApiUiExtension.makeLink;
+
 import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
-import com.google.cloud.tools.intellij.cloudapis.maven.CloudApiMavenService;
-import com.google.cloud.tools.intellij.cloudapis.maven.CloudApiMavenService.LibraryVersionFromBomException;
-import com.google.cloud.tools.intellij.cloudapis.maven.CloudLibraryUtils;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
-import com.google.cloud.tools.libraries.json.CloudLibraryClientMavenCoordinates;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableList;
 import com.intellij.icons.AllIcons.General;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
@@ -34,6 +31,7 @@ import com.intellij.util.SVGLoader;
 import java.awt.Image;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -44,6 +42,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
+import org.fest.util.Lists;
 import org.jetbrains.annotations.Nullable;
 
 /** The form-bound class for the Cloud API details panel. */
@@ -65,6 +64,8 @@ public final class GoogleCloudApiDetailsPanel {
   private CloudLibrary currentCloudLibrary;
   private String currentBomVersion;
   private CloudApiManagementSpec currentCloudApiManagementSpec;
+
+  private final List<Optional<String>> links = Lists.newArrayList();
 
   /** Returns the {@link JPanel} that holds the UI elements in this panel. */
   JPanel getPanel() {
@@ -91,6 +92,11 @@ public final class GoogleCloudApiDetailsPanel {
     updateUI();
   }
 
+  void setCurrentBomVersion(String currentBomVersion) {
+    this.currentBomVersion = currentBomVersion;
+    updateUI();
+  }
+
   /**
    * Enables or disables the components of the GCP API management UI based on if the library is
    * selected or not.
@@ -104,6 +110,15 @@ public final class GoogleCloudApiDetailsPanel {
     // If the checkbox is disabled it should always be unchecked.
     // Otherwise, it should be checked according to the saved value
     enableApiCheckbox.setSelected(enabled && currentCloudApiManagementSpec.shouldEnable());
+  }
+
+  void addCloudLibraryLinks(Collection<Optional<String>> addedLinks) {
+    links.addAll(addedLinks);
+    linksTextPane.setText(joinLinks(links));
+  }
+
+  public CloudLibrary getCurrentCloudLibrary() {
+    return currentCloudLibrary;
   }
 
   /** Returns the {@link JLabel} that holds the library's icon. */
@@ -201,102 +216,17 @@ public final class GoogleCloudApiDetailsPanel {
     descriptionTextPane.setSize(
         descriptionTextPane.getWidth(), descriptionTextPane.getPreferredSize().height);
 
-    if (currentCloudLibrary.getClients() != null) {
-      CloudLibraryUtils.getFirstJavaClient(currentCloudLibrary)
-          .ifPresent(
-              client -> {
-                if (currentBomVersion != null) {
-                  updateManagedLibraryVersionFromBom(currentBomVersion);
-                } else {
-                  if (client.getMavenCoordinates() != null) {
-                    versionLabel.setText(
-                        GoogleCloudApisMessageBundle.message(
-                            "cloud.libraries.version.label",
-                            client.getMavenCoordinates().getVersion()));
-                  }
-                }
+    links.clear();
+    Optional<String> docsLink =
+        makeLink(
+            GoogleCloudApisMessageBundle.message("cloud.libraries.documentation.link"),
+            currentCloudLibrary.getDocumentation());
 
-                Optional<String> docsLink =
-                    makeLink(
-                        "cloud.libraries.documentation.link",
-                        currentCloudLibrary.getDocumentation());
-                Optional<String> sourceLink =
-                    makeLink("cloud.libraries.source.link", client.getSource());
-                Optional<String> apiReferenceLink =
-                    makeLink("cloud.libraries.apireference.link", client.getApiReference());
-
-                List<Optional<String>> links =
-                    ImmutableList.of(docsLink, sourceLink, apiReferenceLink);
-                linksTextPane.setText(joinLinks(links));
-              });
-    }
+    links.add(docsLink);
+    linksTextPane.setText(joinLinks(links));
 
     managementWarningTextPane.setText(
         GoogleCloudApisMessageBundle.message("cloud.apis.management.section.info.text"));
-  }
-
-  /**
-   * Asynchronously fetches and displays the version of the client library that is managed by the
-   * given BOM version.
-   *
-   * @param bomVersion the version of the BOM from which to load the version of the current client
-   *     library
-   */
-  // TODO (eshaul) this unoptimized implementation fetches all managed BOM versions each time the
-  // BOM is updated and library is selected. The bomVersion -> managedLibraryVersions results can be
-  // cached on disk to reduce network calls.
-  @SuppressWarnings("FutureReturnValueIgnored")
-  void updateManagedLibraryVersionFromBom(String bomVersion) {
-    if (currentCloudLibrary.getClients() != null) {
-      CloudLibraryUtils.getFirstJavaClient(currentCloudLibrary)
-          .ifPresent(
-              client -> {
-                CloudLibraryClientMavenCoordinates coordinates = client.getMavenCoordinates();
-
-                if (coordinates != null) {
-                  versionLabel.setIcon(GoogleCloudCoreIcons.LOADING);
-                  versionLabel.setText("");
-
-                  ThreadUtil.getInstance()
-                      .executeInBackground(
-                          () -> {
-                            try {
-                              Optional<String> versionOptional =
-                                  CloudApiMavenService.getInstance()
-                                      .getManagedDependencyVersion(coordinates, bomVersion);
-
-                              if (versionOptional.isPresent()) {
-                                ApplicationManager.getApplication()
-                                    .invokeAndWait(
-                                        () -> {
-                                          versionLabel.setText(
-                                              GoogleCloudApisMessageBundle.message(
-                                                  "cloud.libraries.version.label",
-                                                  versionOptional.get()));
-                                        },
-                                        ModalityState.any());
-
-                                versionLabel.setIcon(null);
-                              } else {
-                                versionLabel.setText(
-                                    GoogleCloudApisMessageBundle.message(
-                                        "cloud.libraries.version.label",
-                                        GoogleCloudApisMessageBundle.message(
-                                            "cloud.libraries.version.notfound.text", bomVersion)));
-                                versionLabel.setIcon(General.Error);
-                              }
-                            } catch (LibraryVersionFromBomException ex) {
-                              versionLabel.setText(
-                                  GoogleCloudApisMessageBundle.message(
-                                      "cloud.libraries.version.label",
-                                      GoogleCloudApisMessageBundle.message(
-                                          "cloud.libraries.version.exception.text")));
-                              versionLabel.setIcon(General.Error);
-                            }
-                          });
-                }
-              });
-    }
   }
 
   /**
@@ -336,23 +266,6 @@ public final class GoogleCloudApiDetailsPanel {
               ApplicationManager.getApplication()
                   .invokeAndWait(() -> imageConsumer.accept(finalImageIcon), ModalityState.any());
             });
-  }
-
-  /**
-   * Optionally returns an HTML-formatted link for the given URL.
-   *
-   * @param key the key of the text (via {@link
-   *     com.google.cloud.tools.intellij.cloudapis.GoogleCloudApisMessageBundle#message}) to show
-   *     for the link
-   * @param url the URL to make into an HTML link
-   * @return the HTML-formatted link, or {@link Optional#empty()} if the given URL is {@code null}
-   */
-  private static Optional<String> makeLink(String key, @Nullable String url) {
-    if (url == null) {
-      return Optional.empty();
-    }
-    return Optional.of(
-        String.format("<a href=\"%s\">%s</a>", url, GoogleCloudApisMessageBundle.message(key)));
   }
 
   /**
