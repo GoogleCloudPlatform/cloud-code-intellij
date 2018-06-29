@@ -35,7 +35,7 @@ public interface CloudApiUiExtension {
 
   /**
    * Called when add cloud libraries dialog is created and opened and base UI is ready. At this
-   * point extension point is active.
+   * point extension point is active and custom UI components can be injected.
    */
   Collection<JComponent> createCustomUiComponents();
 
@@ -53,5 +53,5 @@ public interface CloudApiUiExtension {
    *
    * @param module Currently selected module.
    */
-  void onModuleSelected(Module module);
+  void onModuleSelection(Module module);
 }

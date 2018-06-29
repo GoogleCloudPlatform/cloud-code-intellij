@@ -82,7 +82,7 @@ public class MavenCloudApiUiExtension implements CloudApiUiExtension {
   }
 
   @Override
-  public void onModuleSelected(Module module) {}
+  public void onModuleSelection(Module module) {}
 
   /**
    * Optionally returns an HTML-formatted link for the given URL.

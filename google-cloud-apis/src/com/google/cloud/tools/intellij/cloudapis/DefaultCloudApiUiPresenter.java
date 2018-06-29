@@ -64,7 +64,7 @@ public class DefaultCloudApiUiPresenter implements CloudApiUiPresenter {
             Stream.of(cloudApiUiExtensions)
                 .forEach(
                     uiExtension ->
-                        uiExtension.onModuleSelected(cloudApiSelectorPanel.getSelectedModule())));
+                        uiExtension.onModuleSelection(cloudApiSelectorPanel.getSelectedModule())));
     cloudApiSelectorPanel
         .getCloudLibrariesTable()
         .getSelectionModel()
