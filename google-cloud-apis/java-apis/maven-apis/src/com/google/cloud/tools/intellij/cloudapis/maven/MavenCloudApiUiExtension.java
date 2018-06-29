@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.cloudapis.maven;
 
+import static com.google.cloud.tools.intellij.cloudapis.GoogleCloudApiDetailsPanel.makeLink;
+
 import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
 import com.google.cloud.tools.intellij.cloudapis.CloudApiUiExtension;
 import com.google.cloud.tools.intellij.cloudapis.CloudApiUiPresenter;
@@ -37,7 +39,6 @@ import java.util.stream.Stream;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * {@link CloudApiUiExtension} to support additional components and events for Maven Cloud API
@@ -125,21 +126,6 @@ public class MavenCloudApiUiExtension implements CloudApiUiExtension {
         libraries,
         module,
         Optional.ofNullable(bomComboBox.getSelectedItem()).map(Object::toString).orElse(null));
-  }
-
-  /**
-   * Optionally returns an HTML-formatted link for the given URL.
-   *
-   * @param text the text to show for the link
-   * @param url the URL to make into an HTML link
-   * @return the HTML-formatted link, or {@link Optional#empty()} if the given URL is {@code null}
-   */
-  // TODO move back to core cloud-api when maven module is complete.
-  public static Optional<String> makeLink(String text, @Nullable String url) {
-    if (url == null) {
-      return Optional.empty();
-    }
-    return Optional.of(String.format("<a href=\"%s\">%s</a>", url, text));
   }
 
   @VisibleForTesting

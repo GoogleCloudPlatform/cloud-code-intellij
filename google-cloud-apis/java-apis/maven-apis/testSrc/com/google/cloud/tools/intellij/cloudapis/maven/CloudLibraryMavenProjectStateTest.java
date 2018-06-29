@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.cloudapis.maven;
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.cloudapis.CloudLibrariesService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.MavenTestUtils;
 import com.google.cloud.tools.intellij.testing.TestFixture;
@@ -57,7 +58,8 @@ public class CloudLibraryMavenProjectStateTest {
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
   @TestFixture private IdeaProjectTestFixture testFixture;
 
-  @Mock @TestService CloudLibrariesService librariesService;
+  @Mock @TestService
+  CloudLibrariesService librariesService;
 
   private static final TestCloudLibraryClientMavenCoordinates JAVA_CLIENT_MAVEN_COORDS =
       TestCloudLibraryClientMavenCoordinates.create("java", "client", "1.0.0");

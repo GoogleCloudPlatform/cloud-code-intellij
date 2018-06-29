@@ -28,7 +28,6 @@ import org.jetbrains.annotations.Nullable;
  * Presenter for core Cloud API UI, allows accessing UI points for libraries for extension points to
  * update, including documentation links and version info.
  */
-// TODO: move to core cloud API once dependency is inverted.
 public interface CloudApiUiPresenter {
 
   /**
@@ -39,14 +38,10 @@ public interface CloudApiUiPresenter {
     return ServiceManager.getService(CloudApiUiPresenter.class);
   }
 
-  /**
-   * Returns current IDE project.
-   */
+  /** Returns current IDE project. */
   Project getProject();
 
-  /**
-   * Obtains currently selected module for current IDE project.
-   */
+  /** Obtains currently selected module for current IDE project. */
   Module getSelectedModule();
 
   /**

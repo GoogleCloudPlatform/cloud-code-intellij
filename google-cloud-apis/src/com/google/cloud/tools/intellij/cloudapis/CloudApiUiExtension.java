@@ -30,7 +30,6 @@ import org.jetbrains.annotations.Nullable;
  * selection, module selection, and final library selection confirmation. See also {@link
  * CloudApiUiPresenter}.
  */
-// TODO: move to core cloud API once dependency is inverted.
 public interface CloudApiUiExtension {
   ExtensionPointName<CloudApiUiExtension> EP_NAME =
       new ExtensionPointName<>("com.google.gct.cloudapis.cloudApiUiExtension");

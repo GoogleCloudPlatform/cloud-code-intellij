@@ -18,14 +18,11 @@ package com.google.cloud.tools.intellij.cloudapis;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import com.google.cloud.tools.intellij.cloudapis.maven.CloudApiMavenService;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
-import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.google.cloud.tools.intellij.testing.TestModule;
-import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary;
 import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary.TestCloudLibraryClient;
 import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary.TestCloudLibraryClientMavenCoordinates;
@@ -55,7 +52,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.mockito.Mock;
 
 /** Unit tests for {@link GoogleCloudApiSelectorPanel}. */
 @RunWith(JUnit4.class)
@@ -110,9 +106,6 @@ public final class GoogleCloudApiSelectorPanelTest {
   @TestModule private Module module2;
 
   @TestFixture private IdeaProjectTestFixture testFixture;
-
-  @Mock @TestService private PluginInfoService pluginInfoService;
-  @Mock @TestService CloudApiMavenService mavenService;
 
   @Before
   public void setUp() {
