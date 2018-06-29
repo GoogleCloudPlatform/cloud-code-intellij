@@ -27,8 +27,12 @@ import com.intellij.icons.AllIcons.General;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.module.Module;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
-import org.jetbrains.annotations.NotNull;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import javax.swing.JComponent;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -37,16 +41,13 @@ import org.jetbrains.annotations.Nullable;
  */
 public class MavenCloudApiUiExtension implements CloudApiUiExtension {
 
-  private CloudApiUiPresenter uiPresenter;
-
   @Override
-  public void init(@NotNull CloudApiUiPresenter uiPresenter) {
-    this.uiPresenter = uiPresenter;
+  public Collection<JComponent> createCustomUiComponents() {
+    return Collections.emptyList();
   }
 
   @Override
-  public void onCurrentCloudLibrarySelected(
-      CloudLibrary currentCloudLibrary, String currentBomVersion) {
+  public void onCloudLibrarySelection(CloudLibrary currentCloudLibrary, String currentBomVersion) {
     if (currentCloudLibrary != null && currentCloudLibrary.getClients() != null) {
       CloudLibraryUtils.getFirstJavaClient(currentCloudLibrary)
           .ifPresent(
@@ -55,22 +56,27 @@ public class MavenCloudApiUiExtension implements CloudApiUiExtension {
                   updateManagedLibraryVersionFromBom(currentCloudLibrary, currentBomVersion);
                 } else {
                   if (client.getMavenCoordinates() != null) {
-                    uiPresenter.updateCloudLibraryVersionLabel(
-                        MavenCloudApisMessageBundle.message(
-                            "cloud.libraries.version.label",
-                            client.getMavenCoordinates().getVersion()),
-                        null);
+                    CloudApiUiPresenter.getInstance()
+                        .updateCloudLibraryVersionLabel(
+                            MavenCloudApisMessageBundle.message(
+                                "cloud.libraries.version.label",
+                                client.getMavenCoordinates().getVersion()),
+                            null);
                   }
                 }
 
-                makeLink(
-                        MavenCloudApisMessageBundle.message("cloud.libraries.source.link"),
-                        client.getSource())
-                    .ifPresent(link -> uiPresenter.addCloudLibraryDocumentationLink(link));
-                makeLink(
-                        MavenCloudApisMessageBundle.message("cloud.libraries.apireference.link"),
-                        client.getApiReference())
-                    .ifPresent(link -> uiPresenter.addCloudLibraryDocumentationLink(link));
+                CloudApiUiPresenter.getInstance()
+                    .addCloudLibraryLinks(
+                        Stream.of(
+                                makeLink(
+                                    MavenCloudApisMessageBundle.message(
+                                        "cloud.libraries.source.link"),
+                                    client.getSource()),
+                                makeLink(
+                                    MavenCloudApisMessageBundle.message(
+                                        "cloud.libraries.apireference.link"),
+                                    client.getApiReference()))
+                            .collect(Collectors.toList()));
               });
     }
   }
@@ -111,7 +117,7 @@ public class MavenCloudApiUiExtension implements CloudApiUiExtension {
           .ifPresent(
               client -> {
                 CloudLibraryClientMavenCoordinates coordinates = client.getMavenCoordinates();
-
+                CloudApiUiPresenter uiPresenter = CloudApiUiPresenter.getInstance();
                 if (coordinates != null) {
                   uiPresenter.updateCloudLibraryVersionLabel("", GoogleCloudCoreIcons.LOADING);
 

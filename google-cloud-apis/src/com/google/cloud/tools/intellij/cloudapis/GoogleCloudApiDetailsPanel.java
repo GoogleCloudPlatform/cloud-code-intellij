@@ -31,6 +31,7 @@ import com.intellij.util.SVGLoader;
 import java.awt.Image;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -42,7 +43,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import org.fest.util.Lists;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** The form-bound class for the Cloud API details panel. */
@@ -112,8 +112,8 @@ public final class GoogleCloudApiDetailsPanel {
     enableApiCheckbox.setSelected(enabled && currentCloudApiManagementSpec.shouldEnable());
   }
 
-  void addCloudLibraryDocumentationLink(@NotNull String link) {
-    links.add(Optional.of(link));
+  void addCloudLibraryLinks(Collection<Optional<String>> addedLinks) {
+    links.addAll(addedLinks);
     linksTextPane.setText(joinLinks(links));
   }
 

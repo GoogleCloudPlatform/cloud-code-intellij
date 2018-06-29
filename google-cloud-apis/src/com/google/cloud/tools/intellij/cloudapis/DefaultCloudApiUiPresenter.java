@@ -16,8 +16,11 @@
 
 package com.google.cloud.tools.intellij.cloudapis;
 
+import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Stream;
 import javax.swing.Icon;
+import javax.swing.JComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,8 +35,8 @@ public class DefaultCloudApiUiPresenter implements CloudApiUiPresenter {
   private CloudApiUiExtension[] cloudApiUiExtensions;
 
   @Override
-  public void addCloudLibraryDocumentationLink(@NotNull String link) {
-    cloudApiSelectorPanel.getDetailsPanel().addCloudLibraryDocumentationLink(link);
+  public void addCloudLibraryLinks(Collection<Optional<String>> links) {
+    cloudApiSelectorPanel.getDetailsPanel().addCloudLibraryLinks(links);
   }
 
   @Override
@@ -45,15 +48,16 @@ public class DefaultCloudApiUiPresenter implements CloudApiUiPresenter {
   }
 
   /**
-   * Inits the presenter, creates all extension points and adds necessary event listeners and
-   * handlers.
+   * Inits the presenter when add libraries dialog is created, creates all extension points and adds
+   * necessary event listeners and handlers.
    */
-  void init(GoogleCloudApiSelectorPanel cloudApiSelectorPanel) {
+  void init(@NotNull GoogleCloudApiSelectorPanel cloudApiSelectorPanel) {
     this.cloudApiSelectorPanel = cloudApiSelectorPanel;
 
     cloudApiUiExtensions = CloudApiUiExtension.EP_NAME.getExtensions();
     for (CloudApiUiExtension uiExtension : cloudApiUiExtensions) {
-      uiExtension.init(this);
+      // TODO: will be implemented in the next PR.
+      Collection<JComponent> customComponents = uiExtension.createCustomUiComponents();
     }
     cloudApiSelectorPanel.addModuleSelectionListener(
         e ->
@@ -69,7 +73,7 @@ public class DefaultCloudApiUiPresenter implements CloudApiUiPresenter {
                 Stream.of(cloudApiUiExtensions)
                     .forEach(
                         uiExtension ->
-                            uiExtension.onCurrentCloudLibrarySelected(
+                            uiExtension.onCloudLibrarySelection(
                                 cloudApiSelectorPanel.getDetailsPanel().getCurrentCloudLibrary(),
                                 cloudApiSelectorPanel.getSelectedBomVersion().orElse(null))));
   }

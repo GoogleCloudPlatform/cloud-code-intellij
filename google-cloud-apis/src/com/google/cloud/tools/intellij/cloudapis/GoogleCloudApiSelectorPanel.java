@@ -70,7 +70,7 @@ import javax.swing.table.TableModel;
 import org.jetbrains.annotations.NotNull;
 
 /** The form-bound class for the Cloud API selector panel. */
-final class GoogleCloudApiSelectorPanel {
+public final class GoogleCloudApiSelectorPanel {
 
   private JPanel panel;
   private JBScrollPane leftScrollPane;

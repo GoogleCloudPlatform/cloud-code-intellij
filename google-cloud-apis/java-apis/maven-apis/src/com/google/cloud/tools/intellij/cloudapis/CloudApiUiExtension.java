@@ -19,7 +19,9 @@ package com.google.cloud.tools.intellij.cloudapis;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.module.Module;
-import org.jetbrains.annotations.NotNull;
+import java.util.Collection;
+import javax.swing.JComponent;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Extension point for Cloud APIs, allowing access to UI and getting updates on cloud library
@@ -34,10 +36,8 @@ public interface CloudApiUiExtension {
   /**
    * Called when add cloud libraries dialog is created and opened and base UI is ready. At this
    * point extension point is active.
-   *
-   * @param uiPresenter Presenter to access cloud API base UI.
    */
-  void init(@NotNull CloudApiUiPresenter uiPresenter);
+  Collection<JComponent> createCustomUiComponents();
 
   /**
    * Callback on change in currently selected cloud library.
@@ -45,7 +45,8 @@ public interface CloudApiUiExtension {
    * @param currentCloudLibrary Cloud library selected or null if user de-selected library.
    * @param currentBomVersion BOM version. TODO:// to be removed, move to maven module.
    */
-  void onCurrentCloudLibrarySelected(CloudLibrary currentCloudLibrary, String currentBomVersion);
+  void onCloudLibrarySelection(
+      @Nullable CloudLibrary currentCloudLibrary, String currentBomVersion);
 
   /**
    * Callback on module selection change.

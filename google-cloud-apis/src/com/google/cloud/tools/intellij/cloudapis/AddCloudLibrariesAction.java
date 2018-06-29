@@ -27,7 +27,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.DumbAwareAction;
-import git4idea.DialogManager;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -101,7 +100,7 @@ public final class AddCloudLibrariesAction extends DumbAwareAction {
   public void actionPerformed(AnActionEvent e) {
     if (e.getProject() != null) {
       AddCloudLibrariesDialog librariesDialog = new AddCloudLibrariesDialog(e.getProject());
-      DialogManager.show(librariesDialog);
+      librariesDialog.show();
 
       if (librariesDialog.isOK()) {
         CloudLibraryDependencyWriter.addLibraries(

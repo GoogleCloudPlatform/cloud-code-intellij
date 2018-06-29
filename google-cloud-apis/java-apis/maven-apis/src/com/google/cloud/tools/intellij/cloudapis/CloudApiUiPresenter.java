@@ -16,8 +16,10 @@
 
 package com.google.cloud.tools.intellij.cloudapis;
 
+import com.intellij.openapi.components.ServiceManager;
+import java.util.Collection;
+import java.util.Optional;
 import javax.swing.Icon;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -28,13 +30,21 @@ import org.jetbrains.annotations.Nullable;
 public interface CloudApiUiPresenter {
 
   /**
-   * Adds a link to some documentation page for the currently selected library. If no libraries are
-   * selected, nothing is done.
+   * Obtains active instance of {@link CloudApiUiPresenter} for currently opened and active Cloud
+   * API selection dialog.
    */
-  void addCloudLibraryDocumentationLink(@NotNull String link);
+  static CloudApiUiPresenter getInstance() {
+    return ServiceManager.getService(CloudApiUiPresenter.class);
+  }
 
   /**
-   * Updates version information for the currently selected library. If no libraries are selected,
+   * Adds links to some documentation page for the currently selected library. If no library is
+   * selected, nothing is done.
+   */
+  void addCloudLibraryLinks(Collection<Optional<String>> links);
+
+  /**
+   * Updates version information for the currently selected library. If no library is selected,
    * nothing is done.
    *
    * @param text Text for version label. Null text does nothing (old text retained).

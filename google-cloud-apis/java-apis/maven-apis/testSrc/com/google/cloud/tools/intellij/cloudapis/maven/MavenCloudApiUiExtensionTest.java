@@ -70,8 +70,8 @@ public class MavenCloudApiUiExtensionTest {
   @Rule public CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
 
   private MavenCloudApiUiExtension mavenCloudApiUiExtension;
-  @Mock private CloudApiUiPresenter mockCloudApiUiPresenter;
-  @Mock @TestService CloudApiMavenService mavenService;
+  @Mock @TestService private CloudApiUiPresenter mockCloudApiUiPresenter;
+  @Mock @TestService private CloudApiMavenService mavenService;
 
   private ArgumentCaptor<String> versionText = ArgumentCaptor.forClass(String.class);
   private ArgumentCaptor<Icon> versionIcon = ArgumentCaptor.forClass(Icon.class);
@@ -79,7 +79,6 @@ public class MavenCloudApiUiExtensionTest {
   @Before
   public void setUp() {
     mavenCloudApiUiExtension = new MavenCloudApiUiExtension();
-    mavenCloudApiUiExtension.init(mockCloudApiUiPresenter);
 
     doNothing()
         .when(mockCloudApiUiPresenter)
@@ -91,7 +90,7 @@ public class MavenCloudApiUiExtensionTest {
       updateVersionLabel_withNoVersionReturnedFromBomQuery_fallsBackToAndDisplaysStaticVersion() {
     CloudLibrary cloudLibrary = LIBRARY_1.toCloudLibrary();
 
-    mavenCloudApiUiExtension.onCurrentCloudLibrarySelected(cloudLibrary, null);
+    mavenCloudApiUiExtension.onCloudLibrarySelection(cloudLibrary, null);
 
     assertThat(versionText.getValue())
         .isEqualTo("Version: " + JAVA_CLIENT_MAVEN_COORDS_1.version());
@@ -105,7 +104,7 @@ public class MavenCloudApiUiExtensionTest {
         .thenReturn(Optional.of(libVersion));
     CloudLibrary cloudLibrary = LIBRARY_1.toCloudLibrary();
 
-    mavenCloudApiUiExtension.onCurrentCloudLibrarySelected(cloudLibrary, BOM_VERSION);
+    mavenCloudApiUiExtension.onCloudLibrarySelection(cloudLibrary, BOM_VERSION);
 
     assertThat(versionText.getAllValues()).contains("Version: " + libVersion);
   }
@@ -116,7 +115,7 @@ public class MavenCloudApiUiExtensionTest {
     when(mavenService.getManagedDependencyVersion(any(), anyString())).thenReturn(Optional.empty());
     CloudLibrary cloudLibrary = LIBRARY_1.toCloudLibrary();
 
-    mavenCloudApiUiExtension.onCurrentCloudLibrarySelected(cloudLibrary, BOM_VERSION);
+    mavenCloudApiUiExtension.onCloudLibrarySelection(cloudLibrary, BOM_VERSION);
 
     assertThat(versionText.getAllValues())
         .contains(
@@ -135,7 +134,7 @@ public class MavenCloudApiUiExtensionTest {
         .thenThrow(new LibraryVersionFromBomException("Bom not found"));
     CloudLibrary cloudLibrary = LIBRARY_1.toCloudLibrary();
 
-    mavenCloudApiUiExtension.onCurrentCloudLibrarySelected(cloudLibrary, BOM_VERSION);
+    mavenCloudApiUiExtension.onCloudLibrarySelection(cloudLibrary, BOM_VERSION);
 
     assertThat(versionText.getValue())
         .isEqualTo("Version: Error occurred fetching library version");
