@@ -38,6 +38,8 @@ import java.util.Collections;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.idea.maven.project.MavenProject;
+import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
 /** @author nik. */
 public class AppEngineStandardCommunityWebIntegration extends AppEngineStandardWebIntegration {
@@ -49,6 +51,9 @@ public class AppEngineStandardCommunityWebIntegration extends AppEngineStandardW
   @Override
   public VirtualFile suggestParentDirectoryForAppEngineWebXml(
       @NotNull Module module, @NotNull ModifiableRootModel rootModel) {
+    MavenProject mvnProject = MavenProjectsManager.getInstance(module.getProject())
+        .findProject(module);
+
     final VirtualFile root = ArrayUtil.getFirstElement(rootModel.getContentRoots());
     if (root != null) {
       try {

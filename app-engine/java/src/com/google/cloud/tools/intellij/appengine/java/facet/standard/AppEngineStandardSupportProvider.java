@@ -84,11 +84,7 @@ public class AppEngineStandardSupportProvider extends FrameworkSupportInModulePr
 
   @Override
   public boolean isEnabledForModuleType(@NotNull ModuleType moduleType) {
-    if (PlatformUtils.isIdeaUltimate()) {
       return moduleType instanceof JavaModuleType;
-    } else {
-      return false;
-    }
   }
 
   @Override
