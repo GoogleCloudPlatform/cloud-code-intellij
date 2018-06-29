@@ -25,15 +25,31 @@ import static org.mockito.Mockito.when;
 import com.google.cloud.tools.intellij.cloudapis.CloudApiUiPresenter;
 import com.google.cloud.tools.intellij.cloudapis.maven.CloudApiMavenService.LibraryVersionFromBomException;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.MavenTestUtils;
+import com.google.cloud.tools.intellij.testing.TestFixture;
+import com.google.cloud.tools.intellij.testing.TestModule;
 import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary;
 import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary.TestCloudLibraryClient;
 import com.google.cloud.tools.intellij.testing.apis.TestCloudLibrary.TestCloudLibraryClientMavenCoordinates;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.intellij.icons.AllIcons.General;
+import com.intellij.openapi.application.Result;
+import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.module.Module;
+import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
+import com.intellij.util.xml.DomUtil;
+import java.util.List;
 import java.util.Optional;
 import javax.swing.Icon;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.idea.maven.dom.MavenDomUtil;
+import org.jetbrains.idea.maven.dom.model.MavenDomDependency;
+import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel;
+import org.jetbrains.idea.maven.project.MavenProject;
+import org.jetbrains.idea.maven.project.MavenProjectsManager;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -72,6 +88,10 @@ public class MavenCloudApiUiExtensionTest {
   private MavenCloudApiUiExtension mavenCloudApiUiExtension;
   @Mock @TestService private CloudApiUiPresenter mockCloudApiUiPresenter;
   @Mock @TestService private CloudApiMavenService mavenService;
+
+  @TestModule private Module module1;
+
+  @TestFixture private IdeaProjectTestFixture testFixture;
 
   private ArgumentCaptor<String> versionText = ArgumentCaptor.forClass(String.class);
   private ArgumentCaptor<Icon> versionIcon = ArgumentCaptor.forClass(Icon.class);
@@ -139,5 +159,118 @@ public class MavenCloudApiUiExtensionTest {
     assertThat(versionText.getValue())
         .isEqualTo("Version: Error occurred fetching library version");
     assertThat(versionIcon.getValue()).isEqualTo(General.Error);
+  }
+
+  @Test
+  public void getPanel_withAvailableBomVersions_populatesBomVersionsInReverseOrder() {
+    when(mavenService.getAllBomVersions()).thenReturn(ImmutableList.of("v0", "v1", "v2"));
+
+    BomComboBox bomComboBox = new BomComboBox();
+    bomComboBox.populateBomVersions(testFixture.getProject(), module1);
+
+    assertThat(bomComboBox.getItemCount()).isEqualTo(3);
+
+    assertThat(bomComboBox.getItemAt(0)).isEqualTo("v2");
+    assertThat(bomComboBox.getItemAt(1)).isEqualTo("v1");
+    assertThat(bomComboBox.getItemAt(2)).isEqualTo("v0");
+  }
+
+  @Test
+  public void getPanel_withManyAvailableBomVersions_limitsNumBomVersions() {
+    List<String> versions = Lists.newArrayList();
+    for (int i = 0; i < 20; i++) {
+      versions.add("v" + i);
+    }
+
+    when(mavenService.getAllBomVersions()).thenReturn(versions);
+
+    BomComboBox bomComboBox = new BomComboBox();
+    bomComboBox.populateBomVersions(testFixture.getProject(), module1);
+
+    assertThat(bomComboBox.getItemCount()).isEqualTo(5);
+  }
+
+  //
+  //  @Test
+  //  public void getPanel_withNoAvailableBomVersions_hidesBomUi() {
+  //    // TODO (eshaul): remove once feature is released
+  //    when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
+  //
+  //    when(mavenService.getAllBomVersions()).thenReturn(ImmutableList.of());
+  //
+  //    GoogleCloudApiSelectorPanel panel =
+  //        new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
+  //
+  //    assertThat(panel.getBomSelectorLabel().isVisible()).isFalse();
+  //    assertThat(panel.getBomComboBox().isVisible()).isFalse();
+  //  }
+  //
+  @Test
+  public void getPanel_withBomInPom_partOfAvailableBoms_preselectsConfiguredVersion() {
+    when(mavenService.getAllBomVersions()).thenReturn(ImmutableList.of("v0", "v1", "v2"));
+
+    MavenTestUtils.getInstance()
+        .runWithMavenModule(
+            testFixture.getProject(),
+            module -> {
+              String preconfigureBomVersion = "v1";
+              writeBomDependency(module, preconfigureBomVersion);
+              CloudLibraryMavenProjectState.getInstance(testFixture.getProject())
+                  .syncCloudLibrariesBom();
+
+              BomComboBox bomComboBox = new BomComboBox();
+              bomComboBox.populateBomVersions(testFixture.getProject(), module);
+
+              assertThat(bomComboBox.getItemCount()).isEqualTo(3);
+              assertThat(bomComboBox.getItemAt(0)).isEqualTo("v2");
+              assertThat(bomComboBox.getItemAt(1)).isEqualTo("v1");
+              assertThat(bomComboBox.getItemAt(2)).isEqualTo("v0");
+
+              assertThat(bomComboBox.getSelectedItem()).isEqualTo(preconfigureBomVersion);
+            });
+  }
+
+  @Test
+  public void getPanel_withBomInPom_withNoAvailableBoms_hasOnlyPreconfiguredBom() {
+    when(mavenService.getAllBomVersions()).thenReturn(ImmutableList.of());
+
+    MavenTestUtils.getInstance()
+        .runWithMavenModule(
+            testFixture.getProject(),
+            module -> {
+              String preconfigureBomVersion = "v1";
+              writeBomDependency(module, preconfigureBomVersion);
+              CloudLibraryMavenProjectState.getInstance(testFixture.getProject())
+                  .syncCloudLibrariesBom();
+
+              BomComboBox bomComboBox = new BomComboBox();
+              bomComboBox.populateBomVersions(testFixture.getProject(), module);
+
+              assertThat(bomComboBox.getItemCount()).isEqualTo(1);
+              assertThat(bomComboBox.getItemAt(0)).isEqualTo("v1");
+
+              assertThat(bomComboBox.getSelectedItem()).isEqualTo(preconfigureBomVersion);
+            });
+  }
+
+  private void writeBomDependency(Module module, String bomVersion) {
+    MavenProject mavenProject =
+        MavenProjectsManager.getInstance(testFixture.getProject()).findProject(module);
+    MavenDomProjectModel model =
+        MavenDomUtil.getMavenDomProjectModel(testFixture.getProject(), mavenProject.getFile());
+
+    new WriteCommandAction(testFixture.getProject(), DomUtil.getFile(model)) {
+      @Override
+      protected void run(@NotNull Result result) {
+        MavenDomDependency bomDependency =
+            model.getDependencyManagement().getDependencies().addDependency();
+
+        bomDependency.getGroupId().setStringValue(CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_GROUP);
+        bomDependency
+            .getArtifactId()
+            .setStringValue(CloudApiMavenService.GOOGLE_CLOUD_JAVA_BOM_ARTIFACT);
+        bomDependency.getVersion().setStringValue(bomVersion);
+      }
+    }.execute();
   }
 }
