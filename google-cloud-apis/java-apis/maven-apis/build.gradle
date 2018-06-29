@@ -22,7 +22,7 @@ sourceSets.test.java.srcDirs = ['testSrc']
 sourceSets.test.resources.srcDirs = ['testResources']
 
 intellij {
-    plugins 'properties','maven', 'yaml'
+    plugins 'Groovy', 'gradle', 'git4idea', 'properties','maven', 'yaml'
 }
 
 dependencies {
@@ -34,4 +34,6 @@ dependencies {
 
     testCompile files("${System.properties['java.home']}/../lib/tools.jar")
     testCompile(project(':common-test-lib'))
+    // TODO: remove once dependency inverts
+    testRuntime(project(':google-cloud-apis'))
 }
