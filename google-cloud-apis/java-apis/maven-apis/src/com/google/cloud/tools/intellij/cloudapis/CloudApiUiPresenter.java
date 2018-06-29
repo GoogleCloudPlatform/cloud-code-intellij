@@ -17,6 +17,8 @@
 package com.google.cloud.tools.intellij.cloudapis;
 
 import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
 import java.util.Collection;
 import java.util.Optional;
 import javax.swing.Icon;
@@ -36,6 +38,16 @@ public interface CloudApiUiPresenter {
   static CloudApiUiPresenter getInstance() {
     return ServiceManager.getService(CloudApiUiPresenter.class);
   }
+
+  /**
+   * Returns current IDE project.
+   */
+  Project getProject();
+
+  /**
+   * Obtains currently selected module for current IDE project.
+   */
+  Module getSelectedModule();
 
   /**
    * Adds links to some documentation page for the currently selected library. If no library is

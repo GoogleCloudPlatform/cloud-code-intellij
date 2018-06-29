@@ -62,7 +62,6 @@ public final class GoogleCloudApiDetailsPanel {
   private JLabel warningLabel;
 
   private CloudLibrary currentCloudLibrary;
-  private String currentBomVersion;
   private CloudApiManagementSpec currentCloudApiManagementSpec;
 
   private final List<Optional<String>> links = Lists.newArrayList();
@@ -80,20 +79,13 @@ public final class GoogleCloudApiDetailsPanel {
    *
    * @param library the {@link CloudLibrary} to display
    */
-  void setCloudLibrary(
-      CloudLibrary library, String bomVersion, CloudApiManagementSpec cloudApiManagementSpec) {
+  void setCloudLibrary(CloudLibrary library, CloudApiManagementSpec cloudApiManagementSpec) {
     if (cloudLibrariesEqual(currentCloudLibrary, library)) {
       return;
     }
 
     currentCloudLibrary = library;
-    currentBomVersion = bomVersion;
     currentCloudApiManagementSpec = cloudApiManagementSpec;
-    updateUI();
-  }
-
-  void setCurrentBomVersion(String currentBomVersion) {
-    this.currentBomVersion = currentBomVersion;
     updateUI();
   }
 

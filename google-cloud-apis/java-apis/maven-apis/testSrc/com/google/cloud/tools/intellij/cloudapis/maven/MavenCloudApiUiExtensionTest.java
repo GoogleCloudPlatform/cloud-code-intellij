@@ -110,7 +110,7 @@ public class MavenCloudApiUiExtensionTest {
       updateVersionLabel_withNoVersionReturnedFromBomQuery_fallsBackToAndDisplaysStaticVersion() {
     CloudLibrary cloudLibrary = LIBRARY_1.toCloudLibrary();
 
-    mavenCloudApiUiExtension.onCloudLibrarySelection(cloudLibrary, null);
+    mavenCloudApiUiExtension.onCloudLibrarySelection(cloudLibrary);
 
     assertThat(versionText.getValue())
         .isEqualTo("Version: " + JAVA_CLIENT_MAVEN_COORDS_1.version());
@@ -124,7 +124,7 @@ public class MavenCloudApiUiExtensionTest {
         .thenReturn(Optional.of(libVersion));
     CloudLibrary cloudLibrary = LIBRARY_1.toCloudLibrary();
 
-    mavenCloudApiUiExtension.onCloudLibrarySelection(cloudLibrary, BOM_VERSION);
+    mavenCloudApiUiExtension.onCloudLibrarySelection(cloudLibrary);
 
     assertThat(versionText.getAllValues()).contains("Version: " + libVersion);
   }
@@ -135,7 +135,7 @@ public class MavenCloudApiUiExtensionTest {
     when(mavenService.getManagedDependencyVersion(any(), anyString())).thenReturn(Optional.empty());
     CloudLibrary cloudLibrary = LIBRARY_1.toCloudLibrary();
 
-    mavenCloudApiUiExtension.onCloudLibrarySelection(cloudLibrary, BOM_VERSION);
+    mavenCloudApiUiExtension.onCloudLibrarySelection(cloudLibrary);
 
     assertThat(versionText.getAllValues())
         .contains(
@@ -154,7 +154,7 @@ public class MavenCloudApiUiExtensionTest {
         .thenThrow(new LibraryVersionFromBomException("Bom not found"));
     CloudLibrary cloudLibrary = LIBRARY_1.toCloudLibrary();
 
-    mavenCloudApiUiExtension.onCloudLibrarySelection(cloudLibrary, BOM_VERSION);
+    mavenCloudApiUiExtension.onCloudLibrarySelection(cloudLibrary);
 
     assertThat(versionText.getValue())
         .isEqualTo("Version: Error occurred fetching library version");
@@ -190,21 +190,18 @@ public class MavenCloudApiUiExtensionTest {
     assertThat(bomComboBox.getItemCount()).isEqualTo(5);
   }
 
-  //
-  //  @Test
-  //  public void noAvailableBomVersions_hidesBomUi() {
-  //    // TODO (eshaul): remove once feature is released
-  //    when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
-  //
-  //    when(mavenService.getAllBomVersions()).thenReturn(ImmutableList.of());
-  //
-  //    GoogleCloudApiSelectorPanel panel =
-  //        new GoogleCloudApiSelectorPanel(ImmutableList.of(), testFixture.getProject());
-  //
-  //    assertThat(panel.getBomSelectorLabel().isVisible()).isFalse();
-  //    assertThat(panel.getBomComboBox().isVisible()).isFalse();
-  //  }
-  //
+
+    @Test
+    public void noAvailableBomVersions_hidesBomUi() {
+      when(mavenService.getAllBomVersions()).thenReturn(ImmutableList.of());
+
+      BomComboBox bomComboBox = new BomComboBox();
+      bomComboBox.populateBomVersions(testFixture.getProject(), module1);
+
+      assertThat(mavenCloudApiUiExtension.getBomSelectorLabel().isVisible()).isFalse();
+      assertThat(mavenCloudApiUiExtension.getBomComboBox().isVisible()).isFalse();
+    }
+
   @Test
   public void bomComboBox_withBomInPom_partOfAvailableBoms_preselectsConfiguredVersion() {
     when(mavenService.getAllBomVersions()).thenReturn(ImmutableList.of("v0", "v1", "v2"));

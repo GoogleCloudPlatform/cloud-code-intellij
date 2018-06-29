@@ -21,7 +21,6 @@ import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineSt
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.java.maven.project.MavenProjectService;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
-import com.google.cloud.tools.intellij.cloudapis.maven.CloudLibraryDependencyWriter;
 import com.intellij.facet.FacetManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;
@@ -103,10 +102,12 @@ public final class AddCloudLibrariesAction extends DumbAwareAction {
       librariesDialog.show();
 
       if (librariesDialog.isOK()) {
-        CloudLibraryDependencyWriter.addLibraries(
-            librariesDialog.getSelectedLibraries(),
-            librariesDialog.getSelectedModule(),
-            librariesDialog.getSelectedBomVersion().orElse(null));
+        CloudApiUiPresenter uiPresenter = CloudApiUiPresenter.getInstance();
+        if (uiPresenter instanceof DefaultCloudApiUiPresenter) {
+          ((DefaultCloudApiUiPresenter) uiPresenter)
+              .notifyCloudLibrariesAddition(
+                  librariesDialog.getSelectedLibraries(), librariesDialog.getSelectedModule());
+        }
       }
     }
   }

@@ -19,8 +19,10 @@ package com.google.cloud.tools.intellij.cloudapis;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.module.Module;
-import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 import javax.swing.JComponent;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -33,20 +35,26 @@ public interface CloudApiUiExtension {
   ExtensionPointName<CloudApiUiExtension> EP_NAME =
       new ExtensionPointName<>("com.google.gct.cloudapis.cloudApiUiExtension");
 
+  /** Possible locations for custom extension UI components. */
+  enum EXTENSION_UI_COMPONENT_LOCATION {
+    // bottom line 1 under module label
+    BOTTOM_LINE_1,
+    // bottom line 2 under module combo box
+    BOTTOM_LINE_2
+  }
+
   /**
    * Called when add cloud libraries dialog is created and opened and base UI is ready. At this
    * point extension point is active and custom UI components can be injected.
    */
-  Collection<JComponent> createCustomUiComponents();
+  Map<EXTENSION_UI_COMPONENT_LOCATION, JComponent> createCustomUiComponents();
 
   /**
    * Callback on change in currently selected cloud library.
    *
    * @param currentCloudLibrary Cloud library selected or null if user de-selected library.
-   * @param currentBomVersion BOM version. TODO:// to be removed, move to maven module.
    */
-  void onCloudLibrarySelection(
-      @Nullable CloudLibrary currentCloudLibrary, String currentBomVersion);
+  void onCloudLibrarySelection(@Nullable CloudLibrary currentCloudLibrary);
 
   /**
    * Callback on module selection change.
@@ -54,4 +62,13 @@ public interface CloudApiUiExtension {
    * @param module Currently selected module.
    */
   void onModuleSelection(Module module);
+
+  /**
+   * Callback after user confirmed adding cloud libraries, last step of the Cloud API dialog. At
+   * this point extension can assume libraries are added to the project and module.
+   *
+   * @param libraries List of added libraries.
+   * @param module Module where libraries were added.
+   */
+  void onCloudLibrariesAddition(@NotNull Set<CloudLibrary> libraries, @NotNull Module module);
 }

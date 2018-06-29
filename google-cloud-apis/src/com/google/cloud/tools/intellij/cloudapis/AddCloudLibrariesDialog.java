@@ -30,7 +30,6 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.swing.JComponent;
@@ -62,7 +61,7 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
     CloudApiUiPresenter cloudApiUiPresenter = CloudApiUiPresenter.getInstance();
     if (cloudApiUiPresenter instanceof DefaultCloudApiUiPresenter) {
       // TODO: move init() to interface and make it package visible once dependency inverts
-      ((DefaultCloudApiUiPresenter) cloudApiUiPresenter).init(cloudApiSelectorPanel);
+      ((DefaultCloudApiUiPresenter) cloudApiUiPresenter).init(project, cloudApiSelectorPanel);
     }
   }
 
@@ -92,11 +91,6 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
   /** Returns the set of {@link CloudLibrary APIs} to enable. */
   Set<CloudLibrary> getApisToEnable() {
     return cloudApiSelectorPanel.getApisToEnable();
-  }
-
-  /** Returns, optionally, the selected BOM version. */
-  Optional<String> getSelectedBomVersion() {
-    return cloudApiSelectorPanel.getSelectedBomVersion();
   }
 
   /**

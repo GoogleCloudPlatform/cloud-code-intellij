@@ -23,16 +23,20 @@ import com.google.cloud.tools.intellij.cloudapis.maven.CloudApiMavenService.Libr
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.cloud.tools.libraries.json.CloudLibraryClientMavenCoordinates;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 import com.intellij.icons.AllIcons.General;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.module.Module;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -40,20 +44,48 @@ import org.jetbrains.annotations.Nullable;
  * integration.
  */
 public class MavenCloudApiUiExtension implements CloudApiUiExtension {
+  private BomComboBox bomComboBox;
+  private JLabel bomSelectorLabel;
+
+  private CloudLibrary currentCloudLibrary;
 
   @Override
-  public Collection<JComponent> createCustomUiComponents() {
-    return Collections.emptyList();
+  public Map<EXTENSION_UI_COMPONENT_LOCATION, JComponent> createCustomUiComponents() {
+    bomComboBox = new BomComboBox();
+    bomSelectorLabel =
+        new JLabel(MavenCloudApisMessageBundle.getString("cloud.libraries.bom.selector.label"));
+
+    boolean bomAvailable =
+        bomComboBox.populateBomVersions(
+            CloudApiUiPresenter.getInstance().getProject(),
+            CloudApiUiPresenter.getInstance().getSelectedModule());
+    if (!bomAvailable) {
+      hideBomUI();
+    }
+
+    bomComboBox.addActionListener(
+        event -> {
+          // emulate library select to update version information.
+          onCloudLibrarySelection(currentCloudLibrary);
+        });
+
+    return ImmutableMap.of(
+        EXTENSION_UI_COMPONENT_LOCATION.BOTTOM_LINE_1,
+        bomSelectorLabel,
+        EXTENSION_UI_COMPONENT_LOCATION.BOTTOM_LINE_2,
+        bomComboBox);
   }
 
   @Override
-  public void onCloudLibrarySelection(CloudLibrary currentCloudLibrary, String currentBomVersion) {
+  public void onCloudLibrarySelection(CloudLibrary currentCloudLibrary) {
+    this.currentCloudLibrary = currentCloudLibrary;
     if (currentCloudLibrary != null && currentCloudLibrary.getClients() != null) {
       CloudLibraryUtils.getFirstJavaClient(currentCloudLibrary)
           .ifPresent(
               client -> {
-                if (currentBomVersion != null) {
-                  updateManagedLibraryVersionFromBom(currentCloudLibrary, currentBomVersion);
+                if (bomComboBox.getSelectedItem() != null) {
+                  updateManagedLibraryVersionFromBom(
+                      currentCloudLibrary, bomComboBox.getSelectedItem().toString());
                 } else {
                   if (client.getMavenCoordinates() != null) {
                     CloudApiUiPresenter.getInstance()
@@ -82,7 +114,18 @@ public class MavenCloudApiUiExtension implements CloudApiUiExtension {
   }
 
   @Override
-  public void onModuleSelection(Module module) {}
+  public void onModuleSelection(Module module) {
+    bomComboBox.populateBomVersions(CloudApiUiPresenter.getInstance().getProject(), module);
+  }
+
+  @Override
+  public void onCloudLibrariesAddition(
+      @NotNull Set<CloudLibrary> libraries, @NotNull Module module) {
+    CloudLibraryDependencyWriter.addLibraries(
+        libraries,
+        module,
+        Optional.ofNullable(bomComboBox.getSelectedItem()).map(Object::toString).orElse(null));
+  }
 
   /**
    * Optionally returns an HTML-formatted link for the given URL.
@@ -97,6 +140,21 @@ public class MavenCloudApiUiExtension implements CloudApiUiExtension {
       return Optional.empty();
     }
     return Optional.of(String.format("<a href=\"%s\">%s</a>", url, text));
+  }
+
+  @VisibleForTesting
+  BomComboBox getBomComboBox() {
+    return bomComboBox;
+  }
+
+  @VisibleForTesting
+  JLabel getBomSelectorLabel() {
+    return bomSelectorLabel;
+  }
+
+  private void hideBomUI() {
+    bomComboBox.setVisible(false);
+    bomSelectorLabel.setVisible(false);
   }
 
   /**
