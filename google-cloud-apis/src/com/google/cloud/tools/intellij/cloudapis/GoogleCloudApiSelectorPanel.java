@@ -81,7 +81,7 @@ public final class GoogleCloudApiSelectorPanel {
   private JPanel bottomComponent2;
 
   // insert extension UI components parent panels.
-  Map<EXTENSION_UI_COMPONENT_LOCATION, JComponent> extensionComponentPanels = Maps.newHashMap();
+  private Map<EXTENSION_UI_COMPONENT_LOCATION, JComponent> extensionComponentPanels;
 
   private final Map<CloudLibrary, CloudApiManagementSpec> apiManagementMap;
   private final List<CloudLibrary> libraries;
@@ -188,7 +188,16 @@ public final class GoogleCloudApiSelectorPanel {
 
   void createExtensionUiComponents(
       Map<EXTENSION_UI_COMPONENT_LOCATION, JComponent> extensionComponents) {
-    // for all present components, insert them.
+    // build insert parent component map.
+    if (extensionComponentPanels == null) {
+      extensionComponentPanels = Maps.newHashMap();
+      extensionComponentPanels.put(EXTENSION_UI_COMPONENT_LOCATION.BOTTOM_LINE_1, bottomComponent1);
+      extensionComponentPanels.put(EXTENSION_UI_COMPONENT_LOCATION.BOTTOM_LINE_2, bottomComponent2);
+    }
+
+    System.out.println("panesl: " + extensionComponentPanels);
+    System.out.println("components: " + extensionComponents);
+
     for (EXTENSION_UI_COMPONENT_LOCATION nextLocation : extensionComponentPanels.keySet()) {
       if (extensionComponents.containsKey(nextLocation)) {
         extensionComponentPanels.get(nextLocation).add(extensionComponents.get(nextLocation));
@@ -224,10 +233,6 @@ public final class GoogleCloudApiSelectorPanel {
 
     projectSelector = new ProjectSelector(project);
     projectSelector.addProjectSelectionListener(cloudProject -> updateManagementUI());
-
-    // build insert parent component map.
-    extensionComponentPanels.put(EXTENSION_UI_COMPONENT_LOCATION.BOTTOM_LINE_1, bottomComponent1);
-    extensionComponentPanels.put(EXTENSION_UI_COMPONENT_LOCATION.BOTTOM_LINE_2, bottomComponent2);
   }
 
   private void onClientLibrarySelection(ListSelectionEvent event) {

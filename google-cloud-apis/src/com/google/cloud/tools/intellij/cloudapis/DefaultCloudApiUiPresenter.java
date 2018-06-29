@@ -74,7 +74,6 @@ public class DefaultCloudApiUiPresenter implements CloudApiUiPresenter {
 
     cloudApiUiExtensions = CloudApiUiExtension.EP_NAME.getExtensions();
     for (CloudApiUiExtension uiExtension : cloudApiUiExtensions) {
-      // TODO: will be implemented in the next PR.
       Map<EXTENSION_UI_COMPONENT_LOCATION, JComponent> customComponents =
           uiExtension.createCustomUiComponents();
       cloudApiSelectorPanel.createExtensionUiComponents(customComponents);
