@@ -32,7 +32,7 @@ public enum CloudSdkValidationResult {
       CloudSdkMessageBundle.message("appengine.cloudsdk.java.components.missing")
           + "\n"
           + CloudSdkMessageBundle.message("appengine.cloudsdk.java.components.howtoinstall"),
-      false),
+      true),
   CLOUD_SDK_VERSION_FILE_ERROR(
       CloudSdkMessageBundle.message("appengine.cloudsdk.version.file.error"), false);
 
