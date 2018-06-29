@@ -162,7 +162,7 @@ public class MavenCloudApiUiExtensionTest {
   }
 
   @Test
-  public void getPanel_withAvailableBomVersions_populatesBomVersionsInReverseOrder() {
+  public void bomComboBox_withAvailableBomVersions_populatesBomVersionsInReverseOrder() {
     when(mavenService.getAllBomVersions()).thenReturn(ImmutableList.of("v0", "v1", "v2"));
 
     BomComboBox bomComboBox = new BomComboBox();
@@ -176,7 +176,7 @@ public class MavenCloudApiUiExtensionTest {
   }
 
   @Test
-  public void getPanel_withManyAvailableBomVersions_limitsNumBomVersions() {
+  public void bomComboBox_withManyAvailableBomVersions_limitsNumBomVersions() {
     List<String> versions = Lists.newArrayList();
     for (int i = 0; i < 20; i++) {
       versions.add("v" + i);
@@ -192,7 +192,7 @@ public class MavenCloudApiUiExtensionTest {
 
   //
   //  @Test
-  //  public void getPanel_withNoAvailableBomVersions_hidesBomUi() {
+  //  public void noAvailableBomVersions_hidesBomUi() {
   //    // TODO (eshaul): remove once feature is released
   //    when(pluginInfoService.shouldEnable(GctFeature.BOM)).thenReturn(true);
   //
@@ -206,7 +206,7 @@ public class MavenCloudApiUiExtensionTest {
   //  }
   //
   @Test
-  public void getPanel_withBomInPom_partOfAvailableBoms_preselectsConfiguredVersion() {
+  public void bomComboBox_withBomInPom_partOfAvailableBoms_preselectsConfiguredVersion() {
     when(mavenService.getAllBomVersions()).thenReturn(ImmutableList.of("v0", "v1", "v2"));
 
     MavenTestUtils.getInstance()
@@ -231,7 +231,7 @@ public class MavenCloudApiUiExtensionTest {
   }
 
   @Test
-  public void getPanel_withBomInPom_withNoAvailableBoms_hasOnlyPreconfiguredBom() {
+  public void bomComboBox_withBomInPom_withNoAvailableBoms_hasOnlyPreconfiguredBom() {
     when(mavenService.getAllBomVersions()).thenReturn(ImmutableList.of());
 
     MavenTestUtils.getInstance()
