@@ -18,6 +18,8 @@ sourceSets.main.resources.srcDirs = ['resources']
 sourceSets.main.java.srcDirs = ['src']
 sourceSets.test.java.srcDirs = ['testSrc', 'testResources']
 
+archivesBaseName = 'app-engine-java-ultimate'
+
 intellij {
     type = 'IU'
 

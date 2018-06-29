@@ -58,11 +58,14 @@ import com.intellij.util.containers.ContainerUtil;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** @author nik */
 public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWebIntegration {
+
   public static final String WEB_INF = "WEB-INF";
 
   private static final Logger LOG =
@@ -77,10 +80,18 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
   }
 
   /**
-   * Returns the first WEB-INF folder determined in this order or null if none can be found. 1. If a
-   * WEB-INF folder exists as one of {@code module}'s web resource directories, returns the first
-   * one 2. If a WEB-INF folder is a child of one or more of the web resource directories, returns
-   * the first one 3. Creates a WEB-INF folder in the first web resource directory
+   * Locates a parent WEB-INF directory for placing the generated appengine-web.xml, according to
+   * the following strategy in order, or null if none can be found:
+   *
+   * <p>1. If a WEB-INF folder exists as one of the module's web resource directories, returns the
+   * first one
+   *
+   * <p>2. If a WEB-INF folder is a child of one the web resource directories, returns the first one
+   *
+   * <p>3. Creates a WEB-INF folder in the first web resource directory that exists
+   *
+   * <p>4. If there is at least one web resource directory path, but none exist, recursively creates
+   * a WEB-INF in the first one
    */
   @Override
   public VirtualFile suggestParentDirectoryForAppEngineWebXml(
@@ -96,26 +107,36 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
     }
 
     for (WebRoot webRoot : webRoots) {
-      VirtualFile parent = webRoot.getFile();
-      if (parent != null) {
-        if (WEB_INF.equals(parent.getName())) {
-          return parent;
+      VirtualFile webRootDir = webRoot.getFile();
+      if (webRootDir != null) {
+        if (WEB_INF.equals(webRootDir.getName())) {
+          return webRootDir;
         }
 
-        VirtualFile child = parent.findChild(WEB_INF);
-        if (child != null) {
-          return child;
+        VirtualFile webInfDir = webRootDir.findChild(WEB_INF);
+        if (webInfDir != null) {
+          return webInfDir;
         }
       }
     }
 
     try {
-      VirtualFile webRootFile = webRoots.get(0).getFile();
-      if (webRootFile != null) {
-        return VfsUtil.createDirectoryIfMissing(webRootFile, WEB_INF);
+      Optional<VirtualFile> webRootDir =
+          webRoots.stream().map(WebRoot::getFile).filter(Objects::nonNull).findFirst();
+
+      if (!webRootDir.isPresent()) {
+        // There is at least one web-root path, but none that exist, select the first and create it
+        String presentableUrl = webRoots.get(0).getPresentableUrl();
+        if (presentableUrl != null) {
+          webRootDir = Optional.ofNullable(VfsUtil.createDirectories(presentableUrl));
+        }
+      }
+
+      if (webRootDir.isPresent()) {
+        return VfsUtil.createDirectoryIfMissing(webRootDir.get(), WEB_INF);
       }
     } catch (IOException ioe) {
-      LOG.info(ioe);
+      LOG.warn(ioe);
     }
 
     return null;
