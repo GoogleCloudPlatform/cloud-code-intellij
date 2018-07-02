@@ -59,7 +59,6 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
     // initialize presenter for this dialog and init the extensions if present.
     CloudApiUiPresenter cloudApiUiPresenter = CloudApiUiPresenter.getInstance();
     if (cloudApiUiPresenter instanceof DefaultCloudApiUiPresenter) {
-      // TODO: move init() to interface and make it package visible once dependency inverts
       ((DefaultCloudApiUiPresenter) cloudApiUiPresenter).init(project, cloudApiSelectorPanel);
     }
   }

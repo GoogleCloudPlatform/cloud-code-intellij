@@ -31,6 +31,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.JavaVersion;
 
+/**
+ * {@link CloudApiActionDecoratorExtension} extension point that checks for Java projects version if
+ * App Engine is used, and ensures Maven dependencies support is only available for Maven projects.
+ * Otherwise, action is disabled and help text is shown.
+ */
 public class MavenCloudApiActionDecorator implements CloudApiActionDecoratorExtension {
 
   @Override

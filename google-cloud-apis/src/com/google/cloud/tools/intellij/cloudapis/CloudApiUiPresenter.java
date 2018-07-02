@@ -47,6 +47,9 @@ public interface CloudApiUiPresenter {
   /**
    * Adds links to some documentation page for the currently selected library. If no library is
    * selected, nothing is done.
+   *
+   * @param links Collection of optional prepared links in HTML format, prepared by {@link
+   *     GoogleCloudApiDetailsPanel#makeLink(String, String)}
    */
   void addCloudLibraryLinks(Collection<Optional<String>> links);
 

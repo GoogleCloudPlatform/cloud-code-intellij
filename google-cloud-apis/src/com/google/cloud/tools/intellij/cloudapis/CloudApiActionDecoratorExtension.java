@@ -19,9 +19,17 @@ package com.google.cloud.tools.intellij.cloudapis;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.extensions.ExtensionPointName;
 
+/**
+ * An extension point to dynamically change behaivor of "Add Cloud APIs" action, i.e. check for
+ * eligibility of specific build systems or frameworks and disable/enable/modify text based on that.
+ */
 public interface CloudApiActionDecoratorExtension {
   ExtensionPointName<CloudApiActionDecoratorExtension> EP_NAME =
       new ExtensionPointName<>("com.google.gct.cloudapis.cloudApiActionDecorator");
 
+  /**
+   * Called by core Cloud API UI to allow extensions to "decorate" default behaivor of Cloud API
+   * action, which by default is always enabled. Called by IDE platform on each project change.
+   */
   void decorate(AnActionEvent e);
 }
