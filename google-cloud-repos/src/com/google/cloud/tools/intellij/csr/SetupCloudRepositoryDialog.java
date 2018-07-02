@@ -137,6 +137,13 @@ public class SetupCloudRepositoryDialog extends DialogWrapper {
 
   private void updateButtons() {
     CloudProject selectedProject = projectSelector.getSelectedProject();
+    if (selectedProject == null) {
+      setErrorText(
+          CloudReposMessageBundle.message("cloud.repository.selector.missing.project.error"));
+      setOKActionEnabled(false);
+      return;
+    }
+
     Optional<CredentialedUser> user =
         Services.getLoginService().getLoggedInUser(selectedProject.googleUsername());
 
