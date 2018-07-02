@@ -65,6 +65,10 @@ public class SetupCloudRepositoryDialog extends DialogWrapper {
     setOKActionEnabled(false);
 
     projectSelector.loadActiveCloudProject();
+
+    if (projectSelector.getSelectedProject() == null) {
+      repositorySelector.setEnabled(false);
+    }
   }
 
   /** Return the project ID selected by the user. */
@@ -129,10 +133,15 @@ public class SetupCloudRepositoryDialog extends DialogWrapper {
   }
 
   private void updateRepositorySelector(CloudProject cloudProject) {
-    repositorySelector.setCloudProject(cloudProject);
-    repositorySelector.setText("");
-    repositorySelector.loadRepositories();
-    updateButtons();
+    if (cloudProject != null) {
+      repositorySelector.setEnabled(true);
+      repositorySelector.setCloudProject(cloudProject);
+      repositorySelector.setText("");
+      repositorySelector.loadRepositories();
+      updateButtons();
+    } else {
+      repositorySelector.setEnabled(false);
+    }
   }
 
   private void updateButtons() {
