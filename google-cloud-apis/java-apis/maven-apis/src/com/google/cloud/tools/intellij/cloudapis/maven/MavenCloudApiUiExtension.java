@@ -86,8 +86,7 @@ public class MavenCloudApiUiExtension implements CloudApiUiExtension {
           .ifPresent(
               client -> {
                 if (getSelectedBomVersion() != null) {
-                  updateManagedLibraryVersionFromBom(
-                      currentCloudLibrary, getSelectedBomVersion());
+                  updateManagedLibraryVersionFromBom(currentCloudLibrary, getSelectedBomVersion());
                 } else {
                   if (client.getMavenCoordinates() != null) {
                     CloudApiUiPresenter.getInstance()

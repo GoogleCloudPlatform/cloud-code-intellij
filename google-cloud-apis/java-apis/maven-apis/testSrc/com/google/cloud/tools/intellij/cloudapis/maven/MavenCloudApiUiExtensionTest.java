@@ -201,14 +201,16 @@ public class MavenCloudApiUiExtensionTest {
   public void noAvailableBomVersions_hidesBomUi() {
     when(mavenService.getAllBomVersions()).thenReturn(ImmutableList.of());
 
-    ApplicationManager.getApplication().invokeAndWait(() -> {
-      mavenCloudApiUiExtension.createCustomUiComponents();
-      BomComboBox bomComboBox = mavenCloudApiUiExtension.getBomComboBox();
-      bomComboBox.populateBomVersions(testFixture.getProject(), module1);
+    ApplicationManager.getApplication()
+        .invokeAndWait(
+            () -> {
+              mavenCloudApiUiExtension.createCustomUiComponents();
+              BomComboBox bomComboBox = mavenCloudApiUiExtension.getBomComboBox();
+              bomComboBox.populateBomVersions(testFixture.getProject(), module1);
 
-      assertThat(mavenCloudApiUiExtension.getBomSelectorLabel().isVisible()).isFalse();
-      assertThat(mavenCloudApiUiExtension.getBomComboBox().isVisible()).isFalse();
-    });
+              assertThat(mavenCloudApiUiExtension.getBomSelectorLabel().isVisible()).isFalse();
+              assertThat(mavenCloudApiUiExtension.getBomComboBox().isVisible()).isFalse();
+            });
   }
 
   @Test
