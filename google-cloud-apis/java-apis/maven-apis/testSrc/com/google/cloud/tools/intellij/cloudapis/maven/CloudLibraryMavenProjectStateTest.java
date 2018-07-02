@@ -58,8 +58,7 @@ public class CloudLibraryMavenProjectStateTest {
   @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
   @TestFixture private IdeaProjectTestFixture testFixture;
 
-  @Mock @TestService
-  CloudLibrariesService librariesService;
+  @Mock @TestService CloudLibrariesService librariesService;
 
   private static final TestCloudLibraryClientMavenCoordinates JAVA_CLIENT_MAVEN_COORDS =
       TestCloudLibraryClientMavenCoordinates.create("java", "client", "1.0.0");

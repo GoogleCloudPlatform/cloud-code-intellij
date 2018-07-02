@@ -39,6 +39,7 @@ import java.util.stream.Stream;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * {@link CloudApiUiExtension} to support additional components and events for Maven Cloud API
@@ -84,9 +85,9 @@ public class MavenCloudApiUiExtension implements CloudApiUiExtension {
       CloudLibraryUtils.getFirstJavaClient(currentCloudLibrary)
           .ifPresent(
               client -> {
-                if (bomComboBox.getSelectedItem() != null) {
+                if (getSelectedBomVersion() != null) {
                   updateManagedLibraryVersionFromBom(
-                      currentCloudLibrary, bomComboBox.getSelectedItem().toString());
+                      currentCloudLibrary, getSelectedBomVersion());
                 } else {
                   if (client.getMavenCoordinates() != null) {
                     CloudApiUiPresenter.getInstance()
@@ -131,6 +132,12 @@ public class MavenCloudApiUiExtension implements CloudApiUiExtension {
   @VisibleForTesting
   BomComboBox getBomComboBox() {
     return bomComboBox;
+  }
+
+  @VisibleForTesting
+  @Nullable
+  String getSelectedBomVersion() {
+    return bomComboBox.getSelectedItem() == null ? null : bomComboBox.getSelectedItem().toString();
   }
 
   @VisibleForTesting

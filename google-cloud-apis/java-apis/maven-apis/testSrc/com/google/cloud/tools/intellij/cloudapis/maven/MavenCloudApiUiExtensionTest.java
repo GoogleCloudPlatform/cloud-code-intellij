@@ -20,6 +20,8 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.cloudapis.CloudApiUiPresenter;
@@ -36,6 +38,7 @@ import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.intellij.icons.AllIcons.General;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
@@ -98,11 +101,14 @@ public class MavenCloudApiUiExtensionTest {
 
   @Before
   public void setUp() {
-    mavenCloudApiUiExtension = new MavenCloudApiUiExtension();
-
     doNothing()
         .when(mockCloudApiUiPresenter)
         .updateCloudLibraryVersionLabel(versionText.capture(), versionIcon.capture());
+    when(mockCloudApiUiPresenter.getProject()).thenReturn(testFixture.getProject());
+    when(mockCloudApiUiPresenter.getSelectedModule()).thenReturn(module1);
+
+    mavenCloudApiUiExtension = spy(new MavenCloudApiUiExtension());
+    doReturn(BOM_VERSION).when(mavenCloudApiUiExtension).getSelectedBomVersion();
   }
 
   @Test
@@ -110,6 +116,7 @@ public class MavenCloudApiUiExtensionTest {
       updateVersionLabel_withNoVersionReturnedFromBomQuery_fallsBackToAndDisplaysStaticVersion() {
     CloudLibrary cloudLibrary = LIBRARY_1.toCloudLibrary();
 
+    doReturn(null).when(mavenCloudApiUiExtension).getSelectedBomVersion();
     mavenCloudApiUiExtension.onCloudLibrarySelection(cloudLibrary);
 
     assertThat(versionText.getValue())
@@ -190,17 +197,19 @@ public class MavenCloudApiUiExtensionTest {
     assertThat(bomComboBox.getItemCount()).isEqualTo(5);
   }
 
+  @Test
+  public void noAvailableBomVersions_hidesBomUi() {
+    when(mavenService.getAllBomVersions()).thenReturn(ImmutableList.of());
 
-    @Test
-    public void noAvailableBomVersions_hidesBomUi() {
-      when(mavenService.getAllBomVersions()).thenReturn(ImmutableList.of());
-
-      BomComboBox bomComboBox = new BomComboBox();
+    ApplicationManager.getApplication().invokeAndWait(() -> {
+      mavenCloudApiUiExtension.createCustomUiComponents();
+      BomComboBox bomComboBox = mavenCloudApiUiExtension.getBomComboBox();
       bomComboBox.populateBomVersions(testFixture.getProject(), module1);
 
       assertThat(mavenCloudApiUiExtension.getBomSelectorLabel().isVisible()).isFalse();
       assertThat(mavenCloudApiUiExtension.getBomComboBox().isVisible()).isFalse();
-    }
+    });
+  }
 
   @Test
   public void bomComboBox_withBomInPom_partOfAvailableBoms_preselectsConfiguredVersion() {
