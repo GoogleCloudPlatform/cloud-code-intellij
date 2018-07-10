@@ -92,7 +92,11 @@ public class AppEngineStandardRunTask extends AppEngineTask {
       // for now, this reports only the stacktrace portion of this exception
       String[] stacktrace =
           Stream.of(aee.getStackTrace()).map(StackTraceElement::toString).toArray(String[]::new);
-      logger.error("AppEngineException during local run", stacktrace);
+      Class causeClass = aee.getCause() == null ? null : aee.getCause().getClass();
+
+      logger.error(
+          String.format("AppEngineException during local run with cause %s", causeClass),
+          stacktrace);
     } catch (Exception ex) {
       logger.error(ex);
     }
