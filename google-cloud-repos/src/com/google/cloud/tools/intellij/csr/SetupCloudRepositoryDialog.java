@@ -65,6 +65,10 @@ public class SetupCloudRepositoryDialog extends DialogWrapper {
     setOKActionEnabled(false);
 
     projectSelector.loadActiveCloudProject();
+
+    if (projectSelector.getSelectedProject() == null) {
+      repositorySelector.setEnabled(false);
+    }
   }
 
   /** Return the project ID selected by the user. */
@@ -129,14 +133,26 @@ public class SetupCloudRepositoryDialog extends DialogWrapper {
   }
 
   private void updateRepositorySelector(CloudProject cloudProject) {
-    repositorySelector.setCloudProject(cloudProject);
-    repositorySelector.setText("");
-    repositorySelector.loadRepositories();
-    updateButtons();
+    if (cloudProject != null) {
+      repositorySelector.setEnabled(true);
+      repositorySelector.setCloudProject(cloudProject);
+      repositorySelector.setText("");
+      repositorySelector.loadRepositories();
+      updateButtons();
+    } else {
+      repositorySelector.setEnabled(false);
+    }
   }
 
   private void updateButtons() {
     CloudProject selectedProject = projectSelector.getSelectedProject();
+    if (selectedProject == null) {
+      setErrorText(
+          CloudReposMessageBundle.message("cloud.repository.selector.missing.project.error"));
+      setOKActionEnabled(false);
+      return;
+    }
+
     Optional<CredentialedUser> user =
         Services.getLoginService().getLoggedInUser(selectedProject.googleUsername());
 

@@ -44,4 +44,8 @@
                          enabledByDefault="true" level="WARNING"
                          implementationClass="com.google.cloud.tools.intellij.cloudapis.maven.CloudDependencyWithNoBomInspection"/>
     </extensions>
+    <extensions defaultExtensionNs="com.google.gct.cloudapis">
+        <cloudApiUiExtension
+                implementation="com.google.cloud.tools.intellij.cloudapis.maven.MavenCloudApiUiExtension"/>
+    </extensions>
 </idea-plugin>

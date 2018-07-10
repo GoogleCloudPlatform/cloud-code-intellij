@@ -23,6 +23,8 @@ import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService.SdkStatus;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceManager;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceManager.CloudSdkStatusHandler;
+import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkValidationResult;
+import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkValidator;
 import com.google.cloud.tools.intellij.appengine.java.ultimate.server.instance.AppEngineServerModel;
 import com.google.common.collect.Maps;
 import com.intellij.execution.ExecutionException;
@@ -39,6 +41,8 @@ import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ProjectRootManager;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import org.jetbrains.annotations.Nullable;
 
 /** Runs a Google App Engine Standard app locally with devappserver, through the tools lib. */
@@ -128,6 +132,17 @@ public class CloudSdkStartupPolicy implements ExecutableObjectStartupPolicy {
             if (javaSdk == null || javaSdk.getHomePath() == null) {
               throw new ExecutionException(
                   AppEngineMessageBundle.message("appengine.run.server.nojdk"));
+            }
+
+            Set<CloudSdkValidationResult> validationResults =
+                CloudSdkValidator.getInstance().validateCloudSdk();
+            // show the first error if any exists, allow users to fix one by one.
+            Optional<CloudSdkValidationResult> anySdkError =
+                validationResults.stream().filter(CloudSdkValidationResult::isError).findAny();
+            if (anySdkError.isPresent()) {
+              throw new ExecutionException(
+                  AppEngineMessageBundle.message(
+                      "appengine.run.server.sdk.invalid", anySdkError.get().getMessage()));
             }
 
             AppEngineServerModel runConfiguration;

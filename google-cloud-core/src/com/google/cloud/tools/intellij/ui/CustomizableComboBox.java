@@ -156,6 +156,12 @@ public abstract class CustomizableComboBox extends JPanel {
     }
   }
 
+  @Override
+  public void setEnabled(boolean enabled) {
+    textField.setEnabled(enabled);
+    themedCombo.setEnabled(enabled);
+  }
+
   protected abstract CustomizableComboBoxPopup getPopup();
 
   protected abstract int getPreferredPopupHeight();
