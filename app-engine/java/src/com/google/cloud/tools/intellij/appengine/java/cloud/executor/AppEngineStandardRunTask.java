@@ -36,9 +36,7 @@ import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Represents an App Engine Standard run task. (i.e., devappserver)
- */
+/** Represents an App Engine Standard run task. (i.e., devappserver) */
 public class AppEngineStandardRunTask extends AppEngineTask {
 
   private static final Logger logger = Logger.getInstance(AppEngineStandardRunTask.class);
@@ -53,7 +51,7 @@ public class AppEngineStandardRunTask extends AppEngineTask {
    * @param runConfig local run configuration to be sent to the common library
    * @param javaSdk JRE to run devappserver with
    * @param runnerId typically "Run" or "Debug", to indicate type of local run. To be used in
-   * metrics
+   *     metrics
    */
   public AppEngineStandardRunTask(
       @NotNull RunConfiguration runConfig, @NotNull Sdk javaSdk, @Nullable String runnerId) {
@@ -92,9 +90,9 @@ public class AppEngineStandardRunTask extends AppEngineTask {
     } catch (AppEngineException aee) {
       // TODO(eshaul) replace this with more general exception formatting mechanism
       // for now, this reports only the stacktrace portion of this exception
-      String[] trace = Stream.of(aee.getStackTrace()).map(StackTraceElement::toString)
-          .toArray(String[]::new);
-      logger.error("AppEngineException during local run", trace);
+      String[] stacktrace =
+          Stream.of(aee.getStackTrace()).map(StackTraceElement::toString).toArray(String[]::new);
+      logger.error("AppEngineException during local run", stacktrace);
     } catch (Exception ex) {
       logger.error(ex);
     }
