@@ -32,7 +32,7 @@
         <extensionPoint name="appEngineStandardLibraryManager"
                         interface="com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardLibraryManager"/>
         <extensionPoint name="appEngineWebXmlDirectoryProvider"
-                        interface="com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineWebXmlDirectoryProvider"/>
+                        interface="com.google.cloud.tools.intellij.appengine.java.facet.standard.BuildSystemAppEngineWebXmlDirectoryProvider"/>
     </extensionPoints>
 
     <actions>
@@ -66,9 +66,6 @@
                 implementation="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineArtifactDeploymentSourceProvider"/>
         <appEngineDeploymentSourceProvider
                 implementation="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineUserSpecifiedPathDeploymentSourceProvider"/>
-
-        <appEngineWebXmlDirectoryProvider
-                implementation="com.google.cloud.tools.intellij.appengine.java.facet.standard.NativeAppEngineWebXmlDirectoryProvider"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">

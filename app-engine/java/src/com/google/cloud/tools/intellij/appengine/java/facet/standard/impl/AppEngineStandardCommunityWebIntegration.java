@@ -1,15 +1,4 @@
-/*
- * Copyright 2000-2016 JetBrains s.r.o.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+/* * Copyright 2000-2016 JetBrains s.r.o. * * Licensed under the Apache License, Version 2.0 (the "License"); * you may not use this file except in compliance with the License. * You may obtain a copy of the License at * * http://www.apache.org/licenses/LICENSE-2.0 * * Unless required by applicable law or agreed to in writing, software * distributed under the License is distributed on an "AS IS" BASIS, * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -17,9 +6,11 @@
 package com.google.cloud.tools.intellij.appengine.java.facet.standard.impl;
 
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardWebIntegration;
+import com.google.cloud.tools.intellij.appengine.java.facet.standard.BuildSystemAppEngineWebXmlDirectoryProvider;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
 import com.intellij.ide.util.frameworkSupport.FrameworkRole;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModifiableRootModel;
@@ -36,10 +27,9 @@ import com.intellij.util.ArrayUtil;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.idea.maven.project.MavenProject;
-import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
 /** @author nik. */
 public class AppEngineStandardCommunityWebIntegration extends AppEngineStandardWebIntegration {
@@ -51,13 +41,26 @@ public class AppEngineStandardCommunityWebIntegration extends AppEngineStandardW
   @Override
   public VirtualFile suggestParentDirectoryForAppEngineWebXml(
       @NotNull Module module, @NotNull ModifiableRootModel rootModel) {
-    MavenProject mvnProject = MavenProjectsManager.getInstance(module.getProject())
-        .findProject(module);
+    BuildSystemAppEngineWebXmlDirectoryProvider[] appEngineWebXmlDirectoryProviders =
+        Extensions.getExtensions(BuildSystemAppEngineWebXmlDirectoryProvider.EP_NAME);
+    for (BuildSystemAppEngineWebXmlDirectoryProvider provider : appEngineWebXmlDirectoryProviders) {
+      Optional<String> pathOptional = provider.getAppEngineWebXmlDirectoryPath(module);
 
-    final VirtualFile root = ArrayUtil.getFirstElement(rootModel.getContentRoots());
+      if (pathOptional.isPresent()) {
+        try {
+          return VfsUtil.createDirectoryIfMissing(pathOptional.get());
+        } catch (IOException e) {
+          LOG.warn(
+              "Failed to crete appengine-web.xml in location specified by build-aware extension");
+        }
+      }
+    }
+
+    // Build-aware strategies failed or missing, fall back to simple native approach
+    VirtualFile root = ArrayUtil.getFirstElement(rootModel.getContentRoots());
     if (root != null) {
       try {
-        return VfsUtil.createDirectoryIfMissing(root, "WEB-INF");
+        return VfsUtil.createDirectoryIfMissing(root, "web/WEB-INF");
       } catch (IOException ioe) {
         LOG.info(ioe);
         return null;

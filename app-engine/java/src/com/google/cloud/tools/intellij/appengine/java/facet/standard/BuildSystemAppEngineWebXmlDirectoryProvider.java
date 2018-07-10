@@ -16,15 +16,20 @@
 
 package com.google.cloud.tools.intellij.appengine.java.facet.standard;
 
-import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeploymentSourceProvider;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.module.Module;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 
-public interface AppEngineWebXmlDirectoryProvider {
-  ExtensionPointName<AppEngineDeploymentSourceProvider> EP_NAME =
+/**
+ * An extension point for implementing build-system aware strategies for providing the path to the
+ * appengine-web.xml directory.
+ */
+public interface BuildSystemAppEngineWebXmlDirectoryProvider {
+
+  ExtensionPointName<BuildSystemAppEngineWebXmlDirectoryProvider> EP_NAME =
       ExtensionPointName.create("com.google.gct.core.appEngineWebXmlDirectoryProvider");
 
-  String getAppEngineWebXmlDirectoryPath(@NotNull Module module);
-
+  /** Returns, optionally, the path to the appengine-web.xml directory for the given module. */
+  Optional<String> getAppEngineWebXmlDirectoryPath(@NotNull Module module);
 }
