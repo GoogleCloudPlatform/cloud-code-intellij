@@ -49,9 +49,10 @@ public class AppEngineStandardCommunityWebIntegration extends AppEngineStandardW
       if (pathOptional.isPresent()) {
         try {
           return VfsUtil.createDirectoryIfMissing(pathOptional.get());
-        } catch (IOException e) {
+        } catch (IOException ioe) {
           LOG.warn(
-              "Failed to crete appengine-web.xml in location specified by build-aware extension");
+              "Exception attempting to create appengine-web.xml in location specified by build-aware extension",
+              ioe);
         }
       }
     }
