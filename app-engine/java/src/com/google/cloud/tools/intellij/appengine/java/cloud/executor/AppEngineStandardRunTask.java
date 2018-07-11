@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.java.cloud.executor;
 
+import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.api.devserver.RunConfiguration;
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.appengine.cloudsdk.LocalRun;
@@ -31,6 +32,7 @@ import com.google.common.base.Strings;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.projectRoots.Sdk;
 import java.nio.file.Paths;
+import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -85,6 +87,16 @@ public class AppEngineStandardRunTask extends AppEngineTask {
               GctTracking.METADATA_SDK_KEY,
               CloudSdkServiceUserSettings.getInstance().getUserSelectedSdkServiceType().name())
           .ping();
+    } catch (AppEngineException aee) {
+      // TODO(eshaul) replace this with more general exception formatting mechanism
+      // for now, this reports only the stacktrace portion of this exception
+      String[] stacktrace =
+          Stream.of(aee.getStackTrace()).map(StackTraceElement::toString).toArray(String[]::new);
+      Class causeClass = aee.getCause() == null ? null : aee.getCause().getClass();
+
+      logger.error(
+          String.format("AppEngineException during local run with cause %s", causeClass),
+          stacktrace);
     } catch (Exception ex) {
       logger.error(ex);
     }
