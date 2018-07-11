@@ -57,7 +57,7 @@ public abstract class AddAppEngineFrameworkSupportActionTest extends PlatformTes
   }
 
   public void
-  testGetSuitableModules_returnsAllAppEngineModules_whenSomeModulesHaveAppEngineFacet() {
+      testGetSuitableModules_returnsAllAppEngineModules_whenSomeModulesHaveAppEngineFacet() {
     if (!PlatformUtils.isIdeaUltimate()) {
       return;
     }

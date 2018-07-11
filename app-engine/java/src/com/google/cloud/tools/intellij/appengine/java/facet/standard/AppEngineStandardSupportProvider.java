@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.appengine.java.facet.standard;
 import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.java.util.AppEngineUtil;
 import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
@@ -181,9 +182,9 @@ public class AppEngineStandardSupportProvider extends FrameworkSupportInModulePr
   private void notifyAppEngineWebXmlCreationError(Project project) {
     Notification notification =
         NOTIFICATION_GROUP.createNotification(
-            "Error generating appengine-web.xml",
+            AppEngineMessageBundle.message("appengine.generate.appenginewebxml.error.title"),
             null /* subtitle */,
-            "There was an error generating the appengine-web.xml file for App Engine standard support. Some operations such as deploy and local-run may not work properly.<br /><br />Please try again or generate the file manually in the WEB-INF directory of your module's web resource directory.",
+            AppEngineMessageBundle.message("appengine.generate.appenginewebxml.error.message"),
             NotificationType.WARNING);
     notification.notify(project);
   }
