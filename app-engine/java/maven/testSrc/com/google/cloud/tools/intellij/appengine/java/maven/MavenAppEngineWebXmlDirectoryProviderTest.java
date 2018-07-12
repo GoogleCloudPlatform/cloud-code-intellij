@@ -68,10 +68,11 @@ public class MavenAppEngineWebXmlDirectoryProviderTest {
         .runWithMavenModule(
             testFixture.getProject(),
             mavenModule -> {
-              assertThat(directoryProvider.getAppEngineWebXmlDirectoryPath(mavenModule).isPresent())
-                  .isTrue();
-              assertThat(directoryProvider.getAppEngineWebXmlDirectoryPath(mavenModule).get())
-                  .endsWith("/src/main/webapp/WEB-INF");
+              Optional<String> appEngineWebXmlDirectoryPath =
+                  directoryProvider.getAppEngineWebXmlDirectoryPath(mavenModule);
+
+              assertThat(appEngineWebXmlDirectoryPath.isPresent()).isTrue();
+              assertThat(appEngineWebXmlDirectoryPath.get()).endsWith("/src/main/webapp/WEB-INF");
             });
   }
 
@@ -93,9 +94,11 @@ public class MavenAppEngineWebXmlDirectoryProviderTest {
         .runWithMavenModule(
             testFixture.getProject(),
             mavenModule -> {
-              assertThat(directoryProvider.getAppEngineWebXmlDirectoryPath(mavenModule).isPresent())
-                  .isTrue();
-              assertThat(directoryProvider.getAppEngineWebXmlDirectoryPath(mavenModule).get())
+              Optional<String> appEngineWebXmlDirectoryPath =
+                  directoryProvider.getAppEngineWebXmlDirectoryPath(mavenModule);
+
+              assertThat(appEngineWebXmlDirectoryPath.isPresent()).isTrue();
+              assertThat(appEngineWebXmlDirectoryPath.get())
                   .isEqualTo(baseModulePath + "/" + customWebDirPath + "/WEB-INF");
             });
   }
