@@ -17,17 +17,25 @@
 package com.google.cloud.tools.intellij.appengine.java.maven;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.MavenTestUtils;
 import com.google.cloud.tools.intellij.testing.TestFixture;
 import com.google.cloud.tools.intellij.testing.TestModule;
+import com.intellij.openapi.components.impl.ComponentManagerImpl;
 import com.intellij.openapi.module.Module;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import java.util.Optional;
+import org.jdom.Element;
+import org.jetbrains.idea.maven.project.MavenProject;
+import org.jetbrains.idea.maven.project.MavenProjectsManager;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
 
 /** Tests for {@link MavenAppEngineWebXmlDirectoryProvider}. */
 public class MavenAppEngineWebXmlDirectoryProviderTest {
@@ -36,6 +44,10 @@ public class MavenAppEngineWebXmlDirectoryProviderTest {
   @TestFixture private IdeaProjectTestFixture testFixture;
 
   private @TestModule Module module;
+
+  @Mock private MavenProjectsManager mavenProjectsManager;
+  @Mock private MavenProject mavenProject;
+  @Mock private Element warPluginDom;
 
   private MavenAppEngineWebXmlDirectoryProvider directoryProvider;
 
@@ -60,6 +72,31 @@ public class MavenAppEngineWebXmlDirectoryProviderTest {
                   .isTrue();
               assertThat(directoryProvider.getAppEngineWebXmlDirectoryPath(mavenModule).get())
                   .endsWith("/src/main/webapp/WEB-INF");
+            });
+  }
+
+  @Test
+  public void
+      getPath_withMavenProject_andRelativeWarSourceDirectory_returnsWarSourceDir_withBasePrefix() {
+    String customWebDirPath = "path/to/web/dir";
+    String baseModulePath = "/path/to/module";
+
+    ((ComponentManagerImpl) module)
+        .registerComponentInstance(MavenProjectsManager.class, mavenProjectsManager);
+    when(mavenProjectsManager.findProject(any(Module.class))).thenReturn(mavenProject);
+    when(mavenProjectsManager.isMavenizedModule(any(Module.class))).thenReturn(true);
+    when(mavenProject.getPluginConfiguration(anyString(), anyString())).thenReturn(warPluginDom);
+    when(mavenProject.getDirectory()).thenReturn(baseModulePath);
+    when(warPluginDom.getChildTextTrim("warSourceDirectory")).thenReturn(customWebDirPath);
+
+    MavenTestUtils.getInstance()
+        .runWithMavenModule(
+            testFixture.getProject(),
+            mavenModule -> {
+              assertThat(directoryProvider.getAppEngineWebXmlDirectoryPath(mavenModule).isPresent())
+                  .isTrue();
+              assertThat(directoryProvider.getAppEngineWebXmlDirectoryPath(mavenModule).get())
+                  .isEqualTo(baseModulePath + "/" + customWebDirPath + "/WEB-INF");
             });
   }
 }
