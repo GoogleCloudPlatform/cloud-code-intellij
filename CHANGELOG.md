@@ -4,11 +4,11 @@ This page documents production updates to Cloud Tools for IntelliJ. You can chec
 ## 18.7.1
 
 ### Added
-  - Users can now deploy Gradle based projects with Community Edition and the app-gradle-plugin. [2105](https://github.com/GoogleCloudPlatform/appengine-plugins-core/issues/2105)
-  - Environment variables needed for Google Cloud APIs are now added automatically to plain Java run configurations. [2148](https://github.com/GoogleCloudPlatform/appengine-plugins-core/issues/2148)
+  - Users can now deploy Gradle based projects with Community Edition and the app-gradle-plugin. [2105](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2105)
+  - Environment variables needed for Google Cloud APIs are now added automatically to plain Java run configurations. [2148](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2148)
 
 ### Fixed
-  - Fixed appengine-web.xml generation to work properly with Maven and Gradle based projects including spring-boot projects. [1948](https://github.com/GoogleCloudPlatform/appengine-plugins-core/issues/1948)
+  - Fixed appengine-web.xml generation to work properly with Maven and Gradle based projects including spring-boot projects. [1948](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/1948)
 
 ## 18.6.1
 
