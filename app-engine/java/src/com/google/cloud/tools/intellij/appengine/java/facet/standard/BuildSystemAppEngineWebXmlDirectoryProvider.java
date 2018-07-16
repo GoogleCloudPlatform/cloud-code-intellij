@@ -33,7 +33,8 @@ public interface BuildSystemAppEngineWebXmlDirectoryProvider {
   /**
    * Returns, optionally, the path to the appengine-web.xml directory for the given module.
    *
-   * <p>Will return {@link Optional#empty()} if module is not a Maven module.
+   * <p>Will return {@link Optional#empty()} if module is not applicable to the type of build system
+   * it represents.
    */
   Optional<String> getAppEngineWebXmlDirectoryPath(@NotNull Module module);
 }
