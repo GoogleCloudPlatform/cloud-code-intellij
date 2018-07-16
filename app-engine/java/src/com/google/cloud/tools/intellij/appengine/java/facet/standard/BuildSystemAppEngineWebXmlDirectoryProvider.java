@@ -30,6 +30,10 @@ public interface BuildSystemAppEngineWebXmlDirectoryProvider {
   ExtensionPointName<BuildSystemAppEngineWebXmlDirectoryProvider> EP_NAME =
       ExtensionPointName.create("com.google.gct.core.appEngineWebXmlDirectoryProvider");
 
-  /** Returns, optionally, the path to the appengine-web.xml directory for the given module. */
+  /**
+   * Returns, optionally, the path to the appengine-web.xml directory for the given module.
+   *
+   * <p>Will return {@link Optional#empty()} if module is not a Maven module.
+   */
   Optional<String> getAppEngineWebXmlDirectoryPath(@NotNull Module module);
 }
