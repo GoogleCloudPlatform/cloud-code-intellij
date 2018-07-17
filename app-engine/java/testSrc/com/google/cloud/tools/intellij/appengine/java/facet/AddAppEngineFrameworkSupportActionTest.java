@@ -57,7 +57,7 @@ public abstract class AddAppEngineFrameworkSupportActionTest extends PlatformTes
   }
 
   public void
-      testGetSuitableModules_returnsNonAppEngineModules_whenSomeModulesHaveAppEngineFacet() {
+      testGetSuitableModules_returnsAllAppEngineModules_whenSomeModulesHaveAppEngineFacet() {
     if (!PlatformUtils.isIdeaUltimate()) {
       return;
     }
@@ -83,7 +83,7 @@ public abstract class AddAppEngineFrameworkSupportActionTest extends PlatformTes
     }.execute();
 
     List<Module> suitableModules = getAction().getModulesWithoutAppEngineSupport(project);
-    assertEquals(1, suitableModules.size());
+    assertEquals(3, suitableModules.size());
     assertEquals("module1", suitableModules.get(0).getName());
   }
 }
