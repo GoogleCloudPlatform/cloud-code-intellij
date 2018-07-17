@@ -185,7 +185,7 @@ public class AppEngineStandardSupportProvider extends FrameworkSupportInModulePr
             AppEngineMessageBundle.message("appengine.generate.appenginewebxml.error.title"),
             null /* subtitle */,
             AppEngineMessageBundle.message("appengine.generate.appenginewebxml.error.message"),
-            NotificationType.WARNING);
+            NotificationType.ERROR);
     notification.notify(project);
   }
 
