@@ -63,7 +63,7 @@ public class AddAppEngineFlexibleFrameworkSupportToolsMenuActionTest
 
   @Override
   public void
-      testGetSuitableModules_returnsNonAppEngineModules_whenSomeModulesHaveAppEngineFacet() {
-    super.testGetSuitableModules_returnsNonAppEngineModules_whenSomeModulesHaveAppEngineFacet();
+      testGetSuitableModules_returnsAllAppEngineModules_whenSomeModulesHaveAppEngineFacet() {
+    super.testGetSuitableModules_returnsAllAppEngineModules_whenSomeModulesHaveAppEngineFacet();
   }
 }
