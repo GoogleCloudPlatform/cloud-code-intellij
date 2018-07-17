@@ -50,6 +50,7 @@ public class AppEngineGradleProjectDataServiceTest {
 
   private static final String GRADLE_BUILD_DIR = "/path/to/build/dir";
   private static final String GRADLE_MODULE_DIR = "/path/to/module";
+  private static final String GRADLE_WEB_APP_DIR = "/path/to/webapp";
 
   @TestModule private Module module;
 
@@ -71,13 +72,13 @@ public class AppEngineGradleProjectDataServiceTest {
   }
 
   @Test
-  public void importData_withAppEngineGradleModel_andNoGradlePlugin_doesNotSaveGradleData() {
+  public void importData_withAppEngineGradleModel_andNoGradlePlugin_savesGradleData() {
     System.setProperty(PlatformUtils.PLATFORM_PREFIX_KEY, PlatformUtils.IDEA_CE_PREFIX);
 
     createModelAndImportData(false /*hasPlugin*/);
 
-    assertThat(gradleModuleComponent.getGradleBuildDir().isPresent()).isFalse();
-    assertThat(gradleModuleComponent.getGradleModuleDir().isPresent()).isFalse();
+    assertThat(gradleModuleComponent.getGradleBuildDir().isPresent()).isTrue();
+    assertThat(gradleModuleComponent.getGradleModuleDir().isPresent()).isTrue();
   }
 
   @Test
@@ -93,7 +94,7 @@ public class AppEngineGradleProjectDataServiceTest {
   private void createModelAndImportData(boolean hasAppEngineGradlePlugin) {
     AppEngineGradleModel model =
         new DefaultAppEngineGradleModel(
-            hasAppEngineGradlePlugin, GRADLE_BUILD_DIR, GRADLE_MODULE_DIR);
+            hasAppEngineGradlePlugin, GRADLE_BUILD_DIR, GRADLE_MODULE_DIR, GRADLE_WEB_APP_DIR);
     AppEngineGradleModule appEngineGradleModule =
         new AppEngineGradleModule(module.getName(), model);
 

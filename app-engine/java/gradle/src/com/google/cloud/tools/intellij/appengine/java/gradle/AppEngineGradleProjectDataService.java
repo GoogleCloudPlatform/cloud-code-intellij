@@ -43,8 +43,8 @@ public class AppEngineGradleProjectDataService
       Key.create(AppEngineGradleModule.class, 100 /* Use a high processing weight */);
 
   /**
-   * Sets the Gradle directory on the {@link AppEngineStandardGradleModuleComponent} if the module
-   * has the App Engine Gradle plugin.
+   * Sets the Gradle directory on the {@link AppEngineStandardGradleModuleComponent} and other
+   * Gradle model info.
    */
   @Override
   public void importData(
@@ -63,15 +63,17 @@ public class AppEngineGradleProjectDataService
         .forEach(
             module -> {
               AppEngineGradleModule appEngineGradleModule = moduleNameToModel.get(module.getName());
-              if (PlatformUtils.isIdeaCommunity()
-                  && appEngineGradleModule.getModel().hasAppEngineGradlePlugin()) {
+              if (PlatformUtils.isIdeaCommunity()) {
                 AppEngineStandardGradleModuleComponent gradleModuleComponent =
                     AppEngineStandardGradleModuleComponent.getInstance(module);
 
+                gradleModuleComponent.setHasAppGradlePlugin(
+                    appEngineGradleModule.getModel().hasAppEngineGradlePlugin());
                 gradleModuleComponent.setGradleBuildDir(
                     appEngineGradleModule.getModel().gradleBuildDir());
                 gradleModuleComponent.setGradleModuleDir(
                     appEngineGradleModule.getModel().gradleModuleDir());
+                gradleModuleComponent.setWebAppDir(appEngineGradleModule.getModel().webAppDir());
               }
             });
   }

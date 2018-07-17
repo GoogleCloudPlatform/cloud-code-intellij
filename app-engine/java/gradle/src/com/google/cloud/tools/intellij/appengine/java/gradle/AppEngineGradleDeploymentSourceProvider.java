@@ -62,6 +62,7 @@ public class AppEngineGradleDeploymentSourceProvider implements AppEngineDeploym
             module -> {
               if (projectService.isGradleModule(module)
                   && AppEngineStandardFacet.hasFacet(module)
+                  && AppEngineStandardGradleModuleComponent.getInstance(module).hasAppGradlePlugin()
                   && AppEngineStandardGradleModuleComponent.getInstance(module)
                       .getGradleBuildDir()
                       .isPresent()) {

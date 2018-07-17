@@ -24,12 +24,17 @@ public class DefaultAppEngineGradleModel implements AppEngineGradleModel, Serial
   private final boolean hasAppEngineGradlePlugin;
   private final String gradleBuildDir;
   private final String gradleModuleDir;
+  private final String webAppDir;
 
   DefaultAppEngineGradleModel(
-      boolean hasAppEngineGradlePlugin, String gradleBuildDir, String gradleModuleDir) {
+      boolean hasAppEngineGradlePlugin,
+      String gradleBuildDir,
+      String gradleModuleDir,
+      String webAppDir) {
     this.hasAppEngineGradlePlugin = hasAppEngineGradlePlugin;
     this.gradleBuildDir = gradleBuildDir;
     this.gradleModuleDir = gradleModuleDir;
+    this.webAppDir = webAppDir;
   }
 
   @Override
@@ -45,5 +50,10 @@ public class DefaultAppEngineGradleModel implements AppEngineGradleModel, Serial
   @Override
   public String gradleModuleDir() {
     return gradleModuleDir;
+  }
+
+  @Override
+  public String webAppDir() {
+    return webAppDir;
   }
 }
