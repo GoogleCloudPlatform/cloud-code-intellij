@@ -63,7 +63,6 @@ import com.intellij.packaging.artifacts.ArtifactType;
 import com.intellij.packaging.elements.ArtifactRootElement;
 import com.intellij.packaging.elements.PackagingElementFactory;
 import com.intellij.packaging.impl.artifacts.ArtifactUtil;
-import com.intellij.util.PlatformUtils;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -100,11 +99,7 @@ public class AppEngineStandardSupportProvider extends FrameworkSupportInModulePr
 
   @Override
   public boolean isEnabledForModuleType(@NotNull ModuleType moduleType) {
-    if (PlatformUtils.isIdeaUltimate()) {
-      return moduleType instanceof JavaModuleType;
-    } else {
-      return false;
-    }
+    return moduleType instanceof JavaModuleType;
   }
 
   @Override
