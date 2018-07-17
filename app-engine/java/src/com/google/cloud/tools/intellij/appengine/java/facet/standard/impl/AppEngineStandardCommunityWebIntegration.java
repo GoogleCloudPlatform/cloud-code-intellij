@@ -17,9 +17,11 @@
 package com.google.cloud.tools.intellij.appengine.java.facet.standard.impl;
 
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardWebIntegration;
+import com.google.cloud.tools.intellij.appengine.java.facet.standard.BuildSystemAppEngineWebXmlDirectoryProvider;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
 import com.intellij.ide.util.frameworkSupport.FrameworkRole;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModifiableRootModel;
@@ -36,6 +38,7 @@ import com.intellij.util.ArrayUtil;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,14 +48,39 @@ public class AppEngineStandardCommunityWebIntegration extends AppEngineStandardW
   private static final Logger LOG =
       Logger.getInstance(AppEngineStandardCommunityWebIntegration.class);
 
+  private static final String DEFAULT_NATIVE_WEB_DIR_NAME = "web";
+
   @Nullable
   @Override
   public VirtualFile suggestParentDirectoryForAppEngineWebXml(
       @NotNull Module module, @NotNull ModifiableRootModel rootModel) {
-    final VirtualFile root = ArrayUtil.getFirstElement(rootModel.getContentRoots());
+    BuildSystemAppEngineWebXmlDirectoryProvider[] appEngineWebXmlDirectoryProviders =
+        Extensions.getExtensions(BuildSystemAppEngineWebXmlDirectoryProvider.EP_NAME);
+
+    // Finds any (one only one) registered appengine-web.xml directory provider extension and uses
+    // this to fetch the path to the appengine-web.xml directory. If multiple are registered (i.e.
+    // there are multiple build systems in use), then one will be selected arbitrarily.
+    for (BuildSystemAppEngineWebXmlDirectoryProvider provider : appEngineWebXmlDirectoryProviders) {
+      Optional<String> pathOptional = provider.getAppEngineWebXmlDirectoryPath(module);
+
+      if (pathOptional.isPresent()) {
+        try {
+          return VfsUtil.createDirectoryIfMissing(pathOptional.get());
+        } catch (IOException ioe) {
+          LOG.warn(
+              "Exception attempting to create appengine-web.xml in location specified by build-aware extension",
+              ioe);
+        }
+      }
+    }
+
+    // Build-aware strategies failed or missing, fall back to simple native approach and use the
+    // default IDEA web project structure
+    VirtualFile root = ArrayUtil.getFirstElement(rootModel.getContentRoots());
     if (root != null) {
       try {
-        return VfsUtil.createDirectoryIfMissing(root, "WEB-INF");
+        return VfsUtil.createDirectoryIfMissing(
+            root, String.format("%s/WEB-INF", DEFAULT_NATIVE_WEB_DIR_NAME));
       } catch (IOException ioe) {
         LOG.info(ioe);
         return null;
