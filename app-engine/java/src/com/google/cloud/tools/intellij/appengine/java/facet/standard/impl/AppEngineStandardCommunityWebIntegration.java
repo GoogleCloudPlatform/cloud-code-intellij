@@ -48,6 +48,8 @@ public class AppEngineStandardCommunityWebIntegration extends AppEngineStandardW
   private static final Logger LOG =
       Logger.getInstance(AppEngineStandardCommunityWebIntegration.class);
 
+  private static final String DEFAULT_NATIVE_WEB_DIR_NAME = "web";
+
   @Nullable
   @Override
   public VirtualFile suggestParentDirectoryForAppEngineWebXml(
@@ -68,11 +70,13 @@ public class AppEngineStandardCommunityWebIntegration extends AppEngineStandardW
       }
     }
 
-    // Build-aware strategies failed or missing, fall back to simple native approach
+    // Build-aware strategies failed or missing, fall back to simple native approach and use the
+    // default IDEA web project structure
     VirtualFile root = ArrayUtil.getFirstElement(rootModel.getContentRoots());
     if (root != null) {
       try {
-        return VfsUtil.createDirectoryIfMissing(root, "web/WEB-INF");
+        return VfsUtil.createDirectoryIfMissing(
+            root, String.format("%s/WEB-INF", DEFAULT_NATIVE_WEB_DIR_NAME));
       } catch (IOException ioe) {
         LOG.info(ioe);
         return null;
