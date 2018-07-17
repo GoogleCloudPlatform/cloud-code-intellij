@@ -56,6 +56,10 @@ public class AppEngineStandardCommunityWebIntegration extends AppEngineStandardW
       @NotNull Module module, @NotNull ModifiableRootModel rootModel) {
     BuildSystemAppEngineWebXmlDirectoryProvider[] appEngineWebXmlDirectoryProviders =
         Extensions.getExtensions(BuildSystemAppEngineWebXmlDirectoryProvider.EP_NAME);
+
+    // Finds any (one only one) registered appengine-web.xml directory provider extension and uses
+    // this to fetch the path to the appengine-web.xml directory. If multiple are registered (i.e.
+    // there are multiple build systems in use), then one will be selected arbitrarily.
     for (BuildSystemAppEngineWebXmlDirectoryProvider provider : appEngineWebXmlDirectoryProviders) {
       Optional<String> pathOptional = provider.getAppEngineWebXmlDirectoryPath(module);
 
