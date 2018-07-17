@@ -133,6 +133,7 @@ public class AppEngineGradleDeploymentSourceProviderTest {
   private void initForGradleSources() {
     addGradleBuildDir();
     addAppEngineStandardFacet();
+    addAppGradlePlugin();
     enableGradle();
   }
 
@@ -143,6 +144,10 @@ public class AppEngineGradleDeploymentSourceProviderTest {
 
   private void addAppEngineStandardFacet() {
     ModuleTestUtils.addFacet(module, AppEngineStandardFacetType.ID);
+  }
+
+  private void addAppGradlePlugin() {
+    AppEngineStandardGradleModuleComponent.getInstance(module).setHasAppGradlePlugin(true);
   }
 
   private void enableGradle() {
