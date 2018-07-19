@@ -29,5 +29,8 @@
 
         <appEngineStandardLibraryManager
                 implementation="com.google.cloud.tools.intellij.appengine.java.maven.AppEngineStandardMavenLibraryManager"/>
+
+        <appEngineWebXmlDirectoryProvider
+                implementation="com.google.cloud.tools.intellij.appengine.java.maven.MavenAppEngineWebXmlDirectoryProvider"/>
     </extensions>
 </idea-plugin>

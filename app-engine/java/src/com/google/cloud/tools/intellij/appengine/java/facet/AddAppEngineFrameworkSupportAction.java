@@ -18,7 +18,6 @@ package com.google.cloud.tools.intellij.appengine.java.facet;
 
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.common.annotations.VisibleForTesting;
-import com.intellij.facet.impl.DefaultFacetsProvider;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleConfigurable;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -126,12 +125,8 @@ public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
   List<Module> getModulesWithoutAppEngineSupport(Project project) {
     List<Module> suitableModules =
         new ArrayList<>(Arrays.asList(ModuleManager.getInstance(project).getModules()));
-    DefaultFacetsProvider facetsProvider = new DefaultFacetsProvider();
     FrameworkSupportInModuleProvider provider = getModuleProvider();
-    suitableModules.removeIf(
-        module ->
-            !provider.isEnabledForModuleType(ModuleType.get(module))
-                || provider.isSupportAlreadyAdded(module, facetsProvider));
+    suitableModules.removeIf(module -> !provider.isEnabledForModuleType(ModuleType.get(module)));
     return suitableModules;
   }
 }

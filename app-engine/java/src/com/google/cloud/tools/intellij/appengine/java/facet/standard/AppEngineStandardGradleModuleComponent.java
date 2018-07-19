@@ -30,11 +30,21 @@ public class AppEngineStandardGradleModuleComponent
     implements ModuleComponent, PersistentStateComponent<AppEngineStandardGradleModuleComponent> {
   static final String COMPONENT_NAME = "AppEngineStandardGradleModuleComponent";
 
+  public boolean hasAppGradlePlugin;
   public String gradleBuildDir;
   public String gradleModuleDir;
+  public String webAppDir;
 
   public static AppEngineStandardGradleModuleComponent getInstance(@NotNull Module module) {
     return module.getComponent(AppEngineStandardGradleModuleComponent.class);
+  }
+
+  public boolean hasAppGradlePlugin() {
+    return hasAppGradlePlugin;
+  }
+
+  public void setHasAppGradlePlugin(boolean hasAppGradlePlugin) {
+    this.hasAppGradlePlugin = hasAppGradlePlugin;
   }
 
   /** Returns, optionally, the path to the Gradle build directory. */
@@ -57,6 +67,16 @@ public class AppEngineStandardGradleModuleComponent
     this.gradleModuleDir = gradleModuleDir;
   }
 
+  /** Returns, optionally, the path to the Gradle web application directory. */
+  public Optional<String> getWebAppDir() {
+    return Optional.ofNullable(webAppDir);
+  }
+
+  /** Sets the path to the Gradle web application directory. */
+  public void setWebAppDir(String webAppDir) {
+    this.webAppDir = webAppDir;
+  }
+
   @Nullable
   @Override
   public AppEngineStandardGradleModuleComponent getState() {
@@ -65,7 +85,9 @@ public class AppEngineStandardGradleModuleComponent
 
   @Override
   public void loadState(@NotNull AppEngineStandardGradleModuleComponent state) {
+    hasAppGradlePlugin = state.hasAppGradlePlugin;
     gradleBuildDir = state.gradleBuildDir;
     gradleModuleDir = state.gradleModuleDir;
+    webAppDir = state.webAppDir;
   }
 }

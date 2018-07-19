@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.java.gradle;
 
+import org.jetbrains.annotations.Nullable;
+
 /** Model containing information obtained from the Gradle integration. */
 public interface AppEngineGradleModel {
 
@@ -29,8 +31,14 @@ public interface AppEngineGradleModel {
    * Returns the path to the Gradle build directory where the Gradle build output and artifacts
    * live.
    */
+  @Nullable
   String gradleBuildDir();
 
-  /** Returns the path to the root of the Gradle module */
+  /** Returns the path to the root of the Gradle module. */
+  @Nullable
   String gradleModuleDir();
+
+  /** Returns the path to the web application directory. */
+  @Nullable
+  String webAppDir();
 }

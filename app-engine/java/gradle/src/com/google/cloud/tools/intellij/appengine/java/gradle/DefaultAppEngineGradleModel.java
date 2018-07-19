@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.java.gradle;
 
 import java.io.Serializable;
+import org.jetbrains.annotations.Nullable;
 
 /** Default implementation of {@link AppEngineGradleModel}. */
 public class DefaultAppEngineGradleModel implements AppEngineGradleModel, Serializable {
@@ -24,12 +25,17 @@ public class DefaultAppEngineGradleModel implements AppEngineGradleModel, Serial
   private final boolean hasAppEngineGradlePlugin;
   private final String gradleBuildDir;
   private final String gradleModuleDir;
+  private final String webAppDir;
 
   DefaultAppEngineGradleModel(
-      boolean hasAppEngineGradlePlugin, String gradleBuildDir, String gradleModuleDir) {
+      boolean hasAppEngineGradlePlugin,
+      String gradleBuildDir,
+      String gradleModuleDir,
+      String webAppDir) {
     this.hasAppEngineGradlePlugin = hasAppEngineGradlePlugin;
     this.gradleBuildDir = gradleBuildDir;
     this.gradleModuleDir = gradleModuleDir;
+    this.webAppDir = webAppDir;
   }
 
   @Override
@@ -37,13 +43,21 @@ public class DefaultAppEngineGradleModel implements AppEngineGradleModel, Serial
     return hasAppEngineGradlePlugin;
   }
 
+  @Nullable
   @Override
   public String gradleBuildDir() {
     return gradleBuildDir;
   }
 
+  @Nullable
   @Override
   public String gradleModuleDir() {
     return gradleModuleDir;
+  }
+
+  @Nullable
+  @Override
+  public String webAppDir() {
+    return webAppDir;
   }
 }
