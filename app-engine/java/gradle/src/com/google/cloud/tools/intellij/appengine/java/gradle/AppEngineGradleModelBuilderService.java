@@ -41,7 +41,7 @@ public class AppEngineGradleModelBuilderService implements ModelBuilderService {
 
     if (hasWarPlugin) {
       webAppDir =
-          project.hasProperty(GRADLE_WEB_APP_DIR_PROPERTY_NAME)
+          project.property(GRADLE_WEB_APP_DIR_PROPERTY_NAME) != null
               ? String.valueOf(project.property(GRADLE_WEB_APP_DIR_PROPERTY_NAME))
               : null;
     }
