@@ -67,7 +67,7 @@ public class MavenAppEngineWebXmlDirectoryProvider
       warSourceDirectory = MAVEN_WAR_DEFAULT_DIR;
     }
 
-    if (!FileUtil.isAbsolute(warSourceDirectory)) {
+    if (!FileUtil.isAbsolutePlatformIndependent(warSourceDirectory)) {
       warSourceDirectory = mavenProject.getDirectory() + '/' + warSourceDirectory;
     }
 

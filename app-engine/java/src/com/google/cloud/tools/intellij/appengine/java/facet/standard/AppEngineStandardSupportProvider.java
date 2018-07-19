@@ -16,10 +16,13 @@
 
 package com.google.cloud.tools.intellij.appengine.java.facet.standard;
 
+import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.facet.flexible.AppEngineFlexibleFacetType;
 import com.google.cloud.tools.intellij.appengine.java.util.AppEngineUtil;
+import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetType;
@@ -31,6 +34,10 @@ import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModelListener;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportProvider;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationDisplayType;
+import com.intellij.notification.NotificationGroup;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.application.Result;
@@ -39,6 +46,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModifiableModelsProvider;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ModuleRootManager;
@@ -69,6 +77,14 @@ public class AppEngineStandardSupportProvider extends FrameworkSupportInModulePr
 
   private static final Logger LOG =
       Logger.getInstance("#com.intellij.appengine.facet.AppEngineStandardSupportProvider");
+
+  private static final NotificationGroup NOTIFICATION_GROUP =
+      new NotificationGroup(
+          new PropertiesFileFlagReader().getFlagString("notifications.plugin.groupdisplayid"),
+          NotificationDisplayType.BALLOON.BALLOON,
+          true,
+          null,
+          GoogleCloudCoreIcons.CLOUD);
 
   @NotNull
   @Override
@@ -123,8 +139,15 @@ public class AppEngineStandardSupportProvider extends FrameworkSupportInModulePr
       Set<AppEngineStandardMavenLibrary> librariesToAdd) {
     FacetType<AppEngineStandardFacet, AppEngineStandardFacetConfiguration> facetType =
         AppEngineStandardFacet.getFacetType();
+
     AppEngineStandardFacet appEngineStandardFacet =
-        FacetManager.getInstance(module).addFacet(facetType, facetType.getDefaultFacetName(), null);
+        AppEngineStandardFacet.getAppEngineFacetByModule(module);
+    if (appEngineStandardFacet == null) {
+      appEngineStandardFacet =
+          FacetManager.getInstance(module)
+              .addFacet(facetType, facetType.getDefaultFacetName(), null);
+    }
+
     AppEngineStandardWebIntegration webIntegration = AppEngineStandardWebIntegration.getInstance();
     webIntegration.registerFrameworkInModel(frameworkSupportModel, appEngineStandardFacet);
     final Artifact webArtifact = findOrCreateWebArtifact(appEngineStandardFacet);
@@ -139,12 +162,26 @@ public class AppEngineStandardSupportProvider extends FrameworkSupportInModulePr
               AppEngineUtil.APP_ENGINE_WEB_XML_NAME);
       if (descriptor != null) {
         webIntegration.addDescriptor(webArtifact, module.getProject(), descriptor);
+      } else {
+        notifyAppEngineWebXmlCreationError(module.getProject());
       }
+    } else {
+      notifyAppEngineWebXmlCreationError(module.getProject());
     }
 
     webIntegration.addDevServerToModuleDependencies(rootModel);
 
     addMavenLibraries(librariesToAdd, module, rootModel, webArtifact);
+  }
+
+  private void notifyAppEngineWebXmlCreationError(Project project) {
+    Notification notification =
+        NOTIFICATION_GROUP.createNotification(
+            AppEngineMessageBundle.message("appengine.generate.appenginewebxml.error.title"),
+            null /* subtitle */,
+            AppEngineMessageBundle.message("appengine.generate.appenginewebxml.error.message"),
+            NotificationType.ERROR);
+    notification.notify(project);
   }
 
   @NotNull

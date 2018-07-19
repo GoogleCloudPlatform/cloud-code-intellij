@@ -23,16 +23,23 @@ import com.google.cloud.tools.appengine.cloudsdk.LocalRun;
 import com.google.cloud.tools.appengine.cloudsdk.process.LegacyProcessHandler;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessHandler;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessStartListener;
+import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
+import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkService;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkServiceUserSettings;
 import com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkVersionNotifier;
+import com.google.cloud.tools.intellij.flags.PropertiesFileFlagReader;
 import com.google.common.base.Strings;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationDisplayType;
+import com.intellij.notification.NotificationGroup;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.projectRoots.Sdk;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
-import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,6 +47,14 @@ import org.jetbrains.annotations.Nullable;
 public class AppEngineStandardRunTask extends AppEngineTask {
 
   private static final Logger logger = Logger.getInstance(AppEngineStandardRunTask.class);
+
+  private static final NotificationGroup NOTIFICATION_GROUP =
+      new NotificationGroup(
+          new PropertiesFileFlagReader().getFlagString("notifications.plugin.groupdisplayid"),
+          NotificationDisplayType.BALLOON,
+          true,
+          null,
+          GoogleCloudCoreIcons.CLOUD);
 
   private RunConfiguration runConfig;
   private Sdk javaSdk;
@@ -88,15 +103,19 @@ public class AppEngineStandardRunTask extends AppEngineTask {
               CloudSdkServiceUserSettings.getInstance().getUserSelectedSdkServiceType().name())
           .ping();
     } catch (AppEngineException aee) {
-      // TODO(eshaul) replace this with more general exception formatting mechanism
-      // for now, this reports only the stacktrace portion of this exception
-      String[] stacktrace =
-          Stream.of(aee.getStackTrace()).map(StackTraceElement::toString).toArray(String[]::new);
-      Class causeClass = aee.getCause() == null ? null : aee.getCause().getClass();
-
-      logger.error(
-          String.format("AppEngineException during local run with cause %s", causeClass),
-          stacktrace);
+      if (aee.getCause() instanceof NoSuchFileException) {
+        Notification notification =
+            NOTIFICATION_GROUP.createNotification(
+                AppEngineMessageBundle.message("appengine.run.nosuchfileexception.title"),
+                null /* subtitle */,
+                AppEngineMessageBundle.message("appengine.run.nosuchfileexception.message"),
+                NotificationType.ERROR);
+        notification.notify(null /* project */);
+        logger.warn(
+            "FileNotFoundException during local run. Check for missing appengine-web.xml file.");
+      } else {
+        logger.error(aee);
+      }
     } catch (Exception ex) {
       logger.error(ex);
     }

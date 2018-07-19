@@ -49,7 +49,7 @@ public class GradleAppEngineWebXmlDirectoryProvider
       gradleWebAppDir = GRADLE_WEBAPP_DEFAULT_DIR;
     }
 
-    if (!FileUtil.isAbsolute(gradleWebAppDir)
+    if (!FileUtil.isAbsolutePlatformIndependent(gradleWebAppDir)
         && gradleModuleComponent.getGradleModuleDir().isPresent()) {
       gradleWebAppDir = gradleModuleComponent.gradleModuleDir + '/' + gradleWebAppDir;
     }
