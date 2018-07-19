@@ -243,7 +243,6 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
       return null;
     }
 
-    // TODO test that "/" check works in Windows
     Optional<String> rootPath =
         webRoots
             .stream()
