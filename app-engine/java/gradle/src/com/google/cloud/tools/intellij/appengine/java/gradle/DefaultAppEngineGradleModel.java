@@ -17,6 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.java.gradle;
 
 import java.io.Serializable;
+import org.jetbrains.annotations.Nullable;
 
 /** Default implementation of {@link AppEngineGradleModel}. */
 public class DefaultAppEngineGradleModel implements AppEngineGradleModel, Serializable {
@@ -42,16 +43,19 @@ public class DefaultAppEngineGradleModel implements AppEngineGradleModel, Serial
     return hasAppEngineGradlePlugin;
   }
 
+  @Nullable
   @Override
   public String gradleBuildDir() {
     return gradleBuildDir;
   }
 
+  @Nullable
   @Override
   public String gradleModuleDir() {
     return gradleModuleDir;
   }
 
+  @Nullable
   @Override
   public String webAppDir() {
     return webAppDir;
