@@ -134,6 +134,22 @@ public class AppEngineStandardUltimateWebIntegrationTest {
   }
 
   @Test
+  public void testSuggestParentDirectory_withWebRootEndingWithWebInf_returnsWebInfDir() {
+    when(mockWebRoot.getFile()).thenReturn(null);
+    when(mockWebRoot.getPresentableUrl()).thenReturn(testWebInf.getAbsolutePath());
+
+    VirtualFile suggestedDirectory =
+        webIntegration.suggestParentDirectoryForAppEngineWebXml(
+            mockModule, mockModifiableRootModel);
+
+    assertThat(
+            new File(suggestedDirectory.getPath())
+                .getAbsolutePath()
+                .endsWith(testWebInf.getAbsolutePath()))
+        .isTrue();
+  }
+
+  @Test
   public void testSuggestParentDirectory_withInvalidWebRoot_andNoWebRootPath_returnsNull() {
     when(mockWebRoot.getFile()).thenReturn(null);
     when(mockWebRoot.getPresentableUrl()).thenReturn(null);

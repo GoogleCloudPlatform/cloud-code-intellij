@@ -121,19 +121,27 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
     }
 
     try {
-      Optional<VirtualFile> webRootDir =
+      Optional<VirtualFile> webRootDirOptional =
           webRoots.stream().map(WebRoot::getFile).filter(Objects::nonNull).findFirst();
 
-      if (!webRootDir.isPresent()) {
-        // There is at least one web-root path, but none that exist, select the first and create it
-        String presentableUrl = webRoots.get(0).getPresentableUrl();
+      if (!webRootDirOptional.isPresent()) {
+        // There is at least one web-root path, but none that exist, find a suitable one and create
+        // it
+        String presentableUrl = findWebRootPath(webRoots);
         if (presentableUrl != null) {
-          webRootDir = Optional.ofNullable(VfsUtil.createDirectories(presentableUrl));
+          webRootDirOptional = Optional.ofNullable(VfsUtil.createDirectories(presentableUrl));
         }
       }
 
-      if (webRootDir.isPresent()) {
-        return VfsUtil.createDirectoryIfMissing(webRootDir.get(), WEB_INF);
+      if (webRootDirOptional.isPresent()) {
+        VirtualFile webRootDir = webRootDirOptional.get();
+
+        // If the webroot's leaf directory is already WEB-INF, no need to create it
+        if (WEB_INF.equals(webRootDir.getName())) {
+          return webRootDir;
+        }
+
+        return VfsUtil.createDirectoryIfMissing(webRootDir, WEB_INF);
       }
     } catch (IOException ioe) {
       LOG.warn(ioe);
@@ -218,6 +226,33 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
   @Override
   public void setupDevServer() {
     getOrCreateAppServer();
+  }
+
+  /**
+   * Given a non-empty list of {@link WebRoot} tries to locate a "suitable" one and returns its
+   * path.
+   *
+   * <p>First attempts to find a web root with a root relative path to the deployment root, i.e.
+   * "/".
+   *
+   * <p>If none exist with a root relative path, simply grab the first web root and return its path.
+   */
+  @Nullable
+  private String findWebRootPath(List<WebRoot> webRoots) {
+    if (webRoots.isEmpty()) {
+      return null;
+    }
+
+    Optional<String> rootPath =
+        webRoots
+            .stream()
+            .filter(
+                webRoot ->
+                    webRoot.getRelativePath() == null || "/".equals(webRoot.getRelativePath()))
+            .findAny()
+            .map(WebRoot::getPresentableUrl);
+
+    return rootPath.orElseGet(() -> webRoots.get(0).getPresentableUrl());
   }
 
   private static ApplicationServer getOrCreateAppServer() {
