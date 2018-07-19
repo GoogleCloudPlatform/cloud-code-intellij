@@ -26,6 +26,7 @@ public class AppEngineGradleModelBuilderService implements ModelBuilderService {
 
   private static final String APP_GRADLE_PLUGIN_ID = "com.google.cloud.tools.appengine";
   private static final String GRADLE_WEB_APP_DIR_PROPERTY_NAME = "webAppDirName";
+  private static final String GRADLE_WAR_PLUGIN_ID = "war";
 
   @Override
   public boolean canBuild(String modelName) {
@@ -35,7 +36,7 @@ public class AppEngineGradleModelBuilderService implements ModelBuilderService {
   @Override
   public Object buildAll(String modelName, Project project) {
     boolean hasAppEngineGradlePlugin = project.getPlugins().hasPlugin(APP_GRADLE_PLUGIN_ID);
-    boolean hasWarPlugin = project.getPlugins().hasPlugin("war");
+    boolean hasWarPlugin = project.getPlugins().hasPlugin(GRADLE_WAR_PLUGIN_ID);
     String webAppDir = null;
 
     if (hasWarPlugin) {
