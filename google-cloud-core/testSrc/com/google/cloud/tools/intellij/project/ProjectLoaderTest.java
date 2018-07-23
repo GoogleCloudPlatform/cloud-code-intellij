@@ -112,6 +112,23 @@ public class ProjectLoaderTest {
   }
 
   @Test
+  public void loadUserProjects_keeps_projectsWithSameName() {
+    // two projects with the same name, different IDs.
+    Project project1 = new Project();
+    String sameProjectName = "project";
+    project1.setName(sameProjectName);
+    project1.setProjectId("GCP ID 1");
+    Project project2 = new Project();
+    project2.setName(sameProjectName);
+    project2.setProjectId("GCP ID 2");
+    mockListProjectsResponse(Arrays.asList(project1, project2));
+
+    projectLoader.loadUserProjectsInBackground(mockUser);
+
+    verify(mockFutureCallback).onSuccess(Arrays.asList(project1, project2));
+  }
+
+  @Test
   public void deletedProjects_filteredFromResult() {
     List<Project> projects = Arrays.asList(testProject1, testProject2);
     testProject1.setLifecycleState("DELETE_REQUESTED");
