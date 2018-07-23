@@ -49,7 +49,7 @@ public class AppEngineStandardCommunityWebIntegrationTest {
   }
 
   @Test
-  public void testSuggestParentDirectoryForAppEngineWebXml() {
+  public void testSuggestParentDirectory_withNoBuildExtensions_returnsDefaultNativePath() {
     Project project = testFixture.getProject();
     VirtualFile baseDir = project.getBaseDir();
     when(mockModifiableRootModel.getContentRoots()).thenReturn(new VirtualFile[] {baseDir});
@@ -67,6 +67,6 @@ public class AppEngineStandardCommunityWebIntegrationTest {
     assertTrue(resultObject instanceof VirtualFile);
     VirtualFile virtualFile = (VirtualFile) resultObject;
     assertTrue(virtualFile.exists());
-    assertEquals(virtualFile.getPath(), project.getBasePath() + "/WEB-INF");
+    assertEquals(virtualFile.getPath(), project.getBasePath() + "/web/WEB-INF");
   }
 }

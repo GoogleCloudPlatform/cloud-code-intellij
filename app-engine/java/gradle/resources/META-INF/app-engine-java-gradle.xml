@@ -38,5 +38,8 @@
 
         <appEngineStandardLibraryManager
                 implementation="com.google.cloud.tools.intellij.appengine.java.gradle.AppEngineStandardGradleLibraryManager"/>
+
+         <appEngineWebXmlDirectoryProvider
+                implementation="com.google.cloud.tools.intellij.appengine.java.gradle.GradleAppEngineWebXmlDirectoryProvider"/>
     </extensions>
 </idea-plugin>
