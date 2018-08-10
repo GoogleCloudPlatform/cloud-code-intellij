@@ -51,6 +51,13 @@ public class MavenCloudApiUiExtension implements CloudApiUiExtension {
 
   private CloudLibrary currentCloudLibrary;
 
+  /**
+   * Injects custom extension UI components when base Cloud API UI is constructed and ready. Inserts
+   * Maven specific BOM components below standard module selector - BOM selector label under module
+   * label, and BOM versions combo box under module combo box. See {@link
+   * CloudApiUiExtension.EXTENSION_UI_COMPONENT_LOCATION}.
+   */
+  @NotNull
   @Override
   public Map<EXTENSION_UI_COMPONENT_LOCATION, JComponent> createCustomUiComponents() {
     bomComboBox = new BomComboBox();

@@ -36,9 +36,9 @@ public interface CloudApiUiExtension {
 
   /** Possible locations for custom extension UI components. */
   enum EXTENSION_UI_COMPONENT_LOCATION {
-    // bottom line 1 under module label
+    /** bottom line 1 - under module label */
     BOTTOM_LINE_1,
-    // bottom line 2 under module combo box
+    /** bottom line 2 - under module combo box */
     BOTTOM_LINE_2
   }
 
@@ -46,6 +46,7 @@ public interface CloudApiUiExtension {
    * Called when add cloud libraries dialog is created and opened and base UI is ready. At this
    * point extension point is active and custom UI components can be injected.
    */
+  @NotNull
   Map<EXTENSION_UI_COMPONENT_LOCATION, JComponent> createCustomUiComponents();
 
   /**

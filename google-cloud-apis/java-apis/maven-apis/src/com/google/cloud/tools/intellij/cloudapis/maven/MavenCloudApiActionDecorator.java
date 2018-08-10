@@ -44,7 +44,7 @@ public class MavenCloudApiActionDecorator implements CloudApiActionDecoratorExte
     if (e.getProject() != null) {
       Set<CloudLibrariesModuleSupportType> moduleSupportTypes =
           Stream.of(ModuleManager.getInstance(e.getProject()).getModules())
-              .map(this::checkModuleForAddCloudLibraries)
+              .map(this::checkAddCloudLibrariesSupport)
               .collect(Collectors.toSet());
 
       addLibrariesEnabled = moduleSupportTypes.contains(CloudLibrariesModuleSupportType.SUPPORTED);
@@ -94,7 +94,7 @@ public class MavenCloudApiActionDecorator implements CloudApiActionDecoratorExte
     APPENGINE_JAVA8_REQUIRED
   }
 
-  private CloudLibrariesModuleSupportType checkModuleForAddCloudLibraries(Module module) {
+  private CloudLibrariesModuleSupportType checkAddCloudLibrariesSupport(Module module) {
     // AppEngine Standard + Java 7 are not supported for GCP Libraries
     if (AppEngineProjectService.getInstance().hasAppEngineStandardFacet(module)) {
       AppEngineStandardFacet appEngineStandardFacet =

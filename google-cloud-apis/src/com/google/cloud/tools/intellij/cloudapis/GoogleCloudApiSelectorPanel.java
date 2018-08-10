@@ -195,9 +195,6 @@ public final class GoogleCloudApiSelectorPanel {
       extensionComponentPanels.put(EXTENSION_UI_COMPONENT_LOCATION.BOTTOM_LINE_2, bottomComponent2);
     }
 
-    System.out.println("panesl: " + extensionComponentPanels);
-    System.out.println("components: " + extensionComponents);
-
     for (EXTENSION_UI_COMPONENT_LOCATION nextLocation : extensionComponentPanels.keySet()) {
       if (extensionComponents.containsKey(nextLocation)) {
         extensionComponentPanels.get(nextLocation).add(extensionComponents.get(nextLocation));
