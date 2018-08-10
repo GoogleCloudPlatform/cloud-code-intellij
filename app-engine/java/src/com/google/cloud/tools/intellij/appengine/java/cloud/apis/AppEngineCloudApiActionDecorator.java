@@ -41,19 +41,18 @@ public class AppEngineCloudApiActionDecorator implements CloudApiActionDecorator
     if (e.getProject() != null) {
       cloudApiLibrariesSupported =
           Stream.of(ModuleManager.getInstance(e.getProject()).getModules())
-              .map(this::checkAddCloudLibrariesSupport)
-              .anyMatch(supported -> true);
+              .anyMatch(this::checkAddCloudLibrariesSupport);
+    }
 
-      if (!cloudApiLibrariesSupported) {
-        // update message to hint what is missing.
-        e.getPresentation()
-            .setDescription(
-                AppEngineMessageBundle.message(
-                    "cloud.libraries.menu.action.gae.java8.required.description"));
-        e.getPresentation()
-            .setText(
-                AppEngineMessageBundle.message("cloud.libraries.menu.action.disabled.java8.text"));
-      }
+    if (!cloudApiLibrariesSupported) {
+      // update message to hint what is missing.
+      e.getPresentation()
+          .setDescription(
+              AppEngineMessageBundle.message(
+                  "cloud.libraries.menu.action.gae.java8.required.description"));
+      e.getPresentation()
+          .setText(
+              AppEngineMessageBundle.message("cloud.libraries.menu.action.disabled.java8.text"));
     } else {
       // standard message for a supported module action.
       e.getPresentation()
@@ -75,8 +74,9 @@ public class AppEngineCloudApiActionDecorator implements CloudApiActionDecorator
     if (AppEngineProjectService.getInstance().hasAppEngineStandardFacet(module)) {
       AppEngineStandardFacet appEngineStandardFacet =
           FacetManager.getInstance(module).getFacetByType(AppEngineStandardFacetType.ID);
-      if (!appEngineStandardFacet.getRuntimeJavaVersion().atLeast(JavaVersion.JAVA_1_8))
+      if (!appEngineStandardFacet.getRuntimeJavaVersion().atLeast(JavaVersion.JAVA_1_8)) {
         return false;
+      }
     }
 
     return true;
