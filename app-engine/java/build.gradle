@@ -29,6 +29,7 @@ dependencies {
     compile(project(':google-cloud-core'))
     compile(project(':stackdriver-debugger'))
     compile(project(':google-cloud-sdk'))
+    compile(project(':google-cloud-apis')) // to disable cloud APIs for Java 7 + AE
     compile 'com.google.apis:google-api-services-appengine:v1-rev8-1.22.0'
     compile ('com.google.cloud.tools:appengine-plugins-core:' + toolsLibVersion) {
         exclude group: 'com.google.guava', module: 'guava'

@@ -19,7 +19,6 @@ package com.google.cloud.tools.intellij.cloudapis;
 import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
-import java.util.stream.Stream;
 
 /**
  * The action in the Google Cloud Tools menu group that opens the wizard to add client libraries to
@@ -37,8 +36,13 @@ public final class AddCloudLibrariesAction extends DumbAwareAction {
   @Override
   @SuppressWarnings("MissingCasesInEnumSwitch")
   public void update(AnActionEvent e) {
-    Stream.of(CloudApiActionDecoratorExtension.EP_NAME.getExtensions())
-        .forEach(decorator -> decorator.decorate(e));
+    // iterate all available decorators and stop on first that decorated this action.
+    for (CloudApiActionDecoratorExtension decorator :
+        CloudApiActionDecoratorExtension.EP_NAME.getExtensions()) {
+      if (decorator.decorate(e)) {
+        break;
+      }
+    }
   }
 
   @Override

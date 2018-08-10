@@ -30,6 +30,9 @@ public interface CloudApiActionDecoratorExtension {
   /**
    * Called by core Cloud API UI to allow extensions to "decorate" default behaivor of Cloud API
    * action, which by default is always enabled. Called by IDE platform on each project change.
+   *
+   * @return true if action has been decorated and its state does not need any further changes.
+   *     false if this decorator did no decorations and other decorators may be applied.
    */
-  void decorate(AnActionEvent e);
+  boolean decorate(AnActionEvent e);
 }
