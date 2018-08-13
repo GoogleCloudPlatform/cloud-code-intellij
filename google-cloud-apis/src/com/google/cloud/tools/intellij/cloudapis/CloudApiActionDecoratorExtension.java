@@ -28,7 +28,7 @@ public interface CloudApiActionDecoratorExtension {
       new ExtensionPointName<>("com.google.gct.cloudapis.cloudApiActionDecorator");
 
   /**
-   * Called by core Cloud API UI to allow extensions to "decorate" default behaivor of Cloud API
+   * Called by core Cloud API UI to allow extensions to "decorate" default behavior of Cloud API
    * action, which by default is always enabled. Called by IDE platform on each project change.
    *
    * @return true if action has been decorated and its state does not need any further changes.

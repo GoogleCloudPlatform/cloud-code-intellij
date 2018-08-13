@@ -35,6 +35,13 @@ import org.apache.commons.lang3.JavaVersion;
  */
 public class AppEngineCloudApiActionDecorator implements CloudApiActionDecoratorExtension {
 
+  /**
+   * Checks if current project module(s) are App Engine + Java 7 combination which does not support
+   * cloud APIs and disables the Cloud API action if so.
+   *
+   * @return true if action must be disabled and prevented for this project and other decorators do
+   *     not apply anymore.
+   */
   @Override
   public boolean decorate(AnActionEvent e) {
     boolean cloudApiLibrariesSupported = true;
