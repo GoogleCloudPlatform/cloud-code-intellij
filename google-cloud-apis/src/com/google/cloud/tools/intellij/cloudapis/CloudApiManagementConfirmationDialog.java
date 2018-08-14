@@ -64,7 +64,6 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -173,10 +172,12 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
     return createNewServiceAccountCheckbox.isSelected();
   }
 
+  @NotNull
   String getServiceAccountName() {
     return serviceAccountNameTextField.getText().trim().toLowerCase();
   }
 
+  @NotNull
   Path getServiceAccountKeyDownloadPath() {
     return Paths.get(serviceKeyPathSelector.getText().trim());
   }
@@ -188,7 +189,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
       String name = getServiceAccountName();
       String path = getServiceAccountKeyDownloadPath().toString();
 
-      if (StringUtils.isEmpty(name)) {
+      if (name.isEmpty()) {
         return new ValidationInfo(
             GoogleCloudApisMessageBundle.message(
                 "cloud.apis.management.dialog.serviceaccount.name.empty.error"),
@@ -204,7 +205,7 @@ public class CloudApiManagementConfirmationDialog extends DialogWrapper {
             GoogleCloudApisMessageBundle.message(
                 "cloud.apis.management.dialog.serviceaccount.name.regex.error"),
             serviceAccountNameTextField);
-      } else if (StringUtils.isEmpty(path)) {
+      } else if (path.isEmpty()) {
         return new ValidationInfo(
             GoogleCloudApisMessageBundle.message(
                 "cloud.apis.management.dialog.serviceaccount.key.path.empty.error"),

@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.cloudapis.maven;
 
+import com.google.cloud.tools.intellij.cloudapis.CloudLibrariesService;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
