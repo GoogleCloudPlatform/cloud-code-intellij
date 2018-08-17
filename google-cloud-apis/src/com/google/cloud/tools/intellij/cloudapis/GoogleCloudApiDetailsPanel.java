@@ -16,8 +16,6 @@
 
 package com.google.cloud.tools.intellij.cloudapis;
 
-import static com.google.cloud.tools.intellij.cloudapis.maven.MavenCloudApiUiExtension.makeLink;
-
 import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
 import com.google.cloud.tools.intellij.ui.BrowserOpeningHyperLinkListener;
 import com.google.cloud.tools.intellij.util.ThreadUtil;
@@ -62,10 +60,23 @@ public final class GoogleCloudApiDetailsPanel {
   private JLabel warningLabel;
 
   private CloudLibrary currentCloudLibrary;
-  private String currentBomVersion;
   private CloudApiManagementSpec currentCloudApiManagementSpec;
 
   private final List<Optional<String>> links = Lists.newArrayList();
+
+  /**
+   * Optionally returns an HTML-formatted link for the given URL.
+   *
+   * @param text the text to show for the link
+   * @param url the URL to make into an HTML link
+   * @return the HTML-formatted link, or {@link Optional#empty()} if the given URL is {@code null}
+   */
+  public static Optional<String> makeLink(String text, @Nullable String url) {
+    if (url == null) {
+      return Optional.empty();
+    }
+    return Optional.of(String.format("<a href=\"%s\">%s</a>", url, text));
+  }
 
   /** Returns the {@link JPanel} that holds the UI elements in this panel. */
   JPanel getPanel() {
@@ -80,20 +91,13 @@ public final class GoogleCloudApiDetailsPanel {
    *
    * @param library the {@link CloudLibrary} to display
    */
-  void setCloudLibrary(
-      CloudLibrary library, String bomVersion, CloudApiManagementSpec cloudApiManagementSpec) {
+  void setCloudLibrary(CloudLibrary library, CloudApiManagementSpec cloudApiManagementSpec) {
     if (cloudLibrariesEqual(currentCloudLibrary, library)) {
       return;
     }
 
     currentCloudLibrary = library;
-    currentBomVersion = bomVersion;
     currentCloudApiManagementSpec = cloudApiManagementSpec;
-    updateUI();
-  }
-
-  void setCurrentBomVersion(String currentBomVersion) {
-    this.currentBomVersion = currentBomVersion;
     updateUI();
   }
 

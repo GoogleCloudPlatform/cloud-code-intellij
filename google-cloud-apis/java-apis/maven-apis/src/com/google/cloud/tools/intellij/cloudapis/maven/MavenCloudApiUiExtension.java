@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.cloudapis.maven;
 
+import static com.google.cloud.tools.intellij.cloudapis.GoogleCloudApiDetailsPanel.makeLink;
+
 import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
 import com.google.cloud.tools.intellij.cloudapis.CloudApiUiExtension;
 import com.google.cloud.tools.intellij.cloudapis.CloudApiUiPresenter;
@@ -23,16 +25,20 @@ import com.google.cloud.tools.intellij.cloudapis.maven.CloudApiMavenService.Libr
 import com.google.cloud.tools.intellij.util.ThreadUtil;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.cloud.tools.libraries.json.CloudLibraryClientMavenCoordinates;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 import com.intellij.icons.AllIcons.General;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.module.Module;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -40,20 +46,54 @@ import org.jetbrains.annotations.Nullable;
  * integration.
  */
 public class MavenCloudApiUiExtension implements CloudApiUiExtension {
+  private BomComboBox bomComboBox;
+  private JLabel bomSelectorLabel;
 
+  private CloudLibrary currentCloudLibrary;
+
+  /**
+   * Injects custom extension UI components when base Cloud API UI is constructed and ready. Inserts
+   * Maven specific BOM components below standard module selector - BOM selector label under module
+   * label, and BOM versions combo box under module combo box. See {@link
+   * CloudApiUiExtension.EXTENSION_UI_COMPONENT_LOCATION}.
+   */
+  @NotNull
   @Override
-  public Collection<JComponent> createCustomUiComponents() {
-    return Collections.emptyList();
+  public Map<EXTENSION_UI_COMPONENT_LOCATION, JComponent> createCustomUiComponents() {
+    bomComboBox = new BomComboBox();
+    bomSelectorLabel =
+        new JLabel(MavenCloudApisMessageBundle.getString("cloud.libraries.bom.selector.label"));
+
+    boolean bomAvailable =
+        bomComboBox.populateBomVersions(
+            CloudApiUiPresenter.getInstance().getProject(),
+            CloudApiUiPresenter.getInstance().getSelectedModule());
+    if (!bomAvailable) {
+      hideBomUI();
+    }
+
+    bomComboBox.addActionListener(
+        event -> {
+          // emulate library select to update version information.
+          onCloudLibrarySelection(currentCloudLibrary);
+        });
+
+    return ImmutableMap.of(
+        EXTENSION_UI_COMPONENT_LOCATION.BOTTOM_LINE_1,
+        bomSelectorLabel,
+        EXTENSION_UI_COMPONENT_LOCATION.BOTTOM_LINE_2,
+        bomComboBox);
   }
 
   @Override
-  public void onCloudLibrarySelection(CloudLibrary currentCloudLibrary, String currentBomVersion) {
+  public void onCloudLibrarySelection(CloudLibrary currentCloudLibrary) {
+    this.currentCloudLibrary = currentCloudLibrary;
     if (currentCloudLibrary != null && currentCloudLibrary.getClients() != null) {
       CloudLibraryUtils.getFirstJavaClient(currentCloudLibrary)
           .ifPresent(
               client -> {
-                if (currentBomVersion != null) {
-                  updateManagedLibraryVersionFromBom(currentCloudLibrary, currentBomVersion);
+                if (getSelectedBomVersion() != null) {
+                  updateManagedLibraryVersionFromBom(currentCloudLibrary, getSelectedBomVersion());
                 } else {
                   if (client.getMavenCoordinates() != null) {
                     CloudApiUiPresenter.getInstance()
@@ -82,21 +122,38 @@ public class MavenCloudApiUiExtension implements CloudApiUiExtension {
   }
 
   @Override
-  public void onModuleSelection(Module module) {}
+  public void onModuleSelection(Module module) {
+    bomComboBox.populateBomVersions(CloudApiUiPresenter.getInstance().getProject(), module);
+  }
 
-  /**
-   * Optionally returns an HTML-formatted link for the given URL.
-   *
-   * @param text the text to show for the link
-   * @param url the URL to make into an HTML link
-   * @return the HTML-formatted link, or {@link Optional#empty()} if the given URL is {@code null}
-   */
-  // TODO move back to core cloud-api when maven module is complete.
-  public static Optional<String> makeLink(String text, @Nullable String url) {
-    if (url == null) {
-      return Optional.empty();
-    }
-    return Optional.of(String.format("<a href=\"%s\">%s</a>", url, text));
+  @Override
+  public void onCloudLibrariesAddition(
+      @NotNull Set<CloudLibrary> libraries, @NotNull Module module) {
+    CloudLibraryDependencyWriter.addLibraries(
+        libraries,
+        module,
+        Optional.ofNullable(bomComboBox.getSelectedItem()).map(Object::toString).orElse(null));
+  }
+
+  @VisibleForTesting
+  BomComboBox getBomComboBox() {
+    return bomComboBox;
+  }
+
+  @VisibleForTesting
+  @Nullable
+  String getSelectedBomVersion() {
+    return bomComboBox.getSelectedItem() == null ? null : bomComboBox.getSelectedItem().toString();
+  }
+
+  @VisibleForTesting
+  JLabel getBomSelectorLabel() {
+    return bomSelectorLabel;
+  }
+
+  private void hideBomUI() {
+    bomComboBox.setVisible(false);
+    bomSelectorLabel.setVisible(false);
   }
 
   /**

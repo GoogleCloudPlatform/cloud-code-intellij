@@ -68,6 +68,12 @@
                 implementation="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineUserSpecifiedPathDeploymentSourceProvider"/>
     </extensions>
 
+    <extensions defaultExtensionNs="com.google.gct.cloudapis">
+        <cloudApiActionDecorator
+                implementation="com.google.cloud.tools.intellij.appengine.java.cloud.apis.AppEngineCloudApiActionDecorator"/>
+    </extensions>
+
+
     <extensions defaultExtensionNs="com.intellij">
         <!--<configurationType implementation="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineServerCommunityConfigurationType"/>-->
 

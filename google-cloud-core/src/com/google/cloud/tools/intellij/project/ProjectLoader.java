@@ -29,8 +29,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 /** Loads list of {@link Project} for a {@link CredentialedUser}. */
 class ProjectLoader {
@@ -54,11 +52,7 @@ class ProjectLoader {
         cloudResourceManagerClient.projects().list().setPageSize(PROJECTS_MAX_PAGE_SIZE).execute();
 
     if (response != null && response.getProjects() != null) {
-      // Create a sorted set to sort the projects list by project name.
-      Set<Project> allProjects =
-          new TreeSet<>(Comparator.comparing(project -> project.getName().toLowerCase()));
-
-      allProjects.addAll(response.getProjects());
+      List<Project> allProjects = new ArrayList<>(response.getProjects());
 
       while (!Strings.isNullOrEmpty(response.getNextPageToken())) {
         response =
@@ -78,6 +72,9 @@ class ProjectLoader {
           .filter((project) -> !Strings.isNullOrEmpty(project.getProjectId()))
           // Add remaining projects to the set.
           .forEach(result::add);
+
+      // sort the projects list by project name. project names are not unique.
+      result.sort(Comparator.comparing(project -> project.getName().toLowerCase()));
     }
 
     return result;

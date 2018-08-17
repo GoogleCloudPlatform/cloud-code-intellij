@@ -16,11 +16,9 @@
 
 package com.google.cloud.tools.intellij.cloudapis;
 
-import com.google.cloud.tools.intellij.GctFeature;
-import com.google.cloud.tools.intellij.cloudapis.maven.BomComboBox;
+import com.google.cloud.tools.intellij.cloudapis.CloudApiUiExtension.EXTENSION_UI_COMPONENT_LOCATION;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
-import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
@@ -28,7 +26,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.intellij.application.options.ModulesComboBox;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
@@ -49,13 +46,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -81,8 +77,11 @@ public final class GoogleCloudApiSelectorPanel {
   private JLabel modulesLabel;
   private ModulesComboBox modulesComboBox;
   private ProjectSelector projectSelector;
-  private JComboBox<String> bomComboBox;
-  private JLabel bomSelectorLabel;
+  private JPanel bottomComponent1;
+  private JPanel bottomComponent2;
+
+  // insert extension UI components parent panels.
+  private Map<EXTENSION_UI_COMPONENT_LOCATION, JComponent> extensionComponentPanels;
 
   private final Map<CloudLibrary, CloudApiManagementSpec> apiManagementMap;
   private final List<CloudLibrary> libraries;
@@ -108,22 +107,6 @@ public final class GoogleCloudApiSelectorPanel {
     panel.setPreferredSize(new Dimension(800, 600));
 
     projectSelector.loadActiveCloudProject();
-
-    if (ServiceManager.getService(PluginInfoService.class).shouldEnable(GctFeature.BOM)) {
-      populateBomVersions();
-      bomComboBox.addActionListener(
-          event -> {
-            if (cloudLibrariesTable.getSelectedRow() != -1) {
-              if (bomComboBox.getSelectedItem() != null) {
-                detailsPanel.setCurrentBomVersion(bomComboBox.getSelectedItem().toString());
-              }
-            }
-          });
-
-      modulesComboBox.addActionListener(event -> populateBomVersions());
-    } else {
-      hideBomUI();
-    }
   }
 
   /** Returns the {@link JPanel} that holds the UI elements in this panel. */
@@ -149,11 +132,6 @@ public final class GoogleCloudApiSelectorPanel {
   /** Returns the set of selected {@link CloudLibrary CloudLibraries}. */
   Set<CloudLibrary> getSelectedLibraries() {
     return ((CloudLibraryTableModel) cloudLibrariesTable.getModel()).getSelectedLibraries();
-  }
-
-  /** Returns, optionally, the selected BOM version. */
-  Optional<String> getSelectedBomVersion() {
-    return Optional.ofNullable(bomComboBox.getSelectedItem()).map(Object::toString);
   }
 
   CloudProject getCloudProject() {
@@ -204,18 +182,24 @@ public final class GoogleCloudApiSelectorPanel {
     return projectSelector;
   }
 
-  @VisibleForTesting
-  public JLabel getBomSelectorLabel() {
-    return bomSelectorLabel;
-  }
-
-  @VisibleForTesting
-  public JComboBox<String> getBomComboBox() {
-    return bomComboBox;
-  }
-
   JLabel getVersionLabel() {
     return detailsPanel.getVersionLabel();
+  }
+
+  void createExtensionUiComponents(
+      Map<EXTENSION_UI_COMPONENT_LOCATION, JComponent> extensionComponents) {
+    // build insert parent component map.
+    if (extensionComponentPanels == null) {
+      extensionComponentPanels = Maps.newHashMap();
+      extensionComponentPanels.put(EXTENSION_UI_COMPONENT_LOCATION.BOTTOM_LINE_1, bottomComponent1);
+      extensionComponentPanels.put(EXTENSION_UI_COMPONENT_LOCATION.BOTTOM_LINE_2, bottomComponent2);
+    }
+
+    for (EXTENSION_UI_COMPONENT_LOCATION nextLocation : extensionComponentPanels.keySet()) {
+      if (extensionComponents.containsKey(nextLocation)) {
+        extensionComponentPanels.get(nextLocation).add(extensionComponents.get(nextLocation));
+      }
+    }
   }
 
   /**
@@ -226,8 +210,6 @@ public final class GoogleCloudApiSelectorPanel {
   private void createUIComponents() {
     modulesComboBox = new ModulesComboBox();
     modulesComboBox.fillModules(project);
-
-    bomComboBox = new BomComboBox();
 
     ApplicationManager.getApplication()
         .runReadAction(
@@ -257,10 +239,7 @@ public final class GoogleCloudApiSelectorPanel {
       CloudLibrary library =
           (CloudLibrary)
               cloudLibrariesTable.getModel().getValueAt(selectedIndex, CLOUD_LIBRARY_COL);
-      detailsPanel.setCloudLibrary(
-          library,
-          bomComboBox.getSelectedItem() != null ? bomComboBox.getSelectedItem().toString() : null,
-          apiManagementMap.get(library));
+      detailsPanel.setCloudLibrary(library, apiManagementMap.get(library));
       updateManagementUI();
     }
   }
@@ -272,21 +251,6 @@ public final class GoogleCloudApiSelectorPanel {
             && (boolean)
                 model.getValueAt(cloudLibrariesTable.getSelectedRow(), CLOUD_LIBRARY_SELECT_COL);
     detailsPanel.setManagementUIEnabled(addLibrary && projectSelector.getSelectedProject() != null);
-  }
-
-  // TODO placeholder, remove when UI extension components are finalized.
-  private void populateBomVersions() {
-    boolean bomAvailable =
-        ((BomComboBox) bomComboBox)
-            .populateBomVersions(project, modulesComboBox.getSelectedModule());
-    if (!bomAvailable) {
-      hideBomUI();
-    }
-  }
-
-  private void hideBomUI() {
-    bomComboBox.setVisible(false);
-    bomSelectorLabel.setVisible(false);
   }
 
   /** The custom {@link JBTable} for the table of supported Cloud libraries. */

@@ -15,18 +15,20 @@
   -->
 
 <idea-plugin>
-    <depends>org.jetbrains.idea.maven</depends>
-
     <extensionPoints>
         <extensionPoint qualifiedName="com.google.gct.cloudapis.cloudApiRunConfiguration"
                         interface="com.google.cloud.tools.intellij.cloudapis.CloudApiRunConfigurationProvider"/>
         <extensionPoint qualifiedName="com.google.gct.cloudapis.cloudApiUiExtension"
                         interface="com.google.cloud.tools.intellij.cloudapis.CloudApiUiExtension"/>
+        <extensionPoint qualifiedName="com.google.gct.cloudapis.cloudApiActionDecorator"
+                        interface="com.google.cloud.tools.intellij.cloudapis.CloudApiActionDecoratorExtension"/>
     </extensionPoints>
     <extensions defaultExtensionNs="com.intellij">
         <applicationService
                 serviceInterface="com.google.cloud.tools.intellij.cloudapis.CloudApiUiPresenter"
                 serviceImplementation="com.google.cloud.tools.intellij.cloudapis.DefaultCloudApiUiPresenter"/>
+        <applicationService
+                serviceImplementation="com.google.cloud.tools.intellij.cloudapis.CloudLibrariesService"/>
     </extensions>
     <actions>
         <group id="GoogleCloudTools.cloudapis">

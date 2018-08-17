@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.cloudapis.maven;
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.cloudapis.CloudLibrariesService;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.MavenTestUtils;
 import com.google.cloud.tools.intellij.testing.TestFixture;

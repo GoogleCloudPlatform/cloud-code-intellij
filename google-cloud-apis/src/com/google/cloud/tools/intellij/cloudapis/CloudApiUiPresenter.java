@@ -17,6 +17,8 @@
 package com.google.cloud.tools.intellij.cloudapis;
 
 import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
 import java.util.Collection;
 import java.util.Optional;
 import javax.swing.Icon;
@@ -26,7 +28,6 @@ import org.jetbrains.annotations.Nullable;
  * Presenter for core Cloud API UI, allows accessing UI points for libraries for extension points to
  * update, including documentation links and version info.
  */
-// TODO: move to core cloud API once dependency is inverted.
 public interface CloudApiUiPresenter {
 
   /**
@@ -37,9 +38,18 @@ public interface CloudApiUiPresenter {
     return ServiceManager.getService(CloudApiUiPresenter.class);
   }
 
+  /** Returns current IDE project. */
+  Project getProject();
+
+  /** Obtains currently selected module for current IDE project. */
+  Module getSelectedModule();
+
   /**
    * Adds links to some documentation page for the currently selected library. If no library is
    * selected, nothing is done.
+   *
+   * @param links Collection of optional prepared links in HTML format, prepared by {@link
+   *     GoogleCloudApiDetailsPanel#makeLink(String, String)}
    */
   void addCloudLibraryLinks(Collection<Optional<String>> links);
 
