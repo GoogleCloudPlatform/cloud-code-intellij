@@ -273,7 +273,7 @@ public class CloudDebugProcessStateController {
                   handler.onError(StackdriverDebuggerBundle.getString("clouddebug.no.response"));
                 }
               } catch (IOException ex) {
-                LOG.error("exception setting a breakpoint", ex);
+                LOG.warn("exception setting a breakpoint", ex);
                 handler.onError(ex.toString());
               }
             });
