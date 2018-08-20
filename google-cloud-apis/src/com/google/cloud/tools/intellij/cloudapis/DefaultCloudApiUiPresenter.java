@@ -79,7 +79,10 @@ public class DefaultCloudApiUiPresenter implements CloudApiUiPresenter {
    * Inits the presenter when add libraries dialog is created, creates all extension points and adds
    * necessary event listeners and handlers.
    */
-  void init(Project project, @NotNull AddCloudLibrariesDialog addCloudLibrariesDialog, @NotNull GoogleCloudApiSelectorPanel cloudApiSelectorPanel) {
+  void init(
+      Project project,
+      @NotNull AddCloudLibrariesDialog addCloudLibrariesDialog,
+      @NotNull GoogleCloudApiSelectorPanel cloudApiSelectorPanel) {
     this.project = project;
     this.addCloudLibrariesDialog = addCloudLibrariesDialog;
     this.cloudApiSelectorPanel = cloudApiSelectorPanel;
