@@ -19,6 +19,11 @@ package com.google.cloud.tools.intellij.cloudapis.maven;
 import com.google.cloud.tools.intellij.cloudapis.CloudApiActionDecoratorExtension;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 
+/**
+ * {@link CloudApiActionDecoratorExtension} point that checks if the project has any Maven modules
+ * and if so, changes the text to reflect this action will fully manage and add libraries for Cloud
+ * APIs.
+ */
 public class MavenCloudApisActionDecoratorExtension implements CloudApiActionDecoratorExtension {
 
   @Override

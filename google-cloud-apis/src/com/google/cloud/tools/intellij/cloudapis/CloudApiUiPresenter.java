@@ -26,8 +26,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Presenter for core Cloud API UI, allows accessing major UI points for extension points to
- * update, including labels, documentation links and version info.
+ * Presenter for core Cloud API UI, allows accessing major UI points for extension points to update,
+ * including dialog labels, documentation links and version info.
  */
 public interface CloudApiUiPresenter {
 
@@ -45,8 +45,10 @@ public interface CloudApiUiPresenter {
   /** Obtains currently selected module for current IDE project. */
   Module getSelectedModule();
 
+  /** Changes Cloud API dialog title. */
   void setCloudApiDialogTitle(@NotNull String title);
 
+  /** Sets Cloud API dialog custom text for OK (API selection confirmation) button. */
   void setCloudApiDialogOkButtonText(@NotNull String text);
 
   /**
