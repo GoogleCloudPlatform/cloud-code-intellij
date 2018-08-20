@@ -22,11 +22,12 @@ import com.intellij.openapi.project.Project;
 import java.util.Collection;
 import java.util.Optional;
 import javax.swing.Icon;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Presenter for core Cloud API UI, allows accessing UI points for libraries for extension points to
- * update, including documentation links and version info.
+ * Presenter for core Cloud API UI, allows accessing major UI points for extension points to
+ * update, including labels, documentation links and version info.
  */
 public interface CloudApiUiPresenter {
 
@@ -43,6 +44,10 @@ public interface CloudApiUiPresenter {
 
   /** Obtains currently selected module for current IDE project. */
   Module getSelectedModule();
+
+  void setCloudApiDialogTitle(@NotNull String title);
+
+  void setCloudApiDialogOkButtonText(@NotNull String text);
 
   /**
    * Adds links to some documentation page for the currently selected library. If no library is

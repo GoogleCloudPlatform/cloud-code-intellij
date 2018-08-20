@@ -60,8 +60,12 @@ public class AppEngineCloudApiActionDecorator implements CloudApiActionDecorator
       e.getPresentation()
           .setText(
               AppEngineMessageBundle.message("cloud.libraries.menu.action.disabled.java8.text"));
-    } else {
-      // standard message for a supported module action.
+    }
+    // revert to use standard message for a supported module action if user fixed this and action
+    // text still shows error message.
+    else if (AppEngineMessageBundle.message("cloud.libraries.menu.action.disabled.java8.text")
+        .equals(e.getPresentation().getText())) {
+
       e.getPresentation()
           .setDescription(
               GoogleCloudApisMessageBundle.message("cloud.libraries.menu.action.description"));

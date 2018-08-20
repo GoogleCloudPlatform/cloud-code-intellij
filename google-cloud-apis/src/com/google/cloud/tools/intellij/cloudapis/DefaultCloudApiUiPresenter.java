@@ -37,6 +37,7 @@ import org.jetbrains.annotations.Nullable;
 public class DefaultCloudApiUiPresenter implements CloudApiUiPresenter {
 
   private Project project;
+  private AddCloudLibrariesDialog addCloudLibrariesDialog;
   private GoogleCloudApiSelectorPanel cloudApiSelectorPanel;
 
   private CloudApiUiExtension[] cloudApiUiExtensions;
@@ -49,6 +50,16 @@ public class DefaultCloudApiUiPresenter implements CloudApiUiPresenter {
   @Override
   public Module getSelectedModule() {
     return cloudApiSelectorPanel.getSelectedModule();
+  }
+
+  @Override
+  public void setCloudApiDialogTitle(@NotNull String title) {
+    addCloudLibrariesDialog.setTitle(title);
+  }
+
+  @Override
+  public void setCloudApiDialogOkButtonText(@NotNull String text) {
+    addCloudLibrariesDialog.updateOKButtonText(text);
   }
 
   @Override
@@ -68,8 +79,9 @@ public class DefaultCloudApiUiPresenter implements CloudApiUiPresenter {
    * Inits the presenter when add libraries dialog is created, creates all extension points and adds
    * necessary event listeners and handlers.
    */
-  void init(Project project, @NotNull GoogleCloudApiSelectorPanel cloudApiSelectorPanel) {
+  void init(Project project, @NotNull AddCloudLibrariesDialog addCloudLibrariesDialog, @NotNull GoogleCloudApiSelectorPanel cloudApiSelectorPanel) {
     this.project = project;
+    this.addCloudLibrariesDialog = addCloudLibrariesDialog;
     this.cloudApiSelectorPanel = cloudApiSelectorPanel;
 
     cloudApiUiExtensions = CloudApiUiExtension.EP_NAME.getExtensions();

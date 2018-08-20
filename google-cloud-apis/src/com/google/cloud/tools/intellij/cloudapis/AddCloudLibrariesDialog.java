@@ -59,7 +59,7 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
     // initialize presenter for this dialog and init the extensions if present.
     CloudApiUiPresenter cloudApiUiPresenter = CloudApiUiPresenter.getInstance();
     if (cloudApiUiPresenter instanceof DefaultCloudApiUiPresenter) {
-      ((DefaultCloudApiUiPresenter) cloudApiUiPresenter).init(project, cloudApiSelectorPanel);
+      ((DefaultCloudApiUiPresenter) cloudApiUiPresenter).init(project, this, cloudApiSelectorPanel);
     }
   }
 
@@ -67,8 +67,13 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
   protected void init() {
     super.init();
     setTitle(GoogleCloudApisMessageBundle.message("cloud.libraries.dialog.title"));
-    setOKButtonText(GoogleCloudApisMessageBundle.message("cloud.libraries.ok.button.text"));
+    updateOKButtonText(GoogleCloudApisMessageBundle.message("cloud.libraries.ok.button.text"));
     setOKActionEnabled(isReadyToSubmit());
+  }
+
+  /** Exposes OK button text setter for use by UI extensions via {@link CloudApiUiPresenter} */
+  void updateOKButtonText(String text) {
+    setOKButtonText(text);
   }
 
   /** Returns the selected {@link Module}. */
