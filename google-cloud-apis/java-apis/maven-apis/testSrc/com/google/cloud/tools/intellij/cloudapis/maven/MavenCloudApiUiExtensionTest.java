@@ -38,7 +38,6 @@ import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.intellij.icons.AllIcons.General;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
@@ -201,9 +200,10 @@ public class MavenCloudApiUiExtensionTest {
   public void noAvailableBomVersions_hidesBomUi() {
     when(mavenService.getAllBomVersions()).thenReturn(ImmutableList.of());
 
-    ApplicationManager.getApplication()
-        .invokeAndWait(
-            () -> {
+    MavenTestUtils.getInstance()
+        .runWithMavenModule(
+            testFixture.getProject(),
+            module -> {
               mavenCloudApiUiExtension.createCustomUiComponents();
               BomComboBox bomComboBox = mavenCloudApiUiExtension.getBomComboBox();
               bomComboBox.populateBomVersions(testFixture.getProject(), module1);
@@ -259,6 +259,13 @@ public class MavenCloudApiUiExtensionTest {
 
               assertThat(bomComboBox.getSelectedItem()).isEqualTo(preconfigureBomVersion);
             });
+  }
+
+  @Test
+  public void nonMaven_ideProject_extensionUi_notCreated() {
+    // not setting up any Maven modules should result in extension components not created at all.
+    assertThat(mavenCloudApiUiExtension.createCustomUiComponents().size()).isEqualTo(0);
+    assertThat(mavenCloudApiUiExtension.getBomComboBox()).isNull();
   }
 
   private void writeBomDependency(Module module, String bomVersion) {
