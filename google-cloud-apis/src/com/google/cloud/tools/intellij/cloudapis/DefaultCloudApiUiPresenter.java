@@ -35,7 +35,6 @@ import org.jetbrains.annotations.Nullable;
  * extension points.
  */
 public class DefaultCloudApiUiPresenter implements CloudApiUiPresenter {
-
   private Project project;
   private AddCloudLibrariesDialog addCloudLibrariesDialog;
   private GoogleCloudApiSelectorPanel cloudApiSelectorPanel;
@@ -50,6 +49,11 @@ public class DefaultCloudApiUiPresenter implements CloudApiUiPresenter {
   @Override
   public Module getSelectedModule() {
     return cloudApiSelectorPanel.getSelectedModule();
+  }
+
+  @Override
+  public void enableModuleSelection() {
+    cloudApiSelectorPanel.enableModuleSelection();
   }
 
   @Override
