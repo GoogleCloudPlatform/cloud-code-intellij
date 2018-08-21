@@ -107,6 +107,10 @@ public final class GoogleCloudApiSelectorPanel {
     panel.setPreferredSize(new Dimension(800, 600));
 
     projectSelector.loadActiveCloudProject();
+
+    // by default for all IDEs module selection is hidden since the action is module-independent.
+    modulesLabel.setVisible(false);
+    modulesComboBox.setVisible(false);
   }
 
   /** Returns the {@link JPanel} that holds the UI elements in this panel. */
@@ -200,6 +204,14 @@ public final class GoogleCloudApiSelectorPanel {
         extensionComponentPanels.get(nextLocation).add(extensionComponents.get(nextLocation));
       }
     }
+  }
+
+  /**
+   * Enables module selection UI. Makes module selector combo box and its label available to a user.
+   */
+  void enableModuleSelection() {
+    modulesLabel.setVisible(true);
+    modulesComboBox.setVisible(true);
   }
 
   /**

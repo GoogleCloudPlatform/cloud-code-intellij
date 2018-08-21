@@ -50,6 +50,8 @@ public class MavenCloudApiUiExtension implements CloudApiUiExtension {
   private BomComboBox bomComboBox;
   private JLabel bomSelectorLabel;
 
+  private boolean currentProjectSupportsMaven;
+
   private CloudLibrary currentCloudLibrary;
 
   /**
@@ -62,14 +64,18 @@ public class MavenCloudApiUiExtension implements CloudApiUiExtension {
   @Override
   public Map<EXTENSION_UI_COMPONENT_LOCATION, JComponent> createCustomUiComponents() {
     Project cloudApisProject = CloudApiUiPresenter.getInstance().getProject();
+    currentProjectSupportsMaven = MavenUtils.hasAnyMavenModules(cloudApisProject);
 
-    if (MavenUtils.hasAnyMavenModules(cloudApisProject)) {
-      // this is a proper time to update the title and buttons for the dialog since we know now
-      // this is a valid Maven project.
-      CloudApiUiPresenter.getInstance()
-          .setCloudApiDialogTitle(
-              MavenCloudApisMessageBundle.message("maven.cloud.libraries.dialog.title"));
+    // if this project has no Maven modules, do not create any Maven custom components at all.
+    if (!currentProjectSupportsMaven) {
+      return ImmutableMap.of();
     }
+
+    // this is a proper time to update the title and buttons for the dialog since we know now
+    // this is a valid Maven project.
+    CloudApiUiPresenter.getInstance()
+        .setCloudApiDialogTitle(
+            MavenCloudApisMessageBundle.message("maven.cloud.libraries.dialog.title"));
 
     // create and return custom UI components.
     bomComboBox = new BomComboBox();
@@ -88,6 +94,9 @@ public class MavenCloudApiUiExtension implements CloudApiUiExtension {
           // emulate library select to update version information.
           onCloudLibrarySelection(currentCloudLibrary);
         });
+
+    // enable module selection for Maven - libraries are added into a specific module.
+    CloudApiUiPresenter.getInstance().enableModuleSelection();
 
     return ImmutableMap.of(
         EXTENSION_UI_COMPONENT_LOCATION.BOTTOM_LINE_1,
@@ -140,10 +149,12 @@ public class MavenCloudApiUiExtension implements CloudApiUiExtension {
   @Override
   public void onCloudLibrariesAddition(
       @NotNull Set<CloudLibrary> libraries, @NotNull Module module) {
-    CloudLibraryDependencyWriter.addLibraries(
-        libraries,
-        module,
-        Optional.ofNullable(bomComboBox.getSelectedItem()).map(Object::toString).orElse(null));
+    if (currentProjectSupportsMaven) {
+      CloudLibraryDependencyWriter.addLibraries(
+          libraries,
+          module,
+          Optional.ofNullable(bomComboBox.getSelectedItem()).map(Object::toString).orElse(null));
+    }
   }
 
   @VisibleForTesting
@@ -154,7 +165,9 @@ public class MavenCloudApiUiExtension implements CloudApiUiExtension {
   @VisibleForTesting
   @Nullable
   String getSelectedBomVersion() {
-    return bomComboBox.getSelectedItem() == null ? null : bomComboBox.getSelectedItem().toString();
+    return (!currentProjectSupportsMaven || bomComboBox.getSelectedItem() == null)
+        ? null
+        : bomComboBox.getSelectedItem().toString();
   }
 
   @VisibleForTesting

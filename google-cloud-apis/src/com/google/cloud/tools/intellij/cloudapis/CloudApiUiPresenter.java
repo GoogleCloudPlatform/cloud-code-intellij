@@ -45,6 +45,11 @@ public interface CloudApiUiPresenter {
   /** Obtains currently selected module for current IDE project. */
   Module getSelectedModule();
 
+  /**
+   * Enables module selection UI. Makes module selector combo box and its label available to a user.
+   */
+  void enableModuleSelection();
+
   /** Changes Cloud API dialog title. */
   void setCloudApiDialogTitle(@NotNull String title);
 
