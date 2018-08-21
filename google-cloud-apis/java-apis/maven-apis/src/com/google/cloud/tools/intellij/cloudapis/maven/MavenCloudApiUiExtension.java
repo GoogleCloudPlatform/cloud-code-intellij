@@ -31,6 +31,7 @@ import com.intellij.icons.AllIcons.General;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -60,14 +61,24 @@ public class MavenCloudApiUiExtension implements CloudApiUiExtension {
   @NotNull
   @Override
   public Map<EXTENSION_UI_COMPONENT_LOCATION, JComponent> createCustomUiComponents() {
+    Project cloudApisProject = CloudApiUiPresenter.getInstance().getProject();
+
+    if (MavenUtils.hasAnyMavenModules(cloudApisProject)) {
+      // this is a proper time to update the title and buttons for the dialog since we know now
+      // this is a valid Maven project.
+      CloudApiUiPresenter.getInstance()
+          .setCloudApiDialogTitle(
+              MavenCloudApisMessageBundle.message("maven.cloud.libraries.dialog.title"));
+    }
+
+    // create and return custom UI components.
     bomComboBox = new BomComboBox();
     bomSelectorLabel =
         new JLabel(MavenCloudApisMessageBundle.getString("cloud.libraries.bom.selector.label"));
 
     boolean bomAvailable =
         bomComboBox.populateBomVersions(
-            CloudApiUiPresenter.getInstance().getProject(),
-            CloudApiUiPresenter.getInstance().getSelectedModule());
+            cloudApisProject, CloudApiUiPresenter.getInstance().getSelectedModule());
     if (!bomAvailable) {
       hideBomUI();
     }

@@ -17,14 +17,41 @@
 package com.google.cloud.tools.intellij.cloudapis.maven;
 
 import com.google.cloud.tools.libraries.json.CloudLibraryClientMavenCoordinates;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.project.Project;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 import org.jetbrains.idea.maven.dom.model.MavenDomDependency;
 import org.jetbrains.idea.maven.model.MavenId;
+import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
 /** Holds utility methods for working with {@link org.jetbrains.idea.maven} classes. */
-public class MavenUtils {
+class MavenUtils {
 
   private MavenUtils() {}
+
+  /**
+   * Checks if the given project has any Maven backed modules in it.
+   *
+   * @param project Project to check, if null, false returned.
+   * @return False is project does not have any Maven modules, true if at least one such module
+   *     exists.
+   */
+  static boolean hasAnyMavenModules(Project project) {
+    if (project == null) {
+      return false;
+    }
+
+    MavenProjectsManager mavenProjectsManager = MavenProjectsManager.getInstance(project);
+    Optional<Module> anyMavenModule =
+        Stream.of(ModuleManager.getInstance(project).getModules())
+            .filter(mavenProjectsManager::isMavenizedModule)
+            .findAny();
+
+    return anyMavenModule.isPresent();
+  }
 
   /**
    * Returns {@code true} if the given {@link MavenId} is in the given list of {@link

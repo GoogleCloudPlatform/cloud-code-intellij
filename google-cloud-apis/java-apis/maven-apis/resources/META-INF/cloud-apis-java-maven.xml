@@ -19,7 +19,8 @@
 
     <project-components>
         <component>
-            <implementation-class>com.google.cloud.tools.intellij.cloudapis.maven.CloudLibraryMavenProjectState
+            <implementation-class>
+                com.google.cloud.tools.intellij.cloudapis.maven.CloudLibraryMavenProjectState
             </implementation-class>
         </component>
     </project-components>
@@ -45,5 +46,7 @@
     <extensions defaultExtensionNs="com.google.gct.cloudapis">
         <cloudApiUiExtension
                 implementation="com.google.cloud.tools.intellij.cloudapis.maven.MavenCloudApiUiExtension"/>
+        <cloudApiActionDecorator
+                implementation="com.google.cloud.tools.intellij.cloudapis.maven.MavenCloudApisActionDecoratorExtension"/>
     </extensions>
 </idea-plugin>
