@@ -69,9 +69,6 @@ public class MavenCloudApiUiExtension implements CloudApiUiExtension {
       CloudApiUiPresenter.getInstance()
           .setCloudApiDialogTitle(
               MavenCloudApisMessageBundle.message("maven.cloud.libraries.dialog.title"));
-      CloudApiUiPresenter.getInstance()
-          .setCloudApiDialogOkButtonText(
-              MavenCloudApisMessageBundle.message("maven.cloud.libraries.ok.button.text"));
     }
 
     // create and return custom UI components.

@@ -58,11 +58,6 @@ public class DefaultCloudApiUiPresenter implements CloudApiUiPresenter {
   }
 
   @Override
-  public void setCloudApiDialogOkButtonText(@NotNull String text) {
-    addCloudLibrariesDialog.updateOKButtonText(text);
-  }
-
-  @Override
   public void addCloudLibraryLinks(Collection<Optional<String>> links) {
     cloudApiSelectorPanel.getDetailsPanel().addCloudLibraryLinks(links);
   }

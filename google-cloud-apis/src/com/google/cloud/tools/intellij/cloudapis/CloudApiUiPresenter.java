@@ -48,9 +48,6 @@ public interface CloudApiUiPresenter {
   /** Changes Cloud API dialog title. */
   void setCloudApiDialogTitle(@NotNull String title);
 
-  /** Sets Cloud API dialog custom text for OK (API selection confirmation) button. */
-  void setCloudApiDialogOkButtonText(@NotNull String text);
-
   /**
    * Adds links to some documentation page for the currently selected library. If no library is
    * selected, nothing is done.
