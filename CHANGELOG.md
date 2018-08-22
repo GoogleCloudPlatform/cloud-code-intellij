@@ -1,6 +1,14 @@
 # Release notes
 This page documents production updates to Cloud Tools for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## 18.8.1
+
+### Added
+  - Users can now manage Google Cloud APIs, create service accounts with custom roles in all Jetbrains IDEs, including PyCharm, GoLand, PhpStorm, WebStorm, and others. [2182](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2182)
+
+### Fixed
+  - Fixed GCP project selector look and feel for IDEA 2018.2. [2237](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2237)
+
 ## 18.7.1
 
 ### Added
