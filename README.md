@@ -46,7 +46,7 @@ In addition to IntelliJ IDEA, the plugin provides limited support for the follow
 
 This table displays the features available in the IDEs:
 
-| | IntelliJ IDEA - Ultimate | IntelliJ IDEA - Community | All other IDEs |
+| | IntelliJ IDEA - Ultimate | IntelliJ IDEA - Community | All other IntelliJ platform based IDEs |
 |---|:---:|:---:|:---:|
 | Create App Engine standard environment App | :heavy_check_mark: | :x: | :x: |
 | Create App Engine flexible environment App | :heavy_check_mark: | :heavy_check_mark: | :x: |
