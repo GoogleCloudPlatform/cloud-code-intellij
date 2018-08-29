@@ -18,6 +18,7 @@ package com.google.cloud.tools.intellij.cloudapis;
 
 import com.google.cloud.tools.intellij.cloudapis.CloudApiUiExtension.EXTENSION_UI_COMPONENT_LOCATION;
 import com.google.cloud.tools.intellij.project.CloudProject;
+import com.google.cloud.tools.intellij.project.ProjectSelectionListener;
 import com.google.cloud.tools.intellij.project.ProjectSelector;
 import com.google.cloud.tools.libraries.json.CloudLibrary;
 import com.google.common.annotations.VisibleForTesting;
@@ -126,6 +127,11 @@ public final class GoogleCloudApiSelectorPanel {
   /** Adds the given {@link TableModelListener} to the {@link TableModel}. */
   void addTableModelListener(TableModelListener listener) {
     cloudLibrariesTable.getModel().addTableModelListener(listener);
+  }
+
+  /** Adds the given {@link ProjectSelectionListener} to the {@link ProjectSelector}. */
+  void addCloudProjectSelectionListener(ProjectSelectionListener listener) {
+    projectSelector.addProjectSelectionListener(listener);
   }
 
   /** Returns the selected {@link Module}. */
