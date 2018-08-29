@@ -22,7 +22,7 @@ into the IntelliJ IDEA UI. Currently this includes:
 * [Google Cloud Storage](https://cloud.google.com/storage/) 
   Browse your Google Cloud Storage buckets.
 * [Google Cloud Java Client Libraries](https://cloud.google.com/tools/intellij/docs/client-libraries) 
-  Add Java client libraries to your project and enable Google Cloud APIs.
+  Add Java client libraries to your project, enable Google Cloud APIs, and create service accounts.
 
 For detailed user documentation go to our documentation
  [website](https://cloud.google.com/tools/intellij/docs/?utm_source=github&utm_medium=google-cloud-intellij&utm_campaign=ToolsforIntelliJ).
