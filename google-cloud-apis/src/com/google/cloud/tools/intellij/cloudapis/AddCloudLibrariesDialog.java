@@ -50,9 +50,11 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
 
     cloudApiSelectorPanel = new GoogleCloudApiSelectorPanel(libraries, project);
     cloudApiSelectorPanel.addModuleSelectionListener(
-        listener -> setOKActionEnabled(isReadyToSubmit()));
+        listener -> setOKActionEnabled(isReadyToContinue()));
     cloudApiSelectorPanel.addTableModelListener(
-        cloudProject -> setOKActionEnabled(isReadyToSubmit()));
+        cloudProject -> setOKActionEnabled(isReadyToContinue()));
+    cloudApiSelectorPanel.addCloudProjectSelectionListener(
+        cloudProject -> setOKActionEnabled(isReadyToContinue()));
 
     init();
 
@@ -68,7 +70,7 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
     super.init();
     setTitle(GoogleCloudApisMessageBundle.message("cloud.libraries.dialog.title"));
     updateOKButtonText(GoogleCloudApisMessageBundle.message("cloud.libraries.ok.button.text"));
-    setOKActionEnabled(isReadyToSubmit());
+    setOKActionEnabled(isReadyToContinue());
   }
 
   /** Exposes OK button text setter for use by UI extensions via {@link CloudApiUiPresenter} */
@@ -204,7 +206,17 @@ final class AddCloudLibrariesDialog extends DialogWrapper {
     return cloudApiSelectorPanel.getPanel();
   }
 
-  private boolean isReadyToSubmit() {
-    return getSelectedModule() != null && !getSelectedLibraries().isEmpty();
+  /**
+   * Returns {@code true} if the dialog is ready to continue to the next state, and {@code false}
+   * otherwise.
+   *
+   * <p>The dialog is considered ready if a module is selected and at least one library has been
+   * selected. Also, a Cloud Project selection is required if the client library functionality is
+   * disabled (tested by checking if the module combobox is hidden).
+   */
+  private boolean isReadyToContinue() {
+    return getSelectedModule() != null
+        && (cloudApiSelectorPanel.getModulesComboBox().isVisible() || getCloudProject() != null)
+        && !getSelectedLibraries().isEmpty();
   }
 }
