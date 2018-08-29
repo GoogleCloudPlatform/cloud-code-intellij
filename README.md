@@ -53,7 +53,7 @@ This table displays the features available in the IDEs:
 | Run and Debug App Engine<br>standard environment App Locally | :heavy_check_mark: | :heavy_check_mark: \* | :x: |
 | Deploy App Engine flexible environment App | :heavy_check_mark: | :heavy_check_mark: | :x: |
 | Deploy App Engine standard environment App | :heavy_check_mark: | :heavy_check_mark: \** | :x: |
-| Manage Cloud Client Libraries | :heavy_check_mark: | :heavy_check_mark: | :x: |
+| Manage Cloud Client Libraries | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
 | Browse files in Cloud Storage | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
 | Use VCS for Source Control | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
 | Debug using Stackdriver | :heavy_check_mark: | :heavy_check_mark: | :x: |
