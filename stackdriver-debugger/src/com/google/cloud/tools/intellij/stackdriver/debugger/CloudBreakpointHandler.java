@@ -353,13 +353,13 @@ public class CloudBreakpointHandler
     }
 
     PsiFile javaFile = psiManager.findFile(ideBreakpoint.getSourcePosition().getFile());
-    if (!(javaFile instanceof PsiJavaFile)) {
-      return;
-    }
+//    if (!(javaFile instanceof PsiJavaFile)) {
+//      return;
+//    }
     SourceLocation location = new SourceLocation();
     // Sending the file as com/package/example/Class.java to Cloud Debugger because it plays nice
     // with the CDB plugin. See ServerToIdeFileResolver.
-    location.setPath(ServerToIdeFileResolver.getCloudPathFromJavaFile((PsiJavaFile) javaFile));
+    location.setPath(ServerToIdeFileResolver.getCloudPathFromJavaFile(javaFile));
     location.setLine(ideBreakpoint.getSourcePosition().getLine() + 1);
 
     Breakpoint serverNewBreakpoint = new Breakpoint();

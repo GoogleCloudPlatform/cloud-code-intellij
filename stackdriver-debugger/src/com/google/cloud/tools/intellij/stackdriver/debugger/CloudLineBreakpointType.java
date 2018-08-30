@@ -97,10 +97,10 @@ public class CloudLineBreakpointType extends XLineBreakpointType<CloudLineBreakp
       return false;
     }
 
-    if (!StdFileTypes.CLASS.equals(psiFile.getFileType())
-        && !DebuggerUtils.isBreakpointAware(psiFile)) {
-      return false;
-    }
+//    if (!StdFileTypes.CLASS.equals(psiFile.getFileType())
+//        && !DebuggerUtils.isBreakpointAware(psiFile)) {
+//      return false;
+//    }
 
     final Document document = FileDocumentManager.getInstance().getDocument(file);
     final Ref<Class<? extends CloudLineBreakpointType>> result = Ref.create();
