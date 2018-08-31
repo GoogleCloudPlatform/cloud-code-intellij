@@ -357,6 +357,7 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
 
   @SuppressWarnings("unchecked")
   private XLineBreakpointImpl<CloudLineBreakpointProperties> registerMockBreakpoint(
+      PsiClassOwner psiFile,
       String[] watches,
       String condition,
       int sourceLine,
@@ -389,10 +390,9 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
 
     when(lineBreakpoint.getSourcePosition()).thenReturn(sourcePosition);
 
-    PsiJavaFile psiJavaFile = mock(PsiJavaFile.class);
-    when(psiJavaFile.getPackageName()).thenReturn(packageName);
-    when(psiJavaFile.getName()).thenReturn(shortFileName);
-    when(psiManager.findFile(mockFile)).thenReturn(psiJavaFile);
+    when(psiFile.getPackageName()).thenReturn(packageName);
+    when(psiFile.getName()).thenReturn(shortFileName);
+    when(psiManager.findFile(mockFile)).thenReturn(psiFile);
     handler.setPsiManager(psiManager);
 
     CloudLineBreakpointType.CloudLineBreakpoint javaBreakpoint =

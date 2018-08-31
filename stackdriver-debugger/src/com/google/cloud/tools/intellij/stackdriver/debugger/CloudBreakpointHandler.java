@@ -23,6 +23,7 @@ import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcessStateController.SetBreakpointHandler;
 import com.google.cloud.tools.intellij.stackdriver.debugger.CloudLineBreakpointType.CloudLineBreakpoint;
+import com.intellij.debugger.engine.DebuggerUtils;
 import com.intellij.debugger.ui.breakpoints.BreakpointManager;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -30,8 +31,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiClassOwner;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.xdebugger.XDebuggerManager;
 import com.intellij.xdebugger.breakpoints.XBreakpoint;
@@ -353,13 +354,15 @@ public class CloudBreakpointHandler
     }
 
     PsiFile javaFile = psiManager.findFile(ideBreakpoint.getSourcePosition().getFile());
-//    if (!(javaFile instanceof PsiJavaFile)) {
-//      return;
-//    }
+
+    if (javaFile == null || !DebuggerUtils.isBreakpointAware(javaFile)) {
+      return;
+    }
+
     SourceLocation location = new SourceLocation();
     // Sending the file as com/package/example/Class.java to Cloud Debugger because it plays nice
     // with the CDB plugin. See ServerToIdeFileResolver.
-    location.setPath(ServerToIdeFileResolver.getCloudPathFromJavaFile(javaFile));
+    location.setPath(ServerToIdeFileResolver.getCloudPathFromFile((PsiClassOwner) javaFile));
     location.setLine(ideBreakpoint.getSourcePosition().getLine() + 1);
 
     Breakpoint serverNewBreakpoint = new Breakpoint();

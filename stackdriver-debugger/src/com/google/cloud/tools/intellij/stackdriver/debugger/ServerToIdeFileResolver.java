@@ -26,8 +26,7 @@ import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.VirtualFileSystem;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiJavaFile;
+import com.intellij.psi.PsiClassOwner;
 import com.intellij.psi.PsiPackage;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -35,7 +34,6 @@ import com.intellij.util.indexing.FileBasedIndex;
 import java.util.Collection;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.kotlin.psi.KtFile;
 
 /**
  * Provides a translation between file names sent from the CDB API and IntelliJ project files in the
@@ -59,13 +57,8 @@ public class ServerToIdeFileResolver {
       VirtualFileManager.getInstance().getFileSystem(StandardFileSystems.FILE_PROTOCOL);
 
   /** Utility method that returns the full class name for a file. */
-  public static String getCloudPathFromJavaFile(PsiFile javaFile) {
-    if (javaFile instanceof KtFile) {
-      KtFile ktFile = (KtFile) javaFile;
-      return ktFile.getPackageName().replace('.', '/') + "/" + ktFile.getName();
-    } else {
-      return ((PsiJavaFile) javaFile).getPackageName().replace('.', '/') + "/" + javaFile.getName();
-    }
+  public static String getCloudPathFromFile(PsiClassOwner psiFile) {
+    return psiFile.getPackageName().replace('.', '/') + "/" + psiFile.getName();
   }
 
   /**
