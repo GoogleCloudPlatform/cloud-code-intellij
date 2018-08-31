@@ -42,7 +42,6 @@
   </change-notes>
 
   <depends>org.jetbrains.plugins.yaml</depends>
-  <depends>org.jetbrains.kotlin</depends>
   <depends optional="true" config-file="google-cloud-java.xml">com.intellij.modules.java</depends>
   <depends optional="true" config-file="google-cloud-kotlin.xml">org.jetbrains.kotlin</depends>
   <depends optional="true" config-file="app-engine-java-gradle.xml">org.jetbrains.plugins.gradle</depends>
