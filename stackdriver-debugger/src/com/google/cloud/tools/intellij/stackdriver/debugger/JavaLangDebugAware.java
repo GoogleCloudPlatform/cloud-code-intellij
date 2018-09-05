@@ -21,6 +21,10 @@ import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Implementation of {@link JavaDebugAware} extension point for the Java language to indicate that a
+ * given Java file can accept breakpoints.
+ */
 public class JavaLangDebugAware extends JavaDebugAware {
 
   @Override

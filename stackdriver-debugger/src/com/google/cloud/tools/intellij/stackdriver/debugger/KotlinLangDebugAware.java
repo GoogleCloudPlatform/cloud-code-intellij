@@ -21,6 +21,10 @@ import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.kotlin.idea.KotlinFileType;
 
+/**
+ * Implementation of {@link JavaDebugAware} extension point for the Kotlin language to indicate that
+ * a given Kotlin file can accept breakpoints.
+ */
 public class KotlinLangDebugAware extends JavaDebugAware {
 
   @Override
