@@ -36,10 +36,12 @@ import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcessSta
 import com.google.cloud.tools.intellij.stackdriver.debugger.CloudLineBreakpointType.CloudLineBreakpoint;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.mock.MockProjectEx;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiClassOwner;
 import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.testFramework.IdeaTestCase;
@@ -59,6 +61,8 @@ import com.intellij.xdebugger.breakpoints.XLineBreakpointType;
 import com.intellij.xdebugger.impl.breakpoints.XLineBreakpointImpl;
 import java.util.ArrayList;
 import java.util.List;
+import org.jetbrains.kotlin.idea.KotlinFileType;
+import org.jetbrains.kotlin.psi.KtFile;
 import org.junit.Assert;
 import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
@@ -83,6 +87,8 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
   private XBreakpointManager breakpointManager;
   private ServerToIdeFileResolver fileResolver;
 
+  private PsiJavaFile psiJavaFile;
+
   @SuppressWarnings("JUnitTestCaseWithNonTrivialConstructors")
   public CloudBreakpointHandlerTest() {
     IdeaTestCase.initPlatformPrefix();
@@ -100,6 +106,8 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
     project = new MockProjectEx(getTestRootDisposable());
 
     psiManager = mock(PsiManager.class);
+    psiJavaFile = mock(PsiJavaFile.class);
+    when(psiJavaFile.getFileType()).thenReturn(JavaFileType.INSTANCE);
     project.registerService(PsiManager.class, psiManager);
 
     XDebugSession session = mock(XDebugSession.class);
@@ -162,8 +170,35 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
     super.tearDown();
   }
 
-  public void testSimpleBreakpointRegister() {
+  public void testSimpleJavaFileBreakpointRegister() {
     registerMockBreakpoint(
+        psiJavaFile,
+        new String[] {"foowatch1"},
+        "condition == true",
+        123,
+        "foo.java",
+        "com.google",
+        false,
+        "b_id");
+
+    assertNull(removedBp.get());
+    assertNotNull(addedBp.get());
+    assertContainsElements(addedBp.get().getExpressions(), "foowatch1");
+    assertTrue(addedBp.get().getLocation().getLine() == 124);
+    assertTrue(addedBp.get().getLocation().getPath().equals("com/google/foo.java"));
+    assertTrue(addedBp.get().getCondition().equals("condition == true"));
+
+    ArgumentCaptor<CloudLineBreakpoint> breakpointArgumentCaptor =
+        ArgumentCaptor.forClass(CloudLineBreakpoint.class);
+    verify(process).updateBreakpointPresentation(breakpointArgumentCaptor.capture());
+    assertThat(breakpointArgumentCaptor.getValue().getErrorMessage(), nullValue());
+  }
+
+  public void testSimpleKotlinFileBreakpointRegister() {
+    KtFile ktFile = mock(KtFile.class);
+    when(ktFile.getFileType()).thenReturn(KotlinFileType.INSTANCE);
+    registerMockBreakpoint(
+        ktFile,
         new String[] {"foowatch1"},
         "condition == true",
         123,
@@ -189,6 +224,7 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
       testRegisterBreakpointErrorShouldSetErrorMessageAndCallUpdateBreakpointPresentation() {
     registrationShouldSucceed = false;
     registerMockBreakpoint(
+        psiJavaFile,
         new String[] {"foowatch1"},
         "condition == true",
         123,
@@ -207,7 +243,14 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
   public void
       testRegisterBreakpointErrorShouldSetErrorMessageAndCallUpdateBreakpointPresentation2() {
     registerMockBreakpoint(
-        new String[] {"foowatch1"}, "condition == true", 123, "foo.java", "com.google", false, "");
+        psiJavaFile,
+        new String[] {"foowatch1"},
+        "condition == true",
+        123,
+        "foo.java",
+        "com.google",
+        false,
+        "");
 
     ArgumentCaptor<CloudLineBreakpoint> breakpointArgumentCaptor =
         ArgumentCaptor.forClass(CloudLineBreakpoint.class);
@@ -219,6 +262,7 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
 
   public void testRegisterGetAndDelete() {
     registerMockBreakpoint(
+        psiJavaFile,
         new String[] {"foowatch1"},
         "condition == true",
         123,
@@ -246,6 +290,7 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
 
   public void testServerCreation() {
     registerMockBreakpoint(
+        psiJavaFile,
         new String[] {"foowatch1"},
         "condition == true",
         123,
@@ -267,6 +312,7 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
     existingBreakpoints.add(existingServerBp);
 
     registerMockBreakpoint(
+        psiJavaFile,
         new String[] {"foowatch1"},
         "condition == true",
         123,
@@ -289,7 +335,7 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
   public void testRegisterRegisteredBreakpoint() {
     XLineBreakpointImpl<CloudLineBreakpointProperties> breakpoint =
         registerMockBreakpoint(
-            NO_WATCHES, NO_CONDITION, 13, "fileName", "packageName", false, "12abc");
+            psiJavaFile, NO_WATCHES, NO_CONDITION, 13, "fileName", "packageName", false, "12abc");
     handler.registerBreakpoint(breakpoint);
     verify(stateController, times(1))
         .setBreakpointAsync(isA(Breakpoint.class), isA(SetBreakpointHandler.class));
@@ -298,7 +344,7 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
   public void testRegisterRegisteredButDisabledBreakpoint() {
     XLineBreakpointImpl<CloudLineBreakpointProperties> breakpoint =
         registerMockBreakpoint(
-            NO_WATCHES, NO_CONDITION, 13, "fileName", "packageName", false, "12abc");
+            psiJavaFile, NO_WATCHES, NO_CONDITION, 13, "fileName", "packageName", false, "12abc");
     handler.setStateToDisabled(new Breakpoint().setId("12abc"));
     handler.registerBreakpoint(breakpoint);
     verify(stateController, times(2))
@@ -309,7 +355,7 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
       throws Exception {
     XLineBreakpointImpl breakpoint =
         registerMockBreakpoint(
-            NO_WATCHES, NO_CONDITION, 13, "fileName", "packageName", false, "12abc");
+            psiJavaFile, NO_WATCHES, NO_CONDITION, 13, "fileName", "packageName", false, "12abc");
 
     CloudLineBreakpoint cloudLineBreakpoint =
         (CloudLineBreakpoint)
@@ -329,7 +375,7 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
       throws Exception {
     XLineBreakpointImpl breakpoint =
         registerMockBreakpoint(
-            NO_WATCHES, NO_CONDITION, 13, "fileName", "packageName", false, "12abc");
+            psiJavaFile, NO_WATCHES, NO_CONDITION, 13, "fileName", "packageName", false, "12abc");
     handler.setStateToDisabled(new Breakpoint().setId("12abc"));
     assertNotNull(breakpoint.getProperties());
     assertTrue(((CloudLineBreakpointProperties) breakpoint.getProperties()).isAddedOnServer());
@@ -345,7 +391,7 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
       throws Exception {
     XLineBreakpointImpl breakpoint =
         registerMockBreakpoint(
-            NO_WATCHES, NO_CONDITION, 13, "fileName", "packageName", false, "12abc");
+            psiJavaFile, NO_WATCHES, NO_CONDITION, 13, "fileName", "packageName", false, "12abc");
     assertNotNull(breakpoint.getProperties());
     assertTrue(((CloudLineBreakpointProperties) breakpoint.getProperties()).isAddedOnServer());
 
@@ -357,6 +403,7 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
 
   @SuppressWarnings("unchecked")
   private XLineBreakpointImpl<CloudLineBreakpointProperties> registerMockBreakpoint(
+      PsiClassOwner psiFile,
       String[] watches,
       String condition,
       int sourceLine,
@@ -389,10 +436,9 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
 
     when(lineBreakpoint.getSourcePosition()).thenReturn(sourcePosition);
 
-    PsiJavaFile psiJavaFile = mock(PsiJavaFile.class);
-    when(psiJavaFile.getPackageName()).thenReturn(packageName);
-    when(psiJavaFile.getName()).thenReturn(shortFileName);
-    when(psiManager.findFile(mockFile)).thenReturn(psiJavaFile);
+    when(psiFile.getPackageName()).thenReturn(packageName);
+    when(psiFile.getName()).thenReturn(shortFileName);
+    when(psiManager.findFile(mockFile)).thenReturn(psiFile);
     handler.setPsiManager(psiManager);
 
     CloudLineBreakpointType.CloudLineBreakpoint javaBreakpoint =

@@ -29,6 +29,9 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceImplementation="com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugProcessStateCollector" />
+
+        <debugger.javaDebugAware
+                implementation="com.google.cloud.tools.intellij.stackdriver.debugger.JavaLangDebugAware"/>
     </extensions>
 
     <actions>

@@ -26,7 +26,7 @@ import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.VirtualFileSystem;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiJavaFile;
+import com.intellij.psi.PsiClassOwner;
 import com.intellij.psi.PsiPackage;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -57,8 +57,8 @@ public class ServerToIdeFileResolver {
       VirtualFileManager.getInstance().getFileSystem(StandardFileSystems.FILE_PROTOCOL);
 
   /** Utility method that returns the full class name for a file. */
-  public static String getCloudPathFromJavaFile(PsiJavaFile javaFile) {
-    return javaFile.getPackageName().replace('.', '/') + "/" + javaFile.getName();
+  public static String getCloudPathFromFile(PsiClassOwner psiFile) {
+    return psiFile.getPackageName().replace('.', '/') + "/" + psiFile.getName();
   }
 
   /**

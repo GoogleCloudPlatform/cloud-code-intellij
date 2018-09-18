@@ -22,7 +22,7 @@ sourceSets.test.java.srcDirs = ['testSrc']
 sourceSets.test.resources.srcDirs = ['testResources']
 
 intellij {
-    plugins  'git4idea'
+    plugins  'git4idea', 'Kotlin'
 }
 
 dependencies {
