@@ -16,4 +16,7 @@
 
 <!-- Declares IDE extensions and components for Skaffold support in Container Tools -->
 <idea-plugin>
+    <extensions defaultExtensionNs="com.intellij">
+        <configurationType implementation="com.google.container.tools.skaffold.run.SkaffoldRunConfigurationType"/>
+    </extensions>
 </idea-plugin>

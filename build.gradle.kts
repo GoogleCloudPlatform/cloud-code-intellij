@@ -11,4 +11,13 @@ allprojects {
 
     apply(plugin = "org.jetbrains.intellij")
     apply(plugin = "kotlin")
+
+    intellij {
+        type = "IC"
+        version = "2018.2"
+    }
+}
+
+dependencies {
+    compile(project(":skaffold"))
 }
