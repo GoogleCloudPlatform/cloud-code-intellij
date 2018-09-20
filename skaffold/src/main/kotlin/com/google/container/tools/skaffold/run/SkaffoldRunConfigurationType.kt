@@ -33,7 +33,7 @@ class SkaffoldRunConfigurationType : ConfigurationType {
     override fun getIcon(): Icon = SKAFFOLD_ICON
 
     override fun getConfigurationTypeDescription(): String =
-            message("skaffold.run.config.general.description")
+        message("skaffold.run.config.general.description")
 
     override fun getId(): String = ID
 
