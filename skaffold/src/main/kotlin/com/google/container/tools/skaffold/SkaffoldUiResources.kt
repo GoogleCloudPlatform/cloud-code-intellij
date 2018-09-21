@@ -28,6 +28,9 @@ private const val BUNDLE_NAME = "messages.SkaffoldBundle"
 /**
  * Returns message by provided key from Skaffold message bundle with optional parameters.
  */
-internal fun message(@PropertyKey(resourceBundle = BUNDLE_NAME) key: String, vararg params: String): String {
+internal fun message(
+    @PropertyKey(resourceBundle = BUNDLE_NAME) key: String,
+    vararg params: String
+): String {
     return CommonBundle.message(ResourceBundle.getBundle(BUNDLE_NAME), key, params)
 }

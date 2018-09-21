@@ -16,6 +16,7 @@
 
 plugins {
     id("org.jetbrains.intellij") version "0.3.7"
+    id("com.diffplug.gradle.spotless") version "3.14.0"
 
     kotlin("jvm") version "1.2.61"
 }
@@ -27,11 +28,25 @@ allprojects {
 
     apply(plugin = "org.jetbrains.intellij")
     apply(plugin = "kotlin")
+    apply(plugin = "com.diffplug.gradle.spotless")
 
     intellij {
         type = project.properties["ideaEdition"].toString()
         version = project.properties["ideaVersion"].toString()
         intellijRepo = project.properties["intellijRepoUrl"].toString()
+    }
+
+    spotless {
+        kotlin {
+            target("**/src/**/*.kt")
+            // Set ktlint to follow the Android Style Guide for source files
+            ktlint().userData(mapOf("android" to "true"))
+        }
+
+        kotlinGradle {
+            target("**/*.gradle.kts")
+            ktlint()
+        }
     }
 }
 

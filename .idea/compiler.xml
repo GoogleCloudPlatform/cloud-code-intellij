@@ -4,6 +4,8 @@
     <bytecodeTargetLevel>
       <module name="google-container-tools-intellij_main" target="1.8" />
       <module name="google-container-tools-intellij_test" target="1.8" />
+      <module name="skaffold_main" target="1.8" />
+      <module name="skaffold_test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
