@@ -30,7 +30,7 @@
 cd github/google-container-tools-intellij
 
 @rem Explicitly set to JDK 8 to get around Kokoro default environment value of JDK 9
-set JAVA_HOME=C:\Program Files\Java\jdk1.8.0_144
+set JAVA_HOME=C:\program files\java\jdk1.8.0_152
 
 gradlew.bat check --stacktrace
 
