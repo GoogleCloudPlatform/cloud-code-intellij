@@ -20,6 +20,8 @@ import com.google.container.tools.skaffold.SKAFFOLD_ICON
 import com.google.container.tools.skaffold.message
 import com.intellij.execution.configurations.ConfigurationFactory
 import com.intellij.execution.configurations.ConfigurationType
+import com.intellij.execution.configurations.RunConfiguration
+import com.intellij.openapi.project.Project
 import javax.swing.Icon
 
 /**
@@ -30,6 +32,9 @@ import javax.swing.Icon
 class SkaffoldRunConfigurationType : ConfigurationType {
     val ID = "google-container-tools-skaffold-run-config"
 
+    val skaffoldSingleRunConfigurationFactory = SkaffoldSingleRunConfigurationFactory(this)
+    val skaffoldDevConfigurationFactory = SkaffoldDevConfigurationFactory(this)
+
     override fun getIcon(): Icon = SKAFFOLD_ICON
 
     override fun getConfigurationTypeDescription(): String =
@@ -39,5 +44,28 @@ class SkaffoldRunConfigurationType : ConfigurationType {
 
     override fun getDisplayName(): String = message("skaffold.run.config.general.name")
 
-    override fun getConfigurationFactories(): Array<ConfigurationFactory> = emptyArray()
+    override fun getConfigurationFactories(): Array<ConfigurationFactory> =
+        arrayOf(skaffoldSingleRunConfigurationFactory, skaffoldDevConfigurationFactory)
+}
+
+/**
+ * Factory for Skaffold single run ("skaffold run" style) configurations. See template configuration
+ * at [SkaffoldSingleRunConfiguration].
+ */
+class SkaffoldSingleRunConfigurationFactory(type: ConfigurationType) : ConfigurationFactory(type) {
+    override fun createTemplateConfiguration(project: Project): RunConfiguration =
+        SkaffoldSingleRunConfiguration(project, this, name)
+
+    override fun getName(): String = message("skaffold.run.config.single.run.name")
+}
+
+/**
+ * Factory for Skaffold dev (continuous) mode ("skaffold dev" style) configurations.
+ * See template configuration at [SkaffoldDevConfiguration].
+ */
+class SkaffoldDevConfigurationFactory(type: ConfigurationType) : ConfigurationFactory(type) {
+    override fun createTemplateConfiguration(project: Project): RunConfiguration =
+        SkaffoldDevConfiguration(project, this, name)
+
+    override fun getName(): String = message("skaffold.run.config.dev.run.name")
 }
