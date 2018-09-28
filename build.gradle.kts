@@ -31,6 +31,8 @@ allprojects {
     apply(plugin = "com.diffplug.gradle.spotless")
 
     intellij {
+        setPlugins("yaml")
+
         type = project.properties["ideaEdition"].toString()
         version = project.properties["ideaVersion"].toString()
         intellijRepo = project.properties["intellijRepoUrl"].toString()
