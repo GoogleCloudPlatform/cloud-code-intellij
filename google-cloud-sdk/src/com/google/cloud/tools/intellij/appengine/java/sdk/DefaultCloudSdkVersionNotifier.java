@@ -55,7 +55,7 @@ public class DefaultCloudSdkVersionNotifier extends CloudSdkVersionNotifier {
           CloudSdkMessageBundle.message("appengine.cloudsdk.version.file.error.title"), message);
 
       UsageTrackerService.getInstance()
-          .trackEvent(GctTracking.MANAGED_SDK_VERSION_PARSE_ERROR)
+          .trackEvent(GctTracking.SDK_VERSION_PARSE_ERROR)
           .ping();
     }
   }
