@@ -19,6 +19,7 @@ package com.google.cloud.tools.intellij.appengine.java.cloud;
 import com.google.api.client.repackaged.com.google.common.annotations.VisibleForTesting;
 import com.google.cloud.tools.appengine.api.AppEngineException;
 import com.google.cloud.tools.appengine.api.deploy.DefaultDeployConfiguration;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkOutOfDateException;
 import com.google.cloud.tools.appengine.cloudsdk.process.LegacyProcessHandler;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessExitListener;
 import com.google.cloud.tools.appengine.cloudsdk.process.ProcessHandler;
@@ -147,9 +148,14 @@ public class AppEngineDeploy {
             .build();
 
     // show a warning notification if the cloud sdk version is not supported
-    CloudSdkVersionNotifier.getInstance().notifyIfUnsupportedVersion();
+    CloudSdkVersionNotifier.getInstance().notifyIfVersionOutOfDate();
+    CloudSdkVersionNotifier.getInstance().notifyIfVersionParseError();
 
-    helper.createGcloud(loggingHandler).newDeployment(processHandler).deploy(configuration);
+    try {
+      helper.createGcloud(loggingHandler).newDeployment(processHandler).deploy(configuration);
+    } catch (CloudSdkOutOfDateException ex) {
+      logger.warn("Error during deployment because because Cloud SDK version out of date");
+    }
   }
 
   public AppEngineHelper getHelper() {

@@ -17,7 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.java.cloud;
 
 import static com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND;
-import static com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED;
+import static com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkValidationResult.CLOUD_SDK_NOT_MINIMUM_VERSION;
 import static com.google.cloud.tools.intellij.appengine.java.sdk.CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT;
 import static com.google.cloud.tools.intellij.testing.TestUtils.expectThrows;
 import static com.google.common.truth.Truth.assertThat;
@@ -195,7 +195,7 @@ public final class AppEngineDeploymentConfigurationTest {
   public void checkConfiguration_withOutdatedCloudSdkVersion_throwsException() {
     setUpValidFlexConfiguration();
     when(mockSdkValidator.validateCloudSdk())
-        .thenReturn(ImmutableSet.of(CLOUD_SDK_VERSION_NOT_SUPPORTED));
+        .thenReturn(ImmutableSet.of(CLOUD_SDK_NOT_MINIMUM_VERSION));
 
     RuntimeConfigurationError error =
         expectThrows(

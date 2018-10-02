@@ -58,8 +58,16 @@ public class CloudSdkValidator {
       // If the Cloud SDK is not found, don't bother checking anything else
       return validationResults;
     } catch (CloudSdkOutOfDateException exception) {
-      validationResults.add(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED);
-    } catch (CloudSdkVersionFileException e) {
+      validationResults.add(CloudSdkValidationResult.CLOUD_SDK_NOT_MINIMUM_VERSION);
+    } catch (CloudSdkVersionFileException exception) {
+      // TODO once appengine-plugins core change is merge in, this exception will not be thrown
+      // instead, we validate the version parsing separately
+//      validationResults.add(CloudSdkValidationResult.CLOUD_SDK_VERSION_FILE_ERROR);
+    }
+
+    try {
+      sdk.getVersion();
+    } catch (CloudSdkVersionFileException exception) {
       validationResults.add(CloudSdkValidationResult.CLOUD_SDK_VERSION_FILE_ERROR);
     }
 

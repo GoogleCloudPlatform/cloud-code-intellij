@@ -70,13 +70,22 @@ public class DefaultCloudSdkServiceTest {
   }
 
   @Test
-  public void testValidateCloudSdk_versionUnsupported()
+  public void testValidateCloudSdk_versionOutOfDate()
       throws CloudSdkNotFoundException, CloudSdkOutOfDateException, CloudSdkVersionFileException {
     doThrow(CloudSdkOutOfDateException.class).when(mockSdk).validateCloudSdk();
     Set<CloudSdkValidationResult> results = sdkValidator.validateCloudSdk();
     assertEquals(1, results.size());
-    assertEquals(
-        CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED, results.iterator().next());
+    assertEquals(CloudSdkValidationResult.CLOUD_SDK_NOT_MINIMUM_VERSION, results.iterator().next());
+    assertFalse(sdkValidator.isValidCloudSdk());
+  }
+
+  @Test
+  public void testValidateCloudSdk_versionParseError()
+      throws CloudSdkNotFoundException, CloudSdkOutOfDateException, CloudSdkVersionFileException {
+    doThrow(CloudSdkVersionFileException.class).when(mockSdk).validateCloudSdk();
+    Set<CloudSdkValidationResult> results = sdkValidator.validateCloudSdk();
+    assertEquals(1, results.size());
+    assertEquals(CloudSdkValidationResult.CLOUD_SDK_VERSION_FILE_ERROR, results.iterator().next());
     assertFalse(sdkValidator.isValidCloudSdk());
   }
 
@@ -148,6 +157,6 @@ public class DefaultCloudSdkServiceTest {
     Set<CloudSdkValidationResult> results = sdkValidator.validateCloudSdk("/good/path");
     assertEquals(2, results.size());
     assertTrue(results.contains(CloudSdkValidationResult.NO_APP_ENGINE_COMPONENT));
-    assertTrue(results.contains(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED));
+    assertTrue(results.contains(CloudSdkValidationResult.CLOUD_SDK_NOT_MINIMUM_VERSION));
   }
 }

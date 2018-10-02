@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.java.sdk;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -23,7 +24,7 @@ import static org.mockito.Mockito.when;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.common.collect.Sets;
-import com.intellij.util.containers.HashSet;
+import java.util.HashSet;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -44,18 +45,27 @@ public class DefaultCloudSdkVersionNotifierTest {
   @Test
   public void testNotifyIfCloudSdkNotSupported_isSupported() {
     when(cloudSdkValidator.validateCloudSdk()).thenReturn(new HashSet<>());
-    checker.notifyIfUnsupportedVersion();
+    checker.notifyIfVersionOutOfDate();
 
-    verify(checker, times(0)).showNotification();
+    verify(checker, times(0)).showNotification(anyString(), anyString());
   }
 
   @Test
-  public void testNotifyIfCloudSdkNotSupported_notSupported() {
+  public void testNotifyIfCloudSdkNotSupported_versionOutOfDateError() {
     when(cloudSdkValidator.validateCloudSdk())
-        .thenReturn(Sets.newHashSet(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED));
+        .thenReturn(Sets.newHashSet(CloudSdkValidationResult.CLOUD_SDK_NOT_MINIMUM_VERSION));
 
-    checker.notifyIfUnsupportedVersion();
-    verify(checker, times(1)).showNotification();
+    checker.notifyIfVersionOutOfDate();
+    verify(checker, times(1)).showNotification(anyString(), anyString());
+  }
+
+  @Test
+  public void testNotifyIfCloudSdkNotSupported_versionParseError() {
+    when(cloudSdkValidator.validateCloudSdk())
+        .thenReturn(Sets.newHashSet(CloudSdkValidationResult.CLOUD_SDK_VERSION_FILE_ERROR));
+
+    checker.notifyIfVersionParseError();
+    verify(checker, times(1)).showNotification(anyString(), anyString());
   }
 
   @Test
@@ -63,13 +73,13 @@ public class DefaultCloudSdkVersionNotifierTest {
     when(cloudSdkValidator.validateCloudSdk())
         .thenReturn(Sets.newHashSet(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND));
 
-    checker.notifyIfUnsupportedVersion();
-    verify(checker, times(0)).showNotification();
+    checker.notifyIfVersionOutOfDate();
+    verify(checker, times(0)).showNotification(anyString(), anyString());
   }
 
   @Test
   public void testNotifyIfCloudSdkNotSupported_nullSdkPath() {
-    checker.notifyIfUnsupportedVersion();
-    verify(checker, times(0)).showNotification();
+    checker.notifyIfVersionOutOfDate();
+    verify(checker, times(0)).showNotification(anyString(), anyString());
   }
 }

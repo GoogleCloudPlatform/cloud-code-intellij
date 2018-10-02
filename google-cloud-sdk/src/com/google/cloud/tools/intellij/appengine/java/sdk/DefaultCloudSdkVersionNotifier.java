@@ -25,32 +25,43 @@ import com.intellij.notification.NotificationType;
 public class DefaultCloudSdkVersionNotifier extends CloudSdkVersionNotifier {
 
   @Override
-  public void notifyIfUnsupportedVersion() {
+  public void notifyIfVersionOutOfDate() {
     CloudSdkValidator sdkValidator = CloudSdkValidator.getInstance();
+
     if (sdkValidator
         .validateCloudSdk()
-        .contains(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED)) {
-      showNotification();
+        .contains(CloudSdkValidationResult.CLOUD_SDK_NOT_MINIMUM_VERSION)) {
+      String message =
+          "<p>" + CloudSdkValidationResult.CLOUD_SDK_NOT_MINIMUM_VERSION.getMessage() + "</p>";
+
+      showNotification(
+          CloudSdkMessageBundle.message("appengine.cloudsdk.version.support.title"), message);
+    }
+  }
+
+  @Override
+  public void notifyIfVersionParseError() {
+    CloudSdkValidator sdkValidator = CloudSdkValidator.getInstance();
+
+    if (sdkValidator
+        .validateCloudSdk()
+        .contains(CloudSdkValidationResult.CLOUD_SDK_VERSION_FILE_ERROR)) {
+      String message =
+          "<p>" + CloudSdkValidationResult.CLOUD_SDK_VERSION_FILE_ERROR.getMessage() + "</p>";
+
+      showNotification(
+          CloudSdkMessageBundle.message("appengine.cloudsdk.version.file.error.title"), message);
     }
   }
 
   @VisibleForTesting
-  void showNotification() {
+  void showNotification(String title, String message) {
     NotificationGroup notification =
-        new NotificationGroup(
-            CloudSdkMessageBundle.message("appengine.cloudsdk.version.support.title"),
-            NotificationDisplayType.BALLOON,
-            true);
-
-    String message =
-        "<p>" + CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED.getMessage() + "</p>";
+        new NotificationGroup(title, NotificationDisplayType.BALLOON, true);
 
     notification
         .createNotification(
-            CloudSdkMessageBundle.message("appengine.cloudsdk.version.support.title"),
-            message,
-            NotificationType.WARNING,
-            null /* notificationListener */)
+            title, message, NotificationType.WARNING, null /* notificationListener */)
         .notify(null /*project*/);
   }
 }

@@ -102,25 +102,25 @@ public class CloudSdkPanelTest {
 
   @Test
   public void testCheckSdk_unsupportedSdk() {
-    setValidateCloudSdkResponse(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED);
+    setValidateCloudSdkResponse(CloudSdkValidationResult.CLOUD_SDK_NOT_MINIMUM_VERSION);
     when(cloudSdkValidator.isValidCloudSdk("/non/empty/path")).thenReturn(false);
     panel.checkSdk("/non/empty/path");
     verify(panel, times(1))
-        .showWarning(eq(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED.getMessage()));
+        .showWarning(eq(CloudSdkValidationResult.CLOUD_SDK_NOT_MINIMUM_VERSION.getMessage()));
     verify(panel, times(0)).hideWarning();
   }
 
   @Test
   public void testCheckSdk_multipleValidationResults() {
     setValidateCloudSdkResponse(
-        CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED,
+        CloudSdkValidationResult.CLOUD_SDK_NOT_MINIMUM_VERSION,
         CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND);
     when(cloudSdkValidator.isValidCloudSdk("/non/empty/path")).thenReturn(false);
 
     String expectedMessage =
         INVALID_SDK_DIR_WARNING
             + "<p>"
-            + CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED.getMessage()
+            + CloudSdkValidationResult.CLOUD_SDK_NOT_MINIMUM_VERSION.getMessage()
             + "</p>";
 
     panel.checkSdk("/non/empty/path");

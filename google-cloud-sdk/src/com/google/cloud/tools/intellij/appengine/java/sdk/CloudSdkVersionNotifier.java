@@ -28,6 +28,12 @@ public abstract class CloudSdkVersionNotifier {
     return ServiceManager.getService(CloudSdkVersionNotifier.class);
   }
 
-  /** Notifies the user if the saved Cloud SDK is not supported. */
-  public abstract void notifyIfUnsupportedVersion();
+  /**
+   * Notifies the user if the saved Cloud SDK is not at least updated to the minimum supported
+   * version.
+   */
+  public abstract void notifyIfVersionOutOfDate();
+
+  /** Notifies the user if the saved Cloud SDK version cannot be read. */
+  public abstract void notifyIfVersionParseError();
 }
