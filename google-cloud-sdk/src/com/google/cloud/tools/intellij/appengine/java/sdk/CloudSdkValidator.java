@@ -62,7 +62,7 @@ public class CloudSdkValidator {
     } catch (CloudSdkVersionFileException exception) {
       // TODO once appengine-plugins core change is merge in, this exception will not be thrown
       // instead, we validate the version parsing separately
-//      validationResults.add(CloudSdkValidationResult.CLOUD_SDK_VERSION_FILE_ERROR);
+      //      validationResults.add(CloudSdkValidationResult.CLOUD_SDK_VERSION_FILE_ERROR);
     }
 
     try {
