@@ -80,9 +80,8 @@ public class DefaultCloudSdkServiceTest {
   }
 
   @Test
-  public void testValidateCloudSdk_versionParseError()
-      throws CloudSdkNotFoundException, CloudSdkOutOfDateException, CloudSdkVersionFileException {
-    doThrow(CloudSdkVersionFileException.class).when(mockSdk).validateCloudSdk();
+  public void testValidateCloudSdk_versionParseError() throws CloudSdkVersionFileException {
+    doThrow(CloudSdkVersionFileException.class).when(mockSdk).getVersion();
     Set<CloudSdkValidationResult> results = sdkValidator.validateCloudSdk();
     assertEquals(1, results.size());
     assertEquals(CloudSdkValidationResult.CLOUD_SDK_VERSION_FILE_ERROR, results.iterator().next());
