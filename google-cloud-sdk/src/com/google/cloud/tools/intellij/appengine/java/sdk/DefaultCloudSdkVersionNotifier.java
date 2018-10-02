@@ -16,6 +16,8 @@
 
 package com.google.cloud.tools.intellij.appengine.java.sdk;
 
+import com.google.cloud.tools.intellij.analytics.GctTracking;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
@@ -51,6 +53,10 @@ public class DefaultCloudSdkVersionNotifier extends CloudSdkVersionNotifier {
 
       showNotification(
           CloudSdkMessageBundle.message("appengine.cloudsdk.version.file.error.title"), message);
+
+      UsageTrackerService.getInstance()
+          .trackEvent(GctTracking.MANAGED_SDK_VERSION_PARSE_ERROR)
+          .ping();
     }
   }
 
