@@ -21,6 +21,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.common.collect.Sets;
@@ -56,7 +57,13 @@ public class DefaultCloudSdkVersionNotifierTest {
         .thenReturn(Sets.newHashSet(CloudSdkValidationResult.CLOUD_SDK_NOT_MINIMUM_VERSION));
 
     checker.notifyIfVersionOutOfDate();
-    verify(checker, times(1)).showNotification(anyString(), anyString());
+    verify(checker, times(1))
+        .showNotification(
+            "Google Cloud SDK Update Required",
+            "<p>The Cloud SDK is out of date. Version "
+                + CloudSdk.MINIMUM_VERSION
+                + " is the minimum required version for use with the "
+                + "Google Cloud Tools Plugin. To update, run \"gcloud components update\".</p>");
   }
 
   @Test
@@ -65,7 +72,13 @@ public class DefaultCloudSdkVersionNotifierTest {
         .thenReturn(Sets.newHashSet(CloudSdkValidationResult.CLOUD_SDK_VERSION_FILE_ERROR));
 
     checker.notifyIfVersionParseError();
-    verify(checker, times(1)).showNotification(anyString(), anyString());
+    verify(checker, times(1))
+        .showNotification(
+            "Error Reading Cloud SDK Version",
+            "<p>The Cloud SDK version file could not be read. Operations may have unintended "
+                + "results. You can install the Cloud SDK manually and set the path "
+                + "via:<p><p>Settings -> Google -> Cloud Sdk -> Use a custom local "
+                + "installation</p>");
   }
 
   @Test
