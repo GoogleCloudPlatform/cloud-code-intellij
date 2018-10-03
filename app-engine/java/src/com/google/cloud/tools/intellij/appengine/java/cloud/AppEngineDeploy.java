@@ -121,7 +121,7 @@ public class AppEngineDeploy {
     deployables.add(stagingDirectory.resolve(appYamlName).toFile());
     configuration.setDeployables(deployables);
 
-    configuration.setProject(deploymentConfiguration.getCloudProjectName());
+    configuration.setProjectId(deploymentConfiguration.getCloudProjectName());
 
     configuration.setPromote(deploymentConfiguration.isPromote());
 
