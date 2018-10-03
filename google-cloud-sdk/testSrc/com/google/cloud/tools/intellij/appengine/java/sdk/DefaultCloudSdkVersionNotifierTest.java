@@ -22,6 +22,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkVersionFileException;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.common.collect.Sets;
@@ -42,6 +44,8 @@ public class DefaultCloudSdkVersionNotifierTest {
   @Mock @TestService private CloudSdkService cloudSdkServiceMock;
 
   @Mock @TestService private CloudSdkValidator cloudSdkValidator;
+
+  @Mock private CloudSdk cloudSdk;
 
   @Test
   public void testNotifyIfCloudSdkNotSupported_isSupported() {
@@ -67,9 +71,10 @@ public class DefaultCloudSdkVersionNotifierTest {
   }
 
   @Test
-  public void testNotifyIfCloudSdkNotSupported_versionParseError() {
-    when(cloudSdkValidator.validateCloudSdk())
-        .thenReturn(Sets.newHashSet(CloudSdkValidationResult.CLOUD_SDK_VERSION_FILE_ERROR));
+  public void testNotifyIfCloudSdkNotSupported_versionParseError()
+      throws CloudSdkNotFoundException, CloudSdkVersionFileException {
+    when(cloudSdkValidator.buildCloudSdk()).thenReturn(cloudSdk);
+    when(cloudSdk.getVersion()).thenThrow(new CloudSdkVersionFileException("file error"));
 
     checker.notifyIfVersionParseError();
     verify(checker, times(1))
