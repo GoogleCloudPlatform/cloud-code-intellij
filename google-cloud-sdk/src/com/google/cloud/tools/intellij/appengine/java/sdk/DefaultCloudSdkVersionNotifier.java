@@ -16,6 +16,9 @@
 
 package com.google.cloud.tools.intellij.appengine.java.sdk;
 
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkVersionFileException;
 import com.google.cloud.tools.intellij.analytics.GctTracking;
 import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.common.annotations.VisibleForTesting;
@@ -44,10 +47,14 @@ public class DefaultCloudSdkVersionNotifier extends CloudSdkVersionNotifier {
   @Override
   public void notifyIfVersionParseError() {
     CloudSdkValidator sdkValidator = CloudSdkValidator.getInstance();
+    try {
+      CloudSdk cloudSdk = sdkValidator.buildCloudSdk();
 
-    if (sdkValidator
-        .validateCloudSdk()
-        .contains(CloudSdkValidationResult.CLOUD_SDK_VERSION_FILE_ERROR)) {
+      // Try to get the version; if fails with exception, then notify the user.
+      cloudSdk.getVersion();
+    } catch (CloudSdkNotFoundException ex) {
+      // Cloud SDK not found. Don't notify.
+    } catch (CloudSdkVersionFileException ex) {
       String message =
           "<p>" + CloudSdkValidationResult.CLOUD_SDK_VERSION_FILE_ERROR.getMessage() + "</p>";
 
@@ -56,6 +63,7 @@ public class DefaultCloudSdkVersionNotifier extends CloudSdkVersionNotifier {
 
       UsageTrackerService.getInstance()
           .trackEvent(GctTracking.SDK_VERSION_PARSE_ERROR)
+          .addMetadata(GctTracking.METADATA_LABEL_KEY, ex.getMessage())
           .ping();
     }
   }

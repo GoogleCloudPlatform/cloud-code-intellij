@@ -125,6 +125,14 @@ public class CloudSdkValidator {
     return false;
   }
 
+  CloudSdk buildCloudSdk() throws CloudSdkNotFoundException {
+    CloudSdkService instance = CloudSdkService.getInstance();
+
+    return new CloudSdk.Builder()
+        .sdkPath(instance != null ? instance.getSdkHomePath() : null)
+        .build();
+  }
+
   @VisibleForTesting
   CloudSdk buildCloudSdkWithPath(@NotNull Path path) throws CloudSdkNotFoundException {
     return new CloudSdk.Builder().sdkPath(path).build();
