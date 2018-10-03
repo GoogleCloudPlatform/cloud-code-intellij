@@ -352,6 +352,12 @@ public class AppEngineServerModel
     return ImmutableList.of();
   }
 
+  @javax.annotation.Nullable
+  @Override
+  public String getProjectId() {
+    return null;
+  }
+
   public void setEnvironment(Map<String, String> environment) {
     settings.setEnvironment(environment);
   }
