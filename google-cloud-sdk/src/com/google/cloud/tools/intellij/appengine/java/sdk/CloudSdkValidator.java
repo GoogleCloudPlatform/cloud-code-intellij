@@ -60,9 +60,7 @@ public class CloudSdkValidator {
     } catch (CloudSdkOutOfDateException exception) {
       validationResults.add(CloudSdkValidationResult.CLOUD_SDK_NOT_MINIMUM_VERSION);
     } catch (CloudSdkVersionFileException exception) {
-      // TODO once appengine-plugins core change is merge in, this exception will not be thrown
-      // instead, we validate the version parsing separately
-      //      validationResults.add(CloudSdkValidationResult.CLOUD_SDK_VERSION_FILE_ERROR);
+      // Use CloudSdk#getVersion to validate the SDK version
     }
 
     try {
