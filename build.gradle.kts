@@ -44,6 +44,12 @@ allprojects {
         kotlinOptions.jvmTarget = "1.8"
     }
 
+    dependencies {
+        testCompile("com.google.truth:truth:+") {
+            exclude(group = "com.google.guava", module = "guava")
+        }
+    }
+
     spotless {
         kotlin {
             target("**/src/**/*.kt")

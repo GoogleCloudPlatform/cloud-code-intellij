@@ -35,7 +35,7 @@ private val SKAFFOLD_API_HEADER_PATTERN: Pattern by lazy {
 /**
  * Checks if a given file is a valid Skaffold configuration file based on type and API version.
  */
-internal fun isSkaffoldFile(file: VirtualFile): Boolean {
+fun isSkaffoldFile(file: VirtualFile): Boolean {
     with(file) {
         if (!isDirectory && fileType is YAMLFileType && isValid) {
             val inputStream: InputStream = ByteArrayInputStream(contentsToByteArray())

@@ -15,3 +15,4 @@
  */
 
 include 'skaffold'
+include 'common-test-lib'
