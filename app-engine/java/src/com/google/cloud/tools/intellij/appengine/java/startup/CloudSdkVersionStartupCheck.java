@@ -30,6 +30,7 @@ public class CloudSdkVersionStartupCheck implements StartupActivity {
   @Override
   public void runActivity(@NotNull Project project) {
     // If there is a configured Cloud SDK at this time, check that it is supported.
-    CloudSdkVersionNotifier.getInstance().notifyIfUnsupportedVersion();
+    CloudSdkVersionNotifier.getInstance().notifyIfVersionOutOfDate();
+    CloudSdkVersionNotifier.getInstance().notifyIfVersionParseError();
   }
 }

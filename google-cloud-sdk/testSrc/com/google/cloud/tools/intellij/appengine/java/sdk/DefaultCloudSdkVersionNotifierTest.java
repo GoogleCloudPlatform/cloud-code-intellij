@@ -16,14 +16,18 @@
 
 package com.google.cloud.tools.intellij.appengine.java.sdk;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkVersionFileException;
 import com.google.cloud.tools.intellij.testing.CloudToolsRule;
 import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.common.collect.Sets;
-import com.intellij.util.containers.HashSet;
+import java.util.HashSet;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -41,21 +45,45 @@ public class DefaultCloudSdkVersionNotifierTest {
 
   @Mock @TestService private CloudSdkValidator cloudSdkValidator;
 
+  @Mock private CloudSdk cloudSdk;
+
   @Test
   public void testNotifyIfCloudSdkNotSupported_isSupported() {
     when(cloudSdkValidator.validateCloudSdk()).thenReturn(new HashSet<>());
-    checker.notifyIfUnsupportedVersion();
+    checker.notifyIfVersionOutOfDate();
 
-    verify(checker, times(0)).showNotification();
+    verify(checker, times(0)).showNotification(anyString(), anyString());
   }
 
   @Test
-  public void testNotifyIfCloudSdkNotSupported_notSupported() {
+  public void testNotifyIfCloudSdkNotSupported_versionOutOfDateError() {
     when(cloudSdkValidator.validateCloudSdk())
-        .thenReturn(Sets.newHashSet(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED));
+        .thenReturn(Sets.newHashSet(CloudSdkValidationResult.CLOUD_SDK_NOT_MINIMUM_VERSION));
 
-    checker.notifyIfUnsupportedVersion();
-    verify(checker, times(1)).showNotification();
+    checker.notifyIfVersionOutOfDate();
+    verify(checker, times(1))
+        .showNotification(
+            "Google Cloud SDK Update Required",
+            "<p>The Cloud SDK is out of date. Version "
+                + CloudSdk.MINIMUM_VERSION
+                + " is the minimum required version for use with the "
+                + "Google Cloud Tools Plugin. To update, run \"gcloud components update\".</p>");
+  }
+
+  @Test
+  public void testNotifyIfCloudSdkNotSupported_versionParseError()
+      throws CloudSdkNotFoundException, CloudSdkVersionFileException {
+    when(cloudSdkValidator.buildCloudSdk()).thenReturn(cloudSdk);
+    when(cloudSdk.getVersion()).thenThrow(new CloudSdkVersionFileException("file error"));
+
+    checker.notifyIfVersionParseError();
+    verify(checker, times(1))
+        .showNotification(
+            "Unrecognized Cloud SDK Version",
+            "<p>Operations may have unintended "
+                + "results. You can install the Cloud SDK manually and set the path "
+                + "via:<p><p>Settings -> Google -> Cloud Sdk -> Use a custom local "
+                + "installation</p>");
   }
 
   @Test
@@ -63,13 +91,13 @@ public class DefaultCloudSdkVersionNotifierTest {
     when(cloudSdkValidator.validateCloudSdk())
         .thenReturn(Sets.newHashSet(CloudSdkValidationResult.CLOUD_SDK_NOT_FOUND));
 
-    checker.notifyIfUnsupportedVersion();
-    verify(checker, times(0)).showNotification();
+    checker.notifyIfVersionOutOfDate();
+    verify(checker, times(0)).showNotification(anyString(), anyString());
   }
 
   @Test
   public void testNotifyIfCloudSdkNotSupported_nullSdkPath() {
-    checker.notifyIfUnsupportedVersion();
-    verify(checker, times(0)).showNotification();
+    checker.notifyIfVersionOutOfDate();
+    verify(checker, times(0)).showNotification(anyString(), anyString());
   }
 }

@@ -22,7 +22,7 @@ import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
 public enum CloudSdkValidationResult {
   CLOUD_SDK_NOT_FOUND(
       CloudSdkMessageBundle.message("appengine.cloudsdk.location.invalid.message"), true),
-  CLOUD_SDK_VERSION_NOT_SUPPORTED(
+  CLOUD_SDK_NOT_MINIMUM_VERSION(
       CloudSdkMessageBundle.message(
           "appengine.cloudsdk.version.support.message", CloudSdk.MINIMUM_VERSION),
       false),

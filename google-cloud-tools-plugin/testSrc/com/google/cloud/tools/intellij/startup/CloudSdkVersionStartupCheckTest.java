@@ -51,6 +51,6 @@ public final class CloudSdkVersionStartupCheckTest extends BasePluginTestCase {
   public void testRunActivity() {
     cloudSdkVersionStartupCheck.runActivity(mockProject);
 
-    verify(cloudSdkVersionNotifier, times(1)).notifyIfUnsupportedVersion();
+    verify(cloudSdkVersionNotifier, times(1)).notifyIfVersionOutOfDate();
   }
 }

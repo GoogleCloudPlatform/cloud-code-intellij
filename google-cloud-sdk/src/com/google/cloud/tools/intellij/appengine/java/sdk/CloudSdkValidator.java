@@ -58,8 +58,14 @@ public class CloudSdkValidator {
       // If the Cloud SDK is not found, don't bother checking anything else
       return validationResults;
     } catch (CloudSdkOutOfDateException exception) {
-      validationResults.add(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED);
-    } catch (CloudSdkVersionFileException e) {
+      validationResults.add(CloudSdkValidationResult.CLOUD_SDK_NOT_MINIMUM_VERSION);
+    } catch (CloudSdkVersionFileException exception) {
+      // Use CloudSdk#getVersion to validate the SDK version
+    }
+
+    try {
+      sdk.getVersion();
+    } catch (CloudSdkVersionFileException exception) {
       validationResults.add(CloudSdkValidationResult.CLOUD_SDK_VERSION_FILE_ERROR);
     }
 
@@ -115,6 +121,14 @@ public class CloudSdkValidator {
       }
     }
     return false;
+  }
+
+  CloudSdk buildCloudSdk() throws CloudSdkNotFoundException {
+    CloudSdkService instance = CloudSdkService.getInstance();
+
+    return new CloudSdk.Builder()
+        .sdkPath(instance != null ? instance.getSdkHomePath() : null)
+        .build();
   }
 
   @VisibleForTesting

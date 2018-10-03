@@ -16,6 +16,11 @@
 
 package com.google.cloud.tools.intellij.appengine.java.sdk;
 
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdk;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkNotFoundException;
+import com.google.cloud.tools.appengine.cloudsdk.CloudSdkVersionFileException;
+import com.google.cloud.tools.intellij.analytics.GctTracking;
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
@@ -25,32 +30,52 @@ import com.intellij.notification.NotificationType;
 public class DefaultCloudSdkVersionNotifier extends CloudSdkVersionNotifier {
 
   @Override
-  public void notifyIfUnsupportedVersion() {
+  public void notifyIfVersionOutOfDate() {
     CloudSdkValidator sdkValidator = CloudSdkValidator.getInstance();
+
     if (sdkValidator
         .validateCloudSdk()
-        .contains(CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED)) {
-      showNotification();
+        .contains(CloudSdkValidationResult.CLOUD_SDK_NOT_MINIMUM_VERSION)) {
+      String message =
+          "<p>" + CloudSdkValidationResult.CLOUD_SDK_NOT_MINIMUM_VERSION.getMessage() + "</p>";
+
+      showNotification(
+          CloudSdkMessageBundle.message("appengine.cloudsdk.version.support.title"), message);
+    }
+  }
+
+  @Override
+  public void notifyIfVersionParseError() {
+    CloudSdkValidator sdkValidator = CloudSdkValidator.getInstance();
+    try {
+      CloudSdk cloudSdk = sdkValidator.buildCloudSdk();
+
+      // Try to get the version; if fails with exception, then notify the user.
+      cloudSdk.getVersion();
+    } catch (CloudSdkNotFoundException ex) {
+      // Cloud SDK not found. Don't notify.
+    } catch (CloudSdkVersionFileException ex) {
+      String message =
+          "<p>" + CloudSdkValidationResult.CLOUD_SDK_VERSION_FILE_ERROR.getMessage() + "</p>";
+
+      showNotification(
+          CloudSdkMessageBundle.message("appengine.cloudsdk.version.file.error.title"), message);
+
+      UsageTrackerService.getInstance()
+          .trackEvent(GctTracking.SDK_VERSION_PARSE_ERROR)
+          .addMetadata(GctTracking.METADATA_LABEL_KEY, ex.getMessage())
+          .ping();
     }
   }
 
   @VisibleForTesting
-  void showNotification() {
+  void showNotification(String title, String message) {
     NotificationGroup notification =
-        new NotificationGroup(
-            CloudSdkMessageBundle.message("appengine.cloudsdk.version.support.title"),
-            NotificationDisplayType.BALLOON,
-            true);
-
-    String message =
-        "<p>" + CloudSdkValidationResult.CLOUD_SDK_VERSION_NOT_SUPPORTED.getMessage() + "</p>";
+        new NotificationGroup(title, NotificationDisplayType.BALLOON, true);
 
     notification
         .createNotification(
-            CloudSdkMessageBundle.message("appengine.cloudsdk.version.support.title"),
-            message,
-            NotificationType.WARNING,
-            null /* notificationListener */)
+            title, message, NotificationType.WARNING, null /* notificationListener */)
         .notify(null /*project*/);
   }
 }

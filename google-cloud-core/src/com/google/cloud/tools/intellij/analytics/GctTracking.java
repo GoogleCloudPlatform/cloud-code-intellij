@@ -105,4 +105,5 @@ public class GctTracking {
   public static final String MANAGED_SDK_SUCCESSFUL_UPDATE = "managed.sdk.successful.update";
   public static final String MANAGED_SDK_FAILED_UPDATE = "managed.sdk.failed.update";
   public static final String MANAGED_SDK_CANCELLED_UPDATE = "managed.sdk.cancelled.update";
+  public static final String SDK_VERSION_PARSE_ERROR = "sdk.version.parse.error";
 }
