@@ -74,7 +74,7 @@ public class AppEngineStop {
         new DefaultVersionsSelectionConfiguration();
     configuration.setVersions(Collections.singletonList(version));
     configuration.setService(module);
-    configuration.setProject(deploymentConfiguration.getCloudProjectName());
+    configuration.setProjectId(deploymentConfiguration.getCloudProjectName());
 
     helper.createGcloud(loggingHandler).newVersions(processHandler).stop(configuration);
   }
