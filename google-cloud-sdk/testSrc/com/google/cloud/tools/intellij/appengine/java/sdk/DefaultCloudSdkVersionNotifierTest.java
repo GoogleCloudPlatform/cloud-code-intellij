@@ -79,8 +79,8 @@ public class DefaultCloudSdkVersionNotifierTest {
     checker.notifyIfVersionParseError();
     verify(checker, times(1))
         .showNotification(
-            "Error Reading Cloud SDK Version",
-            "<p>The Cloud SDK version file could not be read. Operations may have unintended "
+            "Unrecognized Cloud SDK Version",
+            "<p>Operations may have unintended "
                 + "results. You can install the Cloud SDK manually and set the path "
                 + "via:<p><p>Settings -> Google -> Cloud Sdk -> Use a custom local "
                 + "installation</p>");
