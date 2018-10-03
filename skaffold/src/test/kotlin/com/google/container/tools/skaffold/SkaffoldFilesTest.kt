@@ -19,6 +19,7 @@ package com.google.container.tools.skaffold
 import com.google.common.truth.Truth.assertThat
 import com.google.container.tools.test.ContainerToolsRule
 import com.intellij.mock.MockVirtualFile
+import com.intellij.openapi.application.ApplicationManager
 import org.junit.Rule
 import org.junit.Test
 
@@ -31,6 +32,14 @@ class SkaffoldFilesTest {
     fun `valid skaffold file is accepted`() {
         val skaffoldFile = MockVirtualFile.file("skaffold.yaml")
         skaffoldFile.setText("apiVersion: skaffold/v1alpha2")
+
+        assertThat(isSkaffoldFile(skaffoldFile)).isTrue()
+    }
+
+    @Test
+    fun `valid skaffold file not named skaffold_yaml is accepted`() {
+        val skaffoldFile = MockVirtualFile.file("tests-deploys.yaml")
+        skaffoldFile.setText("apiVersion: skaffold/v1alpha3")
 
         assertThat(isSkaffoldFile(skaffoldFile)).isTrue()
     }
@@ -55,5 +64,15 @@ class SkaffoldFilesTest {
         k8sFile.setText("apiVersion: apps/v1")
 
         assertThat(isSkaffoldFile(k8sFile)).isFalse()
+    }
+
+    @Test
+    fun `empty IDE project does not contain skaffold yaml files`() {
+        val project = containerToolsRule.ideaProjectTestFixture.project
+
+        ApplicationManager.getApplication().runReadAction {
+            val skaffoldFiles = findSkaffoldFiles(project)
+            assertThat(skaffoldFiles).isEmpty()
+        }
     }
 }

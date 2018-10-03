@@ -56,7 +56,7 @@ fun isSkaffoldFile(file: VirtualFile): Boolean {
  * @param project IDE project to search Skaffold file in
  * @return List of Skaffold configuration files in the project.
  */
-internal fun findSkaffoldFiles(project: Project): List<VirtualFile> {
+fun findSkaffoldFiles(project: Project): List<VirtualFile> {
     return FileTypeIndex.getFiles(YAMLFileType.YML, GlobalSearchScope.allScope(project))
         .filter { isSkaffoldFile(it) }
 }
