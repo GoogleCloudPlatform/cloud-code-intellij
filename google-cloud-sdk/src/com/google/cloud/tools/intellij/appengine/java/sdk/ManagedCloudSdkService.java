@@ -32,6 +32,7 @@ import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.ThrowableRunnable;
@@ -181,7 +182,10 @@ public class ManagedCloudSdkService implements CloudSdkService {
     if (managedSdkBackgroundJob == null || managedSdkBackgroundJob.isDone()) {
       updateStatus(SdkStatus.INSTALLING);
       managedSdkBackgroundJob = ThreadUtil.getInstance().executeInBackground(managedSdkTask);
-      Futures.addCallback(managedSdkBackgroundJob, new ManagedSdkJobListener(jobType));
+      Futures.addCallback(
+          managedSdkBackgroundJob,
+          new ManagedSdkJobListener(jobType),
+          MoreExecutors.directExecutor());
     }
 
     return true;
