@@ -29,6 +29,7 @@ import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -447,7 +448,7 @@ public class ProjectSelectionDialog {
   @VisibleForTesting
   void addProjectListFutureCallback(
       ListenableFuture<List<Project>> future, FutureCallback<List<Project>> callback) {
-    Futures.addCallback(future, callback);
+    Futures.addCallback(future, callback, MoreExecutors.directExecutor());
   }
 
   /** Wraps this form as an IDEA dialog instead of inheriting dialog internals. */
