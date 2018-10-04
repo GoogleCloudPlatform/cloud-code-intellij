@@ -16,8 +16,6 @@
 
 package com.google.cloud.tools.intellij.stackdriver.debugger;
 
-import com.google.cloud.tools.intellij.login.CredentialedUser;
-import com.google.cloud.tools.intellij.login.Services;
 import com.google.cloud.tools.intellij.project.CloudProject;
 import com.google.cloud.tools.intellij.stackdriver.debugger.ui.CloudDebugRunConfigurationPanel;
 import com.google.common.base.Strings;
@@ -41,11 +39,14 @@ public class CloudDebugSettingsEditor extends SettingsEditor<CloudDebugRunConfig
 
   @Override
   protected void applyEditorTo(@NotNull CloudDebugRunConfiguration runConfiguration) {
-    // TODO(ivanporty) CloudDebugRunConfiguration uses `cloudProjectName` for project ID.
-    runConfiguration.setCloudProjectName(
+    runConfiguration.setCloudProjectId(
         Optional.ofNullable(settingsPanel.getSelectedCloudProject())
             .map(CloudProject::projectId)
             .orElse(""));
+    runConfiguration.setGoogleUsername(
+        Optional.ofNullable(settingsPanel.getSelectedCloudProject())
+            .map(CloudProject::googleUsername)
+            .orElse(null));
   }
 
   @NotNull
@@ -56,19 +57,14 @@ public class CloudDebugSettingsEditor extends SettingsEditor<CloudDebugRunConfig
 
   @Override
   protected void resetEditorFrom(@NotNull CloudDebugRunConfiguration runConfiguration) {
-    // TODO(ivanporty) CloudDebugRunConfiguration uses `cloudProjectName` for project ID.
-    String projectId = runConfiguration.getCloudProjectName();
+    String projectId = runConfiguration.getCloudProjectId();
+    // google username may be empty from previous revisions of configurations, should not be null.
+    String googleUsername = Optional.ofNullable(runConfiguration.getGoogleUsername()).orElse("");
     if (!Strings.isNullOrEmpty(projectId)) {
       settingsPanel.setSelectedCloudProject(
           CloudProject.create(
               // TODO(ivanporty) no project name in CloudDebugRunConfiguration.
-              projectId,
-              projectId,
-              null,
-              // TODO(ivanporty) no user name in CloudDebugRunConfiguration.
-              Optional.ofNullable(Services.getLoginService().getActiveUser())
-                  .map(CredentialedUser::getEmail)
-                  .orElse("")));
+              projectId, projectId, null, googleUsername));
     } else {
       settingsPanel.loadActiveCloudProject();
     }

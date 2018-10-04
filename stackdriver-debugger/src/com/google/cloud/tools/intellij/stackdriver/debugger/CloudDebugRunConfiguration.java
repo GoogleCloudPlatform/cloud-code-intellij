@@ -58,7 +58,8 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
 
   private static final String NAME = "Google Stackdriver Debug";
   private static final String PROJECT_NAME_TAG = "CloudProjectName";
-  private String cloudProjectName;
+  private String cloudProjectId;
+  private String googleUsername;
   private volatile CloudDebugProcessState processState = null;
 
   public CloudDebugRunConfiguration(Project project, @NotNull ConfigurationFactory factory) {
@@ -79,27 +80,37 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
           .ping();
     }
     final CloudDebugRunConfiguration configuration = (CloudDebugRunConfiguration) super.clone();
-    configuration.setCloudProjectName(getCloudProjectName());
+    configuration.setCloudProjectId(getCloudProjectId());
     return configuration;
   }
 
   /**
-   * Returns the GCP project name chosen by the user for this {@link CloudDebugRunConfiguration}.
+   * Returns the GCP project ID chosen by the user for this {@link CloudDebugRunConfiguration}.
    *
-   * @return the String name of the GCP project
+   * @return the String ID of the GCP project
    */
   @Nullable
-  public String getCloudProjectName() {
-    return cloudProjectName;
+  String getCloudProjectId() {
+    return cloudProjectId;
   }
 
   /**
-   * Sets the GCP project name for this {@link CloudDebugRunConfiguration}.
+   * Sets the GCP ID name for this {@link CloudDebugRunConfiguration}.
    *
-   * @param cloudProjectName the name of the GCP project that owns the target debuggee
+   * @param cloudProjectId the name of the GCP project that owns the target debuggee
    */
-  public void setCloudProjectName(@Nullable String cloudProjectName) {
-    this.cloudProjectName = cloudProjectName;
+  void setCloudProjectId(@Nullable String cloudProjectId) {
+    this.cloudProjectId = cloudProjectId;
+  }
+
+  /** Returns this debug config GCP project Google account username. */
+  String getGoogleUsername() {
+    return googleUsername;
+  }
+
+  /** Sets the Google username for GCP project for this {@link CloudDebugRunConfiguration}. */
+  void setGoogleUsername(String googleUsername) {
+    this.googleUsername = googleUsername;
   }
 
   @NotNull
@@ -148,7 +159,7 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
   public RunProfileState getState(
       @NotNull Executor executor, @NotNull ExecutionEnvironment environment) {
     if (processState == null) {
-      return new CloudDebugProcessState(null, null, cloudProjectName, null, getProject());
+      return new CloudDebugProcessState(googleUsername, null, cloudProjectId, null, getProject());
     }
     return processState;
   }
@@ -158,13 +169,13 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
     super.readExternal(element);
     Attribute projectNameAttribute = element.getAttribute(PROJECT_NAME_TAG);
     if (projectNameAttribute != null) {
-      cloudProjectName = projectNameAttribute.getValue();
+      cloudProjectId = projectNameAttribute.getValue();
     }
     // Call out to the state serializer to get process state out of workspace.xml.
-    if (!Strings.isNullOrEmpty(cloudProjectName) && !Strings.isNullOrEmpty(getName())) {
+    if (!Strings.isNullOrEmpty(cloudProjectId) && !Strings.isNullOrEmpty(getName())) {
       processState =
           CloudDebugProcessStateSerializer.getInstance(getProject())
-              .getState(getName(), cloudProjectName);
+              .getState(getName(), cloudProjectId);
     }
     CloudDebugProcessWatcher.getInstance().ensureWatcher();
   }
@@ -172,7 +183,7 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
   @Override
   public void writeExternal(Element element) throws WriteExternalException {
     super.writeExternal(element);
-    element.setAttribute(PROJECT_NAME_TAG, cloudProjectName == null ? "" : cloudProjectName);
+    element.setAttribute(PROJECT_NAME_TAG, cloudProjectId == null ? "" : cloudProjectId);
     // IJ handles serialization of the the state serializer since its a project service.
   }
 }
