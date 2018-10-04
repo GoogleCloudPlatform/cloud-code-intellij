@@ -41,6 +41,6 @@ public class AppEngineStandardFacetMigrationConversionProcessor
     settings
         .getFacetElements(DEPRECATED_APP_ENGINE_FACET_ID)
         .forEach(
-            element -> element.setAttribute("type", AppEngineStandardFacetType.STRING_ID + "NEW"));
+            element -> element.setAttribute("type", AppEngineStandardFacetType.STRING_ID));
   }
 }
