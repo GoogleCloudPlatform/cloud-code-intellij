@@ -42,7 +42,7 @@ public class CloudDebugSettingsEditor extends SettingsEditor<CloudDebugRunConfig
     runConfiguration.setCloudProjectId(
         Optional.ofNullable(settingsPanel.getSelectedCloudProject())
             .map(CloudProject::projectId)
-            .orElse(""));
+            .orElse(null));
     runConfiguration.setGoogleUsername(
         Optional.ofNullable(settingsPanel.getSelectedCloudProject())
             .map(CloudProject::googleUsername)
@@ -64,7 +64,7 @@ public class CloudDebugSettingsEditor extends SettingsEditor<CloudDebugRunConfig
       settingsPanel.setSelectedCloudProject(
           CloudProject.create(
               // TODO(ivanporty) no project name in CloudDebugRunConfiguration.
-              projectId, projectId, null, googleUsername));
+              projectId /* as name */, projectId, null /* project number */, googleUsername));
     } else {
       settingsPanel.loadActiveCloudProject();
     }

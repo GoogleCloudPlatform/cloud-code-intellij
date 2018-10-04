@@ -159,7 +159,12 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
   public RunProfileState getState(
       @NotNull Executor executor, @NotNull ExecutionEnvironment environment) {
     if (processState == null) {
-      return new CloudDebugProcessState(googleUsername, null, cloudProjectId, null, getProject());
+      return new CloudDebugProcessState(
+          googleUsername,
+          null /* debug id */,
+          cloudProjectId,
+          null /* project number */,
+          getProject());
     }
     return processState;
   }
