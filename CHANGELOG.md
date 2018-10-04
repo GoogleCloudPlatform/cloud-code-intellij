@@ -1,6 +1,15 @@
 # Release notes
 This page documents production updates to Cloud Tools for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## 18.10.1
+
+### Added
+  - Stackdriver Debugger now works with Kotlin projects. [2253](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2253)
+
+### Fixed
+  - Fixed IDE exception when Cloud SDK version cannot be parsed. Showing a notification instead. [2259](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2259)
+  - Fixed NoSuchMethodError on jdom.Element#detach during legacy App Engine facet migration. [2255](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2255)
+
 ## 18.8.1
 
 ### Added
