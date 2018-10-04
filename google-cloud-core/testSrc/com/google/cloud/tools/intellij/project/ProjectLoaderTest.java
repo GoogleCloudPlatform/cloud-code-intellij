@@ -31,6 +31,7 @@ import com.google.cloud.tools.intellij.testing.TestService;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -69,7 +70,7 @@ public class ProjectLoaderTest {
                   @SuppressWarnings("unchecked")
                   ListenableFuture<List<Project>> result =
                       (ListenableFuture<List<Project>>) invocation.callRealMethod();
-                  Futures.addCallback(result, mockFutureCallback);
+                  Futures.addCallback(result, mockFutureCallback, MoreExecutors.directExecutor());
                   return result;
                 });
     testProject1 = new Project();
