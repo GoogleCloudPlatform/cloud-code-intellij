@@ -9,6 +9,7 @@ This page documents production updates to Cloud Tools for IntelliJ. You can chec
 ### Fixed
   - Fixed IDE exception when Cloud SDK version cannot be parsed. Showing a notification instead. [2259](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2259)
   - Fixed NoSuchMethodError on jdom.Element#detach during legacy App Engine facet migration. [2255](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2255)
+  - Fixed issue with Stackdriver Debugger where it would not remember the last Cloud Project selection across multiple run configurations. [2266](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2266)
 
 ## 18.8.1
 
