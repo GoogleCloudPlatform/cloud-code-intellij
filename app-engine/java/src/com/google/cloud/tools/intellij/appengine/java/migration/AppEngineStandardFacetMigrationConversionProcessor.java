@@ -40,7 +40,6 @@ public class AppEngineStandardFacetMigrationConversionProcessor
   public void process(ModuleSettings settings) throws CannotConvertException {
     settings
         .getFacetElements(DEPRECATED_APP_ENGINE_FACET_ID)
-        .forEach(
-            element -> element.setAttribute("type", AppEngineStandardFacetType.STRING_ID));
+        .forEach(element -> element.setAttribute("type", AppEngineStandardFacetType.STRING_ID));
   }
 }
