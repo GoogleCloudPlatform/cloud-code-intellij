@@ -21,8 +21,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.intellij.conversion.CannotConvertException;
 import com.intellij.conversion.ConversionProcessor;
 import com.intellij.conversion.ModuleSettings;
-import org.jdom.Element;
-import org.jetbrains.jps.model.serialization.facet.JpsFacetSerializer;
 
 /** Performs conversions from deprecated App Engine Facets to their new version. */
 public class AppEngineStandardFacetMigrationConversionProcessor
@@ -35,18 +33,14 @@ public class AppEngineStandardFacetMigrationConversionProcessor
     return !settings.getFacetElements(DEPRECATED_APP_ENGINE_FACET_ID).isEmpty();
   }
 
+  /**
+   * Updates the legacy app engine facet type's ID to match {@link AppEngineStandardFacetType#ID}.
+   */
   @Override
   public void process(ModuleSettings settings) throws CannotConvertException {
-    for (Element deprecatedTag : settings.getFacetElements(DEPRECATED_APP_ENGINE_FACET_ID)) {
-      // remove the old tag
-      deprecatedTag.detach();
-
-      Element configuration = deprecatedTag.getChild(JpsFacetSerializer.CONFIGURATION_TAG);
-      String facetName = deprecatedTag.getAttributeValue(JpsFacetSerializer.NAME_ATTRIBUTE);
-
-      // add a new tag with all the same settings as the old one, but the new facet type id
-      settings.addFacetElement(
-          AppEngineStandardFacetType.STRING_ID, facetName, configuration.clone());
-    }
+    settings
+        .getFacetElements(DEPRECATED_APP_ENGINE_FACET_ID)
+        .forEach(
+            element -> element.setAttribute("type", AppEngineStandardFacetType.STRING_ID + "NEW"));
   }
 }
