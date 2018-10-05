@@ -154,7 +154,10 @@ public class AppEngineDeploy {
     try {
       helper.createGcloud(loggingHandler).newDeployment(processHandler).deploy(configuration);
     } catch (CloudSdkOutOfDateException ex) {
-      logger.warn("Error during deployment because because Cloud SDK version out of date");
+      String message = "Error during deployment because because Cloud SDK version out of date.";
+      logger.warn(message);
+      callback.errorOccurred(
+          message + "\n" + AppEngineMessageBundle.message("appengine.action.error.update.message"));
     }
   }
 
