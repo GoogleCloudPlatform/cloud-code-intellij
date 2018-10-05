@@ -16,21 +16,8 @@
 
 package com.google.container.tools.skaffold.run
 
-import com.intellij.execution.configurations.RunConfiguration
-import com.intellij.openapi.options.SettingsEditor
-import javax.swing.JComponent
-import javax.swing.JPanel
-
 /**
  * Settings editor that provides a UI for Skaffold single mode run configuration settings,
  * also saves and retrieves the settings from the project state.
  */
-class SkaffoldSingleRunSettingsEditor : SettingsEditor<RunConfiguration>() {
-    override fun resetEditorFrom(s: RunConfiguration) {
-    }
-
-    override fun createEditor(): JComponent = JPanel()
-
-    override fun applyEditorTo(s: RunConfiguration) {
-    }
-}
+class SkaffoldSingleRunSettingsEditor : BaseSkaffoldSettingsEditor()
