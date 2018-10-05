@@ -35,6 +35,7 @@ import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
+import java.util.Optional;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -58,6 +59,8 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
 
   private static final String NAME = "Google Stackdriver Debug";
   private static final String PROJECT_NAME_TAG = "CloudProjectName";
+  private static final String GOOGLE_USERNAME_TAG = "GoogleUsername";
+
   private String cloudProjectId;
   private String googleUsername;
   private volatile CloudDebugProcessState processState = null;
@@ -172,10 +175,13 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
   @Override
   public void readExternal(Element element) throws InvalidDataException {
     super.readExternal(element);
-    Attribute projectNameAttribute = element.getAttribute(PROJECT_NAME_TAG);
-    if (projectNameAttribute != null) {
-      cloudProjectId = projectNameAttribute.getValue();
-    }
+    Optional.ofNullable(element.getAttribute(PROJECT_NAME_TAG))
+        .map(Attribute::getValue)
+        .ifPresent(this::setCloudProjectId);
+    Optional.ofNullable(element.getAttribute(GOOGLE_USERNAME_TAG))
+        .map(Attribute::getValue)
+        .ifPresent(this::setGoogleUsername);
+
     // Call out to the state serializer to get process state out of workspace.xml.
     if (!Strings.isNullOrEmpty(cloudProjectId) && !Strings.isNullOrEmpty(getName())) {
       processState =
@@ -186,9 +192,12 @@ public class CloudDebugRunConfiguration extends LocatableConfigurationBase
   }
 
   @Override
-  public void writeExternal(Element element) throws WriteExternalException {
+  public void writeExternal(@NotNull Element element) throws WriteExternalException {
     super.writeExternal(element);
-    element.setAttribute(PROJECT_NAME_TAG, cloudProjectId == null ? "" : cloudProjectId);
+    Optional.ofNullable(cloudProjectId)
+        .ifPresent(value -> element.setAttribute(PROJECT_NAME_TAG, value));
+    Optional.ofNullable(googleUsername)
+        .ifPresent(value -> element.setAttribute(GOOGLE_USERNAME_TAG, value));
     // IJ handles serialization of the the state serializer since its a project service.
   }
 }
