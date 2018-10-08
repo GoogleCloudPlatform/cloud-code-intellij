@@ -206,7 +206,13 @@ public class AppEngineServerModel
 
   @Override
   public List<File> getServices() {
-    return ImmutableList.of(Paths.get(artifactPointer.getArtifact().getOutputPath()).toFile());
+    Artifact artifact = artifactPointer.getArtifact();
+
+    if (artifact != null && artifact.getOutputPath() != null) {
+      return ImmutableList.of(Paths.get(artifact.getOutputPath()).toFile());
+    } else {
+      return ImmutableList.of();
+    }
   }
 
   @Override
@@ -352,7 +358,7 @@ public class AppEngineServerModel
     return ImmutableList.of();
   }
 
-  @javax.annotation.Nullable
+  @Nullable
   @Override
   public String getProjectId() {
     return null;
