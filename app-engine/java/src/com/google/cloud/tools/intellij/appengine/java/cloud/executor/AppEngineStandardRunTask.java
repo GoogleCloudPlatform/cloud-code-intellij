@@ -40,6 +40,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.projectRoots.Sdk;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
+import org.apache.commons.collections.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -92,6 +93,12 @@ public class AppEngineStandardRunTask extends AppEngineTask {
     ProcessHandler processHandler =
         LegacyProcessHandler.builder().async(true).setStartListener(startListener).build();
 
+    if (CollectionUtils.isEmpty(runConfig.getServices())) {
+      notifyMissingArtifact();
+      logger.warn("Error during local run due to missing deployment artifact");
+      return;
+    }
+
     try {
       LocalRun localRun = LocalRun.builder(sdkBuilder.build()).build();
       localRun.newDevAppServer1(processHandler).run(runConfig);
@@ -105,13 +112,7 @@ public class AppEngineStandardRunTask extends AppEngineTask {
           .ping();
     } catch (AppEngineException aee) {
       if (aee.getCause() instanceof NoSuchFileException) {
-        Notification notification =
-            NOTIFICATION_GROUP.createNotification(
-                AppEngineMessageBundle.message("appengine.run.nosuchfileexception.title"),
-                null /* subtitle */,
-                AppEngineMessageBundle.message("appengine.run.nosuchfileexception.message"),
-                NotificationType.ERROR);
-        notification.notify(null /* project */);
+        notifyMissingAppEngineWebXml();
         logger.warn(
             "FileNotFoundException during local run. Check for missing appengine-web.xml file.");
       } else {
@@ -120,5 +121,25 @@ public class AppEngineStandardRunTask extends AppEngineTask {
     } catch (Exception ex) {
       logger.error(ex);
     }
+  }
+
+  private void notifyMissingAppEngineWebXml() {
+    Notification notification =
+        NOTIFICATION_GROUP.createNotification(
+            AppEngineMessageBundle.message("appengine.run.nosuchfileexception.title"),
+            null /* subtitle */,
+            AppEngineMessageBundle.message("appengine.run.nosuchfileexception.message"),
+            NotificationType.ERROR);
+    notification.notify(null /* project */);
+  }
+
+  private void notifyMissingArtifact() {
+    Notification notification =
+        NOTIFICATION_GROUP.createNotification(
+            AppEngineMessageBundle.message("appengine.run.server.artifact.missing.title"),
+            null /* subtitle */,
+            AppEngineMessageBundle.message("appengine.run.server.artifact.missing"),
+            NotificationType.ERROR);
+    notification.notify(null /* project */);
   }
 }
