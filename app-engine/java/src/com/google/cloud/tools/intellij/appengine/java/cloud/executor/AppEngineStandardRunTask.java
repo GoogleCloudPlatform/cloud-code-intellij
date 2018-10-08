@@ -93,7 +93,7 @@ public class AppEngineStandardRunTask extends AppEngineTask {
     ProcessHandler processHandler =
         LegacyProcessHandler.builder().async(true).setStartListener(startListener).build();
 
-    if (CollectionUtils.isEmpty(runConfig.getServices())) {
+    if (runConfig.getServices() == null || runConfig.getServices().isEmpty()) {
       notifyMissingArtifact();
       logger.warn("Error during local run due to missing deployment artifact");
       return;
