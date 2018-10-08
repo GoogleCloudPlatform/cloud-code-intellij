@@ -40,7 +40,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.projectRoots.Sdk;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
-import org.apache.commons.collections.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -93,7 +92,7 @@ public class AppEngineStandardRunTask extends AppEngineTask {
     ProcessHandler processHandler =
         LegacyProcessHandler.builder().async(true).setStartListener(startListener).build();
 
-    if (CollectionUtils.isEmpty(runConfig.getServices())) {
+    if (runConfig.getServices() == null || runConfig.getServices().isEmpty()) {
       notifyMissingArtifact();
       logger.warn("Error during local run due to missing deployment artifact");
       return;
