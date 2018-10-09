@@ -23,17 +23,19 @@ import com.intellij.openapi.application.ApplicationManager
 import org.junit.Rule
 import org.junit.Test
 
-/** Unit tests for Skaffold files functionality in [SkaffoldFiles.kt] */
-class SkaffoldFilesTest {
+/** Unit tests for Skaffold files functionality in [SkaffoldFileService] */
+class SkaffoldFileServiceTest {
     @get:Rule
-    val containerToolsRule = ContainerToolsRule()
+    val containerToolsRule = ContainerToolsRule(this)
+
+    private val skaffoldFileService = SkaffoldFileService()
 
     @Test
     fun `valid skaffold file is accepted`() {
         val skaffoldFile = MockVirtualFile.file("skaffold.yaml")
         skaffoldFile.setText("apiVersion: skaffold/v1alpha2")
 
-        assertThat(isSkaffoldFile(skaffoldFile)).isTrue()
+        assertThat(skaffoldFileService.isSkaffoldFile(skaffoldFile)).isTrue()
     }
 
     @Test
@@ -41,7 +43,7 @@ class SkaffoldFilesTest {
         val skaffoldFile = MockVirtualFile.file("tests-deploys.yaml")
         skaffoldFile.setText("apiVersion: skaffold/v1alpha3")
 
-        assertThat(isSkaffoldFile(skaffoldFile)).isTrue()
+        assertThat(skaffoldFileService.isSkaffoldFile(skaffoldFile)).isTrue()
     }
 
     @Test
@@ -55,7 +57,7 @@ class SkaffoldFilesTest {
             """
         )
 
-        assertThat(isSkaffoldFile(skaffoldFile)).isTrue()
+        assertThat(skaffoldFileService.isSkaffoldFile(skaffoldFile)).isTrue()
     }
 
     @Test
@@ -63,15 +65,16 @@ class SkaffoldFilesTest {
         val k8sFile = MockVirtualFile.file("deploy.yaml")
         k8sFile.setText("apiVersion: apps/v1")
 
-        assertThat(isSkaffoldFile(k8sFile)).isFalse()
+        assertThat(skaffoldFileService.isSkaffoldFile(k8sFile)).isFalse()
     }
 
     @Test
     fun `empty IDE project does not contain skaffold yaml files`() {
         val project = containerToolsRule.ideaProjectTestFixture.project
+        val skaffoldFilesService = SkaffoldFileService()
 
         ApplicationManager.getApplication().runReadAction {
-            val skaffoldFiles = findSkaffoldFiles(project)
+            val skaffoldFiles = skaffoldFilesService.findSkaffoldFiles(project)
             assertThat(skaffoldFiles).isEmpty()
         }
     }

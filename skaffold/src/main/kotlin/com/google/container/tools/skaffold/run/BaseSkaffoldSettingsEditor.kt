@@ -16,7 +16,7 @@
 
 package com.google.container.tools.skaffold.run
 
-import com.google.container.tools.skaffold.isSkaffoldFile
+import com.google.container.tools.skaffold.SkaffoldFileService
 import com.google.container.tools.skaffold.message
 import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.openapi.options.ConfigurationException
@@ -47,7 +47,7 @@ open class BaseSkaffoldSettingsEditor : SettingsEditor<RunConfiguration>() {
             skaffoldFilesComboBox.getItemAt(skaffoldFilesComboBox.selectedIndex)
                 ?: throw ConfigurationException(message("skaffold.no.file.selected.error"))
 
-        if (!isSkaffoldFile(selectedSkaffoldFile)) {
+        if (!SkaffoldFileService.instance.isSkaffoldFile(selectedSkaffoldFile)) {
             throw ConfigurationException(message("skaffold.invalid.file.error"))
         }
     }

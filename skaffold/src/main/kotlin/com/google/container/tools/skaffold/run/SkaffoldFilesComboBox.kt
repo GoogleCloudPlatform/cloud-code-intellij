@@ -16,7 +16,7 @@
 
 package com.google.container.tools.skaffold.run
 
-import com.google.container.tools.skaffold.findSkaffoldFiles
+import com.google.container.tools.skaffold.SkaffoldFileService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
@@ -41,7 +41,9 @@ class SkaffoldFilesComboBox : JComboBox<VirtualFile>() {
     fun setProject(project: Project) {
         setRenderer(VirtualFileRenderer(project.baseDir))
         skaffoldFilesMutableModel =
-            DefaultComboBoxModel<VirtualFile>(findSkaffoldFiles(project).toTypedArray())
+            DefaultComboBoxModel<VirtualFile>(
+                SkaffoldFileService.instance.findSkaffoldFiles(project).toTypedArray()
+            )
         model = skaffoldFilesMutableModel
         if (model.size > 0) selectedIndex = 0
     }
@@ -51,9 +53,23 @@ class SkaffoldFilesComboBox : JComboBox<VirtualFile>() {
      * the file, adds it and selects it.
      */
     fun setSelectedSkaffoldFile(skaffoldFile: VirtualFile) {
-        skaffoldFilesMutableModel.addElement(skaffoldFile)
+        var existingElement = false
+        for (i in 0..skaffoldFilesMutableModel.size) {
+            if (skaffoldFilesMutableModel.getElementAt(i) == skaffoldFile) {
+                existingElement = true
+                break
+            }
+        }
+        if (!existingElement) {
+            skaffoldFilesMutableModel.addElement(skaffoldFile)
+        }
+
         selectedItem = skaffoldFile
     }
+
+    /** Returns currently selected Skaffold file or null if none is selected. */
+    fun getSelectedSkaffoldFile(): VirtualFile? =
+        if (selectedIndex >= 0) model.getElementAt(selectedIndex) else null
 }
 
 /** Renders name of the Skaffold file relative to the base dir of the current IDE project. */

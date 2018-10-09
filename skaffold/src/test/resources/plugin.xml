@@ -14,12 +14,9 @@
   ~ limitations under the License.
   -->
 
-<!-- Declares IDE extensions and components for Skaffold support in Container Tools -->
-<idea-plugin>
-    <depends>org.jetbrains.plugins.yaml</depends>
-    <extensions defaultExtensionNs="com.intellij">
-        <configurationType implementation="com.google.container.tools.skaffold.run.SkaffoldRunConfigurationType"/>
+<idea-plugin xmlns:xi="http://www.w3.org/2001/XInclude">
+    <id>com.google.container.tools</id>
+    <name>Google Container Tools</name>
 
-        <applicationService serviceImplementation="com.google.container.tools.skaffold.SkaffoldFileService"/>
-    </extensions>
+    <xi:include href="/META-INF/skaffold.xml" xpointer="xpointer(/idea-plugin/*)"/>
 </idea-plugin>

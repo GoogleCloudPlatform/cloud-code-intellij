@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 /*
  * Copyright 2018 Google Inc. All Rights Reserved.
  *
@@ -15,6 +13,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("org.jetbrains.intellij") version "0.3.7"
@@ -48,6 +48,7 @@ allprojects {
         testCompile("com.google.truth:truth:+") {
             exclude(group = "com.google.guava", module = "guava")
         }
+        testCompile("io.mockk:mockk:+")
     }
 
     spotless {
