@@ -181,7 +181,9 @@ public class ProjectSelectionDialog {
     }
   }
 
-  /** Check if cached, if not then check if already loading, and finally start loading if not. */
+  /**
+   * Check if cached, if not then check if already loading, and finally start loading if not.
+   */
   private void loadProjectList(CredentialedUser user) {
     if (!cachedProjectList.containsKey(user) && !runningProjectLoaderJobs.containsKey(user)) {
       // not cached and not loading - start loading project list here and keep the future reference.
@@ -210,8 +212,8 @@ public class ProjectSelectionDialog {
                     String errorMessage =
                         Optional.ofNullable(throwable.getMessage())
                             .orElse(throwable.getClass().getName());
-                    dialogWrapper.setErrorInfoAll(
-                        Collections.singletonList(new ValidationInfo(errorMessage)));
+//                    dialogWrapper.setErrorInfoAll(
+//                        Collections.singletonList(new ValidationInfo(errorMessage)));
                     refreshProjectListUi(user);
                   });
             }
@@ -220,13 +222,17 @@ public class ProjectSelectionDialog {
     }
   }
 
-  /** Refreshes accounts and project lists and selects given account. */
+  /**
+   * Refreshes accounts and project lists and selects given account.
+   */
   private void refreshDialog(@Nullable CredentialedUser userToSelect) {
     loadAllProjects();
     accountComboBox.setSelectedItem(userToSelect);
   }
 
-  /** Updates project list if this list is for currently selected account. if not, does nothing. */
+  /**
+   * Updates project list if this list is for currently selected account. if not, does nothing.
+   */
   private void refreshProjectListUi(@Nullable CredentialedUser user) {
     if (Objects.equals(user, accountComboBox.getSelectedItem())) {
       if (cachedProjectList.containsKey(user)) {
@@ -373,7 +379,9 @@ public class ProjectSelectionDialog {
     }
   }
 
-  /** finds if project list contains the project with given name, selects and scrolls to it. */
+  /**
+   * finds if project list contains the project with given name, selects and scrolls to it.
+   */
   @VisibleForTesting
   void showProjectInList(String projectName) {
     for (int i = 0; i < projectListTableModel.getRowCount(); i++) {
@@ -451,7 +459,9 @@ public class ProjectSelectionDialog {
     Futures.addCallback(future, callback, MoreExecutors.directExecutor());
   }
 
-  /** Wraps this form as an IDEA dialog instead of inheriting dialog internals. */
+  /**
+   * Wraps this form as an IDEA dialog instead of inheriting dialog internals.
+   */
   @VisibleForTesting
   class ProjectSelectionDialogWrapper extends DialogWrapper {
 
@@ -470,17 +480,12 @@ public class ProjectSelectionDialog {
     @NotNull
     @Override
     protected Action[] createLeftSideActions() {
-      return new Action[] {refreshAction};
+      return new Action[]{refreshAction};
     }
 
     @Override
     public void setOKActionEnabled(boolean isEnabled) {
       super.setOKActionEnabled(isEnabled);
-    }
-
-    @Override
-    protected void setErrorInfoAll(@NotNull List<ValidationInfo> info) {
-      super.setErrorInfoAll(info);
     }
 
     @Nullable
