@@ -114,9 +114,7 @@ public abstract class BuildDeploymentSourceType
       return;
     }
 
-    List<BeforeRunTask> buildTasks = editor.getStepsBeforeLaunch();
-
-    if (select && !hasBuildTaskForModule(buildTasks, module)) {
+    if (select && !hasBuildTaskForModule(editor.getStepsBeforeLaunch(), module)) {
       BeforeRunTask buildTask = createBuildTask(module);
       if (buildTask != null) {
         editor.addBeforeLaunchStep(buildTask);
