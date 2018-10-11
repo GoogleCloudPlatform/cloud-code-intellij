@@ -20,6 +20,7 @@ import com.google.common.truth.Truth.assertThat
 import com.google.container.tools.skaffold.SkaffoldFileService
 import com.google.container.tools.test.ContainerToolsRule
 import com.google.container.tools.test.TestService
+import com.google.container.tools.test.UiTest
 import com.intellij.mock.MockVirtualFile
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -44,6 +45,7 @@ class SkaffoldFilesComboBoxTest {
     }
 
     @Test
+    @UiTest
     fun `skaffold combo box for a project with no files has no elements and empty selection`() {
         val project = containerToolsRule.ideaProjectTestFixture.project
         every { mockSkaffoldFileService.findSkaffoldFiles(project) } returns listOf()
@@ -53,6 +55,7 @@ class SkaffoldFilesComboBoxTest {
     }
 
     @Test
+    @UiTest
     fun `single skaffold file from project is pre-selected in combo box`() {
         val project = containerToolsRule.ideaProjectTestFixture.project
         val mockSkaffoldFile = MockVirtualFile.file("skaffold.yaml")
@@ -64,6 +67,7 @@ class SkaffoldFilesComboBoxTest {
     }
 
     @Test
+    @UiTest
     fun `first skaffold file from multi-file project is pre-selected in combo box`() {
         val project = containerToolsRule.ideaProjectTestFixture.project
         val mockSkaffoldFile1 = MockVirtualFile.file("k8s/deploy.yaml")
@@ -78,6 +82,7 @@ class SkaffoldFilesComboBoxTest {
     }
 
     @Test
+    @UiTest
     fun `setSelectedSkaffoldFile with existing file changes selection in combo box`() {
         val project = containerToolsRule.ideaProjectTestFixture.project
         val mockSkaffoldFile1 = MockVirtualFile.file("k8s/deploy.yaml")
@@ -95,6 +100,7 @@ class SkaffoldFilesComboBoxTest {
     }
 
     @Test
+    @UiTest
     fun `setSelectedSkaffoldFile with non-existing file changes selection and adds element`() {
         val project = containerToolsRule.ideaProjectTestFixture.project
         val mockSkaffoldFile1 = MockVirtualFile.file("k8s/deploy.yaml")

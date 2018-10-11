@@ -48,19 +48,28 @@ class ContainerToolsRule(private val testInstance: Any) : TestRule {
             override fun evaluate() {
                 try {
                     setUpRule()
-                    baseStatement.evaluate()
+                    executeTest(baseStatement, description)
                 } finally {
                     tearDownRule()
                 }
             }
         }
 
+    /** Checks the test method for additional annotations such as UI thread, and runs it. */
+    private fun executeTest(baseStatement: Statement, description: Description) {
+        if (description.annotations.any { it is UiTest }) {
+            EdtTestUtil.runInEdtAndWait(ThrowableRunnable { baseStatement.evaluate() })
+        } else {
+            baseStatement.evaluate()
+        }
+    }
+
     private fun setUpRule() {
         ideaProjectTestFixture =
             IdeaTestFixtureFactory.getFixtureFactory().createLightFixtureBuilder().fixture
         EdtTestUtil.runInEdtAndWait(ThrowableRunnable { ideaProjectTestFixture.setUp() })
 
-        MockKAnnotations.init(testInstance, relaxUnitFun = true)
+        MockKAnnotations.init(testInstance, relaxed = true)
         replaceServices()
     }
 

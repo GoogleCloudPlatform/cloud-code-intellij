@@ -16,11 +16,12 @@
 
 package com.google.container.tools.skaffold.run
 
+import com.google.common.annotations.VisibleForTesting
 import com.google.container.tools.skaffold.SkaffoldFileService
 import com.google.container.tools.skaffold.message
-import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.options.SettingsEditor
+import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.layout.panel
 import javax.swing.JComponent
@@ -30,8 +31,9 @@ import javax.swing.JComponent
  * drop-down list of all Skaffold configuration files ([SkaffoldFilesComboBox]) found
  * in the project and basic validation of the currently selected Skaffold file.
  */
-open class BaseSkaffoldSettingsEditor : SettingsEditor<RunConfiguration>() {
-    private lateinit var skaffoldFilesComboBox: SkaffoldFilesComboBox
+open class BaseSkaffoldSettingsEditor : SettingsEditor<AbstractSkaffoldRunConfiguration>() {
+    @VisibleForTesting
+    lateinit var skaffoldFilesComboBox: SkaffoldFilesComboBox
 
     override fun createEditor(): JComponent {
         skaffoldFilesComboBox = SkaffoldFilesComboBox()
@@ -42,7 +44,7 @@ open class BaseSkaffoldSettingsEditor : SettingsEditor<RunConfiguration>() {
         return basePanel
     }
 
-    override fun applyEditorTo(runConfig: RunConfiguration) {
+    override fun applyEditorTo(runConfig: AbstractSkaffoldRunConfiguration) {
         val selectedSkaffoldFile: VirtualFile =
             skaffoldFilesComboBox.getItemAt(skaffoldFilesComboBox.selectedIndex)
                 ?: throw ConfigurationException(message("skaffold.no.file.selected.error"))
@@ -50,9 +52,15 @@ open class BaseSkaffoldSettingsEditor : SettingsEditor<RunConfiguration>() {
         if (!SkaffoldFileService.instance.isSkaffoldFile(selectedSkaffoldFile)) {
             throw ConfigurationException(message("skaffold.invalid.file.error"))
         }
+
+        // save properties
+        runConfig.skaffoldConfigurationFilePath = selectedSkaffoldFile.path
     }
 
-    override fun resetEditorFrom(runConfig: RunConfiguration) {
+    override fun resetEditorFrom(runConfig: AbstractSkaffoldRunConfiguration) {
         skaffoldFilesComboBox.setProject(runConfig.project)
+        runConfig.skaffoldConfigurationFilePath?.let {
+            LocalFileSystem.getInstance().findFileByPath(it)
+        }?.let { skaffoldFilesComboBox.setSelectedSkaffoldFile(it) }
     }
 }
