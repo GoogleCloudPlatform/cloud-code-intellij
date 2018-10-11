@@ -209,9 +209,9 @@ public class ProjectSelectionDialog {
                     String errorMessage =
                         Optional.ofNullable(throwable.getMessage())
                             .orElse(throwable.getClass().getName());
-                    //                    dialogWrapper.setErrorInfoAll(
-                    //                        Collections.singletonList(new
-                    // ValidationInfo(errorMessage)));
+
+                    dialogWrapper.setErrorText(errorMessage, projectListTable);
+
                     refreshProjectListUi(user);
                   });
             }
@@ -464,6 +464,11 @@ public class ProjectSelectionDialog {
     @Override
     protected JComponent createCenterPanel() {
       return centerPanelWrapper;
+    }
+
+    @Override
+    protected void setErrorText(@Nullable String text, @Nullable JComponent component) {
+      super.setErrorText(text, component);
     }
 
     // IntelliJ API - creates actions (buttons) for "left side" of the dialog bottom panel.
