@@ -352,7 +352,7 @@ public class AppEngineServerModel
     return ImmutableList.of();
   }
 
-  @javax.annotation.Nullable
+  @Nullable
   @Override
   public String getProjectId() {
     return null;

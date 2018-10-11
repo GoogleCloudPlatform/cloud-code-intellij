@@ -33,7 +33,6 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.DoubleClickListener;
 import com.intellij.ui.JBProgressBar;
@@ -210,8 +209,9 @@ public class ProjectSelectionDialog {
                     String errorMessage =
                         Optional.ofNullable(throwable.getMessage())
                             .orElse(throwable.getClass().getName());
-                    dialogWrapper.setErrorInfoAll(
-                        Collections.singletonList(new ValidationInfo(errorMessage)));
+
+                    dialogWrapper.setErrorText(errorMessage, projectListTable);
+
                     refreshProjectListUi(user);
                   });
             }
@@ -466,6 +466,11 @@ public class ProjectSelectionDialog {
       return centerPanelWrapper;
     }
 
+    @Override
+    protected void setErrorText(@Nullable String text, @Nullable JComponent component) {
+      super.setErrorText(text, component);
+    }
+
     // IntelliJ API - creates actions (buttons) for "left side" of the dialog bottom panel.
     @NotNull
     @Override
@@ -476,11 +481,6 @@ public class ProjectSelectionDialog {
     @Override
     public void setOKActionEnabled(boolean isEnabled) {
       super.setOKActionEnabled(isEnabled);
-    }
-
-    @Override
-    protected void setErrorInfoAll(@NotNull List<ValidationInfo> info) {
-      super.setErrorInfoAll(info);
     }
 
     @Nullable
