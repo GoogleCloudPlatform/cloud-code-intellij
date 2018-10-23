@@ -18,8 +18,14 @@
 <idea-plugin>
     <depends>org.jetbrains.plugins.yaml</depends>
     <extensions defaultExtensionNs="com.intellij">
-        <configurationType implementation="com.google.container.tools.skaffold.run.SkaffoldRunConfigurationType"/>
+        <configurationType
+                implementation="com.google.container.tools.skaffold.run.SkaffoldRunConfigurationType"/>
 
-        <applicationService serviceImplementation="com.google.container.tools.skaffold.SkaffoldFileService"/>
+        <applicationService
+                serviceImplementation="com.google.container.tools.skaffold.SkaffoldFileService"/>
+
+        <applicationService
+                serviceInterface="com.google.container.tools.skaffold.SkaffoldExecutorService"
+                serviceImplementation="com.google.container.tools.skaffold.DefaultSkaffoldExecutorService"/>
     </extensions>
 </idea-plugin>
