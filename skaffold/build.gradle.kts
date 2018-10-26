@@ -15,5 +15,5 @@
  */
 
 dependencies {
-    compile(project(":common-test-lib"))
+    testCompile(project(":common-test-lib"))
 }
