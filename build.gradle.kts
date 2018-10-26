@@ -67,4 +67,5 @@ allprojects {
 
 dependencies {
     compile(project(":skaffold"))
+    compile(project(":skaffold-editing"))
 }

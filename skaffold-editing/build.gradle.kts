@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-include 'skaffold'
-include 'skaffold-editing'
-include 'common-test-lib'
+dependencies {
+    testCompile(project(":common-test-lib"))
+}
