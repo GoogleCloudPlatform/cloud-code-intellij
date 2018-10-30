@@ -37,6 +37,7 @@ import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.jvm.isAccessible
+import kotlin.reflect.jvm.javaType
 
 /**
  * A custom [TestRule] for Container Tools unit tests.
@@ -96,7 +97,7 @@ class ContainerToolsRule(private val testInstance: Any) : TestRule {
             member as KProperty1<Any?, Any?>
             member.isAccessible = true
             val service: Any = member.get(testInstance)!!
-            setService(service)
+            setService(member.returnType.javaType.typeName, service)
         }
     }
 
@@ -151,15 +152,13 @@ class ContainerToolsRule(private val testInstance: Any) : TestRule {
      * Replaces the service binding in the [MutablePicoContainer] with the given instance and
      * returns the original service instance.
      *
+     * @param javaClassName Java class name that is used to register/replace IDE service.
      * @param newInstance the new instance to register
      */
-    private fun setService(newInstance: Any) {
+    private fun setService(javaClassName: String, newInstance: Any) {
         with(ApplicationManager.getApplication().picoContainer as MutablePicoContainer) {
-            unregisterComponent(newInstance::class.java.name)
-            registerComponentInstance(
-                newInstance::class.java.name,
-                newInstance
-            )
+            unregisterComponent(javaClassName)
+            registerComponentInstance(javaClassName, newInstance)
         }
     }
 }

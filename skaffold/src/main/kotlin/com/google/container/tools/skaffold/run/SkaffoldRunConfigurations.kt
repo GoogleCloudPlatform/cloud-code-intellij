@@ -16,6 +16,7 @@
 
 package com.google.container.tools.skaffold.run
 
+import com.google.container.tools.skaffold.SkaffoldExecutorSettings
 import com.intellij.execution.Executor
 import com.intellij.execution.configurations.ConfigurationFactory
 import com.intellij.execution.configurations.RunConfiguration
@@ -24,7 +25,8 @@ import com.intellij.execution.configurations.RunProfileState
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
-import com.intellij.util.xmlb.annotations.Attribute
+import com.intellij.util.xmlb.XmlSerializer
+import org.jdom.Element
 
 /**
  * Template configuration for Skaffold single run configuration, serving as a base for all new
@@ -38,7 +40,7 @@ class SkaffoldSingleRunConfiguration(
 ) : AbstractSkaffoldRunConfiguration(project, factory, name) {
 
     override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState? =
-        null
+        SkaffoldCommandLineState(environment, SkaffoldExecutorSettings.ExecutionMode.SINGLE_RUN)
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
         SkaffoldSingleRunSettingsEditor()
@@ -56,7 +58,7 @@ class SkaffoldDevConfiguration(
 ) : AbstractSkaffoldRunConfiguration(project, factory, name) {
 
     override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState? =
-        null
+        SkaffoldCommandLineState(environment, SkaffoldExecutorSettings.ExecutionMode.DEV)
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
         SkaffoldDevSettingsEditor()
@@ -76,6 +78,17 @@ abstract class AbstractSkaffoldRunConfiguration(
      * Persisted Skaffold config file absolute path for Skaffold run configurations.
      * See more at [com.intellij.openapi.vfs.VirtualFile.getPath]
      */
-    @Attribute("skaffoldConfigurationFilePath")
     var skaffoldConfigurationFilePath: String? = null
+
+    override fun readExternal(element: Element) {
+        super.readExternal(element)
+
+        XmlSerializer.deserializeInto(this, element)
+    }
+
+    override fun writeExternal(element: Element) {
+        super.writeExternal(element)
+
+        XmlSerializer.serializeInto(this, element)
+    }
 }
