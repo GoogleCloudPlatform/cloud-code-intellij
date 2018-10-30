@@ -38,6 +38,7 @@ allprojects {
         type = project.properties["ideaEdition"].toString()
         version = project.properties["ideaVersion"].toString()
         intellijRepo = project.properties["intellijRepoUrl"].toString()
+        updateSinceUntilBuild = false
     }
 
     tasks.withType<KotlinCompile> {

@@ -20,9 +20,9 @@
     <name>Google Container Tools</name>
     <vendor>Google</vendor>
 
-    <!-- "idea-version since-build" set to cover 2017.1 - 2018.2 -->
+    <!-- "idea-version since-build" set to cover 2017.1 - 2018.3 -->
     <!-- Set manually because the gradle-intellij-plugin cannot span across major release versions -->
-    <idea-version since-build="171.3780" until-build="182.*"/>
+    <idea-version since-build="171.3780" until-build="183.*"/>
 
     <xi:include href="/META-INF/skaffold.xml" xpointer="xpointer(/idea-plugin/*)"/>
     <xi:include href="/META-INF/skaffold-editing.xml" xpointer="xpointer(/idea-plugin/*)"/>
