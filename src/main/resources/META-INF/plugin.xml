@@ -24,6 +24,8 @@
     <!-- Set manually because the gradle-intellij-plugin cannot span across major release versions -->
     <idea-version since-build="171.3780" until-build="183.*"/>
 
+    <depends>com.intellij.modules.lang</depends>
+
     <xi:include href="/META-INF/skaffold.xml" xpointer="xpointer(/idea-plugin/*)"/>
     <xi:include href="/META-INF/skaffold-editing.xml" xpointer="xpointer(/idea-plugin/*)"/>
 
