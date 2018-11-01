@@ -16,9 +16,15 @@
 
 package com.google.container.tools.skaffold.run
 
+import com.google.container.tools.skaffold.message
+
 /**
  * Settings editor that provides a UI for Skaffold continuous development mode run
  * configuration settings (ultimately calling "skaffold dev"), also saves and retrieves
  * the settings from the project state.
  */
-class SkaffoldDevSettingsEditor : BaseSkaffoldSettingsEditor()
+class SkaffoldDevSettingsEditor :
+    BaseSkaffoldSettingsEditor(
+        editorTitle = message("skaffold.run.config.dev.run.name"),
+        helperText = message("skaffold.run.config.dev.run.helperText")
+    )

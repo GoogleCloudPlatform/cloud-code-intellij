@@ -23,23 +23,36 @@ import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.ui.border.IdeaTitledBorder
 import com.intellij.ui.layout.panel
+import com.intellij.util.ui.UIUtil
+import java.awt.Insets
 import javax.swing.JComponent
 
 /**
  * Base settings editor for both Skaffold single run and continunous run configurations. Includes
  * drop-down list of all Skaffold configuration files ([SkaffoldFilesComboBox]) found
  * in the project and basic validation of the currently selected Skaffold file.
+ *
+ * @param editorTitle title for the settings editor
+ * @param helperText additional helper text for the settings editor
  */
-open class BaseSkaffoldSettingsEditor : SettingsEditor<AbstractSkaffoldRunConfiguration>() {
+open class BaseSkaffoldSettingsEditor(val editorTitle: String, val helperText: String = "") :
+    SettingsEditor<AbstractSkaffoldRunConfiguration>() {
+
     @VisibleForTesting
-    lateinit var skaffoldFilesComboBox: SkaffoldFilesComboBox
+    val skaffoldFilesComboBox = SkaffoldFilesComboBox()
+
+    val basePanel = panel {
+        row {
+            label(helperText, 0, UIUtil.ComponentStyle.SMALL)
+        }
+
+        row(message("skaffold.configuration.label")) { skaffoldFilesComboBox(grow) }
+    }
 
     override fun createEditor(): JComponent {
-        skaffoldFilesComboBox = SkaffoldFilesComboBox()
-        val basePanel = panel {
-            row(message("skaffold.configuration.label")) { skaffoldFilesComboBox(grow) }
-        }
+        basePanel.border = IdeaTitledBorder(editorTitle, 0, Insets(0, 0, 0, 0))
 
         return basePanel
     }

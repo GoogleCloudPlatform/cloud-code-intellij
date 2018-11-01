@@ -16,8 +16,14 @@
 
 package com.google.container.tools.skaffold.run
 
+import com.google.container.tools.skaffold.message
+
 /**
  * Settings editor that provides a UI for Skaffold single mode run configuration settings,
  * also saves and retrieves the settings from the project state.
  */
-class SkaffoldSingleRunSettingsEditor : BaseSkaffoldSettingsEditor()
+class SkaffoldSingleRunSettingsEditor :
+    BaseSkaffoldSettingsEditor(
+        editorTitle = message("skaffold.run.config.single.run.name"),
+        helperText = message("skaffold.run.config.single.run.helperText")
+    )

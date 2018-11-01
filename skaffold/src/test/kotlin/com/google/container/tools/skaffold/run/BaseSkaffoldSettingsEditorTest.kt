@@ -53,7 +53,7 @@ class BaseSkaffoldSettingsEditorTest {
     @Before
     fun setUp() {
         EdtTestUtil.runInEdtAndWait(ThrowableRunnable {
-            baseSkaffoldSettingsEditor = BaseSkaffoldSettingsEditor()
+            baseSkaffoldSettingsEditor = BaseSkaffoldSettingsEditor("test")
             // calls getComponent() to initialize UI first, IDE flow.
             baseSkaffoldSettingsEditor.component
         })
