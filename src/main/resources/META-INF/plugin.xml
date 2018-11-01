@@ -22,7 +22,7 @@
 
     <!-- "idea-version since-build" set to cover 2017.1 - 2018.3 -->
     <!-- Set manually because the gradle-intellij-plugin cannot span across major release versions -->
-    <idea-version since-build="171.3780" until-build="183.*"/>
+    <idea-version since-build="182.0" until-build="183.*"/>
 
     <depends>com.intellij.modules.lang</depends>
 
