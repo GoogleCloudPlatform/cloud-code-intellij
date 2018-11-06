@@ -39,6 +39,7 @@ allprojects {
         version = project.properties["ideaVersion"].toString()
         intellijRepo = project.properties["intellijRepoUrl"].toString()
         updateSinceUntilBuild = false
+        project.properties["alternativeIdePath"]?.let { alternativeIdePath = it.toString() }
     }
 
     tasks.withType<KotlinCompile> {
