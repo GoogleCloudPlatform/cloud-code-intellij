@@ -94,7 +94,10 @@ class ContainerToolsRule(private val testInstance: Any) : TestRule {
      */
     private fun replaceServices() {
         for (member in getMembersWithAnnotation(TestService::class)) {
+            // See https://youtrack.jetbrains.com/issue/KT-16432
+            @Suppress("UNCHECKED_CAST")
             member as KProperty1<Any?, Any?>
+
             member.isAccessible = true
             val service: Any = member.get(testInstance)!!
             setService(member.returnType.javaType.typeName, service)
