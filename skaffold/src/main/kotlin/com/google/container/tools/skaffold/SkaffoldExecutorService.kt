@@ -56,6 +56,13 @@ abstract class SkaffoldExecutorService {
                 add("--filename")
                 add(it)
             }
+            settings.skaffoldLabels?.let {
+                it.labels
+                    .forEach { label ->
+                        add("--label")
+                        add("${label.key}=${label.value}")
+                    }
+            }
         }
 
         return SkaffoldProcess(
@@ -84,11 +91,13 @@ abstract class SkaffoldExecutorService {
  *           configuration file. If not provided, default `skaffold.yaml` used.
  * @property workingDirectory Optional, working directory where Skaffold needs to be launched.
  *           This is usually set to project working directory.
+ * @property skaffoldLabels Kubernetes style labels to pass to Skaffold execution.
  */
 data class SkaffoldExecutorSettings(
     val executionMode: ExecutionMode,
     val skaffoldConfigurationFilePath: String? = null,
-    var workingDirectory: File? = null
+    val workingDirectory: File? = null,
+    val skaffoldLabels: SkaffoldLabels? = null
 ) {
 
     /** Execution mode for Skaffold, single run, continuous development, etc. */

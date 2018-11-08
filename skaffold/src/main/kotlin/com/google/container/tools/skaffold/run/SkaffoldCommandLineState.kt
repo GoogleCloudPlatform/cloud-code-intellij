@@ -18,6 +18,7 @@ package com.google.container.tools.skaffold.run
 
 import com.google.container.tools.skaffold.SkaffoldExecutorService
 import com.google.container.tools.skaffold.SkaffoldExecutorSettings
+import com.google.container.tools.skaffold.SkaffoldLabels
 import com.google.container.tools.skaffold.message
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.configurations.CommandLineState
@@ -69,7 +70,8 @@ class SkaffoldCommandLineState(
             SkaffoldExecutorSettings(
                 executionMode,
                 skaffoldConfigurationFilePath,
-                workingDirectory = File(environment.project.basePath)
+                workingDirectory = File(environment.project.basePath),
+                skaffoldLabels = SkaffoldLabels.defaultLabels
             )
         )
 

@@ -14,10 +14,9 @@
   ~ limitations under the License.
   -->
 
-<idea-plugin xmlns:xi="http://www.w3.org/2001/XInclude">
-    <id>com.google.container.tools</id>
-    <name>Google Container Tools</name>
-
-    <xi:include href="/META-INF/core.xml" xpointer="xpointer(/idea-plugin/*)"/>
-    <xi:include href="/META-INF/skaffold.xml" xpointer="xpointer(/idea-plugin/*)"/>
+<!-- Declares core/utility IDE extensions and components for Container Tools -->
+<idea-plugin>
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService serviceImplementation="com.google.container.tools.core.PluginInfo"/>
+    </extensions>
 </idea-plugin>

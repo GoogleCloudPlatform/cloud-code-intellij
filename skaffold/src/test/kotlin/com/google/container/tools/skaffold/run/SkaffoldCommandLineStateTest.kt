@@ -17,6 +17,7 @@
 package com.google.container.tools.skaffold.run
 
 import com.google.common.truth.Truth.assertThat
+import com.google.container.tools.core.PluginInfo
 import com.google.container.tools.skaffold.SkaffoldExecutorService
 import com.google.container.tools.skaffold.SkaffoldExecutorSettings
 import com.google.container.tools.skaffold.SkaffoldProcess
@@ -56,6 +57,9 @@ class SkaffoldCommandLineStateTest {
     @MockK
     @TestService
     private lateinit var mockSkaffoldExecutorService: SkaffoldExecutorService
+    @MockK
+    @TestService
+    private lateinit var mockPluginInfoService: PluginInfo
 
     private val skaffoldSettingsCapturingSlot: CapturingSlot<SkaffoldExecutorSettings> = slot()
 

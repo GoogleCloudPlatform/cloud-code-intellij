@@ -89,4 +89,58 @@ class DefaultSkaffoldExecutorServiceTest {
 
         verify { defaultSkaffoldExecutorService.createProcess(File("/tmp"), any()) }
     }
+
+    @Test
+    fun `empty skaffold label list does not generate label flags`() {
+        val skaffoldLabels = SkaffoldLabels()
+
+        val result = defaultSkaffoldExecutorService.executeSkaffold(
+            SkaffoldExecutorSettings(
+                SkaffoldExecutorSettings.ExecutionMode.DEV,
+                skaffoldConfigurationFilePath = "test.yaml",
+                skaffoldLabels = skaffoldLabels
+            )
+        )
+
+        assertThat(result.commandLine).isEqualTo("skaffold dev --filename test.yaml")
+    }
+
+    @Test
+    fun `single skaffold label list generates correct label flag`() {
+        val skaffoldLabels = SkaffoldLabels()
+        skaffoldLabels.labels["ide"] = "testIde"
+
+        val result = defaultSkaffoldExecutorService.executeSkaffold(
+            SkaffoldExecutorSettings(
+                SkaffoldExecutorSettings.ExecutionMode.DEV,
+                skaffoldConfigurationFilePath = "test.yaml",
+                skaffoldLabels = skaffoldLabels
+            )
+        )
+
+        assertThat(result.commandLine).isEqualTo(
+            "skaffold dev --filename test.yaml --label ide=testIde"
+        )
+    }
+
+    @Test
+    fun `multiple skaffold label list generates correct label flag set`() {
+        val skaffoldLabels = SkaffoldLabels()
+        skaffoldLabels.labels["ide"] = "testIde"
+        skaffoldLabels.labels["name"] = "unitTest"
+        skaffoldLabels.labels["version"] = "1"
+
+        val result = defaultSkaffoldExecutorService.executeSkaffold(
+            SkaffoldExecutorSettings(
+                SkaffoldExecutorSettings.ExecutionMode.DEV,
+                skaffoldConfigurationFilePath = "test.yaml",
+                skaffoldLabels = skaffoldLabels
+            )
+        )
+
+        assertThat(result.commandLine).isEqualTo(
+            "skaffold dev --filename test.yaml " +
+                "--label ide=testIde --label name=unitTest --label version=1"
+        )
+    }
 }

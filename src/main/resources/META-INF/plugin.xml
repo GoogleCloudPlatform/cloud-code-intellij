@@ -26,6 +26,7 @@
 
     <depends>com.intellij.modules.lang</depends>
 
+    <xi:include href="/META-INF/core.xml" xpointer="xpointer(/idea-plugin/*)"/>
     <xi:include href="/META-INF/skaffold.xml" xpointer="xpointer(/idea-plugin/*)"/>
     <xi:include href="/META-INF/skaffold-editing.xml" xpointer="xpointer(/idea-plugin/*)"/>
 
