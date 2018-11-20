@@ -20,7 +20,7 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
-        classpath "net.ltgt.gradle:gradle-errorprone-plugin:0.0.13"
+        classpath "net.ltgt.gradle:gradle-errorprone-plugin:0.6"
         classpath "net.ltgt.gradle:gradle-apt-plugin:0.13"
     }
 }
@@ -85,6 +85,7 @@ subprojects {
 
     dependencies {
         compile 'joda-time:joda-time:2.9.2'
+        errorproneJavac("com.google.errorprone:error_prone_core:2.3.2")
 
         testCompile ('com.google.truth:truth:0.36') {
             exclude group: 'com.google.guava', module: 'guava'
@@ -94,6 +95,10 @@ subprojects {
         }
         testCompile 'junit:junit:4.+'
         testCompile 'org.mockito:mockito-core:2.+'
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.errorprone.disableWarningsInGeneratedCode = true
     }
 
     apply plugin: 'jacoco'
