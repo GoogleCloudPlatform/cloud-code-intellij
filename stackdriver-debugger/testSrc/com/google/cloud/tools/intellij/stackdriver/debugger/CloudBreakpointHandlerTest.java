@@ -44,7 +44,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClassOwner;
 import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
-import com.intellij.testFramework.IdeaTestCase;
 import com.intellij.testFramework.UsefulTestCase;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory;
@@ -88,11 +87,6 @@ public class CloudBreakpointHandlerTest extends UsefulTestCase {
   private ServerToIdeFileResolver fileResolver;
 
   private PsiJavaFile psiJavaFile;
-
-  @SuppressWarnings("JUnitTestCaseWithNonTrivialConstructors")
-  public CloudBreakpointHandlerTest() {
-    IdeaTestCase.initPlatformPrefix();
-  }
 
   @Override
   protected void setUp() throws Exception {

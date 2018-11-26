@@ -33,7 +33,6 @@ import com.google.gdt.eclipse.login.common.GoogleLoginState;
 import com.intellij.mock.MockProjectEx;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.psi.PsiManager;
-import com.intellij.testFramework.IdeaTestCase;
 import com.intellij.testFramework.UsefulTestCase;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory;
@@ -60,11 +59,6 @@ public class CloudDebugProcessStateTest extends UsefulTestCase {
 
   private MockProjectEx project;
   private IdeaProjectTestFixture fixture;
-
-  @SuppressWarnings("JUnitTestCaseWithNonTrivialConstructors")
-  public CloudDebugProcessStateTest() {
-    IdeaTestCase.initPlatformPrefix();
-  }
 
   private static boolean verifyList(List<Breakpoint> breakpoints, String... ids) {
     int bindex = 0;
