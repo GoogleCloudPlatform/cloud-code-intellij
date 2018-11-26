@@ -3,8 +3,8 @@ This page documents production updates to Cloud Tools for IntelliJ. You can chec
 
 ## 18.11.1
 
-### Fixed
-  - Support IDEA 2018.3 [2279](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2279)
+### Added
+  - Added support IDEA 2018.3 [2279](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2279)
 
 ## 18.10.1
 
