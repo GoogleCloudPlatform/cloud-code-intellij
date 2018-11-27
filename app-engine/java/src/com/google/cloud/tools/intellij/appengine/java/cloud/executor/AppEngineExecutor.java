@@ -68,8 +68,8 @@ public class AppEngineExecutor implements CancellableRunnable {
     ThreadUtil.getInstance()
         .executeInBackground(
             () -> {
+              CloudSdkServiceManager.getInstance().getSdkReadLock().lock();
               try {
-                CloudSdkServiceManager.getInstance().getSdkReadLock().lock();
                 process.waitFor();
               } catch (InterruptedException e) {
                 // unexpected interruption, nothing can be done.
