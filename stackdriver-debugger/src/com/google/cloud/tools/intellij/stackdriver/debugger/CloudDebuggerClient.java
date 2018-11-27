@@ -25,7 +25,7 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
-import com.google.api.services.clouddebugger.v2.Clouddebugger.Builder;
+import com.google.api.services.clouddebugger.v2.Clouddebugger;
 import com.google.api.services.clouddebugger.v2.Clouddebugger.Debugger;
 import com.google.cloud.tools.intellij.login.CredentialedUser;
 import com.google.cloud.tools.intellij.login.Services;
@@ -123,7 +123,7 @@ public class CloudDebuggerClient {
           HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
           String userAgent = ServiceManager.getService(PluginInfoService.class).getUserAgent();
           cloudDebuggerClient =
-              new Builder(httpTransport, JSON_FACTORY, initializer)
+              new Clouddebugger.Builder(httpTransport, JSON_FACTORY, initializer)
                   .setRootUrl(ROOT_URL)
                   // this ends up prefixed to user agent
                   .setApplicationName(userAgent)
