@@ -158,8 +158,8 @@ public class CloudSdkAppEngineHelper implements AppEngineHelper {
                 .getFlexibleRuntimeFromAppYaml(facetConfiguration.getAppYamlPath());
 
         if (runtimeOptional.filter(runtime -> runtime == FlexibleRuntime.CUSTOM).isPresent()
-            && (!Files.isRegularFile(
-                Paths.get(facetConfiguration.getDockerDirectory(), DOCKERFILE_NAME)))) {
+            && !Files.isRegularFile(
+                Paths.get(facetConfiguration.getDockerDirectory(), DOCKERFILE_NAME))) {
           callback.errorOccurred(
               AppEngineMessageBundle.getString("appengine.deployment.error.Dockerfile.notfound"));
           return Optional.empty();

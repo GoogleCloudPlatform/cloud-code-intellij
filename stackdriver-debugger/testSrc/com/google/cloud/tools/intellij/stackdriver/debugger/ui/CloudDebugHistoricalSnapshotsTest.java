@@ -163,7 +163,7 @@ public class CloudDebugHistoricalSnapshotsTest {
   }
 
   private void runModelSetter(CloudDebugHistoricalSnapshots snapshots) {
-    (snapshots.new ModelSetter(mockProcess.getCurrentBreakpointList(), snapshots.getSelection()))
+    snapshots.new ModelSetter(mockProcess.getCurrentBreakpointList(), snapshots.getSelection())
         .run();
   }
 
