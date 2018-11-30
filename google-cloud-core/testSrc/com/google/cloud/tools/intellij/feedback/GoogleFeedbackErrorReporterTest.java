@@ -19,20 +19,22 @@ package com.google.cloud.tools.intellij.feedback;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.service.PluginInfoService;
+import com.google.cloud.tools.intellij.testing.CloudToolsRule;
+import com.google.cloud.tools.intellij.testing.TestService;
 import com.intellij.errorreport.bean.ErrorBean;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationNamesInfo;
 import com.intellij.openapi.application.ex.ApplicationInfoEx;
 import java.util.Map;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 /** Test cases for {@link GoogleFeedbackErrorReporter}. */
-@RunWith(MockitoJUnitRunner.class)
 public class GoogleFeedbackErrorReporterTest {
+  @Rule public final CloudToolsRule cloudToolsRule = new CloudToolsRule(this);
 
   private static final String TEST_MESSAGE = "Test message";
   private static final String LAST_ACTION = "last action";
@@ -42,6 +44,8 @@ public class GoogleFeedbackErrorReporterTest {
   private static final String MAJOR_VERSION = "major version";
   private static final String MINOR_VERSION = "minor version";
   private static final String PLUGIN_VERSION = "plugin version";
+
+  @TestService @Mock private PluginInfoService pluginInfoService;
 
   @Mock private ApplicationNamesInfo mockAppNameInfo;
 
@@ -53,12 +57,12 @@ public class GoogleFeedbackErrorReporterTest {
   @Before
   public void setUp() {
     error = new ErrorBean(new Throwable(TEST_MESSAGE), LAST_ACTION);
-    error.setPluginVersion(PLUGIN_VERSION);
     when(mockAppNameInfo.getFullProductName()).thenReturn(FULL_PRODUCT_NAME);
     when(mockAppInfoEx.getPackageCode()).thenReturn(PACKAGE_CODE);
     when(mockAppInfoEx.getVersionName()).thenReturn(VERSION_NAME);
     when(mockAppInfoEx.getMajorVersion()).thenReturn(MAJOR_VERSION);
     when(mockAppInfoEx.getMinorVersion()).thenReturn(MINOR_VERSION);
+    when(pluginInfoService.getPluginVersion()).thenReturn(PLUGIN_VERSION);
   }
 
   @Test
