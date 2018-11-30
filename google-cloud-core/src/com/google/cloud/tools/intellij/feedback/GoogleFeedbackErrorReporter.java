@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.feedback;
 
+import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.intellij.diagnostic.AbstractMessage;
@@ -35,6 +36,7 @@ import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ApplicationNamesInfo;
 import com.intellij.openapi.application.ex.ApplicationInfoEx;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.ErrorReportSubmitter;
 import com.intellij.openapi.diagnostic.IdeaLoggingEvent;
 import com.intellij.openapi.diagnostic.SubmittedReportInfo;
@@ -137,8 +139,8 @@ public class GoogleFeedbackErrorReporter extends ErrorReportSubmitter {
             true,
             event.getThrowable(),
             params,
-            error.getMessage(),
-            error.getDescription(),
+            error.getMessage() == null ? "" : error.getMessage(),
+            error.getDescription() == null ? "" : error.getDescription(),
             ApplicationInfo.getInstance().getFullVersion(),
             successCallback,
             errorCallback);
@@ -194,7 +196,9 @@ public class GoogleFeedbackErrorReporter extends ErrorReportSubmitter {
             .put(APP_INTERNAL_KEY, Boolean.toString(application.isInternal()))
             .put(APP_VERSION_MAJOR_KEY, intelliJAppExtendedInfo.getMajorVersion())
             .put(APP_VERSION_MINOR_KEY, intelliJAppExtendedInfo.getMinorVersion())
-            .put(PLUGIN_VERSION, error.getPluginVersion())
+            .put(
+                PLUGIN_VERSION,
+                ServiceManager.getService(PluginInfoService.class).getPluginVersion())
             .build();
 
     return params;
