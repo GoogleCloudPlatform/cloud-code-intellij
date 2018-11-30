@@ -19,13 +19,9 @@ package com.google.cloud.tools.intellij.feedback;
 import com.google.cloud.tools.intellij.service.PluginInfoService;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
-import com.intellij.diagnostic.AbstractMessage;
-import com.intellij.diagnostic.IdeErrorsDialog;
 import com.intellij.diagnostic.ReportMessages;
 import com.intellij.errorreport.bean.ErrorBean;
 import com.intellij.ide.DataManager;
-import com.intellij.ide.plugins.IdeaPluginDescriptor;
-import com.intellij.ide.plugins.PluginManager;
 import com.intellij.idea.IdeaLogger;
 import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
@@ -40,7 +36,6 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.ErrorReportSubmitter;
 import com.intellij.openapi.diagnostic.IdeaLoggingEvent;
 import com.intellij.openapi.diagnostic.SubmittedReportInfo;
-import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.progress.EmptyProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
@@ -83,8 +78,6 @@ public class GoogleFeedbackErrorReporter extends ErrorReportSubmitter {
       final String description) {
     error.setDescription(description);
     error.setMessage(event.getMessage());
-
-    configureErrorFromEvent(event, error);
 
     ApplicationNamesInfo intelliJAppNameInfo = ApplicationNamesInfo.getInstance();
     ApplicationInfoEx intelliJAppExtendedInfo = ApplicationInfoEx.getInstanceEx();
@@ -150,26 +143,6 @@ public class GoogleFeedbackErrorReporter extends ErrorReportSubmitter {
       ProgressManager.getInstance().run(task);
     }
     return true;
-  }
-
-  private static void configureErrorFromEvent(IdeaLoggingEvent event, ErrorBean error) {
-    Throwable throwable = event.getThrowable();
-    if (throwable != null) {
-      PluginId pluginId = IdeErrorsDialog.findPluginId(throwable);
-      if (pluginId != null) {
-        IdeaPluginDescriptor ideaPluginDescriptor = PluginManager.getPlugin(pluginId);
-        if (ideaPluginDescriptor != null && !ideaPluginDescriptor.isBundled()) {
-          error.setPluginName(ideaPluginDescriptor.getName());
-          error.setPluginVersion(ideaPluginDescriptor.getVersion());
-        }
-      }
-    }
-
-    Object data = event.getData();
-
-    if (data instanceof AbstractMessage) {
-      error.setAttachments(((AbstractMessage) data).getIncludedAttachments());
-    }
   }
 
   @VisibleForTesting
