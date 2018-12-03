@@ -4,8 +4,8 @@ This page documents production updates to Cloud Tools for IntelliJ. You can chec
 ## 18.12.1
 
 ### Fixed
-
   - Fixed error reporting for IDEA 2018.2+ [2303](https://github.com/GoogleCloudPlatform/google-cloud-intellij/pull/2303)
+  - Fixed Cloud SDK auto-management UI thread bug for IDEA 2018.3. [2304](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2304)
 
 ## 18.11.1
 
