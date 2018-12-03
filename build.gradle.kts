@@ -70,4 +70,9 @@ allprojects {
 dependencies {
     compile(project(":skaffold"))
     compile(project(":skaffold-editing"))
+    compile(project(":common-test-lib"))
+
+    compile(files("lib/GoogleFeedback.jar"))
+
+    compile("com.google.protobuf:protobuf-java:2.5.0")
 }

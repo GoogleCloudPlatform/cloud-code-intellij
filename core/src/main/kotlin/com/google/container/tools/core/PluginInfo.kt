@@ -22,12 +22,12 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.extensions.PluginId
 import com.intellij.util.PlatformUtils
 
-const val CONTAINER_TOOLS_PLUGIN_ID = "com.google.container.tools"
-const val UNKNOWN_VERSION = "unknown"
-
 /** Utilities to get common plugin information such as its version. */
 class PluginInfo {
     companion object {
+        private const val UNKNOWN_VERSION = "unknown"
+        const val CONTAINER_TOOLS_PLUGIN_ID = "com.google.container.tools"
+
         val instance: PluginInfo
             get() = ServiceManager.getService(PluginInfo::class.java)!!
     }

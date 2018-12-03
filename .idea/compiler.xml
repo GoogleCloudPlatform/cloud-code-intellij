@@ -4,6 +4,8 @@
     <bytecodeTargetLevel>
       <module name="common-test-lib_main" target="1.8" />
       <module name="common-test-lib_test" target="1.8" />
+      <module name="core_main" target="1.8" />
+      <module name="core_test" target="1.8" />
       <module name="google-container-tools-intellij_main" target="1.8" />
       <module name="google-container-tools-intellij_test" target="1.8" />
       <module name="skaffold-editing_main" target="1.8" />
