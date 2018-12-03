@@ -67,6 +67,7 @@ public class AppEngineLocalRunCloudApiRunConfigurationProviderTest {
   @Mock private JavaPatchableProgramRunner mockProgramRunner;
   @Mock private CommonStrategy mockCommonStrategy;
   @Mock private ScriptHelper mockScriptHelper;
+  @Mock private RunConfiguration runConfiguration;
   private RunnerSpecificLocalConfigurationBit runnerSpecificLocalConfigurationBit;
 
   private AppEngineLocalRunCloudApiRunConfigurationProvider appEngineConfigProvider;
@@ -87,7 +88,8 @@ public class AppEngineLocalRunCloudApiRunConfigurationProviderTest {
         new RunnerSpecificLocalConfigurationBit(new TestConfigurationInfoProvider());
     runnerSpecificLocalConfigurationBit.setEnvironmentVariables(new ArrayList<>());
 
-    when(mockRunnerAndConfigurationSettings.getConfigurationSettings(mockProgramRunner))
+    when(mockRunnerAndConfigurationSettings.getConfiguration()).thenReturn(runConfiguration);
+    when(mockRunnerAndConfigurationSettings.getConfigurationSettings(any()))
         .thenReturn(runnerSpecificLocalConfigurationBit);
     when(mockRunnerRegistry.getRunner(any(), any())).thenReturn(mockProgramRunner);
 
