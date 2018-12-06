@@ -16,5 +16,8 @@
 
 dependencies {
     // required for container tools rule not in the test code.
-    compile("io.mockk:mockk:+")
+    compile("io.mockk:mockk:+") {
+        // this ensures kotlin plugin/version takes precedence, mockk updates less often
+        exclude(group = "org.jetbrains.kotlin", module = "kotlin-reflect")
+    }
 }

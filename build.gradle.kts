@@ -20,7 +20,7 @@ plugins {
     id("org.jetbrains.intellij") version "0.3.7"
     id("com.diffplug.gradle.spotless") version "3.14.0"
 
-    kotlin("jvm") version "1.2.61"
+    kotlin("jvm") version "1.3.11"
 }
 
 allprojects {
@@ -50,7 +50,10 @@ allprojects {
         testCompile("com.google.truth:truth:+") {
             exclude(group = "com.google.guava", module = "guava")
         }
-        testCompile("io.mockk:mockk:+")
+        testCompile("io.mockk:mockk:+") {
+            // this ensures kotlin plugin/version takes precedence, mockk updates less often
+            exclude(group = "org.jetbrains.kotlin", module = "kotlin-reflect")
+        }
     }
 
     spotless {
