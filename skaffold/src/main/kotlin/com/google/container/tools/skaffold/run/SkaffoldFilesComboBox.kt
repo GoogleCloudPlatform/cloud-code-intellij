@@ -18,6 +18,7 @@ package com.google.container.tools.skaffold.run
 
 import com.google.container.tools.skaffold.SkaffoldFileService
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import java.awt.Component
@@ -39,7 +40,7 @@ class SkaffoldFilesComboBox : JComboBox<VirtualFile>() {
      * in this project. First file is selected by default.
      */
     fun setProject(project: Project) {
-        setRenderer(VirtualFileRenderer(project.baseDir))
+        setRenderer(VirtualFileRenderer(project.guessProjectDir()))
         skaffoldFilesMutableModel =
             DefaultComboBoxModel<VirtualFile>(
                 SkaffoldFileService.instance.findSkaffoldFiles(project).toTypedArray()
@@ -73,7 +74,7 @@ class SkaffoldFilesComboBox : JComboBox<VirtualFile>() {
 }
 
 /** Renders name of the Skaffold file relative to the base dir of the current IDE project. */
-private class VirtualFileRenderer(val projectBaseDir: VirtualFile) : DefaultListCellRenderer() {
+private class VirtualFileRenderer(val projectBaseDir: VirtualFile?) : DefaultListCellRenderer() {
     override fun getListCellRendererComponent(
         list: JList<*>?,
         value: Any?,
@@ -83,7 +84,7 @@ private class VirtualFileRenderer(val projectBaseDir: VirtualFile) : DefaultList
     ): Component {
         val renderer =
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus)
-        if (value is VirtualFile && renderer is JLabel) {
+        if (value is VirtualFile && renderer is JLabel && projectBaseDir != null) {
             renderer.text = VfsUtilCore.getRelativeLocation(value, projectBaseDir)
         }
 

@@ -72,7 +72,7 @@ abstract class AbstractSkaffoldRunConfiguration(
     project: Project,
     factory: ConfigurationFactory,
     name: String
-) : RunConfigurationBase(project, factory, name) {
+) : RunConfigurationBase<Element>(project, factory, name) {
 
     /**
      * Persisted Skaffold config file absolute path for Skaffold run configurations.

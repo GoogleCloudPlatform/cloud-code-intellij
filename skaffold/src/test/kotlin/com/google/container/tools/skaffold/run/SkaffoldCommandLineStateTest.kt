@@ -29,6 +29,7 @@ import com.intellij.execution.RunnerAndConfigurationSettings
 import com.intellij.execution.configurations.RunConfigurationBase
 import com.intellij.execution.configurations.SearchScopeProvider
 import com.intellij.execution.runners.ExecutionEnvironment
+import com.intellij.openapi.project.guessProjectDir
 import com.intellij.util.ThrowableRunnable
 import io.mockk.CapturingSlot
 import io.mockk.every
@@ -36,6 +37,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.slot
+import org.jdom.Element
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -88,7 +90,7 @@ class SkaffoldCommandLineStateTest {
 
     @Test
     fun `unsupported run configuration type throws execution exception`() {
-        val invalidSkaffoldRunConfiguration = mockk<RunConfigurationBase>()
+        val invalidSkaffoldRunConfiguration = mockk<RunConfigurationBase<Element>>()
         every { mockRunnerSettings.configuration } answers { invalidSkaffoldRunConfiguration }
 
         skaffoldCommandLineState = SkaffoldCommandLineState(
@@ -100,7 +102,8 @@ class SkaffoldCommandLineStateTest {
             ExecutionException::class,
             ThrowableRunnable { skaffoldCommandLineState.startProcess() })
         assertThat(exception.message).isEqualTo(
-            "Your Skaffold run configuration is corrupted. Please re-create it to fix.")
+            "Your Skaffold run configuration is corrupted. Please re-create it to fix."
+        )
     }
 
     @Test
@@ -120,7 +123,8 @@ class SkaffoldCommandLineStateTest {
 
     @Test
     fun `given valid settings skaffold process is executed from the project directory`() {
-        val projectBaseDir = containerToolsRule.ideaProjectTestFixture.project.baseDir.path
+        val projectBaseDir: String =
+            containerToolsRule.ideaProjectTestFixture.project.guessProjectDir()!!.path
         every { mockDevConfiguration.skaffoldConfigurationFilePath } answers {
             projectBaseDir + "/skaffold.yaml"
         }
