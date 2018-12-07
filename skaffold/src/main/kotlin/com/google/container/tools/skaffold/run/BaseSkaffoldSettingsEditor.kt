@@ -28,6 +28,7 @@ import com.intellij.ui.layout.panel
 import com.intellij.util.ui.UIUtil
 import java.awt.Insets
 import javax.swing.JComponent
+import javax.swing.JPanel
 
 /**
  * Base settings editor for both Skaffold single run and continunous run configurations. Includes
@@ -36,28 +37,48 @@ import javax.swing.JComponent
  *
  * @param editorTitle title for the settings editor
  * @param helperText additional helper text for the settings editor
+ * @param T type of the [AbstractSkaffoldRunConfiguration] this editor works with, i.e. run or dev.
  */
-open class BaseSkaffoldSettingsEditor(val editorTitle: String, val helperText: String = "") :
-    SettingsEditor<AbstractSkaffoldRunConfiguration>() {
+open class BaseSkaffoldSettingsEditor<T : AbstractSkaffoldRunConfiguration>(
+    val editorTitle: String,
+    val helperText: String = ""
+) :
+    SettingsEditor<T>() {
 
     @VisibleForTesting
     val skaffoldFilesComboBox = SkaffoldFilesComboBox()
 
-    val basePanel = panel {
-        row {
-            label(helperText, 0, UIUtil.ComponentStyle.SMALL)
-        }
+    protected lateinit var basePanel: JPanel
 
-        row(message("skaffold.configuration.label")) { skaffoldFilesComboBox(grow) }
+    private val extensionComponents: MutableMap<String, JComponent> = mutableMapOf()
+
+    /**
+     * Registers additional custom components for Skaffold configuration UI.
+     * @param newExtensionComponents extension components mapped to their label text
+     */
+    protected fun addExtensionComponents(newExtensionComponents: Map<String, JComponent>) {
+        extensionComponents.putAll(newExtensionComponents)
     }
 
     override fun createEditor(): JComponent {
+        basePanel = panel {
+            row {
+                label(helperText, 0, UIUtil.ComponentStyle.SMALL)
+            }
+
+            row(message("skaffold.configuration.label")) { skaffoldFilesComboBox(grow) }
+
+            extensionComponents.forEach {
+                row(it.key) { it.value(grow) }
+            }
+        }
+
         basePanel.border = IdeaTitledBorder(editorTitle, 0, Insets(0, 0, 0, 0))
 
         return basePanel
     }
 
-    override fun applyEditorTo(runConfig: AbstractSkaffoldRunConfiguration) {
+    override fun applyEditorTo(runConfig: T) {
         val selectedSkaffoldFile: VirtualFile =
             skaffoldFilesComboBox.getItemAt(skaffoldFilesComboBox.selectedIndex)
                 ?: throw ConfigurationException(message("skaffold.no.file.selected.error"))
@@ -70,7 +91,7 @@ open class BaseSkaffoldSettingsEditor(val editorTitle: String, val helperText: S
         runConfig.skaffoldConfigurationFilePath = selectedSkaffoldFile.path
     }
 
-    override fun resetEditorFrom(runConfig: AbstractSkaffoldRunConfiguration) {
+    override fun resetEditorFrom(runConfig: T) {
         skaffoldFilesComboBox.setProject(runConfig.project)
         runConfig.skaffoldConfigurationFilePath?.let {
             LocalFileSystem.getInstance().findFileByPath(it)

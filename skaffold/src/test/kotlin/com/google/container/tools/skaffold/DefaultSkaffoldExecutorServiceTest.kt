@@ -143,4 +143,30 @@ class DefaultSkaffoldExecutorServiceTest {
                 "--label ide=testIde --label name=unitTest --label version=1"
         )
     }
+
+    @Test
+    fun `tail logs option set to true generates valid command line`() {
+        val result = defaultSkaffoldExecutorService.executeSkaffold(
+            SkaffoldExecutorSettings(
+                SkaffoldExecutorSettings.ExecutionMode.DEV,
+                skaffoldConfigurationFilePath = "test.yaml",
+                tailLogsAfterDeploy = true
+            )
+        )
+
+        assertThat(result.commandLine).isEqualTo("skaffold dev --filename test.yaml --tail")
+    }
+
+    @Test
+    fun `tail logs option set to false does not add --tail option`() {
+        val result = defaultSkaffoldExecutorService.executeSkaffold(
+            SkaffoldExecutorSettings(
+                SkaffoldExecutorSettings.ExecutionMode.DEV,
+                skaffoldConfigurationFilePath = "skaffold.yaml",
+                tailLogsAfterDeploy = false
+            )
+        )
+
+        assertThat(result.commandLine).isEqualTo("skaffold dev --filename skaffold.yaml")
+    }
 }

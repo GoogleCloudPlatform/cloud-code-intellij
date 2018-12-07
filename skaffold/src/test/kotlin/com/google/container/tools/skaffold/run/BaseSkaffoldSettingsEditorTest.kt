@@ -48,7 +48,8 @@ class BaseSkaffoldSettingsEditorTest {
     @MockK
     private lateinit var mockSkaffoldSettings: AbstractSkaffoldRunConfiguration
 
-    private lateinit var baseSkaffoldSettingsEditor: BaseSkaffoldSettingsEditor
+    private lateinit var baseSkaffoldSettingsEditor:
+        BaseSkaffoldSettingsEditor<AbstractSkaffoldRunConfiguration>
 
     @Before
     fun setUp() {

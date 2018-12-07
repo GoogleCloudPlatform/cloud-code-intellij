@@ -67,12 +67,17 @@ class SkaffoldCommandLineState(
             configFile, projectBaseDir
         )
 
+        // custom settings for single deployment (run) mode
+        val singleRunConfiguration: SkaffoldSingleRunConfiguration? =
+            if (runConfiguration is SkaffoldSingleRunConfiguration) runConfiguration else null
+
         val skaffoldProcess = SkaffoldExecutorService.instance.executeSkaffold(
             SkaffoldExecutorSettings(
                 executionMode,
                 skaffoldConfigurationFilePath,
                 workingDirectory = File(projectBaseDir.path),
-                skaffoldLabels = SkaffoldLabels.defaultLabels
+                skaffoldLabels = SkaffoldLabels.defaultLabels,
+                tailLogsAfterDeploy = singleRunConfiguration?.tailDeploymentLogs
             )
         )
 
