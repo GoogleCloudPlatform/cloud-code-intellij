@@ -30,7 +30,9 @@ import javax.swing.Icon
  * [ConfigurationFactory].
  */
 class SkaffoldRunConfigurationType : ConfigurationType {
-    val ID = "google-container-tools-skaffold-run-config"
+    companion object {
+        const val ID = "google-container-tools-skaffold-run-config"
+    }
 
     val skaffoldSingleRunConfigurationFactory = SkaffoldSingleRunConfigurationFactory(this)
     val skaffoldDevConfigurationFactory = SkaffoldDevConfigurationFactory(this)
@@ -53,7 +55,9 @@ class SkaffoldRunConfigurationType : ConfigurationType {
  * at [SkaffoldSingleRunConfiguration].
  */
 class SkaffoldSingleRunConfigurationFactory(type: ConfigurationType) : ConfigurationFactory(type) {
-    val RUN_ID = "google-container-tools-skaffold-run-config-run"
+    companion object {
+        const val RUN_ID = "google-container-tools-skaffold-run-config-run"
+    }
 
     override fun createTemplateConfiguration(project: Project): RunConfiguration =
         SkaffoldSingleRunConfiguration(project, this, name)
@@ -68,7 +72,9 @@ class SkaffoldSingleRunConfigurationFactory(type: ConfigurationType) : Configura
  * See template configuration at [SkaffoldDevConfiguration].
  */
 class SkaffoldDevConfigurationFactory(type: ConfigurationType) : ConfigurationFactory(type) {
-    val DEV_ID = "google-container-tools-skaffold-run-config-dev"
+    companion object {
+        const val DEV_ID = "google-container-tools-skaffold-run-config-dev"
+    }
 
     override fun createTemplateConfiguration(project: Project): RunConfiguration =
         SkaffoldDevConfiguration(project, this, name)

@@ -19,15 +19,13 @@ package com.google.container.tools.skaffold
 import com.google.common.annotations.VisibleForTesting
 import com.google.container.tools.core.PLUGIN_NOTIFICATION_DISPLAY_GROUP_ID
 import com.google.container.tools.skaffold.run.AbstractSkaffoldRunConfiguration
-import com.google.container.tools.skaffold.run.SkaffoldDevConfiguration
 import com.google.container.tools.skaffold.run.SkaffoldDevConfigurationFactory
 import com.google.container.tools.skaffold.run.SkaffoldRunConfigurationType
-import com.google.container.tools.skaffold.run.SkaffoldSingleRunConfiguration
 import com.google.container.tools.skaffold.run.SkaffoldSingleRunConfigurationFactory
 import com.intellij.execution.RunManager
+import com.intellij.execution.configurations.ConfigurationFactory
+import com.intellij.execution.configurations.ConfigurationTypeUtil
 import com.intellij.execution.configurations.RunConfiguration
-import com.intellij.execution.impl.RunManagerImpl
-import com.intellij.execution.impl.RunnerAndConfigurationSettingsImpl
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationDisplayType
 import com.intellij.notification.NotificationGroup
@@ -35,6 +33,7 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.ProjectComponent
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 
@@ -46,6 +45,9 @@ import com.intellij.openapi.vfs.VirtualFile
  * @param project IDE Project for which this component is created.
  */
 class SkaffoldConfigurationDetector(val project: Project) : ProjectComponent {
+
+    private val logger = Logger.getInstance(SkaffoldConfigurationDetector::class.java)
+
     private val NOTIFICATION_GROUP = NotificationGroup(
         PLUGIN_NOTIFICATION_DISPLAY_GROUP_ID,
         NotificationDisplayType.BALLOON,
@@ -95,42 +97,59 @@ class SkaffoldConfigurationDetector(val project: Project) : ProjectComponent {
 
     @VisibleForTesting
     fun addSkaffoldDevConfiguration(skaffoldFilePath: String) {
-        val skaffoldDevSettings = SkaffoldDevConfiguration(
-            project,
-            SkaffoldDevConfigurationFactory(SkaffoldRunConfigurationType()),
-            message("skaffold.run.config.dev.default.name")
+        createRunConfigurationFromSettings(
+            SkaffoldDevConfigurationFactory.DEV_ID,
+            message("skaffold.run.config.dev.default.name"),
+            skaffoldFilePath
         )
-        skaffoldDevSettings.skaffoldConfigurationFilePath = skaffoldFilePath
-
-        createRunConfigurationFromSettings(skaffoldDevSettings)
     }
 
     @VisibleForTesting
     fun addSkaffoldRunConfiguration(skaffoldFilePath: String) {
-        val skaffoldRunSettings = SkaffoldSingleRunConfiguration(
-            project,
-            SkaffoldSingleRunConfigurationFactory(SkaffoldRunConfigurationType()),
-            message("skaffold.run.config.run.default.name")
+        createRunConfigurationFromSettings(
+            SkaffoldSingleRunConfigurationFactory.RUN_ID,
+            message("skaffold.run.config.run.default.name"),
+            skaffoldFilePath
         )
-        skaffoldRunSettings.skaffoldConfigurationFilePath = skaffoldFilePath
-
-        createRunConfigurationFromSettings(skaffoldRunSettings)
     }
 
     /** Creates a run configuration from the given settings and selects it in run combobox */
-    private fun createRunConfigurationFromSettings(runConfiguration: RunConfiguration) {
-        val runnerAndConfigSettings = RunnerAndConfigurationSettingsImpl(
-            RunManagerImpl.getInstanceImpl(project),
-            runConfiguration
-        )
+    private fun createRunConfigurationFromSettings(
+        factoryId: String,
+        name: String,
+        skaffoldFilePath: String
+    ) {
+
+        val factory = findConfigurationFactoryById(factoryId)
+        if (factory == null) {
+            logger.error("Skaffold configuration factory not found, plugin install is corrupted.")
+            return
+        }
+
+        val runnerAndConfigSettings = getRunManager(project).createConfiguration(name, factory)
+        (runnerAndConfigSettings.configuration as AbstractSkaffoldRunConfiguration)
+            .skaffoldConfigurationFilePath = skaffoldFilePath
         getRunManager(project).addConfiguration(runnerAndConfigSettings)
         getRunManager(project).selectedConfiguration = runnerAndConfigSettings
     }
 
     @VisibleForTesting
-    fun createNotification(title: String, message: String): Notification =
+    fun findConfigurationFactoryById(factoryId: String): ConfigurationFactory? {
+        val configurationType =
+            ConfigurationTypeUtil.findConfigurationType(SkaffoldRunConfigurationType.ID)
+        return configurationType?.let {
+            it.configurationFactories.filter { it.id == factoryId }[0]
+        }
+    }
+
+    @VisibleForTesting
+    fun createNotification(
+        title: String,
+        message: String,
+        type: NotificationType = NotificationType.INFORMATION
+    ): Notification =
         NOTIFICATION_GROUP.createNotification(
-            title, null /* subtitle */, message, NotificationType.INFORMATION
+            title, null /* subtitle */, message, type
         )
 
     @VisibleForTesting
