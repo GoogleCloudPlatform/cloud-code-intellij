@@ -170,7 +170,7 @@ class GoogleFeedbackErrorReporter : ErrorReportSubmitter() {
     fun buildKeyValuesMap(
         event: IdeaLoggingEvent,
         description: String?,
-        lastActionId: String,
+        lastActionId: String?,
         intelliJAppNameInfo: ApplicationNamesInfo,
         intelliJAppExtendedInfo: ApplicationInfoEx,
         application: Application
@@ -182,7 +182,7 @@ class GoogleFeedbackErrorReporter : ErrorReportSubmitter() {
             ERROR_STACKTRACE_KEY to (getStacktrace(event) ?: NONE_STRING),
             // end or required parameters
             ERROR_DESCRIPTION_KEY to (description ?: NONE_STRING),
-            LAST_ACTION_KEY to lastActionId,
+            LAST_ACTION_KEY to (lastActionId ?: NONE_STRING),
             OS_NAME_KEY to SystemInfo.OS_NAME,
             JAVA_VERSION_KEY to SystemInfo.JAVA_VERSION,
             JAVA_VM_VENDOR_KEY to SystemInfo.JAVA_VENDOR,
