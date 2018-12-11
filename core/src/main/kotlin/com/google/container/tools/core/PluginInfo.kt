@@ -27,6 +27,8 @@ class PluginInfo {
     companion object {
         private const val UNKNOWN_VERSION = "unknown"
         const val CONTAINER_TOOLS_PLUGIN_ID = "com.google.container.tools"
+        const val PLUGIN_NAME_EXTERNAL = "google-container-tools-intellij"
+        const val PLUGIN_USER_AGENT = "google-container-tools-intellij-plugin"
 
         val instance: PluginInfo
             get() = ServiceManager.getService(PluginInfo::class.java)!!

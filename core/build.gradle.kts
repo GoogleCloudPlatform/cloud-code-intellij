@@ -16,4 +16,20 @@
 
 dependencies {
     testCompile(project(":common-test-lib"))
+
+    // TODO replace with maven central dependency once published
+    compile(files("../lib/ide-analytics-common-0.1.0-SNAPSHOT.jar"))
+}
+
+// Processes the analytics id environment variable value into the analyticsId property
+// in config.properties
+val processResources by tasks.getting(ProcessResources::class) {
+    val analyticsId: String? = System.getenv("ANALYTICS_ID")
+
+    analyticsId?.let {
+        inputs.property("analyticsId", analyticsId)
+        filesMatching("**/config.properties") {
+            expand(mutableMapOf("analyticsId" to analyticsId))
+        }
+    }
 }

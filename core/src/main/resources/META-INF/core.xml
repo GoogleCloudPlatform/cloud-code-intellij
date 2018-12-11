@@ -18,5 +18,12 @@
 <idea-plugin>
     <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceImplementation="com.google.container.tools.core.PluginInfo"/>
+
+        <applicationService
+                serviceImplementation="com.google.container.tools.core.analytics.UsageTrackerProvider"/>
+        <applicationService
+                serviceImplementation="com.google.container.tools.core.analytics.UsageTrackerManagerService"/>
+        <applicationService
+                serviceImplementation="com.google.container.tools.core.properties.PluginPropertiesFileReader"/>
     </extensions>
 </idea-plugin>
