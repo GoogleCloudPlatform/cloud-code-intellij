@@ -34,6 +34,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 
@@ -57,15 +58,19 @@ class SkaffoldConfigurationDetector(val project: Project) : ProjectComponent {
     )
 
     override fun projectOpened() {
-        val skaffoldFiles: List<VirtualFile> =
-            SkaffoldFileService.instance.findSkaffoldFiles(project)
-        if (skaffoldFiles.isNotEmpty()) {
-            val skaffoldRunConfigList: List<RunConfiguration> =
-                getRunManager(project)
-                    .allConfigurationsList.filter { it is AbstractSkaffoldRunConfiguration }
-            if (skaffoldRunConfigList.isEmpty()) {
-                // existing Skaffold config files, but no skaffold configurations, prompt
-                showPromptForSkaffoldConfigurations(project, skaffoldFiles[0])
+        // on project open there may be a lot of indexing and other preparation and files still
+        // not available, wait for "smart" mode for configuration identification
+        DumbService.getInstance(project).runWhenSmart {
+            val skaffoldFiles: List<VirtualFile> =
+                SkaffoldFileService.instance.findSkaffoldFiles(project)
+            if (skaffoldFiles.isNotEmpty()) {
+                val skaffoldRunConfigList: List<RunConfiguration> =
+                    getRunManager(project)
+                        .allConfigurationsList.filter { it is AbstractSkaffoldRunConfiguration }
+                if (skaffoldRunConfigList.isEmpty()) {
+                    // existing Skaffold config files, but no skaffold configurations, prompt
+                    showPromptForSkaffoldConfigurations(project, skaffoldFiles[0])
+                }
             }
         }
     }

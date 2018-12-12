@@ -20,6 +20,7 @@ import com.google.common.truth.Truth.assertThat
 import com.google.container.tools.skaffold.run.SkaffoldDevConfiguration
 import com.google.container.tools.test.ContainerToolsRule
 import com.google.container.tools.test.TestService
+import com.google.container.tools.test.UiTest
 import com.intellij.execution.RunManager
 import com.intellij.execution.RunnerAndConfigurationSettings
 import com.intellij.execution.configurations.ConfigurationFactory
@@ -81,6 +82,7 @@ class SkaffoldConfigurationDetectorTest {
     }
 
     @Test
+    @UiTest
     fun `project with no skaffold files does not show prompt to add run configs`() {
         every { mockSkaffoldFileService.findSkaffoldFiles(any()) } answers { listOf() }
 
@@ -90,6 +92,7 @@ class SkaffoldConfigurationDetectorTest {
     }
 
     @Test
+    @UiTest
     fun `project with skaffold files and no skaffold config prompts to add run configs`() {
         val skaffoldFile = MockVirtualFile.file("skaffold.yaml")
         every { mockSkaffoldFileService.findSkaffoldFiles(any()) } answers { listOf(skaffoldFile) }
@@ -100,6 +103,7 @@ class SkaffoldConfigurationDetectorTest {
     }
 
     @Test
+    @UiTest
     fun `project with skaffold files and existing skaffold config doesnt ask to add configs`() {
         val skaffoldFile = MockVirtualFile.file("skaffold.yaml")
         every { mockSkaffoldFileService.findSkaffoldFiles(any()) } answers { listOf(skaffoldFile) }
