@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
+import net.researchgate.release.GitAdapter
+import org.jetbrains.intellij.tasks.PublishTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("org.jetbrains.intellij") version "0.3.7"
     id("com.diffplug.gradle.spotless") version "3.14.0"
+    id("net.researchgate.release") version "2.7.0"
 
     kotlin("jvm") version "1.3.11"
 }
@@ -79,3 +82,20 @@ dependencies {
 
     compile("com.google.protobuf:protobuf-java:2.5.0")
 }
+
+val intellijRepoChannel: String by project
+val publishPlugin: PublishTask by tasks
+publishPlugin {
+    username(System.getenv("CONTAINER_TOOLS_REPO_USERNAME"))
+    password(System.getenv("CONTAINER_TOOLS_REPO_PASSWORD"))
+    channels(intellijRepoChannel)
+}
+
+release {
+    tagTemplate = "v\${version}"
+
+    val git: GitAdapter.GitConfig = getProperty("git") as GitAdapter.GitConfig
+    git.requireBranch = "/^release_v\\d+.*$/"
+}
+
+inline operator fun <T : Task> T.invoke(a: T.() -> Unit): T = apply(a)
