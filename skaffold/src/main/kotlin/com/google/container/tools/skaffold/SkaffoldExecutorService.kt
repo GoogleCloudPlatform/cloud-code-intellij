@@ -56,6 +56,10 @@ abstract class SkaffoldExecutorService {
                 add("--filename")
                 add(it)
             }
+            settings.skaffoldProfile?.let {
+                add("--profile")
+                add(it)
+            }
             settings.skaffoldLabels?.let {
                 it.labels
                     .forEach { label ->
@@ -93,6 +97,7 @@ abstract class SkaffoldExecutorService {
  * @property executionMode Mandatory execution mode for Skaffold, see [ExecutionMode].
  * @property skaffoldConfigurationFilePath Optional, location of the Skaffold YAML
  *           configuration file. If not provided, default `skaffold.yaml` used.
+ * @property skaffoldProfile Skaffold profile name, optional.
  * @property workingDirectory Optional, working directory where Skaffold needs to be launched.
  *           This is usually set to project working directory.
  * @property skaffoldLabels Kubernetes style labels to pass to Skaffold execution.
@@ -100,6 +105,7 @@ abstract class SkaffoldExecutorService {
 data class SkaffoldExecutorSettings(
     val executionMode: ExecutionMode,
     val skaffoldConfigurationFilePath: String? = null,
+    val skaffoldProfile: String? = null,
     val workingDirectory: File? = null,
     val skaffoldLabels: SkaffoldLabels? = null,
     val tailLogsAfterDeploy: Boolean? = null

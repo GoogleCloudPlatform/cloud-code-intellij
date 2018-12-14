@@ -169,4 +169,31 @@ class DefaultSkaffoldExecutorServiceTest {
 
         assertThat(result.commandLine).isEqualTo("skaffold dev --filename skaffold.yaml")
     }
+
+    @Test
+    fun `added profile name generates valid command line`() {
+        val result = defaultSkaffoldExecutorService.executeSkaffold(
+            SkaffoldExecutorSettings(
+                SkaffoldExecutorSettings.ExecutionMode.DEV,
+                skaffoldConfigurationFilePath = "profiles.yaml",
+                skaffoldProfile = "cloudBuild"
+            )
+        )
+
+        assertThat(result.commandLine).isEqualTo("skaffold dev --filename profiles.yaml " +
+            "--profile cloudBuild")
+    }
+
+    @Test
+    fun `null profile name generates valid command line`() {
+        val result = defaultSkaffoldExecutorService.executeSkaffold(
+            SkaffoldExecutorSettings(
+                SkaffoldExecutorSettings.ExecutionMode.SINGLE_RUN,
+                skaffoldConfigurationFilePath = "test.yaml",
+                skaffoldProfile = null
+            )
+        )
+
+        assertThat(result.commandLine).isEqualTo("skaffold run --filename test.yaml")
+    }
 }

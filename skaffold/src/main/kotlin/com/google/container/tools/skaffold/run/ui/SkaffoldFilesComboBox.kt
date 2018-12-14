@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.container.tools.skaffold.run
+package com.google.container.tools.skaffold.run.ui
 
 import com.google.container.tools.skaffold.SkaffoldFileService
 import com.intellij.openapi.project.Project

@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.container.tools.skaffold.run
+package com.google.container.tools.skaffold.run.ui
 
 import com.google.container.tools.skaffold.message
+import com.google.container.tools.skaffold.run.SkaffoldDevConfiguration
 
 /**
  * Settings editor that provides a UI for Skaffold continuous development mode run

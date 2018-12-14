@@ -75,6 +75,7 @@ class SkaffoldCommandLineState(
             SkaffoldExecutorSettings(
                 executionMode,
                 skaffoldConfigurationFilePath,
+                skaffoldProfile = runConfiguration.skaffoldProfile,
                 workingDirectory = File(projectBaseDir.path),
                 skaffoldLabels = SkaffoldLabels.defaultLabels,
                 tailLogsAfterDeploy = singleRunConfiguration?.tailDeploymentLogs

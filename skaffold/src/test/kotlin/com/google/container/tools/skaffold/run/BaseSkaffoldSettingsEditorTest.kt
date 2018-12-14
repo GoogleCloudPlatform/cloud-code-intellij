@@ -18,6 +18,7 @@ package com.google.container.tools.skaffold.run
 
 import com.google.common.truth.Truth.assertThat
 import com.google.container.tools.skaffold.SkaffoldFileService
+import com.google.container.tools.skaffold.run.ui.BaseSkaffoldSettingsEditor
 import com.google.container.tools.test.ContainerToolsRule
 import com.google.container.tools.test.TestService
 import com.google.container.tools.test.UiTest
@@ -54,7 +55,8 @@ class BaseSkaffoldSettingsEditorTest {
     @Before
     fun setUp() {
         EdtTestUtil.runInEdtAndWait(ThrowableRunnable {
-            baseSkaffoldSettingsEditor = BaseSkaffoldSettingsEditor("test")
+            baseSkaffoldSettingsEditor =
+                BaseSkaffoldSettingsEditor("test")
             // calls getComponent() to initialize UI first, IDE flow.
             baseSkaffoldSettingsEditor.component
         })
@@ -95,14 +97,74 @@ class BaseSkaffoldSettingsEditorTest {
         every { mockSkaffoldFileService.findSkaffoldFiles(any()) } returns listOf(skaffoldFile)
         baseSkaffoldSettingsEditor.resetFrom(mockSkaffoldSettings)
         baseSkaffoldSettingsEditor.skaffoldFilesComboBox.setSelectedSkaffoldFile(skaffoldFile)
-        baseSkaffoldSettingsEditor.applyTo(mockSkaffoldSettings)
 
         // capture settings update
         every {
             mockSkaffoldSettings setProperty "skaffoldConfigurationFilePath" value any<String>()
         } propertyType String::class answers {
-            fieldValue = value
             assertThat(value).isEqualTo(skaffoldFile.path)
         }
+
+        baseSkaffoldSettingsEditor.applyTo(mockSkaffoldSettings)
+    }
+
+    @Test
+    @UiTest
+    fun `given valid Skaffold configuration with profiles applyTo successfully saves settings`() {
+        val skaffoldFile = MockVirtualFile.file("skaffold.yaml")
+        skaffoldFile.setText(
+            """
+            apiVersion: skaffold/v1beta1
+            kind: Config
+            profiles:
+              - name: gcb
+                build:
+                  googleCloudBuild:
+                    projectId: k8s-skaffold
+        """
+        )
+        every { mockSkaffoldFileService.findSkaffoldFiles(any()) } returns listOf(skaffoldFile)
+        every { mockSkaffoldFileService.isSkaffoldFile(skaffoldFile) } returns true
+        baseSkaffoldSettingsEditor.resetFrom(mockSkaffoldSettings)
+        baseSkaffoldSettingsEditor.skaffoldFilesComboBox.setSelectedSkaffoldFile(skaffoldFile)
+        baseSkaffoldSettingsEditor.skaffoldProfilesComboBox.setSelectedProfile("gcb")
+
+        // capture settings update
+        every {
+            mockSkaffoldSettings setProperty "skaffoldProfile" value any<String>()
+        } propertyType String::class answers {
+            assertThat(value).isEqualTo("gcb")
+        }
+
+        baseSkaffoldSettingsEditor.applyTo(mockSkaffoldSettings)
+    }
+
+    @Test
+    @UiTest
+    fun `given valid Skaffold profiles resetFrom selects saved profile name in combobox`() {
+        val skaffoldFile = MockVirtualFile.file("skaffold.yaml")
+        skaffoldFile.setText(
+            """
+            apiVersion: skaffold/v1beta1
+            kind: Config
+            profiles:
+              - name: gcb
+                build:
+                  googleCloudBuild:
+                    projectId: k8s-skaffold
+        """
+        )
+        every { mockSkaffoldFileService.findSkaffoldFiles(any()) } returns listOf(skaffoldFile)
+        every { mockSkaffoldFileService.isSkaffoldFile(skaffoldFile) } returns true
+        every {
+            mockSkaffoldSettings.skaffoldConfigurationFilePath
+        } answers { skaffoldFile.path }
+        every {
+            mockSkaffoldSettings.skaffoldProfile
+        } answers { "gcb" }
+        baseSkaffoldSettingsEditor.resetFrom(mockSkaffoldSettings)
+
+        assertThat(baseSkaffoldSettingsEditor.skaffoldProfilesComboBox.getSelectedProfile())
+            .isEqualTo("gcb")
     }
 }

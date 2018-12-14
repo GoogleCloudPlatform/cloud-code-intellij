@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.container.tools.skaffold.run
+package com.google.container.tools.skaffold.run.ui
 
 import com.google.common.annotations.VisibleForTesting
 import com.google.container.tools.skaffold.SkaffoldFileService
 import com.google.container.tools.skaffold.message
+import com.google.container.tools.skaffold.run.AbstractSkaffoldRunConfiguration
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.vfs.LocalFileSystem
@@ -48,6 +49,9 @@ open class BaseSkaffoldSettingsEditor<T : AbstractSkaffoldRunConfiguration>(
     @VisibleForTesting
     val skaffoldFilesComboBox = SkaffoldFilesComboBox()
 
+    @VisibleForTesting
+    val skaffoldProfilesComboBox = SkaffoldProfilesComboBox()
+
     protected lateinit var basePanel: JPanel
 
     private val extensionComponents: MutableMap<String, JComponent> = mutableMapOf()
@@ -68,6 +72,8 @@ open class BaseSkaffoldSettingsEditor<T : AbstractSkaffoldRunConfiguration>(
 
             row(message("skaffold.configuration.label")) { skaffoldFilesComboBox(grow) }
 
+            row(message("skaffold.profile.label")) { skaffoldProfilesComboBox(grow) }
+
             extensionComponents.forEach {
                 row(it.key) { it.value(grow) }
             }
@@ -75,12 +81,18 @@ open class BaseSkaffoldSettingsEditor<T : AbstractSkaffoldRunConfiguration>(
 
         basePanel.border = IdeaTitledBorder(editorTitle, 0, Insets(0, 0, 0, 0))
 
+        skaffoldFilesComboBox.addActionListener {
+            skaffoldProfilesComboBox.skaffoldFileUpdated(
+                skaffoldFilesComboBox.getSelectedSkaffoldFile()
+            )
+        }
+
         return basePanel
     }
 
     override fun applyEditorTo(runConfig: T) {
         val selectedSkaffoldFile: VirtualFile =
-            skaffoldFilesComboBox.getItemAt(skaffoldFilesComboBox.selectedIndex)
+            skaffoldFilesComboBox.getSelectedSkaffoldFile()
                 ?: throw ConfigurationException(message("skaffold.no.file.selected.error"))
 
         if (!SkaffoldFileService.instance.isSkaffoldFile(selectedSkaffoldFile)) {
@@ -89,6 +101,7 @@ open class BaseSkaffoldSettingsEditor<T : AbstractSkaffoldRunConfiguration>(
 
         // save properties
         runConfig.skaffoldConfigurationFilePath = selectedSkaffoldFile.path
+        runConfig.skaffoldProfile = skaffoldProfilesComboBox.getSelectedProfile()
     }
 
     override fun resetEditorFrom(runConfig: T) {
@@ -96,5 +109,9 @@ open class BaseSkaffoldSettingsEditor<T : AbstractSkaffoldRunConfiguration>(
         runConfig.skaffoldConfigurationFilePath?.let {
             LocalFileSystem.getInstance().findFileByPath(it)
         }?.let { skaffoldFilesComboBox.setSelectedSkaffoldFile(it) }
+
+        runConfig.skaffoldProfile?.let {
+            skaffoldProfilesComboBox.setSelectedProfile(it)
+        }
     }
 }
