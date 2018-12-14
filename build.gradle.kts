@@ -95,7 +95,7 @@ release {
     tagTemplate = "v\${version}"
 
     val git: GitAdapter.GitConfig = getProperty("git") as GitAdapter.GitConfig
-    git.requireBranch = "/^release_v\\d+.*$/"
+    git.requireBranch = "^release_v\\d+.*$"
 }
 
 inline operator fun <T : Task> T.invoke(a: T.() -> Unit): T = apply(a)
