@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.container.tools.skaffold.run
+package com.google.container.tools.skaffold.run.ui
 
 import com.google.common.truth.Truth.assertThat
 import com.google.container.tools.skaffold.SkaffoldFileService
-import com.google.container.tools.skaffold.run.ui.SkaffoldFilesComboBox
 import com.google.container.tools.test.ContainerToolsRule
 import com.google.container.tools.test.TestService
 import com.google.container.tools.test.UiTest

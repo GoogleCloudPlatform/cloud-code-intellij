@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.container.tools.skaffold.run
+package com.google.container.tools.skaffold.run.ui
 
 import com.google.common.truth.Truth.assertThat
 import com.google.container.tools.skaffold.SkaffoldFileService
-import com.google.container.tools.skaffold.run.ui.SkaffoldSingleRunSettingsEditor
+import com.google.container.tools.skaffold.run.SkaffoldRunConfigurationType
+import com.google.container.tools.skaffold.run.SkaffoldSingleRunConfiguration
+import com.google.container.tools.skaffold.run.SkaffoldSingleRunConfigurationFactory
 import com.google.container.tools.test.ContainerToolsRule
 import com.google.container.tools.test.TestService
 import com.google.container.tools.test.UiTest
@@ -63,11 +65,12 @@ class SkaffoldSingleRunSettingsEditorTest {
         every { mockSkaffoldFileService.findSkaffoldFiles(any()) } returns listOf(skaffoldFile)
 
         // empty single run configuration
-        skaffoldSingleRunConfiguration = SkaffoldSingleRunConfiguration(
-            containerToolsRule.ideaProjectTestFixture.project,
-            SkaffoldSingleRunConfigurationFactory(SkaffoldRunConfigurationType()),
-            "test"
-        )
+        skaffoldSingleRunConfiguration =
+            SkaffoldSingleRunConfiguration(
+                containerToolsRule.ideaProjectTestFixture.project,
+                SkaffoldSingleRunConfigurationFactory(SkaffoldRunConfigurationType()),
+                "test"
+            )
     }
 
     @Test
