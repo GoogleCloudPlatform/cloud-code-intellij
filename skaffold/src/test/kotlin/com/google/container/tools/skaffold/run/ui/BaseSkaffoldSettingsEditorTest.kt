@@ -110,6 +110,25 @@ class BaseSkaffoldSettingsEditorTest {
 
     @Test
     @UiTest
+    fun `given valid Skaffold configuration resetFrom selects saved file name in file combobox`() {
+        val skaffoldFile = MockVirtualFile.file("test.yaml")
+        skaffoldFile.setText("apiVersion: skaffold/v1beta1")
+        every { mockSkaffoldFileService.findSkaffoldFiles(any()) } returns listOf(skaffoldFile)
+        every { mockSkaffoldFileService.isSkaffoldFile(skaffoldFile) } returns true
+        every {
+            mockSkaffoldSettings.skaffoldConfigurationFilePath
+        } answers { skaffoldFile.path }
+
+        baseSkaffoldSettingsEditor.resetFrom(mockSkaffoldSettings)
+
+        assertThat(
+            baseSkaffoldSettingsEditor.skaffoldFilesComboBox.getSelectedSkaffoldFile()
+        )
+            .isEqualTo(skaffoldFile)
+    }
+
+    @Test
+    @UiTest
     fun `given valid Skaffold configuration with profiles applyTo successfully saves settings`() {
         val skaffoldFile = MockVirtualFile.file("skaffold.yaml")
         skaffoldFile.setText(
@@ -162,6 +181,7 @@ class BaseSkaffoldSettingsEditorTest {
         every {
             mockSkaffoldSettings.skaffoldProfile
         } answers { "gcb" }
+
         baseSkaffoldSettingsEditor.resetFrom(mockSkaffoldSettings)
 
         assertThat(baseSkaffoldSettingsEditor.skaffoldProfilesComboBox.getSelectedProfile())
