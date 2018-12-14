@@ -19,6 +19,12 @@
     <id>com.google.container.tools</id>
     <name>Google Container Tools</name>
     <vendor>Google</vendor>
+    <description>
+    <![CDATA[<html>
+      <p>Google Container Tools</p>
+      <p>Under development - coming soon!</p>
+    </html>]]>
+    </description>
 
     <!-- "idea-version since-build" set to cover 2017.1 - 2018.3 -->
     <!-- Set manually because the gradle-intellij-plugin cannot span across major release versions -->
