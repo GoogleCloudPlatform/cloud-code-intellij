@@ -33,8 +33,12 @@
 ## Export required environment variables
 ANALYTICS_ID_PATH=${KOKORO_KEYSTORE_DIR}/72743_analytics_id
 GITHUB_TOKEN_PATH=${KOKORO_KEYSTORE_DIR}/72743_paflynn_github_token
+IJ_REPO_USERNAME_PATH=${KOKORO_KEYSTORE_DIR}/72743_ij_repo_username
+IJ_REPO_PASSWORD_PATH=${KOKORO_KEYSTORE_DIR}/72743_ij_repo_password
 export ANALYTICS_ID=$(cat ANALYTICS_ID_PATH)
 export GITHUB_TOKEN=$(cat GITHUB_TOKEN_PATH)
+export IJ_REPO_USERNAME=$(cat IJ_REPO_USERNAME_PATH)
+export IJ_REPO_PASSWORD=$(cat IJ_REPO_PASSWORD_PATH)
 
 cd github/google-container-tools-intellij
 

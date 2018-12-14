@@ -86,8 +86,8 @@ dependencies {
 val intellijRepoChannel: String by project
 val publishPlugin: PublishTask by tasks
 publishPlugin {
-    username(System.getenv("CONTAINER_TOOLS_REPO_USERNAME"))
-    password(System.getenv("CONTAINER_TOOLS_REPO_PASSWORD"))
+    username(System.getenv("IJ_REPO_USERNAME"))
+    password(System.getenv("IJ_REPO_PASSWORD"))
     channels(intellijRepoChannel)
 }
 
