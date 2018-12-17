@@ -17,6 +17,8 @@
 package com.google.container.tools.skaffold.run.ui
 
 import com.google.container.tools.skaffold.SkaffoldFileService
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.vfs.VfsUtilCore
@@ -41,6 +43,11 @@ class SkaffoldFilesComboBox : JComboBox<VirtualFile>() {
      */
     fun setProject(project: Project) {
         setRenderer(VirtualFileRenderer(project.guessProjectDir()))
+        // save all edited project files to account for changes in Skaffold configuration that
+        // are not in the file system yet.
+        with(ApplicationManager.getApplication()) {
+            invokeAndWait { FileDocumentManager.getInstance().saveAllDocuments() }
+        }
         skaffoldFilesMutableModel =
             DefaultComboBoxModel<VirtualFile>(
                 SkaffoldFileService.instance.findSkaffoldFiles(project).toTypedArray()
