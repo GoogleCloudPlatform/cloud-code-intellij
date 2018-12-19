@@ -22,16 +22,9 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.search.FileTypeIndex
 import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.yaml.YAMLFileType
-import java.io.ByteArrayInputStream
-import java.io.InputStream
-import java.util.Scanner
-import java.util.regex.Pattern
 
 // see https://github.com/GoogleContainerTools/skaffold/blob/master/examples/annotated-skaffold.yaml
-private const val SKAFFOLD_API_HEADER_REGEX = """\s*apiVersion:\s*skaffold/v"""
-private val SKAFFOLD_API_HEADER_PATTERN: Pattern by lazy {
-    Pattern.compile(SKAFFOLD_API_HEADER_REGEX)
-}
+private const val SKAFFOLD_API_HEADER = "skaffold/v"
 
 /** IDE service for finding Skaffold files in the given IDE project. */
 class SkaffoldFileService {
@@ -47,12 +40,13 @@ class SkaffoldFileService {
     fun isSkaffoldFile(file: VirtualFile): Boolean {
         with(file) {
             if (!isDirectory && fileType is YAMLFileType && isValid) {
-                val inputStream: InputStream = ByteArrayInputStream(contentsToByteArray())
-                inputStream.use {
-                    val scanner = Scanner(it)
-                    // consider this YAML file as Skaffold when first line contains proper API version
-                    return scanner.hasNextLine() &&
-                        SKAFFOLD_API_HEADER_PATTERN.matcher(scanner.nextLine()).find()
+                try {
+                    val skaffoldYaml = SkaffoldYamlConfiguration(this)
+                    return skaffoldYaml.apiVersion?.startsWith(SKAFFOLD_API_HEADER) == true
+                } catch (ex: Exception) {
+                    // We don't care about I/O or scan exceptions here since we only need to know if
+                    // the YAML file was in the proper format.
+                    return false
                 }
             }
         }

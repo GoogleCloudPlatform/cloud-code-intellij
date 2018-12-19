@@ -47,14 +47,18 @@ class SkaffoldFileServiceTest {
     }
 
     @Test
-    fun `extra spaces and tabs in header skaffold file is accepted`() {
+    fun `multiple fields and values with a header skaffold file is accepted`() {
         val skaffoldFile = MockVirtualFile.file("skaffold.yaml")
         skaffoldFile.setText(
-            """ apiVersion:    skaffold/v1alpha3
-                  kind: Config
-                  build:
-
             """
+            apiVersion: skaffold/v1beta1
+            kind: Config
+            profiles:
+              - name: gcb
+                build:
+                  googleCloudBuild:
+                    projectId: k8s-skaffold
+        """
         )
 
         assertThat(skaffoldFileService.isSkaffoldFile(skaffoldFile)).isTrue()
