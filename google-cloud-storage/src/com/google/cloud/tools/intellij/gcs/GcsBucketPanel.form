@@ -37,14 +37,19 @@
         </properties>
         <border type="none"/>
         <children>
-          <component id="65470" class="javax.swing.JList" binding="bucketList">
+          <scrollpane id="b0819" class="com.intellij.ui.components.JBScrollPane">
             <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="2" anchor="0" fill="3" indent="0" use-parent-layout="false">
-                <preferred-size width="150" height="50"/>
-              </grid>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties/>
-          </component>
+            <border type="none"/>
+            <children>
+              <component id="65470" class="javax.swing.JList" binding="bucketList">
+                <constraints/>
+                <properties/>
+              </component>
+            </children>
+          </scrollpane>
         </children>
       </grid>
       <nested-form id="dbb3b" form-file="com/google/cloud/tools/intellij/project/ProjectSelector.form" binding="projectSelector" custom-create="true">
