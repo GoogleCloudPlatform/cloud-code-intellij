@@ -106,6 +106,8 @@ open class BaseSkaffoldSettingsEditor<T : AbstractSkaffoldRunConfiguration>(
 
     override fun resetEditorFrom(runConfig: T) {
         skaffoldFilesComboBox.setProject(runConfig.project)
+        skaffoldProfilesComboBox.project = runConfig.project
+
         runConfig.skaffoldConfigurationFilePath?.let {
             LocalFileSystem.getInstance().findFileByPath(it)
         }?.let { skaffoldFilesComboBox.setSelectedSkaffoldFile(it) }

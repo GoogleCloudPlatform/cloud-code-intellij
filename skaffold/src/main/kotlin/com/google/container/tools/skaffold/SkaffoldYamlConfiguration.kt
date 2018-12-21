@@ -16,25 +16,45 @@
 
 package com.google.container.tools.skaffold
 
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiManager
 import org.yaml.snakeyaml.Yaml
 import java.io.ByteArrayInputStream
+import java.io.StringReader
 
 /**
  * Skaffold YAML configuration parsed into a map of objects. Useful objects and names, such
  * as [profiles], are additionally parsed and presented in a structured format.
  * Malformed YAML files are not handled and exception ([ScannerException]/[IOException]) is
  * thrown for the caller to handle.
+ *
+ * Optionally, can also take a [Project] parameter. If the project is not null, attempts to use
+ * project's PSI model to load current memory representation of the given Skaffold YAML.
  */
-class SkaffoldYamlConfiguration(skaffoldYamlFile: VirtualFile) {
+class SkaffoldYamlConfiguration(skaffoldYamlFile: VirtualFile, project: Project? = null) {
     /** Map of objects (presented as maps/lists) to their names from YAML file. */
     private val skaffoldYamlMap = mutableMapOf<Any, Any>()
 
     init {
+        // attempt to use in-memory data of PSI if exists and project is set first, or if not,
+        // fallback to directly parsing YAML file with VirtualFile
         val yamlLoader = Yaml()
-        skaffoldYamlMap.putAll(
-            yamlLoader.load(ByteArrayInputStream(skaffoldYamlFile.contentsToByteArray()))
-        )
+        var loadedWithPsiFile = false
+        if (project != null) {
+            val psiFile: PsiFile? = PsiManager.getInstance(project).findFile(skaffoldYamlFile)
+            if (psiFile != null) {
+                skaffoldYamlMap.putAll(yamlLoader.load(StringReader(psiFile.text)))
+                loadedWithPsiFile = true
+            }
+        }
+
+        if (project == null || !loadedWithPsiFile) {
+            skaffoldYamlMap.putAll(
+                yamlLoader.load(ByteArrayInputStream(skaffoldYamlFile.contentsToByteArray()))
+            )
+        }
     }
 
     /** apiVersion of Skaffold configuration file, in the form of skaffold/v{number} */

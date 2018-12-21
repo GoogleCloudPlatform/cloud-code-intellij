@@ -20,6 +20,7 @@ import com.google.common.annotations.VisibleForTesting
 import com.google.container.tools.skaffold.SkaffoldYamlConfiguration
 import com.google.container.tools.skaffold.message
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import javax.swing.DefaultComboBoxModel
 import javax.swing.JComboBox
@@ -34,6 +35,8 @@ import javax.swing.JComboBox
  */
 class SkaffoldProfilesComboBox : JComboBox<String>() {
     private val log = Logger.getInstance(this::class.java)
+
+    internal var project: Project? = null
 
     @VisibleForTesting
     internal val model: DefaultComboBoxModel<String> = DefaultComboBoxModel()
@@ -69,7 +72,7 @@ class SkaffoldProfilesComboBox : JComboBox<String>() {
     fun skaffoldFileUpdated(skaffoldFile: VirtualFile?) {
         val profileSet: Set<String> = skaffoldFile?.let {
             try {
-                val skaffoldYamlConfiguration = SkaffoldYamlConfiguration(skaffoldFile)
+                val skaffoldYamlConfiguration = SkaffoldYamlConfiguration(skaffoldFile, project)
                 skaffoldYamlConfiguration.profiles.keys
             } catch (e: Exception) {
                 // malformed YAML - clear and disable profiles selection.
