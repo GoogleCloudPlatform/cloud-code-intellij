@@ -17,7 +17,13 @@
 package com.google.container.tools.skaffold
 
 import com.google.common.annotations.VisibleForTesting
+import com.google.container.tools.core.analytics.UsageTrackerProvider
 import com.google.container.tools.skaffold.SkaffoldExecutorSettings.ExecutionMode
+import com.google.container.tools.skaffold.metrics.METADATA_ERROR_MESSAGE_KEY
+import com.google.container.tools.skaffold.metrics.SKAFFOLD_DEV_RUN_FAIL
+import com.google.container.tools.skaffold.metrics.SKAFFOLD_DEV_RUN_SUCCESS
+import com.google.container.tools.skaffold.metrics.SKAFFOLD_SINGLE_RUN_FAIL
+import com.google.container.tools.skaffold.metrics.SKAFFOLD_SINGLE_RUN_SUCCESS
 import com.intellij.openapi.components.ServiceManager
 import java.io.File
 import java.nio.file.Path
@@ -73,10 +79,36 @@ abstract class SkaffoldExecutorService {
             }
         }
 
-        return SkaffoldProcess(
-            createProcess(settings.workingDirectory, commandList),
-            commandLine = commandList.joinToString(" ")
-        )
+        try {
+            val skaffoldProcess = SkaffoldProcess(
+                createProcess(settings.workingDirectory, commandList),
+                commandLine = commandList.joinToString(" ")
+            )
+
+            // track event based on execution mode.
+            val skaffoldEventName =
+                if (settings.executionMode == ExecutionMode.DEV)
+                    SKAFFOLD_DEV_RUN_SUCCESS
+                else
+                    SKAFFOLD_SINGLE_RUN_SUCCESS
+            UsageTrackerProvider.instance.usageTracker.trackEvent(skaffoldEventName).ping()
+
+            return skaffoldProcess
+        } catch (e: Exception) {
+            val skaffoldFailEventName =
+                if (settings.executionMode == ExecutionMode.DEV)
+                    SKAFFOLD_DEV_RUN_FAIL
+                else
+                    SKAFFOLD_SINGLE_RUN_FAIL
+
+            UsageTrackerProvider.instance.usageTracker.trackEvent(skaffoldFailEventName)
+                .addMetadata(
+                    METADATA_ERROR_MESSAGE_KEY, e.javaClass.name
+                ).ping()
+            // re-throw exception to make sure a user sees run resulted in an error and sees error
+            // message.
+            throw e
+        }
     }
 
     @VisibleForTesting
