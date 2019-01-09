@@ -22,5 +22,7 @@ const val SKAFFOLD_DEV_RUN_FAIL = "skaffold.dev.run.fail"
 const val SKAFFOLD_SINGLE_RUN_SUCCESS = "skaffold.single.run"
 const val SKAFFOLD_SINGLE_RUN_FAIL = "skaffold.single.run.fail"
 
+const val SKAFFOLD_AUTO_CREATE_CONFIGURATIONS = "skaffold.auto.create.configs"
+
 /** Generic metadata field name for any error message (or error name) information. */
 const val METADATA_ERROR_MESSAGE_KEY = "error.message"

@@ -18,6 +18,8 @@ package com.google.container.tools.skaffold
 
 import com.google.common.annotations.VisibleForTesting
 import com.google.container.tools.core.PLUGIN_NOTIFICATION_DISPLAY_GROUP_ID
+import com.google.container.tools.core.analytics.UsageTrackerProvider
+import com.google.container.tools.skaffold.metrics.SKAFFOLD_AUTO_CREATE_CONFIGURATIONS
 import com.google.container.tools.skaffold.run.AbstractSkaffoldRunConfiguration
 import com.google.container.tools.skaffold.run.SkaffoldDevConfigurationFactory
 import com.google.container.tools.skaffold.run.SkaffoldRunConfigurationType
@@ -93,6 +95,13 @@ class SkaffoldConfigurationDetector(val project: Project) : ProjectComponent {
             override fun actionPerformed(e: AnActionEvent) {
                 addSkaffoldRunConfiguration(skaffoldFile.path)
                 addSkaffoldDevConfiguration(skaffoldFile.path)
+
+                // single client tracking ping since we offer single menu item
+                // to create both deploy/dev configurations at once
+                UsageTrackerProvider.instance.usageTracker.trackEvent(
+                    SKAFFOLD_AUTO_CREATE_CONFIGURATIONS
+                ).ping()
+
                 notification.expire()
             }
         })
