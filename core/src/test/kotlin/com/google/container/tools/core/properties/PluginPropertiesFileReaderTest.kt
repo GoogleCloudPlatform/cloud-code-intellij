@@ -16,7 +16,7 @@
 
 package com.google.container.tools.core.properties
 
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import kotlin.test.fail
 
@@ -29,18 +29,18 @@ class PluginPropertiesFileReaderTest {
 
     @Test
     fun `existing properties flag returns value`() {
-        Truth.assertThat(propertiesFileReader.getPropertyValue("test.prop"))
+        assertThat(propertiesFileReader.getPropertyValue("test.prop"))
             .isEqualTo("testPropValue")
     }
 
     @Test
     fun `non existing properties flag returns null`() {
-        Truth.assertThat(propertiesFileReader.getPropertyValue("test.missing.prop")).isNull()
+        assertThat(propertiesFileReader.getPropertyValue("test.missing.prop")).isNull()
     }
 
     @Test
     fun `empty properties flag returns empty string`() {
-        Truth.assertThat(propertiesFileReader.getPropertyValue("test.empty.prop")).isEmpty()
+        assertThat(propertiesFileReader.getPropertyValue("test.empty.prop")).isEmpty()
     }
 
     @Test

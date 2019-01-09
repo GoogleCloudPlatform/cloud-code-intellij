@@ -14,33 +14,41 @@
  * limitations under the License.
  */
 
-package com.google.container.tools.core.analytics
+package com.google.container.tools.core.settings
 
 import com.google.common.truth.Truth.assertThat
-import com.google.container.tools.core.PluginInfo
+import com.google.container.tools.core.properties.PluginPropertiesFileReader
 import com.google.container.tools.test.ContainerToolsRule
 import com.google.container.tools.test.TestService
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 /**
- * Tests for [UsageTrackerProvider].
+ * Tests for [UsageTrackerConfigurableProvider]
  */
-class UsageTrackerProviderTest {
+class UsageTrackerConfigurableProviderTest {
     @get:Rule
     val containerToolsRule = ContainerToolsRule(this)
 
-    @MockK
     @TestService
-    private lateinit var usageTrackerManagerService: UsageTrackerManagerService
+    @MockK
+    private lateinit var propertyReader: PluginPropertiesFileReader
 
-    @MockK
-    @TestService
-    private lateinit var pluginInfo: PluginInfo
+    private lateinit var usageTrackerConfigurableProvider: UsageTrackerConfigurableProvider
+
+    @Before
+    fun setUp() {
+        usageTrackerConfigurableProvider = UsageTrackerConfigurableProvider()
+    }
 
     @Test
-    fun `usage tracker provides initializes usage tracker`() {
-        assertThat(UsageTrackerProvider().usageTracker).isNotNull()
+    fun `usage tracker panel is not available in unit test mode`() {
+        // Set a valid looking analytics ID so that we are only testing the unit test mode part
+        every { propertyReader.getPropertyValue("analytics.id") } answers { "UA-12345" }
+
+        assertThat(usageTrackerConfigurableProvider.canCreateConfigurable()).isFalse()
     }
 }
