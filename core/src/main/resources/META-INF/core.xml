@@ -26,10 +26,17 @@
         <applicationService
                 serviceImplementation="com.google.container.tools.core.properties.PluginPropertiesFileReader"/>
 
+        <!-- Configures the menu item for the Google panel. Ensure that the ID is identical in all
+        plugins that share this panel. -->
         <applicationConfigurable groupId="google" id="google.settings"
-                             instance="com.google.container.tools.core.settings.GoogleSettingsConfigurable"/>
-        <applicationConfigurable parentId="google.settings" id="google.usagetracker.settings"
-                             provider="com.google.container.tools.core.settings.UsageTrackerConfigurableProvider"/>
+                                 instance="com.google.container.tools.core.settings.GoogleSettingsConfigurable"/>
+
+        <!-- Configures the menu item for the Usage Panel. Ensure that the ID is identical in all
+        plugins that share this panel. The load order is set to "last" so that this panel loads
+        after the panel in the GCT plugin; see UsageTrackerConfigurableProvider for more info. -->
+        <applicationConfigurable order="last" parentId="google.settings"
+                                 id="google.usagetracker.settings"
+                                 provider="com.google.container.tools.core.settings.UsageTrackerConfigurableProvider"/>
 
     </extensions>
 </idea-plugin>
