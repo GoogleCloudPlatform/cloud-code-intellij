@@ -24,6 +24,11 @@
                 com.google.container.tools.skaffold.SkaffoldConfigurationDetector
             </implementation-class>
         </component>
+        <component>
+            <implementation-class>
+                com.google.container.tools.skaffold.SkaffoldConfigurationRunManagerListener
+            </implementation-class>
+        </component>
     </project-components>
 
     <extensions defaultExtensionNs="com.intellij">
