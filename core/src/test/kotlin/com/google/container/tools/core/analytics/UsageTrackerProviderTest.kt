@@ -16,6 +16,7 @@
 
 package com.google.container.tools.core.analytics
 
+import com.google.cloud.tools.ide.analytics.UsageTrackerSettings
 import com.google.common.truth.Truth.assertThat
 import com.google.container.tools.core.PluginInfo
 import com.google.container.tools.test.ContainerToolsRule
@@ -43,4 +44,37 @@ class UsageTrackerProviderTest {
     fun `usage tracker provides initializes usage tracker`() {
         assertThat(UsageTrackerProvider().usageTracker).isNotNull()
     }
+
+    @Test
+    fun `usage tracker with tracking not enabled returns no-op tracker`() {
+        val usageTrackerProvider = UsageTrackerProvider()
+        usageTrackerProvider.usageTrackerSettings =
+            createUsageTrackerSettings(isTrackingEnabled = false)
+
+        assertThat(usageTrackerProvider.usageTracker.javaClass.simpleName)
+            .isEqualTo("NoOpUsageTracker")
+    }
+
+    @Test
+    fun `usage tracker with tracking enabled returns google tracker`() {
+        val usageTrackerProvider = UsageTrackerProvider()
+        usageTrackerProvider.usageTrackerSettings =
+            createUsageTrackerSettings(isTrackingEnabled = true)
+
+        assertThat(usageTrackerProvider.usageTracker.javaClass.simpleName)
+            .isEqualTo("GoogleUsageTracker")
+    }
+
+    private fun createUsageTrackerSettings(isTrackingEnabled: Boolean): UsageTrackerSettings =
+        UsageTrackerSettings.Builder()
+            .manager { isTrackingEnabled }
+            .analyticsId("analytics-id")
+            .pageHost("page-host")
+            .platformName("platform-name")
+            .platformVersion("platform-version")
+            .pluginName("plugin-name")
+            .pluginVersion("plugin-version")
+            .clientId("client-id")
+            .userAgent("user-agent")
+            .build()
 }

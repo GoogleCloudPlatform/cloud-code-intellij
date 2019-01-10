@@ -17,7 +17,9 @@
 package com.google.container.tools.core.analytics
 
 import com.google.cloud.tools.ide.analytics.UsageTracker
+import com.google.cloud.tools.ide.analytics.UsageTrackerManager
 import com.google.cloud.tools.ide.analytics.UsageTrackerSettings
+import com.google.common.annotations.VisibleForTesting
 import com.google.container.tools.core.PluginInfo
 import com.intellij.openapi.application.ApplicationInfo
 import com.intellij.openapi.application.PermanentInstallationID
@@ -34,13 +36,14 @@ import com.intellij.openapi.components.ServiceManager
  */
 class UsageTrackerProvider {
 
-    val usageTracker: UsageTracker
+    @VisibleForTesting
+    var usageTrackerSettings: UsageTrackerSettings
 
     init {
         val usageTrackerManagerService: UsageTrackerManagerService =
             UsageTrackerManagerService.instance
 
-        val settings: UsageTrackerSettings = UsageTrackerSettings.Builder()
+        usageTrackerSettings = UsageTrackerSettings.Builder()
             .manager { usageTrackerManagerService.isUsageTrackingEnabled() }
             .analyticsId(usageTrackerManagerService.getAnalyticsId())
             .pageHost(PAGE_HOST)
@@ -51,9 +54,15 @@ class UsageTrackerProvider {
             .clientId(PermanentInstallationID.get())
             .userAgent(PluginInfo.PLUGIN_USER_AGENT)
             .build()
-
-        usageTracker = UsageTracker.create(settings)
     }
+
+    /**
+     * Returns the appropriate implementation of [UsageTracker]. The implementation will change -
+     * from either a noop version, or the real version - depending on the value returned by the
+     * [UsageTrackerManager] callback which will depend on the current user selected tracking
+     * preference.
+     */
+    val usageTracker: UsageTracker get() = UsageTracker.create(usageTrackerSettings)
 
     companion object {
         private const val PAGE_HOST = "virtual.intellij"
