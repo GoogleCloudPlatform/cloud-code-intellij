@@ -44,6 +44,9 @@ class UsageTrackerManagerService(
             get() = ServiceManager.getService(UsageTrackerManagerService::class.java)!!
     }
 
+    fun hasUserRecordedTrackingPreference(): Boolean =
+        trackingPreferenceProperty.getValue(USAGE_TRACKING_PREFERENCE_KEY) != null
+
     /**
      * Tracking is considered "available" if it can be collected. This occurs when there is a
      * retrievable Analytics ID, and we are not in unit test mode.
@@ -71,9 +74,10 @@ class UsageTrackerManagerService(
 
     /**
      * Stores the user tracking preference backed by a persistent [PropertiesComponent].
+     * Writes the value as a string because otherwise a false value unsets the property.
      */
     fun setTrackingOptedIn(optIn: Boolean) {
-        trackingPreferenceProperty.setValue(USAGE_TRACKING_PREFERENCE_KEY, optIn)
+        trackingPreferenceProperty.setValue(USAGE_TRACKING_PREFERENCE_KEY, optIn.toString())
     }
 
     /**

@@ -36,6 +36,12 @@
     <xi:include href="/META-INF/skaffold.xml" xpointer="xpointer(/idea-plugin/*)"/>
     <xi:include href="/META-INF/skaffold-editing.xml" xpointer="xpointer(/idea-plugin/*)"/>
 
+    <application-components>
+        <component>
+            <implementation-class>com.google.container.tools.init.PluginInitComponent</implementation-class>
+        </component>
+    </application-components>
+
     <extensions defaultExtensionNs="com.intellij">
         <errorHandler
                 implementation="com.google.container.tools.diagnostics.GoogleFeedbackErrorReporter"/>
