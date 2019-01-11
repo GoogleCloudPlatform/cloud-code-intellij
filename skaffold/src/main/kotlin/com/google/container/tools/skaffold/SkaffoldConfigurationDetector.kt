@@ -27,7 +27,6 @@ import com.google.container.tools.skaffold.run.SkaffoldSingleRunConfigurationFac
 import com.intellij.execution.RunManager
 import com.intellij.execution.configurations.ConfigurationFactory
 import com.intellij.execution.configurations.ConfigurationTypeUtil
-import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationDisplayType
 import com.intellij.notification.NotificationGroup
@@ -39,11 +38,18 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.VirtualFileEvent
+import com.intellij.openapi.vfs.VirtualFileListener
+import com.intellij.openapi.vfs.VirtualFileManager
+import org.jetbrains.yaml.YAMLFileType
 
 /**
  * Detects if project has Skaffold configuration but no Skaffold run targets configured. Uses
  * [ProjectComponent] to watch project opening, and prompts to create dev/deploy configurations
  * if they don't exist yet.
+ *
+ * Uses [VirtualFileManager] and [VirtualFileListener] to track new YAML files in already opened
+ * project to prompt creating new configurations when Skaffold YAML is created.
  *
  * @param project IDE Project for which this component is created.
  */
@@ -66,16 +72,47 @@ class SkaffoldConfigurationDetector(val project: Project) : ProjectComponent {
             val skaffoldFiles: List<VirtualFile> =
                 SkaffoldFileService.instance.findSkaffoldFiles(project)
             if (skaffoldFiles.isNotEmpty()) {
-                val skaffoldRunConfigList: List<RunConfiguration> =
-                    getRunManager(project)
-                        .allConfigurationsList.filter { it is AbstractSkaffoldRunConfiguration }
-                if (skaffoldRunConfigList.isEmpty()) {
+                if (!hasExistingSkaffoldConfigurations()) {
                     // existing Skaffold config files, but no skaffold configurations, prompt
                     showPromptForSkaffoldConfigurations(project, skaffoldFiles[0])
                 }
             }
         }
+
+        // add VFS listener to ensure we track YAML file changes when no Skaffold configurations
+        // exist yet to show prompt for configurations once Skaffold file is created.
+        addVirtualFileListener(object : VirtualFileListener {
+            override fun contentsChanged(event: VirtualFileEvent) {
+                checkForSkaffoldFile(event.file)
+            }
+
+            override fun fileCreated(event: VirtualFileEvent) {
+                checkForSkaffoldFile(event.file)
+            }
+
+            private fun checkForSkaffoldFile(file: VirtualFile) {
+                DumbService.getInstance(project).runWhenSmart {
+                    if (file.fileType is YAMLFileType &&
+                        SkaffoldFileService.instance.isSkaffoldFile(
+                            file
+                        ) && !hasExistingSkaffoldConfigurations()
+                    ) {
+                        // content changed to be a valid Skaffold file,
+                        // and no Skaffold configurations exist, prompt
+                        showPromptForSkaffoldConfigurations(project, file)
+                    }
+                }
+            }
+        })
     }
+
+    /**
+     * Checks if the project has existing Skaffold run configurations. Project is current, one
+     * per created component, passed a parameter.
+     */
+    private fun hasExistingSkaffoldConfigurations() =
+        getRunManager(project)
+            .allConfigurationsList.filter { it is AbstractSkaffoldRunConfiguration }.isNotEmpty()
 
     /**
      * Prepares an IDE notification if no Skaffold configurations exist, adding actions to add
@@ -169,4 +206,16 @@ class SkaffoldConfigurationDetector(val project: Project) : ProjectComponent {
     @VisibleForTesting
     fun getRunManager(project: Project): RunManager =
         RunManager.getInstance(project)
+
+    /**
+     * Adds [VirtualFileListener] to [VirtualFileManager] to track project's file system changes
+     * and detect new file and content changes.
+     */
+    @VisibleForTesting
+    fun addVirtualFileListener(listener: VirtualFileListener) {
+        VirtualFileManager.getInstance().addVirtualFileListener(
+            listener,
+            project /* project used as a disposable to remove listener when project closes */
+        )
+    }
 }

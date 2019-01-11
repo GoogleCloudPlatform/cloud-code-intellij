@@ -26,6 +26,8 @@ import com.intellij.execution.RunnerAndConfigurationSettings
 import com.intellij.execution.configurations.ConfigurationFactory
 import com.intellij.mock.MockVirtualFile
 import com.intellij.notification.Notification
+import com.intellij.openapi.vfs.VirtualFileEvent
+import com.intellij.openapi.vfs.VirtualFileListener
 import io.mockk.CapturingSlot
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -60,6 +62,8 @@ class SkaffoldConfigurationDetectorTest {
     @MockK
     private lateinit var mockNotification: Notification
 
+    private val fileListenerCapture: CapturingSlot<VirtualFileListener> = slot()
+
     @Before
     fun setUp() {
         skaffoldConfigurationDetector = spyk(
@@ -73,6 +77,10 @@ class SkaffoldConfigurationDetectorTest {
                 any()
             )
         } answers { mockNotification }
+
+        every {
+            skaffoldConfigurationDetector.addVirtualFileListener(capture(fileListenerCapture))
+        } returns Unit
 
         every { skaffoldConfigurationDetector.getRunManager(any()) } answers { mockRunManager }
         every {
@@ -112,6 +120,62 @@ class SkaffoldConfigurationDetectorTest {
         skaffoldConfigurationDetector.projectOpened()
 
         verify(exactly = 0) { skaffoldConfigurationDetector.createNotification(any(), any()) }
+    }
+
+    @Test
+    @UiTest
+    fun `non-Skaffold yaml file modified in the project doesnt ask to add configs`() {
+        val nonSkaffoldFile = MockVirtualFile.file("pod.yaml")
+        every { mockSkaffoldFileService.isSkaffoldFile(nonSkaffoldFile) } returns false
+        every { mockSkaffoldFileService.findSkaffoldFiles(any()) } answers { listOf() }
+        val virtualFileEvent = VirtualFileEvent(null, nonSkaffoldFile, nonSkaffoldFile.name, null)
+
+        skaffoldConfigurationDetector.projectOpened()
+        fileListenerCapture.captured.contentsChanged(virtualFileEvent)
+
+        verify(exactly = 0) { skaffoldConfigurationDetector.createNotification(any(), any()) }
+    }
+
+    @Test
+    @UiTest
+    fun `Skaffold yaml file modified in the project prompts to add run configs`() {
+        val skaffoldFile = MockVirtualFile.file("skaffold.yaml")
+        every { mockSkaffoldFileService.isSkaffoldFile(skaffoldFile) } returns true
+        every { mockSkaffoldFileService.findSkaffoldFiles(any()) } answers { listOf() }
+        val virtualFileEvent = VirtualFileEvent(null, skaffoldFile, skaffoldFile.name, null)
+
+        skaffoldConfigurationDetector.projectOpened()
+        fileListenerCapture.captured.contentsChanged(virtualFileEvent)
+
+        verify(exactly = 1) { skaffoldConfigurationDetector.createNotification(any(), any()) }
+    }
+
+    @Test
+    @UiTest
+    fun `non-Skaffold yaml file copied or created in the project doesnt ask to add configs`() {
+        val nonSkaffoldFile = MockVirtualFile.file("pod.yaml")
+        every { mockSkaffoldFileService.isSkaffoldFile(nonSkaffoldFile) } returns false
+        every { mockSkaffoldFileService.findSkaffoldFiles(any()) } answers { listOf() }
+        val virtualFileEvent = VirtualFileEvent(null, nonSkaffoldFile, nonSkaffoldFile.name, null)
+
+        skaffoldConfigurationDetector.projectOpened()
+        fileListenerCapture.captured.fileCreated(virtualFileEvent)
+
+        verify(exactly = 0) { skaffoldConfigurationDetector.createNotification(any(), any()) }
+    }
+
+    @Test
+    @UiTest
+    fun `Skaffold yaml file copied or created  in the project prompts to add run configs`() {
+        val skaffoldFile = MockVirtualFile.file("skaffold.yaml")
+        every { mockSkaffoldFileService.isSkaffoldFile(skaffoldFile) } returns true
+        every { mockSkaffoldFileService.findSkaffoldFiles(any()) } answers { listOf() }
+        val virtualFileEvent = VirtualFileEvent(null, skaffoldFile, skaffoldFile.name, null)
+
+        skaffoldConfigurationDetector.projectOpened()
+        fileListenerCapture.captured.fileCreated(virtualFileEvent)
+
+        verify(exactly = 1) { skaffoldConfigurationDetector.createNotification(any(), any()) }
     }
 
     @Test
