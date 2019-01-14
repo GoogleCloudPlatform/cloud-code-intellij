@@ -41,7 +41,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class AppEngineDeprecatedRuntimeInspection extends XmlSuppressableInspectionTool {
 
-  private List<String> deprecatedRuntimes = ImmutableList.of("java", "java7");
+  private final List<String> deprecatedRuntimes = ImmutableList.of("java", "java7");
 
   private static final String APP_ENGINE_JAVA8_RUNTIME_VALUE = "java8";
   private static final String APP_ENGINE_WEB_XML_ROOT_TAG_NAME = "appengine-web-app";
