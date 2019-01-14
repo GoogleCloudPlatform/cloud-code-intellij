@@ -229,8 +229,6 @@
                          implementationClass="com.google.cloud.tools.intellij.appengine.java.validation.RestSignatureInspection"/>
 
         <postStartupActivity
-                implementation="com.google.cloud.tools.intellij.appengine.java.startup.AppEngineStandardUnsupportedJavaVersionCheck"/>
-        <postStartupActivity
                 implementation="com.google.cloud.tools.intellij.appengine.java.startup.CloudSdkVersionStartupCheck"/>
     </extensions>
 </idea-plugin>
