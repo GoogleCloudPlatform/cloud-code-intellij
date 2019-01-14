@@ -134,6 +134,12 @@
         <fileTypeFactory
                 implementation="com.google.cloud.tools.intellij.appengine.java.file.DockerFileTemplateTypeFactory"/>
 
+        <localInspection language="XML" shortName="DeprecatedAppEngineJavaRuntime" bundle="messages.AppEngineBundle"
+                         groupKey="appengine.inspections.group.name"
+                         hasStaticDescription="true"
+                         enabledByDefault="true" level="ERROR"
+                         implementationClass="com.google.cloud.tools.intellij.appengine.java.inspections.AppEngineDeprecatedRuntimeInspection"/>
+
         <localInspection language="JAVA" shortName="GoogleAppEngineForbiddenCode"
                          displayName="Forbidden code in App Engine applications"
                          groupName="Google App Engine" enabledByDefault="true" level="ERROR"

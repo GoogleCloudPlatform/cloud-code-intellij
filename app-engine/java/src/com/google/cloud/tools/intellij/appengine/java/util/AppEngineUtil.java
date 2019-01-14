@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 public class AppEngineUtil {
 
   public static final String APP_ENGINE_WEB_XML_NAME = "appengine-web.xml";
+  public static final String APP_ENGINE_WEB_XML_ROOT_TAG_NAME = "appengine-web-app";
 
   private AppEngineUtil() {
     // Not designed for instantiation

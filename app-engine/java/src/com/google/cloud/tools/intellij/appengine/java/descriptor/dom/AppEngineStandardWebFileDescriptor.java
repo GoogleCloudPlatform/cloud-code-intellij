@@ -28,7 +28,7 @@ public class AppEngineStandardWebFileDescriptor
     extends DomFileDescription<AppEngineStandardWebApp> {
 
   public AppEngineStandardWebFileDescriptor() {
-    super(AppEngineStandardWebApp.class, "appengine-web-app");
+    super(AppEngineStandardWebApp.class, AppEngineUtil.APP_ENGINE_WEB_XML_ROOT_TAG_NAME);
   }
 
   @Override
