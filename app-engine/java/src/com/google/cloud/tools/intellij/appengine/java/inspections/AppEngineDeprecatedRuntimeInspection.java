@@ -44,7 +44,6 @@ public class AppEngineDeprecatedRuntimeInspection extends XmlSuppressableInspect
   private final List<String> deprecatedRuntimes = ImmutableList.of("java", "java7");
 
   private static final String APP_ENGINE_JAVA8_RUNTIME_VALUE = "java8";
-  private static final String APP_ENGINE_WEB_XML_ROOT_TAG_NAME = "appengine-web-app";
   private static final String APP_ENGINE_WEB_XML_RUNTIME_TAG_NAME = "runtime";
 
   @Nls
@@ -109,7 +108,8 @@ public class AppEngineDeprecatedRuntimeInspection extends XmlSuppressableInspect
     boolean isAppEngineWebXml =
         xmlFile.getRootTag() != null
             && AppEngineUtil.APP_ENGINE_WEB_XML_NAME.equals(xmlFile.getName())
-            && APP_ENGINE_WEB_XML_ROOT_TAG_NAME.equals(xmlFile.getRootTag().getName());
+            && AppEngineUtil.APP_ENGINE_WEB_XML_ROOT_TAG_NAME.equals(
+                xmlFile.getRootTag().getName());
 
     if (isAppEngineWebXml) {
       return APP_ENGINE_WEB_XML_RUNTIME_TAG_NAME.equals(tag.getName())

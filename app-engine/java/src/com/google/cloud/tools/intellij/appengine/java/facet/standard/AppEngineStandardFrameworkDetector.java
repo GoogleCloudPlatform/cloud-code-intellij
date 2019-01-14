@@ -75,6 +75,6 @@ public class AppEngineStandardFrameworkDetector
   public ElementPattern<FileContent> createSuitableFilePattern() {
     return FileContentPattern.fileContent()
         .withName(AppEngineUtil.APP_ENGINE_WEB_XML_NAME)
-        .xmlWithRootTag("appengine-web-app");
+        .xmlWithRootTag(AppEngineUtil.APP_ENGINE_WEB_XML_ROOT_TAG_NAME);
   }
 }
