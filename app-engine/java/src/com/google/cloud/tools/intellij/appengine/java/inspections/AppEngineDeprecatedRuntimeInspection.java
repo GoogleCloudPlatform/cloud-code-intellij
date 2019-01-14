@@ -51,15 +51,15 @@ public class AppEngineDeprecatedRuntimeInspection extends XmlSuppressableInspect
   @NotNull
   @Override
   public String getDisplayName() {
-    return AppEngineMessageBundle
-        .message("appengine.deprecated.java.runtime.inspection.display.name");
+    return AppEngineMessageBundle.message(
+        "appengine.deprecated.java.runtime.inspection.display.name");
   }
 
   @Nullable
   @Override
   public String getStaticDescription() {
-    return AppEngineMessageBundle
-        .message("appengine.deprecated.java.runtime.inspection.description");
+    return AppEngineMessageBundle.message(
+        "appengine.deprecated.java.runtime.inspection.description");
   }
 
   @NotNull
@@ -70,9 +70,10 @@ public class AppEngineDeprecatedRuntimeInspection extends XmlSuppressableInspect
       @Override
       public void visitXmlTag(XmlTag tag) {
         if (isAppEngineWebXmlDeprecatedRuntimeTag(tag)) {
-          holder.registerProblem(tag,
-              AppEngineMessageBundle
-                  .message("appengine.deprecated.java.runtime.inspection.problem.text"),
+          holder.registerProblem(
+              tag,
+              AppEngineMessageBundle.message(
+                  "appengine.deprecated.java.runtime.inspection.problem.text"),
               new UpdateDeprecatedAppEngineJavaRuntimeQuickFix());
         }
       }
@@ -106,13 +107,13 @@ public class AppEngineDeprecatedRuntimeInspection extends XmlSuppressableInspect
   private boolean isAppEngineWebXmlDeprecatedRuntimeTag(XmlTag tag) {
     XmlFile xmlFile = (XmlFile) tag.getContainingFile();
     boolean isAppEngineWebXml =
-        xmlFile.getRootTag() != null && AppEngineUtil.APP_ENGINE_WEB_XML_NAME
-            .equals(xmlFile.getName()) && APP_ENGINE_WEB_XML_ROOT_TAG_NAME
-            .equals(xmlFile.getRootTag().getName());
+        xmlFile.getRootTag() != null
+            && AppEngineUtil.APP_ENGINE_WEB_XML_NAME.equals(xmlFile.getName())
+            && APP_ENGINE_WEB_XML_ROOT_TAG_NAME.equals(xmlFile.getRootTag().getName());
 
     if (isAppEngineWebXml) {
-      return APP_ENGINE_WEB_XML_RUNTIME_TAG_NAME.equals(tag.getName()) && deprecatedRuntimes
-          .contains(tag.getValue().getText());
+      return APP_ENGINE_WEB_XML_RUNTIME_TAG_NAME.equals(tag.getName())
+          && deprecatedRuntimes.contains(tag.getValue().getText());
     }
 
     return false;
