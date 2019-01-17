@@ -112,7 +112,7 @@ public class AppEngineDeprecatedRuntimeInspection extends XmlSuppressableInspect
           xmlFile.getRootTag() != null
               && AppEngineUtil.APP_ENGINE_WEB_XML_NAME.equals(xmlFile.getName())
               && AppEngineUtil.APP_ENGINE_WEB_XML_ROOT_TAG_NAME.equals(
-              xmlFile.getRootTag().getName());
+                  xmlFile.getRootTag().getName());
 
       if (isAppEngineWebXml) {
         return APP_ENGINE_WEB_XML_RUNTIME_TAG_NAME.equals(tag.getName())
