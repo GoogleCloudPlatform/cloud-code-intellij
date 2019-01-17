@@ -16,7 +16,7 @@
 
 <!-- Core IJ plugin manifest that contains all sub-module declarations -->
 <idea-plugin xmlns:xi="http://www.w3.org/2001/XInclude">
-    <id>com.google.container.tools</id>
+    <id>google-container-tools</id>
     <name>Google Container Tools</name>
     <vendor>Google</vendor>
     <description>
