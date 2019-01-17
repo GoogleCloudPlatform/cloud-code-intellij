@@ -94,8 +94,10 @@ public class AppEngineDeprecatedRuntimeInspection extends XmlSuppressableInspect
 
     @Override
     public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
-      XmlTag xmlTag = (XmlTag) descriptor.getPsiElement();
-      xmlTag.getValue().setText(APP_ENGINE_JAVA8_RUNTIME_VALUE);
+      if (descriptor.getPsiElement() != null && descriptor.getPsiElement() instanceof XmlTag) {
+        XmlTag xmlTag = (XmlTag) descriptor.getPsiElement();
+        xmlTag.getValue().setText(APP_ENGINE_JAVA8_RUNTIME_VALUE);
+      }
     }
   }
 
@@ -104,16 +106,18 @@ public class AppEngineDeprecatedRuntimeInspection extends XmlSuppressableInspect
    * runtime tag, and the value is a deprecated Java runtime.
    */
   private boolean isAppEngineWebXmlDeprecatedRuntimeTag(XmlTag tag) {
-    XmlFile xmlFile = (XmlFile) tag.getContainingFile();
-    boolean isAppEngineWebXml =
-        xmlFile.getRootTag() != null
-            && AppEngineUtil.APP_ENGINE_WEB_XML_NAME.equals(xmlFile.getName())
-            && AppEngineUtil.APP_ENGINE_WEB_XML_ROOT_TAG_NAME.equals(
-                xmlFile.getRootTag().getName());
+    if (tag != null && tag.getContainingFile() instanceof XmlFile) {
+      XmlFile xmlFile = (XmlFile) tag.getContainingFile();
+      boolean isAppEngineWebXml =
+          xmlFile.getRootTag() != null
+              && AppEngineUtil.APP_ENGINE_WEB_XML_NAME.equals(xmlFile.getName())
+              && AppEngineUtil.APP_ENGINE_WEB_XML_ROOT_TAG_NAME.equals(
+                  xmlFile.getRootTag().getName());
 
-    if (isAppEngineWebXml) {
-      return APP_ENGINE_WEB_XML_RUNTIME_TAG_NAME.equals(tag.getName())
-          && deprecatedRuntimes.contains(tag.getValue().getText());
+      if (isAppEngineWebXml) {
+        return APP_ENGINE_WEB_XML_RUNTIME_TAG_NAME.equals(tag.getName())
+            && deprecatedRuntimes.contains(tag.getValue().getText());
+      }
     }
 
     return false;
