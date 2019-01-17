@@ -1,6 +1,11 @@
 # Release notes
 This page documents production updates to Cloud Tools for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## 19.1.2
+
+### Fixed
+  - Fixed ClassCastException in deprecated App Engine Runtime inspection. [2322](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2322)
+
 ## 19.1.1
 
 Users of App Engine Java 7 runtime should migrate to Java 8: https://cloud.google.com/appengine/docs/deprecations/java7
