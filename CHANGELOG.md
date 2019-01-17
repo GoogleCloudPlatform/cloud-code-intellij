@@ -4,7 +4,7 @@ This page documents production updates to Cloud Tools for IntelliJ. You can chec
 ## 19.1.2
 
 ### Fixed
-  - Fixed ClassCastException in deprecated App Engine Runtime inspection [2322](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2322)
+  - Fixed ClassCastException in deprecated App Engine Runtime inspection. [2322](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2322)
 
 ## 19.1.1
 
