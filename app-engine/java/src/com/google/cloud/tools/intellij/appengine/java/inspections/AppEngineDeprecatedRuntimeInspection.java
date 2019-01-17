@@ -106,7 +106,7 @@ public class AppEngineDeprecatedRuntimeInspection extends XmlSuppressableInspect
    * runtime tag, and the value is a deprecated Java runtime.
    */
   private boolean isAppEngineWebXmlDeprecatedRuntimeTag(XmlTag tag) {
-    if (tag instanceof XmlFile) {
+    if (tag != null && tag.getContainingFile() instanceof XmlFile) {
       XmlFile xmlFile = (XmlFile) tag.getContainingFile();
       boolean isAppEngineWebXml =
           xmlFile.getRootTag() != null
