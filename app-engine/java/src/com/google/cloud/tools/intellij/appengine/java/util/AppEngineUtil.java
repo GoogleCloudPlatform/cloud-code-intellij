@@ -22,7 +22,6 @@ import com.google.cloud.tools.intellij.appengine.java.facet.flexible.AppEngineFl
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
 import com.google.common.collect.Lists;
-import com.intellij.facet.FacetManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.impl.artifacts.ArtifactUtil;
@@ -49,8 +48,7 @@ public class AppEngineUtil {
     Collection<Artifact> artifacts = ArtifactUtil.getArtifactsContainingModuleOutput(module);
     Collection<Artifact> appEngineStandardArtifacts = Lists.newArrayList();
     appEngineStandardArtifacts.addAll(
-        artifacts
-            .stream()
+        artifacts.stream()
             .filter(
                 artifact ->
                     AppEngineProjectService.getInstance().isAppEngineStandardArtifactType(artifact))
@@ -69,11 +67,8 @@ public class AppEngineUtil {
    */
   public static boolean isAnyAppEngineFacetAlreadyAdded(@NotNull Module module) {
     AppEngineStandardFacet existingStandardFacet =
-        FacetManager.getInstance(module)
-            .getFacetByType(AppEngineStandardFacet.getFacetType().getId());
-    AppEngineFlexibleFacet existingFlexibleFacet =
-        FacetManager.getInstance(module)
-            .getFacetByType(AppEngineFlexibleFacet.getFacetType().getId());
+        AppEngineStandardFacet.getAppEngineFacetByModule(module);
+    AppEngineFlexibleFacet existingFlexibleFacet = AppEngineFlexibleFacet.getFacetByModule(module);
 
     return existingFlexibleFacet != null || existingStandardFacet != null;
   }
