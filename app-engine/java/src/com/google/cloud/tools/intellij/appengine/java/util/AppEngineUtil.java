@@ -69,9 +69,11 @@ public class AppEngineUtil {
    */
   public static boolean isAnyAppEngineFacetAlreadyAdded(@NotNull Module module) {
     AppEngineStandardFacet existingStandardFacet =
-        FacetManager.getInstance(module).getFacetByType(AppEngineStandardFacet.getFacetType().getId());
+        FacetManager.getInstance(module)
+            .getFacetByType(AppEngineStandardFacet.getFacetType().getId());
     AppEngineFlexibleFacet existingFlexibleFacet =
-        FacetManager.getInstance(module).getFacetByType(AppEngineFlexibleFacet.getFacetType().getId());
+        FacetManager.getInstance(module)
+            .getFacetByType(AppEngineFlexibleFacet.getFacetType().getId());
 
     return existingFlexibleFacet != null || existingStandardFacet != null;
   }

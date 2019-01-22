@@ -153,7 +153,8 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
   }
 
   private static boolean hasFlexibleDeploymentConfiguration(List<RunConfiguration> runConfigs) {
-    return runConfigs.stream()
+    return runConfigs
+        .stream()
         .filter(runConfig -> runConfig instanceof DeployToServerRunConfiguration)
         .map(runConfig -> ((DeployToServerRunConfiguration) runConfig).getDeploymentConfiguration())
         .filter(deployConfig -> deployConfig instanceof AppEngineDeploymentConfiguration)
@@ -185,8 +186,9 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
           AppEngineFlexibleFacet.getFacetType();
       // pre-condition - multiple facets of the same type are not allowed and result in a critical
       // error, check for existing facet explicitly and do nothing if it was already added.
-      if (AppEngineUtil.isAnyAppEngineFacetAlreadyAdded(module))
+      if (AppEngineUtil.isAnyAppEngineFacetAlreadyAdded(module)) {
         return;
+      }
 
       AppEngineFlexibleFacet facet =
           FacetManager.getInstance(module)
