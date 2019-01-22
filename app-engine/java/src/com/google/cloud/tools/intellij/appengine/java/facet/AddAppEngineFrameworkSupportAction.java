@@ -127,7 +127,7 @@ public abstract class AddAppEngineFrameworkSupportAction extends AnAction {
     List<Module> suitableModules =
         new ArrayList<>(Arrays.asList(ModuleManager.getInstance(project).getModules()));
     FrameworkSupportInModuleProvider provider = getModuleProvider();
-    // checks if this module type supports out facets at all
+    // checks if this module type supports our facets at all
     suitableModules.removeIf(module -> !provider.isEnabledForModuleType(ModuleType.get(module)));
     // filter out compatible modules where support has been already added.
     suitableModules.removeIf(AppEngineUtil::isAnyAppEngineFacetAlreadyAdded);
