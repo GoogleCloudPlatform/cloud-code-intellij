@@ -25,6 +25,7 @@ import com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineServerConfi
 import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacetType;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService.FlexibleRuntime;
+import com.google.cloud.tools.intellij.appengine.java.util.AppEngineUtil;
 import com.google.common.annotations.VisibleForTesting;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
@@ -184,11 +185,8 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
           AppEngineFlexibleFacet.getFacetType();
       // pre-condition - multiple facets of the same type are not allowed and result in a critical
       // error, check for existing facet explicitly and do nothing if it was already added.
-      AppEngineFlexibleFacet existingFacet =
-          FacetManager.getInstance(module).getFacetByType(facetType.getId());
-      if (existingFacet != null) {
+      if (AppEngineUtil.isAnyAppEngineFacetAlreadyAdded(module))
         return;
-      }
 
       AppEngineFlexibleFacet facet =
           FacetManager.getInstance(module)
