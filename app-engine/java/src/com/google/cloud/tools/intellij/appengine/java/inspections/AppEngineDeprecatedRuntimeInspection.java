@@ -83,7 +83,7 @@ public class AppEngineDeprecatedRuntimeInspection extends XmlSuppressableInspect
    * A quickfix that updates deprecated App Engine Java runtime values to the supported Java 8
    * runtime.
    */
-  private class UpdateDeprecatedAppEngineJavaRuntimeQuickFix implements LocalQuickFix {
+  private static class UpdateDeprecatedAppEngineJavaRuntimeQuickFix implements LocalQuickFix {
 
     @Nls(capitalization = Capitalization.Sentence)
     @NotNull
