@@ -48,7 +48,8 @@ public class AppEngineUtil {
     Collection<Artifact> artifacts = ArtifactUtil.getArtifactsContainingModuleOutput(module);
     Collection<Artifact> appEngineStandardArtifacts = Lists.newArrayList();
     appEngineStandardArtifacts.addAll(
-        artifacts.stream()
+        artifacts
+            .stream()
             .filter(
                 artifact ->
                     AppEngineProjectService.getInstance().isAppEngineStandardArtifactType(artifact))

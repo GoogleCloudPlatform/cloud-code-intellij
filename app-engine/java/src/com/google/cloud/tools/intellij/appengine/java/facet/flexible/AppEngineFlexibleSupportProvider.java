@@ -153,7 +153,8 @@ public class AppEngineFlexibleSupportProvider extends FrameworkSupportInModulePr
   }
 
   private static boolean hasFlexibleDeploymentConfiguration(List<RunConfiguration> runConfigs) {
-    return runConfigs.stream()
+    return runConfigs
+        .stream()
         .filter(runConfig -> runConfig instanceof DeployToServerRunConfiguration)
         .map(runConfig -> ((DeployToServerRunConfiguration) runConfig).getDeploymentConfiguration())
         .filter(deployConfig -> deployConfig instanceof AppEngineDeploymentConfiguration)
