@@ -480,8 +480,8 @@ public class ManagedCloudSdkServiceTest {
     SdkInstaller mockInstaller = mock(SdkInstaller.class);
     when(mockManagedCloudSdk.newInstaller()).thenReturn(mockInstaller);
 
+    CloudSdkServiceManager.getInstance().getSdkReadLock().lock();
     try {
-      CloudSdkServiceManager.getInstance().getSdkReadLock().lock();
       // signal when install is about to start write operation.
       CountDownLatch waitForInstallToStart = new CountDownLatch(1);
       doAnswer(
@@ -514,8 +514,8 @@ public class ManagedCloudSdkServiceTest {
     SdkUpdater mockUpdater = mock(SdkUpdater.class);
     when(mockManagedCloudSdk.newUpdater()).thenReturn(mockUpdater);
 
+    CloudSdkServiceManager.getInstance().getSdkReadLock().lock();
     try {
-      CloudSdkServiceManager.getInstance().getSdkReadLock().lock();
       // signal when update is about to start write operation.
       CountDownLatch waitForUpdateToStart = new CountDownLatch(1);
       doAnswer(
