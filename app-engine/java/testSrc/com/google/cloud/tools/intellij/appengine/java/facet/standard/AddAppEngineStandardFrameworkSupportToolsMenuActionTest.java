@@ -62,8 +62,7 @@ public class AddAppEngineStandardFrameworkSupportToolsMenuActionTest
   }
 
   @Override
-  public void
-      testGetSuitableModules_returnsAllAppEngineModules_whenSomeModulesHaveAppEngineFacet() {
-    super.testGetSuitableModules_returnsAllAppEngineModules_whenSomeModulesHaveAppEngineFacet();
+  public void testGetSuitableModules_returns_noAEFacetsModules_whenSomeModulesHaveAEFacet() {
+    super.testGetSuitableModules_returns_noAEFacetsModules_whenSomeModulesHaveAEFacet();
   }
 }
