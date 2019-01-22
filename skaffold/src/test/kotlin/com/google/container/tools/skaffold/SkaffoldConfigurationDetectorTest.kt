@@ -198,7 +198,7 @@ class SkaffoldConfigurationDetectorTest {
 
         skaffoldConfigurationDetector.addSkaffoldDevConfiguration(skaffoldFile.path)
 
-        assertThat(nameSlot.captured).isEqualTo("develop on Kubernetes")
+        assertThat(nameSlot.captured).isEqualTo("Develop on Kubernetes")
     }
 
     @Test
@@ -221,6 +221,6 @@ class SkaffoldConfigurationDetectorTest {
 
         skaffoldConfigurationDetector.addSkaffoldRunConfiguration(skaffoldFile.path)
 
-        assertThat(nameSlot.captured).isEqualTo("deploy to Kubernetes")
+        assertThat(nameSlot.captured).isEqualTo("Deploy to Kubernetes")
     }
 }
