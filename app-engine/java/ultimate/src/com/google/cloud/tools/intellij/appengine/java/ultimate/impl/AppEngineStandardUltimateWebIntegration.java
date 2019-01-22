@@ -212,7 +212,7 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
   @Override
   public void addDevServerToModuleDependencies(@NotNull ModifiableRootModel rootModel) {
     final ApplicationServer appServer = getOrCreateAppServer();
-    if (appServer != null) {
+    if (appServer != null && !appServer.isDisposed()) {
       rootModel.addLibraryEntry(appServer.getLibrary()).setScope(DependencyScope.PROVIDED);
     }
   }
@@ -267,6 +267,9 @@ public class AppEngineStandardUltimateWebIntegration extends AppEngineStandardWe
     // the first one found
     final List<ApplicationServer> servers =
         ApplicationServersManager.getInstance().getApplicationServers(integration);
+    // make sure no servers are recently disposed (see #2326)
+    servers.removeIf(server -> !server.isDisposed());
+
     if (!servers.isEmpty()) {
       return servers.iterator().next();
     }
