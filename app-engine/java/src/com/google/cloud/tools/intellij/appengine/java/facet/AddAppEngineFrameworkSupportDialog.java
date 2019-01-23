@@ -17,8 +17,7 @@
 package com.google.cloud.tools.intellij.appengine.java.facet;
 
 import com.intellij.framework.addSupport.FrameworkSupportInModuleConfigurable;
-import com.intellij.openapi.application.Result;
-import com.intellij.openapi.application.WriteAction;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.IdeaModifiableModelsProvider;
@@ -61,16 +60,15 @@ public class AddAppEngineFrameworkSupportDialog extends DialogWrapper {
   @Override
   protected void doOKAction() {
     if (getOKAction().isEnabled()) {
-      new WriteAction() {
-
-        @Override
-        protected void run(@NotNull final Result result) {
-          ModifiableRootModel model = ModuleRootManager.getInstance(module).getModifiableModel();
-          IdeaModifiableModelsProvider modelsProvider = new IdeaModifiableModelsProvider();
-          moduleConfigurable.addSupport(module, model, modelsProvider);
-          model.commit();
-        }
-      }.execute();
+      ApplicationManager.getApplication()
+          .runWriteAction(
+              () -> {
+                ModifiableRootModel model =
+                    ModuleRootManager.getInstance(module).getModifiableModel();
+                IdeaModifiableModelsProvider modelsProvider = new IdeaModifiableModelsProvider();
+                moduleConfigurable.addSupport(module, model, modelsProvider);
+                model.commit();
+              });
     }
     super.doOKAction();
   }
