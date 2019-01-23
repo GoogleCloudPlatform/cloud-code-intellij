@@ -25,8 +25,8 @@ import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationType;
-import com.intellij.openapi.application.Result;
 import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xml.DomUtil;
@@ -47,6 +47,8 @@ import org.jetbrains.idea.maven.project.MavenProjectsManager;
 /** A helper class that adds dependencies of Cloud libraries to a given module. */
 // TODO (eshaul) refactor this into a mockable service with non-static methods
 public final class CloudLibraryDependencyWriter {
+
+  private static final Logger LOG = Logger.getInstance(CloudLibraryDependencyWriter.class);
 
   private static final NotificationGroup NOTIFICATION_GROUP =
       new NotificationGroup(
@@ -101,44 +103,55 @@ public final class CloudLibraryDependencyWriter {
       @NotNull Set<CloudLibrary> libraries, @NotNull Module module, @Nullable String bomVersion) {
     Project project = module.getProject();
     MavenProject mavenProject = MavenProjectsManager.getInstance(project).findProject(module);
-    MavenDomProjectModel model =
-        MavenDomUtil.getMavenDomProjectModel(project, mavenProject.getFile());
+    MavenDomProjectModel model;
+    if (mavenProject != null) {
+      model = MavenDomUtil.getMavenDomProjectModel(project, mavenProject.getFile());
+    } else {
+      LOG.warn(
+          "Expected mavenized module "
+              + module
+              + " to have an associated MavenProject, but null was found. Possibly due to a missing pom.xml file.");
+      notifyFailedDependencies(project);
+      return;
+    }
 
-    new WriteCommandAction(project, DomUtil.getFile(model)) {
-      @Override
-      protected void run(@NotNull Result result) {
-        List<MavenDomDependency> dependencies = model.getDependencies().getDependencies();
-        Map<Boolean, List<MavenId>> mavenIdsMap =
-            libraries
-                .stream()
-                .map(CloudLibraryUtils::getFirstJavaClientMavenCoordinates)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .map(MavenUtils::toMavenId)
-                .collect(
-                    Collectors.partitioningBy(
-                        mavenId -> MavenUtils.isMavenIdInDependencyList(mavenId, dependencies)));
+    WriteCommandAction.writeCommandAction(project, DomUtil.getFile(model))
+        .run(
+            () -> {
+              List<MavenDomDependency> dependencies = model.getDependencies().getDependencies();
+              Map<Boolean, List<MavenId>> mavenIdsMap =
+                  libraries
+                      .stream()
+                      .map(CloudLibraryUtils::getFirstJavaClientMavenCoordinates)
+                      .filter(Optional::isPresent)
+                      .map(Optional::get)
+                      .map(MavenUtils::toMavenId)
+                      .collect(
+                          Collectors.partitioningBy(
+                              mavenId ->
+                                  MavenUtils.isMavenIdInDependencyList(mavenId, dependencies)));
 
-        // The MavenIds in the "true" list are already in the pom.xml, so we don't duplicate them
-        // and warn the user that they weren't added.
-        List<MavenId> ignoredMavenIds = mavenIdsMap.get(true);
-        notifyIgnoredDependencies(ignoredMavenIds, project);
+              // The MavenIds in the "true" list are already in the pom.xml, so we don't duplicate
+              // them
+              // and warn the user that they weren't added.
+              List<MavenId> ignoredMavenIds = mavenIdsMap.get(true);
+              notifyIgnoredDependencies(ignoredMavenIds, project);
 
-        // The MavenIds in the "false" list are not in the pom.xml, so we add them and notify the
-        // user when it's complete.
-        List<MavenId> newMavenIds = mavenIdsMap.get(false);
-        if (!newMavenIds.isEmpty()) {
-          newMavenIds.forEach(
-              mavenId -> writeNewMavenDependency(model, mavenId, bomVersion != null));
+              // The MavenIds in the "false" list are not in the pom.xml, so we add them and notify
+              // the
+              // user when it's complete.
+              List<MavenId> newMavenIds = mavenIdsMap.get(false);
+              if (!newMavenIds.isEmpty()) {
+                newMavenIds.forEach(
+                    mavenId -> writeNewMavenDependency(model, mavenId, bomVersion != null));
 
-          if (bomVersion != null) {
-            addBomToMavenModule(module, model, bomVersion);
-          }
+                if (bomVersion != null) {
+                  addBomToMavenModule(module, model, bomVersion);
+                }
 
-          notifyAddedDependencies(newMavenIds, project);
-        }
-      }
-    }.execute();
+                notifyAddedDependencies(newMavenIds, project);
+              }
+            });
   }
 
   /**
@@ -265,6 +278,17 @@ public final class CloudLibraryDependencyWriter {
     Notification notification =
         NOTIFICATION_GROUP.createNotification(
             title, /* subtitle= */ null, message, NotificationType.INFORMATION);
+    notification.notify(project);
+  }
+
+  private static void notifyFailedDependencies(Project project) {
+    String title =
+        MavenCloudApisMessageBundle.message("cloud.libraries.depwriter.maven.failed.deps.title");
+    String message =
+        MavenCloudApisMessageBundle.message("cloud.libraries.depwriter.maven.failed.deps.message");
+    Notification notification =
+        NOTIFICATION_GROUP.createNotification(
+            title, /* subtitle= */ null, message, NotificationType.WARNING);
     notification.notify(project);
   }
 
