@@ -18,6 +18,8 @@ package com.google.cloud.tools.intellij.appengine.java.util;
 
 import static java.util.stream.Collectors.toList;
 
+import com.google.cloud.tools.intellij.appengine.java.facet.flexible.AppEngineFlexibleFacet;
+import com.google.cloud.tools.intellij.appengine.java.facet.standard.AppEngineStandardFacet;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.module.Module;
@@ -56,5 +58,19 @@ public class AppEngineUtil {
     return appEngineStandardArtifacts.size() == 1
         ? appEngineStandardArtifacts.iterator().next()
         : null;
+  }
+
+  /**
+   * Checks if the given module already has either App Engine Standard or Flexible facets.
+   *
+   * @param module project module.
+   * @return True of module has standard or flexible facets, false otherwise.
+   */
+  public static boolean isAnyAppEngineFacetAlreadyAdded(@NotNull Module module) {
+    AppEngineStandardFacet existingStandardFacet =
+        AppEngineStandardFacet.getAppEngineFacetByModule(module);
+    AppEngineFlexibleFacet existingFlexibleFacet = AppEngineFlexibleFacet.getFacetByModule(module);
+
+    return existingFlexibleFacet != null || existingStandardFacet != null;
   }
 }
