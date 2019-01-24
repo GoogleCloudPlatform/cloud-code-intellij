@@ -211,6 +211,27 @@ class BaseSkaffoldSettingsEditorTest {
 
     @Test
     @UiTest
+    fun `empty image repo override not saved to settings`() {
+        val skaffoldFile = MockVirtualFile.file("skaffold.yaml")
+        every { mockSkaffoldFileService.findSkaffoldFiles(any()) } returns listOf(skaffoldFile)
+        every { mockSkaffoldFileService.isSkaffoldFile(skaffoldFile) } returns true
+        baseSkaffoldSettingsEditor.resetFrom(mockSkaffoldSettings)
+        baseSkaffoldSettingsEditor.skaffoldFilesComboBox.setSelectedSkaffoldFile(skaffoldFile)
+
+        baseSkaffoldSettingsEditor.overrideImageRepoTextField.text = ""
+
+        // capture settings update
+        every {
+            mockSkaffoldSettings setProperty "imageRepositoryOverride" value any<String>()
+        } propertyType String::class answers {
+            assertThat(value).isNull()
+        }
+
+        baseSkaffoldSettingsEditor.applyTo(mockSkaffoldSettings)
+    }
+
+    @Test
+    @UiTest
     fun `given non-empty image repo resetFrom sets repo name in repo textfield`() {
         val skaffoldFile = MockVirtualFile.file("test.yaml")
         every { mockSkaffoldFileService.findSkaffoldFiles(any()) } returns listOf(skaffoldFile)
