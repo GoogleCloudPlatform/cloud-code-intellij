@@ -87,6 +87,9 @@ abstract class AbstractSkaffoldRunConfiguration(
 
     var skaffoldProfile: String? = null
 
+    /** Image repository to use with a Skaffold run target instead of one configured by default. */
+    var imageRepositoryOverride: String? = null
+
     override fun readExternal(element: Element) {
         super.readExternal(element)
 

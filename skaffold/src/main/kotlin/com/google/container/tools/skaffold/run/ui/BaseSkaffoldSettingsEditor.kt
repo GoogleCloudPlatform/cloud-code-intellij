@@ -24,7 +24,9 @@ import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.ui.TitledSeparator
 import com.intellij.ui.border.IdeaTitledBorder
+import com.intellij.ui.components.JBTextField
 import com.intellij.ui.layout.panel
 import com.intellij.util.ui.UIUtil
 import java.awt.Insets
@@ -52,6 +54,9 @@ open class BaseSkaffoldSettingsEditor<T : AbstractSkaffoldRunConfiguration>(
     @VisibleForTesting
     val skaffoldProfilesComboBox = SkaffoldProfilesComboBox()
 
+    @VisibleForTesting
+    val overrideImageRepoTextField = JBTextField()
+
     protected lateinit var basePanel: JPanel
 
     private val extensionComponents: MutableMap<String, JComponent> = mutableMapOf()
@@ -77,9 +82,18 @@ open class BaseSkaffoldSettingsEditor<T : AbstractSkaffoldRunConfiguration>(
             extensionComponents.forEach {
                 row(it.key) { it.value(grow) }
             }
+
+            row {
+                TitledSeparator(message("skaffold.image.options.subtitle"))(grow)
+            }
+            row(message("skaffold.override.image.repo")) { overrideImageRepoTextField(grow) }
         }
 
         basePanel.border = IdeaTitledBorder(editorTitle, 0, Insets(0, 0, 0, 0))
+
+        overrideImageRepoTextField.emptyText.text =
+            message("skaffold.override.image.repo.empty.prompt")
+        overrideImageRepoTextField.toolTipText = message("skaffold.override.image.repo.tooltip")
 
         skaffoldFilesComboBox.addActionListener {
             skaffoldProfilesComboBox.skaffoldFileUpdated(
@@ -102,6 +116,9 @@ open class BaseSkaffoldSettingsEditor<T : AbstractSkaffoldRunConfiguration>(
         // save properties
         runConfig.skaffoldConfigurationFilePath = selectedSkaffoldFile.path
         runConfig.skaffoldProfile = skaffoldProfilesComboBox.getSelectedProfile()
+        // do not save empty repository name, convert to null
+        runConfig.imageRepositoryOverride =
+            overrideImageRepoTextField.text.let { if (it.isEmpty()) null else it }
     }
 
     override fun resetEditorFrom(runConfig: T) {
@@ -114,6 +131,10 @@ open class BaseSkaffoldSettingsEditor<T : AbstractSkaffoldRunConfiguration>(
 
         runConfig.skaffoldProfile?.let {
             skaffoldProfilesComboBox.setSelectedProfile(it)
+        }
+
+        runConfig.imageRepositoryOverride?.let {
+            overrideImageRepoTextField.text = it
         }
     }
 }

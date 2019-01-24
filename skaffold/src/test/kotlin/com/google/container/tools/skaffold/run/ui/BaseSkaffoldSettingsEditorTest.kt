@@ -187,4 +187,44 @@ class BaseSkaffoldSettingsEditorTest {
         assertThat(baseSkaffoldSettingsEditor.skaffoldProfilesComboBox.getSelectedProfile())
             .isEqualTo("gcb")
     }
+
+    @Test
+    @UiTest
+    fun `given non-empty image repo override applyTo successfully saves settings`() {
+        val skaffoldFile = MockVirtualFile.file("skaffold.yaml")
+        every { mockSkaffoldFileService.findSkaffoldFiles(any()) } returns listOf(skaffoldFile)
+        every { mockSkaffoldFileService.isSkaffoldFile(skaffoldFile) } returns true
+        baseSkaffoldSettingsEditor.resetFrom(mockSkaffoldSettings)
+        baseSkaffoldSettingsEditor.skaffoldFilesComboBox.setSelectedSkaffoldFile(skaffoldFile)
+
+        baseSkaffoldSettingsEditor.overrideImageRepoTextField.text = "gcr.io/test-project"
+
+        // capture settings update
+        every {
+            mockSkaffoldSettings setProperty "imageRepositoryOverride" value any<String>()
+        } propertyType String::class answers {
+            assertThat(value).isEqualTo("gcr.io/test-project")
+        }
+
+        baseSkaffoldSettingsEditor.applyTo(mockSkaffoldSettings)
+    }
+
+    @Test
+    @UiTest
+    fun `given non-empty image repo resetFrom sets repo name in repo textfield`() {
+        val skaffoldFile = MockVirtualFile.file("test.yaml")
+        every { mockSkaffoldFileService.findSkaffoldFiles(any()) } returns listOf(skaffoldFile)
+        every { mockSkaffoldFileService.isSkaffoldFile(skaffoldFile) } returns true
+        every {
+            mockSkaffoldSettings.skaffoldConfigurationFilePath
+        } answers { skaffoldFile.path }
+        every { mockSkaffoldSettings.imageRepositoryOverride } answers { "docker.io/me" }
+
+        baseSkaffoldSettingsEditor.resetFrom(mockSkaffoldSettings)
+
+        assertThat(
+            baseSkaffoldSettingsEditor.overrideImageRepoTextField.text
+        )
+            .isEqualTo("docker.io/me")
+    }
 }
