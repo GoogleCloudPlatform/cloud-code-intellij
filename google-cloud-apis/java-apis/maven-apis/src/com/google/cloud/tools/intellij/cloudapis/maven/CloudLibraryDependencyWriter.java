@@ -107,10 +107,13 @@ public final class CloudLibraryDependencyWriter {
     if (mavenProject != null) {
       model = MavenDomUtil.getMavenDomProjectModel(project, mavenProject.getFile());
     } else {
-      LOG.warn(
-          "Expected mavenized module "
-              + module
-              + " to have an associated MavenProject, but null was found. Possibly due to a missing pom.xml file.");
+      LOG.warn("Null MavenProject found. Possibly due to a missing pom.xml file.");
+      notifyFailedDependencies(project);
+      return;
+    }
+
+    if (model == null) {
+      LOG.warn("Null MavenDomProjectModel found. Possibly due to an empty pom.xml file.");
       notifyFailedDependencies(project);
       return;
     }
