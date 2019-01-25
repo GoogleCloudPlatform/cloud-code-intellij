@@ -113,7 +113,8 @@ public final class CloudLibraryDependencyWriter {
     }
 
     if (model == null) {
-      LOG.warn("Null MavenDomProjectModel found. Possibly due to an empty pom.xml file.");
+      LOG.warn(
+          "Null MavenDomProjectModel found. Possibly due to an empty or malformed pom.xml file.");
       notifyFailedDependencies(project);
       return;
     }
