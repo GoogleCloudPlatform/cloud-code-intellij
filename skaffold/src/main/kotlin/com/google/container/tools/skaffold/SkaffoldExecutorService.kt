@@ -77,6 +77,11 @@ abstract class SkaffoldExecutorService {
             settings.tailLogsAfterDeploy?.let { tailLogs ->
                 if (tailLogs) add("--tail")
             }
+
+            settings.defaultImageRepo?.let {
+                add("--default-repo")
+                add(it)
+            }
         }
 
         try {
@@ -133,6 +138,8 @@ abstract class SkaffoldExecutorService {
  * @property workingDirectory Optional, working directory where Skaffold needs to be launched.
  *           This is usually set to project working directory.
  * @property skaffoldLabels Kubernetes style labels to pass to Skaffold execution.
+ * @property defaultImageRepo Default image repository to use instead of repo defined in Skaffold
+ *           and Kubernetes manifests.
  */
 data class SkaffoldExecutorSettings(
     val executionMode: ExecutionMode,
@@ -140,7 +147,8 @@ data class SkaffoldExecutorSettings(
     val skaffoldProfile: String? = null,
     val workingDirectory: File? = null,
     val skaffoldLabels: SkaffoldLabels? = null,
-    val tailLogsAfterDeploy: Boolean? = null
+    val tailLogsAfterDeploy: Boolean? = null,
+    val defaultImageRepo: String? = null
 ) {
 
     /** Execution mode for Skaffold, single run, continuous development, etc. */

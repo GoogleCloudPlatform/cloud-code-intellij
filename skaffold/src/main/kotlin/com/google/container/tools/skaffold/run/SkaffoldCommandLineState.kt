@@ -78,7 +78,8 @@ class SkaffoldCommandLineState(
                 skaffoldProfile = runConfiguration.skaffoldProfile,
                 workingDirectory = File(projectBaseDir.path),
                 skaffoldLabels = SkaffoldLabels.defaultLabels,
-                tailLogsAfterDeploy = singleRunConfiguration?.tailDeploymentLogs
+                tailLogsAfterDeploy = singleRunConfiguration?.tailDeploymentLogs,
+                defaultImageRepo = runConfiguration.imageRepositoryOverride
             )
         )
 

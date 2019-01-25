@@ -180,8 +180,10 @@ class DefaultSkaffoldExecutorServiceTest {
             )
         )
 
-        assertThat(result.commandLine).isEqualTo("skaffold dev --filename profiles.yaml " +
-            "--profile cloudBuild")
+        assertThat(result.commandLine).isEqualTo(
+            "skaffold dev --filename profiles.yaml " +
+                "--profile cloudBuild"
+        )
     }
 
     @Test
@@ -195,5 +197,33 @@ class DefaultSkaffoldExecutorServiceTest {
         )
 
         assertThat(result.commandLine).isEqualTo("skaffold run --filename test.yaml")
+    }
+
+    @Test
+    fun `added default image repo name generates valid command line`() {
+        val result = defaultSkaffoldExecutorService.executeSkaffold(
+            SkaffoldExecutorSettings(
+                SkaffoldExecutorSettings.ExecutionMode.DEV,
+                skaffoldConfigurationFilePath = "skaffold.yaml",
+                defaultImageRepo = "gcr.io/k8s-tests"
+            )
+        )
+
+        assertThat(result.commandLine).isEqualTo(
+            "skaffold dev --filename skaffold.yaml " +
+                "--default-repo gcr.io/k8s-tests"
+        )
+    }
+
+    @Test
+    fun `null default image repo name generates valid command line without repo override`() {
+        val result = defaultSkaffoldExecutorService.executeSkaffold(
+            SkaffoldExecutorSettings(
+                SkaffoldExecutorSettings.ExecutionMode.DEV,
+                skaffoldConfigurationFilePath = "test.yaml"
+            )
+        )
+
+        assertThat(result.commandLine).isEqualTo("skaffold dev --filename test.yaml")
     }
 }
