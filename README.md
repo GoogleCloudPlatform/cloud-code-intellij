@@ -27,7 +27,19 @@ This plugin uses familiar Kubernetes and container tools to bring you a rich Kub
 
 ## Installing the plugin into your IDE
 
-(coming soon)
+If you'd like to try out the plugin pre-release, you can build it from source and install it into your IDE:
+
+1) Clone this repository to your machine:<br />
+   `git clone git@github.com:GoogleContainerTools/google-container-tools-intellij.git`
+2) Build the plugin from the root of the repository:<br />
+   `./gradlew buildPlugin`
+3) Find the `.zip` binary in the root of the repository under: <br />
+   `build/distributions/google-container-tools-intellij.zip`
+4) Install the plugin into your JetBrains IDE:
+   1) Go to `Preferences/Settings > Plugins`
+   2) Select the settings gear icon and then `Install Plugin From Disk`:
+      <img src="docs/images/plugin-manual-install.png" alt="manual-install" width="500"/> 
+   3) Select the zip from `step 3`
 
 ## Getting started
 
