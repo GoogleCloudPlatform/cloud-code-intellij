@@ -24,6 +24,7 @@ import com.google.container.tools.skaffold.run.AbstractSkaffoldRunConfiguration
 import com.google.container.tools.skaffold.run.SkaffoldDevConfigurationFactory
 import com.google.container.tools.skaffold.run.SkaffoldRunConfigurationType
 import com.google.container.tools.skaffold.run.SkaffoldSingleRunConfigurationFactory
+import com.intellij.ProjectTopics
 import com.intellij.execution.RunManager
 import com.intellij.execution.configurations.ConfigurationFactory
 import com.intellij.execution.configurations.ConfigurationTypeUtil
@@ -35,7 +36,9 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.DumbService
+import com.intellij.openapi.project.ModuleListener
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileEvent
@@ -69,15 +72,19 @@ class SkaffoldConfigurationDetector(val project: Project) : ProjectComponent {
         // on project open there may be a lot of indexing and other preparation and files still
         // not available, wait for "smart" mode for configuration identification
         DumbService.getInstance(project).runWhenSmart {
-            val skaffoldFiles: List<VirtualFile> =
-                SkaffoldFileService.instance.findSkaffoldFiles(project)
-            if (skaffoldFiles.isNotEmpty()) {
-                if (!hasExistingSkaffoldConfigurations()) {
-                    // existing Skaffold config files, but no skaffold configurations, prompt
-                    showPromptForSkaffoldConfigurations(project, skaffoldFiles[0])
+            checkSkaffoldConfigurationsNeeded()
+        }
+
+        // when a project is initialized from external build system for the first time (i.e. Maven),
+        // modules are not available immediately. Use message bus to check for modules once they are
+        // actually available
+        project.messageBus.connect().subscribe(ProjectTopics.MODULES, object : ModuleListener {
+            override fun moduleAdded(project: Project, module: Module) {
+                DumbService.getInstance(project).runWhenSmart {
+                    checkSkaffoldConfigurationsNeeded()
                 }
             }
-        }
+        })
 
         // add VFS listener to ensure we track YAML file changes when no Skaffold configurations
         // exist yet to show prompt for configurations once Skaffold file is created.
@@ -104,6 +111,21 @@ class SkaffoldConfigurationDetector(val project: Project) : ProjectComponent {
                 }
             }
         })
+    }
+
+    /**
+     * Lists existing skaffold configuration files and in case no run configuration targets for
+     * Skaffold exist, prompts to create them with pop-up notification.
+     */
+    private fun checkSkaffoldConfigurationsNeeded() {
+        val skaffoldFiles: List<VirtualFile> =
+            SkaffoldFileService.instance.findSkaffoldFiles(project)
+        if (skaffoldFiles.isNotEmpty()) {
+            if (!hasExistingSkaffoldConfigurations()) {
+                // existing Skaffold config files, but no skaffold configurations, prompt
+                showPromptForSkaffoldConfigurations(project, skaffoldFiles[0])
+            }
+        }
     }
 
     /**
