@@ -65,16 +65,19 @@ class ProjectLoader {
         allProjects.addAll(response.getProjects());
       }
 
-      allProjects
-          .stream()
+      allProjects.stream()
           // Filter out any projects that are scheduled for deletion.
           .filter((project) -> !PROJECT_DELETE_REQUESTED.equals(project.getLifecycleState()))
+          // without valid user ID
           .filter((project) -> !Strings.isNullOrEmpty(project.getProjectId()))
+          // replace null names with empty ones for UI/sorting purposes
+          .map((project) -> project.setName(Strings.nullToEmpty(project.getName())))
           // Add remaining projects to the set.
           .forEach(result::add);
 
       // sort the projects list by project name. project names are not unique.
-      result.sort(Comparator.comparing(project -> project.getName().toLowerCase()));
+      result.sort(
+          Comparator.comparing(project -> Strings.nullToEmpty(project.getName()).toLowerCase()));
     }
 
     return result;
