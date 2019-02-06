@@ -76,8 +76,7 @@ class ProjectLoader {
           .forEach(result::add);
 
       // sort the projects list by project name. project names are not unique.
-      result.sort(
-          Comparator.comparing(project -> Strings.nullToEmpty(project.getName()).toLowerCase()));
+      result.sort(Comparator.comparing(project -> project.getName().toLowerCase()));
     }
 
     return result;
