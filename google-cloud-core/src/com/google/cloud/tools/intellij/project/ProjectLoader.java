@@ -69,7 +69,10 @@ class ProjectLoader {
           .stream()
           // Filter out any projects that are scheduled for deletion.
           .filter((project) -> !PROJECT_DELETE_REQUESTED.equals(project.getLifecycleState()))
+          // without valid user ID
           .filter((project) -> !Strings.isNullOrEmpty(project.getProjectId()))
+          // replace null names with empty ones for UI/sorting purposes
+          .map((project) -> project.setName(Strings.nullToEmpty(project.getName())))
           // Add remaining projects to the set.
           .forEach(result::add);
 
