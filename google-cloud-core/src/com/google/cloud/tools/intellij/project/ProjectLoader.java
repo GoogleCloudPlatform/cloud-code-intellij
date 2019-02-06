@@ -65,7 +65,8 @@ class ProjectLoader {
         allProjects.addAll(response.getProjects());
       }
 
-      allProjects.stream()
+      allProjects
+          .stream()
           // Filter out any projects that are scheduled for deletion.
           .filter((project) -> !PROJECT_DELETE_REQUESTED.equals(project.getLifecycleState()))
           // without valid user ID
