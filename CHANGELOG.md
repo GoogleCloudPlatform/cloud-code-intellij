@@ -3,8 +3,8 @@ This page documents production updates to Cloud Tools for IntelliJ. You can chec
 
 ## 19.2.1
 
- - Miscellanous bug fixes [2328](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2328) [2329](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2329) [2330](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2330) [2331](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2331)
- - Fixes project selection when a malformed project with no name set is present [2334](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2334)
+ - Miscellanous bug fixes [2292](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2292) [2326](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2326) [2320](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2320)
+ - Fixes project selection when a malformed project with no name set is present [2332](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2332)
 
 ## 19.1.2
 
