@@ -1,4 +1,4 @@
-# Example
+# Examples
 
 This directory contains example projects for the [JetBrains family of IDEs](https://www.jetbrains.com/products.html) that demonstrate how to work with the plugin and use it to deploy and develop on Kubernetes.
 
