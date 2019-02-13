@@ -9,6 +9,19 @@ This plugin adds support for [Kubernetes](https://www.kubernetes.io) development
 
 **Note**: This plugin is still in development.
 
+# Table Of Contents
+
+ * [Features](#features)
+  * [Prerequisites and required dependencies](#prerequisites-and-required-dependencies)
+  * [Installing the plugin into your IDE](#installing-the-plugin-into-your-ide)
+  * [Getting started](#getting-started)
+     * [Specifying image repository](#specifying-image-repository)
+     * [Continuous development on Kubernetes](#continuous-development-on-kubernetes)
+        * [Adding new features](#adding-new-features)
+     * [Deployment to Kubernetes](#deployment-to-kubernetes)
+  * [Setup existing Kubernetes projects with the plugin](#setup-existing-kubernetes-projects-with-the-plugin)
+
+
 ## Features
 
 * One click **deployment to Kubernetes clusters right from your IDE** using [Skaffold](https://skaffold.dev/docs/getting-started/). Configure Skaffold to use your desired build and deployment strategies: works with kubectl, Helm, Google Cloud Build (for remote builds), Jib and Kanico.
