@@ -56,7 +56,7 @@ Open the `hello-spring-boot` example from `google-container-tools/examples` dire
 
 <img src="docs/images/sb-hello-world-project.png" alt="opened Spring Boot hello world project" width="500"/> 
 
-This project is a very simple web application created with [the popular Spring Boot framework](https://spring.io/projects/spring-boot). It uses the [Jib Maven plugin](https://github.com/GoogleContainerTools/jib) to build a container image for the project, without needing to create a Dockerfile.
+This project is a simple web application created with [the popular Spring Boot framework](https://spring.io/projects/spring-boot). It uses the [Jib Maven plugin](https://github.com/GoogleContainerTools/jib) to build a container image for the project, without needing to create a Dockerfile.
 
 Once the project loads, the plugin will detect the Skaffold configuration and prompt to create the Kubernetes targets. The notification shows:
 
