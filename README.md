@@ -11,8 +11,8 @@ This plugin adds support for [Kubernetes](https://www.kubernetes.io) development
 
 ## Features
 
-* One click deployment to Kubernetes clusters right from your IDE using [Skaffold](https://skaffold.dev/docs/getting-started/). Configure Skaffold to use your desired build and deployment strategies: works with kubectl, Helm, Google Cloud Build (for remote builds), Jib and Kanico.
-* Continuous development on Kubernetes. Watches the dependencies of your docker image or Jib Java project for changes, so that on any change, Skaffold builds and deploys your application to a Kubernetes cluster.
+* One click **deployment to Kubernetes clusters right from your IDE** using [Skaffold](https://skaffold.dev/docs/getting-started/). Configure Skaffold to use your desired build and deployment strategies: works with kubectl, Helm, Google Cloud Build (for remote builds), Jib and Kanico.
+* **Continuous development on Kubernetes**. Watches the dependencies of your docker image or Jib Java project for changes, so that on any change, Skaffold builds and deploys your application to a Kubernetes cluster.
 * Automatic discovery and support for project with existing Skaffold configuration, in any language supported by your preferred JetBrains IDE.
 * Initial support for Skaffold configuration file editing and smart templates.
 
