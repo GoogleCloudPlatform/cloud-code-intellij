@@ -63,7 +63,6 @@ dependencies {
     compile(project(':google-container-tools-intellij:core'))
     compile(project(':google-container-tools-intellij:skaffold'))
     compile(project(':google-container-tools-intellij:skaffold-editing'))
-    compile(project(':google-container-tools-intellij:common-test-lib')) // remove this
 
     compile 'com.google.protobuf:protobuf-java:2.5.0'
     compile 'com.google.apis:google-api-services-clouddebugger:v2-rev7-1.21.0'
@@ -81,6 +80,7 @@ dependencies {
     apt         'com.google.auto.value:auto-value:1.4.1'
 
     testCompile(project(':common-test-lib'))
+    testCompile(project(':google-container-tools-intellij:common-test-lib'))
     testCompile project(':stackdriver-debugger')
     testRuntime files('google-account/lib/google-gct-login-context-ij-pg.jar')
 }

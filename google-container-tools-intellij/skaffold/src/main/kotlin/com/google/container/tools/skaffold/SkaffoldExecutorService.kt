@@ -19,7 +19,11 @@ package com.google.container.tools.skaffold
 import com.google.cloud.tools.intellij.analytics.UsageTrackerService
 import com.google.common.annotations.VisibleForTesting
 import com.google.container.tools.skaffold.SkaffoldExecutorSettings.ExecutionMode
-import com.google.container.tools.skaffold.metrics.*
+import com.google.container.tools.skaffold.metrics.METADATA_ERROR_MESSAGE_KEY
+import com.google.container.tools.skaffold.metrics.SKAFFOLD_DEV_RUN_FAIL
+import com.google.container.tools.skaffold.metrics.SKAFFOLD_DEV_RUN_SUCCESS
+import com.google.container.tools.skaffold.metrics.SKAFFOLD_SINGLE_RUN_FAIL
+import com.google.container.tools.skaffold.metrics.SKAFFOLD_SINGLE_RUN_SUCCESS
 import com.intellij.openapi.components.ServiceManager
 import java.io.File
 import java.nio.file.Path

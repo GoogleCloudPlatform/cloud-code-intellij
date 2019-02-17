@@ -17,5 +17,5 @@
 dependencies {
     compile(project(":google-cloud-core"))
     compile(project(":google-container-tools-intellij:core"))
-    testCompile(project(":common-test-lib"))
+    testCompile(project(":google-container-tools-intellij:common-test-lib"))
 }
