@@ -1,0 +1,50 @@
+<!--
+  ~ Copyright 2018 Google Inc. All Rights Reserved.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!-- Core IJ plugin manifest that contains all sub-module declarations -->
+<idea-plugin xmlns:xi="http://www.w3.org/2001/XInclude">
+    <id>google-container-tools</id>
+    <name>Google Container Tools</name>
+    <vendor>Google</vendor>
+    <description>
+    <![CDATA[<html>
+      <p>Google Container Tools</p>
+      <p>Under development - coming soon!</p>
+    </html>]]>
+    </description>
+
+    <!-- "idea-version since-build" set to cover 2017.1 - 2018.3 -->
+    <!-- Set manually because the gradle-intellij-plugin cannot span across major release versions -->
+    <idea-version since-build="182.0" until-build="183.*"/>
+
+    <depends>com.intellij.modules.lang</depends>
+
+    <xi:include href="/META-INF/core.xml" xpointer="xpointer(/idea-plugin/*)"/>
+    <xi:include href="/META-INF/skaffold.xml" xpointer="xpointer(/idea-plugin/*)"/>
+    <xi:include href="/META-INF/skaffold-editing.xml" xpointer="xpointer(/idea-plugin/*)"/>
+
+    <application-components>
+        <component>
+            <implementation-class>com.google.container.tools.init.PluginInitComponent</implementation-class>
+        </component>
+    </application-components>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <errorHandler
+                implementation="com.google.container.tools.diagnostics.GoogleFeedbackErrorReporter"/>
+    </extensions>
+
+</idea-plugin>

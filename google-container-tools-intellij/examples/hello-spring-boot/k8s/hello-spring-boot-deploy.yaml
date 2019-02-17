@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-spring-boot
+spec:
+  selector:
+    matchLabels:
+      app: hello-spring-boot
+  template:
+    metadata:
+      labels:
+        app: hello-spring-boot
+    spec:
+      containers:
+        - name: hello-spring-boot
+          image: gcr.io/gcp-dev-tools/hello-spring-boot
+          ports:
+            - containerPort: 8080
