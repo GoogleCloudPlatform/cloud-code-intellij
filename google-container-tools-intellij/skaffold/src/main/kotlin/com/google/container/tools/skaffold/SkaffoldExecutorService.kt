@@ -16,14 +16,10 @@
 
 package com.google.container.tools.skaffold
 
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService
 import com.google.common.annotations.VisibleForTesting
-import com.google.container.tools.core.analytics.UsageTrackerProvider
 import com.google.container.tools.skaffold.SkaffoldExecutorSettings.ExecutionMode
-import com.google.container.tools.skaffold.metrics.METADATA_ERROR_MESSAGE_KEY
-import com.google.container.tools.skaffold.metrics.SKAFFOLD_DEV_RUN_FAIL
-import com.google.container.tools.skaffold.metrics.SKAFFOLD_DEV_RUN_SUCCESS
-import com.google.container.tools.skaffold.metrics.SKAFFOLD_SINGLE_RUN_FAIL
-import com.google.container.tools.skaffold.metrics.SKAFFOLD_SINGLE_RUN_SUCCESS
+import com.google.container.tools.skaffold.metrics.*
 import com.intellij.openapi.components.ServiceManager
 import java.io.File
 import java.nio.file.Path
@@ -96,7 +92,7 @@ abstract class SkaffoldExecutorService {
                     SKAFFOLD_DEV_RUN_SUCCESS
                 else
                     SKAFFOLD_SINGLE_RUN_SUCCESS
-            UsageTrackerProvider.instance.usageTracker.trackEvent(skaffoldEventName).ping()
+            UsageTrackerService.getInstance().trackEvent(skaffoldEventName).ping()
 
             return skaffoldProcess
         } catch (e: Exception) {
@@ -106,7 +102,7 @@ abstract class SkaffoldExecutorService {
                 else
                     SKAFFOLD_SINGLE_RUN_FAIL
 
-            UsageTrackerProvider.instance.usageTracker.trackEvent(skaffoldFailEventName)
+            UsageTrackerService.getInstance().trackEvent(skaffoldFailEventName)
                 .addMetadata(
                     METADATA_ERROR_MESSAGE_KEY, e.javaClass.name
                 ).ping()

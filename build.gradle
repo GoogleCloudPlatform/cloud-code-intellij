@@ -28,7 +28,9 @@ buildscript {
 plugins {
     id 'net.researchgate.release' version '2.6.0'
     id "org.jetbrains.intellij" version "0.3.12" apply false
-    id "com.diffplug.gradle.spotless" version "3.6.0" apply false
+    id "com.diffplug.gradle.spotless" version "3.14.0" apply false
+
+    id "org.jetbrains.kotlin.jvm" version "1.3.21"
 }
 
 subprojects {
@@ -40,6 +42,7 @@ subprojects {
         }
     }
 
+    apply plugin: 'kotlin'
     apply plugin: 'java'
     sourceCompatibility = javaVersion
     targetCompatibility = javaVersion
@@ -152,9 +155,9 @@ subprojects {
     }
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
-}
+//task clean(type: Delete) {
+//    delete rootProject.buildDir
+//}
 
 release {
     buildTasks = ['doRelease']

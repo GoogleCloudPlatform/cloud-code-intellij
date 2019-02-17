@@ -16,7 +16,7 @@
 
 package com.google.container.tools.skaffold
 
-import com.google.container.tools.core.analytics.UsageTrackerProvider
+import com.google.cloud.tools.intellij.analytics.UsageTrackerService
 import com.google.container.tools.skaffold.metrics.SKAFFOLD_DEV_CONFIGURATION_ADDED
 import com.google.container.tools.skaffold.metrics.SKAFFOLD_SINGLE_RUN_CONFIGURATION_ADDED
 import com.google.container.tools.skaffold.run.SkaffoldDevConfiguration
@@ -37,12 +37,12 @@ class SkaffoldConfigurationRunManagerListener(val project: Project) : ProjectCom
             object : RunManagerListener {
                 override fun runConfigurationAdded(settings: RunnerAndConfigurationSettings) {
                     if (settings.configuration is SkaffoldDevConfiguration) {
-                        UsageTrackerProvider.instance.usageTracker.trackEvent(
+                        UsageTrackerService.getInstance().trackEvent(
                             SKAFFOLD_DEV_CONFIGURATION_ADDED
                         ).ping()
                     }
                     if (settings.configuration is SkaffoldSingleRunConfiguration) {
-                        UsageTrackerProvider.instance.usageTracker.trackEvent(
+                        UsageTrackerService.getInstance().trackEvent(
                             SKAFFOLD_SINGLE_RUN_CONFIGURATION_ADDED
                         ).ping()
                     }

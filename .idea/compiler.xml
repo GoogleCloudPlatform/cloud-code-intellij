@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <option name="DEFAULT_COMPILER" value="error-prone" />
     <wildcardResourcePatterns>
       <entry name="!?*.java" />
       <entry name="!?*.form" />
@@ -21,6 +20,8 @@
       <module name="common-lib_test" target="1.8" />
       <module name="common-test-lib_main" target="1.8" />
       <module name="common-test-lib_test" target="1.8" />
+      <module name="core_main" target="1.8" />
+      <module name="core_test" target="1.8" />
       <module name="google-account_main" target="1.8" />
       <module name="google-account_test" target="1.8" />
       <module name="google-cloud-apis_main" target="1.8" />
@@ -33,6 +34,8 @@
       <module name="google-cloud-intellij-app-engine-java_test" target="1.8" />
       <module name="google-cloud-intellij-app-engine_main" target="1.8" />
       <module name="google-cloud-intellij-app-engine_test" target="1.8" />
+      <module name="google-cloud-intellij-common-test-lib_main" target="1.8" />
+      <module name="google-cloud-intellij-common-test-lib_test" target="1.8" />
       <module name="google-cloud-intellij-google-cloud-apis_main" target="1.8" />
       <module name="google-cloud-intellij-google-cloud-apis_test" target="1.8" />
       <module name="google-cloud-intellij-google-cloud-core_main" target="1.8" />
@@ -43,6 +46,8 @@
       <module name="google-cloud-intellij-google-cloud-storage_test" target="1.8" />
       <module name="google-cloud-intellij-stackdriver-debugger_main" target="1.8" />
       <module name="google-cloud-intellij-stackdriver-debugger_test" target="1.8" />
+      <module name="google-cloud-intellij_main" target="1.8" />
+      <module name="google-cloud-intellij_test" target="1.8" />
       <module name="google-cloud-repos_main" target="1.8" />
       <module name="google-cloud-repos_test" target="1.8" />
       <module name="google-cloud-sdk_main" target="1.8" />
@@ -57,6 +62,10 @@
       <module name="google-cloud-tools-plugin-ultimate_test" target="1.8" />
       <module name="google-cloud-tools-plugin_main" target="1.8" />
       <module name="google-cloud-tools-plugin_test" target="1.8" />
+      <module name="google-container-tools-intellij-common-test-lib_main" target="1.8" />
+      <module name="google-container-tools-intellij-common-test-lib_test" target="1.8" />
+      <module name="google-container-tools-intellij_main" target="1.8" />
+      <module name="google-container-tools-intellij_test" target="1.8" />
       <module name="gradle_main" target="1.8" />
       <module name="gradle_test" target="1.8" />
       <module name="java-apis_main" target="1.8" />
@@ -69,6 +78,10 @@
       <module name="maven-apis_test" target="1.8" />
       <module name="maven_main" target="1.8" />
       <module name="maven_test" target="1.8" />
+      <module name="skaffold-editing_main" target="1.8" />
+      <module name="skaffold-editing_test" target="1.8" />
+      <module name="skaffold_main" target="1.8" />
+      <module name="skaffold_test" target="1.8" />
       <module name="stackdriver-debugger_main" target="1.8" />
       <module name="stackdriver-debugger_test" target="1.8" />
       <module name="ultimate_main" target="1.8" />
