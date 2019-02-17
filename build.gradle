@@ -116,6 +116,17 @@ subprojects {
         java {
             googleJavaFormat('1.5')
         }
+
+        kotlin {
+            target("**/src/**/*.kt")
+            // Set ktlint to follow the Android Style Guide for source files
+            ktlint().userData("android" : "true")
+        }
+
+        kotlinGradle {
+            target("**/*.gradle.kts")
+            ktlint()
+        }
     }
 
     apply plugin: 'checkstyle'

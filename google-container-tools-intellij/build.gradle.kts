@@ -31,19 +31,6 @@ allprojects {
             exclude(group = "org.jetbrains.kotlin", module = "kotlin-reflect")
         }
     }
-
-    spotless {
-        kotlin {
-            target("**/src/**/*.kt")
-            // Set ktlint to follow the Android Style Guide for source files
-            ktlint().userData(mapOf("android" to "true"))
-        }
-
-        kotlinGradle {
-            target("**/*.gradle.kts")
-            ktlint()
-        }
-    }
 }
 
 dependencies {
