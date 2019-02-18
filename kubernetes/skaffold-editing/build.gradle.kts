@@ -15,5 +15,5 @@
  */
 
 dependencies {
-    testCompile(project(":google-container-tools-intellij:common-test-lib"))
+    testCompile(project(":kubernetes:common-test-lib"))
 }

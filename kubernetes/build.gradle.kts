@@ -34,11 +34,11 @@ allprojects {
 }
 
 dependencies {
-    compile(project(":google-container-tools-intellij:core"))
+    compile(project(":kubernetes:core"))
 
     compile("com.google.protobuf:protobuf-java:2.5.0")
 
-    testCompile(project(":google-container-tools-intellij:common-test-lib"))
+    testCompile(project(":kubernetes:common-test-lib"))
 }
 
 inline operator fun <T : Task> T.invoke(a: T.() -> Unit): T = apply(a)

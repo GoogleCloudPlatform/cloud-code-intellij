@@ -62,10 +62,6 @@
       <module name="google-cloud-tools-plugin-ultimate_test" target="1.8" />
       <module name="google-cloud-tools-plugin_main" target="1.8" />
       <module name="google-cloud-tools-plugin_test" target="1.8" />
-      <module name="google-container-tools-intellij-common-test-lib_main" target="1.8" />
-      <module name="google-container-tools-intellij-common-test-lib_test" target="1.8" />
-      <module name="google-container-tools-intellij_main" target="1.8" />
-      <module name="google-container-tools-intellij_test" target="1.8" />
       <module name="gradle_main" target="1.8" />
       <module name="gradle_test" target="1.8" />
       <module name="java-apis_main" target="1.8" />
@@ -74,6 +70,10 @@
       <module name="java-ultimate_test" target="1.8" />
       <module name="java_main" target="1.8" />
       <module name="java_test" target="1.8" />
+      <module name="kubernetes-common-test-lib_main" target="1.8" />
+      <module name="kubernetes-common-test-lib_test" target="1.8" />
+      <module name="kubernetes_main" target="1.8" />
+      <module name="kubernetes_test" target="1.8" />
       <module name="maven-apis_main" target="1.8" />
       <module name="maven-apis_test" target="1.8" />
       <module name="maven_main" target="1.8" />
