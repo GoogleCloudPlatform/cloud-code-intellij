@@ -1,13 +1,8 @@
-[![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)
-![Build Status](https://storage.googleapis.com/cloud-tools-for-java-kokoro-build-badges/container-tools-ubuntu-master-orb.svg)
-![Build Status](https://storage.googleapis.com/cloud-tools-for-java-kokoro-build-badges/container-tools-windows-master-orb.svg)
-![Build Status](https://storage.googleapis.com/cloud-tools-for-java-kokoro-build-badges/container-tools-macos-master-orb.svg)
-
-# Google Container Tools for IntelliJ
+# Kubernetes
 
 This plugin adds support for [Kubernetes](https://www.kubernetes.io) development into the [JetBrains family of IDEs](https://www.jetbrains.com/products.html), including IntelliJ (both Community and Ultimate editions), GoLand, PyCharm, WebStorm (and others).
 
-**Note**: This plugin is still in development.
+**Note**: This feature is still under development.
 
 # Table Of Contents
 
@@ -40,19 +35,12 @@ This plugin uses familiar Kubernetes and container tools to bring you a rich Kub
 
 ## Installing the plugin into your IDE
 
-If you'd like to try out the plugin pre-release, you can build it from source and install it into your IDE:
+If you'd like to try out the Kubernetes features, you can install the nightly release:
 
-1) Clone this repository to your machine:<br />
-   `git clone git@github.com:GoogleContainerTools/google-container-tools-intellij.git`
-2) Build the plugin from the root of the repository:<br />
-   `./gradlew buildPlugin`
-3) Find the `.zip` binary in the root of the repository under: <br />
-   `build/distributions/google-container-tools-intellij.zip`
-4) Install the plugin into your JetBrains IDE:
-   1) Go to `Preferences/Settings > Plugins`
-   2) Select the settings gear icon and then `Install Plugin From Disk`:
-      <img src="docs/images/plugin-manual-install.png" alt="manual-install" width="500"/> 
-   3) Select the zip from `step 3`
+1) Copy this URL:<br />
+   `https://plugins.jetbrains.com/plugins/alpha/8079`
+2) Use the copied URL to add a Custom Plugin URL, following [these instructions](https://www.jetbrains.com/idea/help/managing-enterprise-plugin-repositories.html)
+3) Search for the `Google Cloud Tools` plugin and install it
 
 ## Getting started
 
