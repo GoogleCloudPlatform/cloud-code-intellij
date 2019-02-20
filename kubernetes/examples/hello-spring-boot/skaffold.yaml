@@ -1,0 +1,12 @@
+apiVersion: skaffold/v1beta4
+kind: Config
+build:
+  artifacts:
+  - image: gcr.io/gcp-dev-tools/hello-spring-boot
+    jibMaven: {}
+
+# optional profile to run the jib build on Google Cloud Build
+profiles:
+  - name: gcb
+    build:
+      googleCloudBuild: {}
