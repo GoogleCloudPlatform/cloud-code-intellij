@@ -38,7 +38,7 @@ for more details.
 
 ## Installation
 
-You can find our plugin in the Jetbrains plugin repository by going to IntelliJ -> Settings -> Browse Repositories, and search for 'Google Cloud Tools'. 
+You can find our plugin in the Jetbrains plugin repository by going to IntelliJ -> Settings -> Browse Repositories, and search for `Google Cloud Tools`. 
 
 ### Pre-releases 
 
