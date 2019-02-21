@@ -23,7 +23,7 @@ following areas:
   * [Google Cloud Java Client Libraries](https://cloud.google.com/tools/intellij/docs/client-libraries) 
     Add Java client libraries to your project, enable Google Cloud APIs, and create service accounts.
 
-For detailed user documentation go to our documentation
+    (_For detailed user documentation on the GCP support, visit our documentation_)
  [website](https://cloud.google.com/tools/intellij/docs/?utm_source=github&utm_medium=google-cloud-intellij&utm_campaign=ToolsforIntelliJ).
 
 ## Supported Platforms
