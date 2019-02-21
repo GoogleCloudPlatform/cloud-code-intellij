@@ -14,6 +14,14 @@
  * limitations under the License.
  */
 
-dependencies {
-    testCompile(project(":kubernetes:common-test-lib"))
+package com.google.container.tools.skaffold.editing
+
+import com.intellij.openapi.project.Project
+import com.jetbrains.jsonSchema.extension.JsonSchemaFileProvider
+import com.jetbrains.jsonSchema.extension.JsonSchemaProviderFactory
+
+class SkaffoldSchemaProviderFactory: JsonSchemaProviderFactory {
+    override fun getProviders(project: Project): MutableList<JsonSchemaFileProvider> {
+        return mutableListOf(SkaffoldSchemaFileProvider())
+    }
 }

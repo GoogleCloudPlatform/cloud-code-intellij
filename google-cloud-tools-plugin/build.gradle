@@ -62,7 +62,6 @@ dependencies {
     compile(project(':kubernetes'))
     compile(project(':kubernetes:core'))
     compile(project(':kubernetes:skaffold'))
-    compile(project(':kubernetes:skaffold-editing'))
 
     compile 'com.google.protobuf:protobuf-java:2.5.0'
     compile 'com.google.apis:google-api-services-clouddebugger:v2-rev7-1.21.0'

@@ -41,5 +41,13 @@
         <applicationService
                 serviceInterface="com.google.container.tools.skaffold.SkaffoldExecutorService"
                 serviceImplementation="com.google.container.tools.skaffold.DefaultSkaffoldExecutorService"/>
+
+        <liveTemplateContext implementation="com.google.container.tools.skaffold.editing.SkaffoldContextType"/>
+        <defaultLiveTemplatesProvider
+                implementation="com.google.container.tools.skaffold.editing.SkaffoldLiveTemplatesProvider"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="JavaScript">
+        <JsonSchema.ProviderFactory implementation="com.google.container.tools.skaffold.editing.SkaffoldSchemaProviderFactory" />
     </extensions>
 </idea-plugin>
