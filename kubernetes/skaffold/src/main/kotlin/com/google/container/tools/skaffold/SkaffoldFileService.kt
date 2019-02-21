@@ -84,7 +84,6 @@ class SkaffoldFileService {
                 .filter { isSkaffoldFile(it) }
     }
 
-
     private fun isValidSkaffoldFileType(file: VirtualFile): Boolean =
             with(file) {
                 !isDirectory && fileType is YAMLFileType && isValid

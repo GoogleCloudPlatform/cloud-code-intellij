@@ -27,8 +27,8 @@ private const val SKAFFOLD_TEMPLATE_NAME = "Skaffold"
  * Defines the [TemplateContextType] for Skaffold files.
  */
 class SkaffoldContextType(
-        id: String = SKAFFOLD_TEMPLATE_ID,
-        presentableName: String = SKAFFOLD_TEMPLATE_NAME
+    id: String = SKAFFOLD_TEMPLATE_ID,
+    presentableName: String = SKAFFOLD_TEMPLATE_NAME
 ) :
     TemplateContextType(id, presentableName) {
 

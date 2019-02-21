@@ -24,21 +24,21 @@ import com.jetbrains.jsonSchema.extension.SchemaType
 
 const val SKAFFOLD_SCHEMA_NAME = "skaffold"
 
-class SkaffoldSchemaFileProvider(private val skaffoldSchemaVersion: String) : JsonSchemaFileProvider {
-
+class SkaffoldSchemaFileProvider(private val skaffoldSchemaVersion: String)
+    : JsonSchemaFileProvider {
 
     override fun getName(): String = SKAFFOLD_SCHEMA_NAME
-
 
     override fun isAvailable(file: VirtualFile): Boolean {
         val skaffoldVersion: String? = SkaffoldFileService.instance.getSkaffoldVersion(file)
 
-        return SkaffoldFileService.instance.isSkaffoldFile(file) && skaffoldVersion == skaffoldSchemaVersion
+        return SkaffoldFileService.instance.isSkaffoldFile(file) &&
+                skaffoldVersion == skaffoldSchemaVersion
     }
 
-
     override fun getSchemaFile(): VirtualFile? {
-        return JsonSchemaProviderFactory.getResourceFile(this::class.java, "/schemas/$skaffoldSchemaVersion.json")
+        return JsonSchemaProviderFactory
+                .getResourceFile(this::class.java, "/schemas/$skaffoldSchemaVersion.json")
     }
 
     override fun getSchemaType(): SchemaType {
