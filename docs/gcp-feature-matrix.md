@@ -1,4 +1,4 @@
-## Google Cloud Platform Support Satrix
+## Google Cloud Platform Features - Support Matrix
 
 In addition to IntelliJ IDEA, the plugin provides limited support for the following IDEs, version 2017.1 or later:
 * PyCharm (Professional and Community Editions)
