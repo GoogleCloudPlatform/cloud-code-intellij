@@ -24,11 +24,19 @@ import com.jetbrains.jsonSchema.extension.SchemaType
 
 const val SKAFFOLD_SCHEMA_NAME = "skaffold"
 
+/**
+ * A [JsonSchemaFileProvider] that attaches a bundled JSON schema to the editor corresponding to the
+ * version of Skaffold.
+ */
 class SkaffoldSchemaFileProvider(private val skaffoldSchemaVersion: String)
     : JsonSchemaFileProvider {
 
     override fun getName(): String = SKAFFOLD_SCHEMA_NAME
 
+    /**
+     * Returns true if the currently open file is a valid Skaffold file, and the Skaffold version
+     * associated with this schema provider matches the Skaffold version in the currently open file.
+     */
     override fun isAvailable(file: VirtualFile): Boolean {
         val skaffoldVersion: String? = SkaffoldFileService.instance.getSkaffoldVersion(file)
 

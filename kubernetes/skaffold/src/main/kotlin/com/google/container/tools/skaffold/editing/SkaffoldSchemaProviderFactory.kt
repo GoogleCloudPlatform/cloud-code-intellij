@@ -20,6 +20,10 @@ import com.intellij.openapi.project.Project
 import com.jetbrains.jsonSchema.extension.JsonSchemaFileProvider
 import com.jetbrains.jsonSchema.extension.JsonSchemaProviderFactory
 
+/**
+ * A Skaffold [JsonSchemaProviderFactory] that returns a the providers for each schema corresponding
+ * to our supported Skaffold versions.
+ */
 class SkaffoldSchemaProviderFactory : JsonSchemaProviderFactory {
     override fun getProviders(project: Project): MutableList<JsonSchemaFileProvider> {
         return mutableListOf(
