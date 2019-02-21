@@ -20,8 +20,19 @@ import com.intellij.openapi.project.Project
 import com.jetbrains.jsonSchema.extension.JsonSchemaFileProvider
 import com.jetbrains.jsonSchema.extension.JsonSchemaProviderFactory
 
-class SkaffoldSchemaProviderFactory: JsonSchemaProviderFactory {
+class SkaffoldSchemaProviderFactory : JsonSchemaProviderFactory {
     override fun getProviders(project: Project): MutableList<JsonSchemaFileProvider> {
-        return mutableListOf(SkaffoldSchemaFileProvider())
+        return mutableListOf(
+                SkaffoldSchemaFileProvider("v1beta5"),
+                SkaffoldSchemaFileProvider("v1beta4"),
+                SkaffoldSchemaFileProvider("v1beta3"),
+                SkaffoldSchemaFileProvider("v1beta2"),
+                SkaffoldSchemaFileProvider("v1beta1"),
+                SkaffoldSchemaFileProvider("v1alpha5"),
+                SkaffoldSchemaFileProvider("v1alpha4"),
+                SkaffoldSchemaFileProvider("v1alpha3"),
+                SkaffoldSchemaFileProvider("v1alpha2"),
+                SkaffoldSchemaFileProvider("v1alpha1")
+        )
     }
 }

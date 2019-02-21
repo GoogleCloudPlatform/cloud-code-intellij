@@ -38,19 +38,39 @@ class SkaffoldFileService {
      * Checks if a given file is a valid Skaffold configuration file based on type and API version.
      */
     fun isSkaffoldFile(file: VirtualFile): Boolean {
-        with(file) {
-            if (!isDirectory && fileType is YAMLFileType && isValid) {
-                try {
-                    val skaffoldYaml = SkaffoldYamlConfiguration(this)
-                    return skaffoldYaml.apiVersion?.startsWith(SKAFFOLD_API_HEADER) == true
-                } catch (ex: Exception) {
-                    // We don't care about I/O or scan exceptions here since we only need to know if
-                    // the YAML file was in the proper format.
-                    return false
-                }
+        if (isValidSkaffoldFileType(file)) {
+            return try {
+                val skaffoldYaml = SkaffoldYamlConfiguration(file)
+                skaffoldYaml.apiVersion?.startsWith(SKAFFOLD_API_HEADER) == true
+            } catch (ex: Exception) {
+                // We don't care about I/O or scan exceptions here since we only need to know if
+                // the YAML file was in the proper format.
+                false
             }
         }
+
         return false
+    }
+
+    /**
+     * Returns the version of Skaffold as defined in skaffold.yaml, or null if it can't be read.
+     *
+     * The version is represented as skaffold/[version] in the yaml.
+     */
+    fun getSkaffoldVersion(file: VirtualFile): String? {
+        if (isValidSkaffoldFileType(file)) {
+            try {
+                val skaffoldYaml = SkaffoldYamlConfiguration(file)
+                skaffoldYaml.apiVersion?.let {
+                    return it.split("/")[1]
+                }
+            } catch (ex: Exception) {
+                // If version can't be read, return null
+                return null
+            }
+        }
+
+        return null
     }
 
     /**
@@ -61,6 +81,12 @@ class SkaffoldFileService {
      */
     fun findSkaffoldFiles(project: Project): List<VirtualFile> {
         return FileTypeIndex.getFiles(YAMLFileType.YML, GlobalSearchScope.allScope(project))
-            .filter { isSkaffoldFile(it) }
+                .filter { isSkaffoldFile(it) }
     }
+
+
+    private fun isValidSkaffoldFileType(file: VirtualFile): Boolean =
+            with(file) {
+                !isDirectory && fileType is YAMLFileType && isValid
+            }
 }
