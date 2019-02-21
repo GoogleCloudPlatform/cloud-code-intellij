@@ -86,7 +86,7 @@
     <group id="GoogleCloudTools.misc">
       <action id="GoogleCloudTools.Feedback"
               class="com.google.cloud.tools.intellij.CloudToolsFeedbackAction"/>
-      <add-to-group group-id="GoogleCloudTools" anchor="last"/>
+      <add-to-group group-id="CloudCodeGoogle" anchor="last"/>
     </group>
 
   </actions>
