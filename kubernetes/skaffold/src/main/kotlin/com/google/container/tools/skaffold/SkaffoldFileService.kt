@@ -92,6 +92,4 @@ class SkaffoldFileService {
      */
     private fun isValidSkaffoldFile(skaffoldYamlConfiguration: SkaffoldYamlConfiguration): Boolean =
             skaffoldYamlConfiguration.apiVersion?.startsWith(SKAFFOLD_API_HEADER) == true
-
-
 }
