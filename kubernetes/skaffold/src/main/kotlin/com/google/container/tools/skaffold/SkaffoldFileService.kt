@@ -58,9 +58,7 @@ class SkaffoldFileService {
                 val skaffoldYaml = SkaffoldYamlConfiguration(file)
 
                 if (isValidSkaffoldFile(skaffoldYaml)) {
-                    skaffoldYaml.apiVersion?.let {
-                        it.split("/")[1]
-                    }
+                    skaffoldYaml.skaffoldVersion
                 }
             }
 
