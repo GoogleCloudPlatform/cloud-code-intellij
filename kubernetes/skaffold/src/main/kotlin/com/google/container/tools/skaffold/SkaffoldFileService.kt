@@ -61,12 +61,10 @@ class SkaffoldFileService {
                     skaffoldYaml.apiVersion?.let {
                         it.split("/")[1]
                     }
-                } else {
-                    null
                 }
-            } else {
-                null
             }
+
+            null
         } catch (ex: Exception) {
             // If version can't be read, return null
             null
