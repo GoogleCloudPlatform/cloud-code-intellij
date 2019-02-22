@@ -33,7 +33,7 @@ later for Kubernetes support, and 2017.2 for everything else. Both Community and
 are supported.
 
 For GCP functionality, full support is available for IntelliJ IDEA Ultimate Edition, with limited
-support for the other platforms. See this [feature matrix](https://github.com/GoogleCloudPlatform/google-cloud-intellij/blob/master/docs/gcp-feature-matrix.md) 
+support for the other platforms. See this [feature matrix](docs/gcp-feature-matrix.md) 
 for more details.
 
 ## Installation
