@@ -38,18 +38,13 @@ class SkaffoldFileService {
      * Checks if a given file is a valid Skaffold configuration file based on type and API version.
      */
     fun isSkaffoldFile(file: VirtualFile): Boolean {
-        if (isValidSkaffoldFileType(file)) {
-            return try {
-                val skaffoldYaml = SkaffoldYamlConfiguration(file)
-                skaffoldYaml.apiVersion?.startsWith(SKAFFOLD_API_HEADER) == true
-            } catch (ex: Exception) {
-                // We don't care about I/O or scan exceptions here since we only need to know if
-                // the YAML file was in the proper format.
-                false
-            }
+        return try {
+            isValidYamlFile(file) && isValidSkaffoldFile(SkaffoldYamlConfiguration(file))
+        } catch (ex: Exception) {
+            // We don't care about I/O or scan exceptions here since we only need to know if
+            // the YAML file was in the proper format.
+            false
         }
-
-        return false
     }
 
     /**
@@ -58,19 +53,24 @@ class SkaffoldFileService {
      * The version is represented as skaffold/[version] in the yaml.
      */
     fun getSkaffoldVersion(file: VirtualFile): String? {
-        if (isValidSkaffoldFileType(file)) {
-            try {
+        return try {
+            if (isValidYamlFile(file)) {
                 val skaffoldYaml = SkaffoldYamlConfiguration(file)
-                skaffoldYaml.apiVersion?.let {
-                    return it.split("/")[1]
-                }
-            } catch (ex: Exception) {
-                // If version can't be read, return null
-                return null
-            }
-        }
 
-        return null
+                if (isValidSkaffoldFile(skaffoldYaml)) {
+                    skaffoldYaml.apiVersion?.let {
+                        it.split("/")[1]
+                    }
+                } else {
+                    null
+                }
+            } else {
+                null
+            }
+        } catch (ex: Exception) {
+            // If version can't be read, return null
+            null
+        }
     }
 
     /**
@@ -84,8 +84,16 @@ class SkaffoldFileService {
                 .filter { isSkaffoldFile(it) }
     }
 
-    private fun isValidSkaffoldFileType(file: VirtualFile): Boolean =
+    private fun isValidYamlFile(file: VirtualFile): Boolean =
             with(file) {
                 !isDirectory && fileType is YAMLFileType && isValid
             }
+
+    /**
+     * A file is a valid Skaffold file if it has the correct API header.
+     */
+    private fun isValidSkaffoldFile(skaffoldYamlConfiguration: SkaffoldYamlConfiguration): Boolean =
+            skaffoldYamlConfiguration.apiVersion?.startsWith(SKAFFOLD_API_HEADER) == true
+
+
 }
