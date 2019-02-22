@@ -37,37 +37,35 @@ class SkaffoldFileService {
     /**
      * Checks if a given file is a valid Skaffold configuration file based on type and API version.
      */
-    fun isSkaffoldFile(file: VirtualFile): Boolean {
-        return try {
-            isValidYamlFile(file) && isValidSkaffoldFile(SkaffoldYamlConfiguration(file))
-        } catch (ex: Exception) {
-            // We don't care about I/O or scan exceptions here since we only need to know if
-            // the YAML file was in the proper format.
-            false
-        }
-    }
+    fun isSkaffoldFile(file: VirtualFile): Boolean =
+            try {
+                isValidYamlFile(file) && isValidSkaffoldFile(SkaffoldYamlConfiguration(file))
+            } catch (ex: Exception) {
+                // We don't care about I/O or scan exceptions here since we only need to know if
+                // the YAML file was in the proper format.
+                false
+            }
 
     /**
      * Returns the version of Skaffold as defined in skaffold.yaml, or null if it can't be read.
      *
      * The version is represented as skaffold/[version] in the yaml.
      */
-    fun getSkaffoldVersion(file: VirtualFile): String? {
-        return try {
-            if (isValidYamlFile(file)) {
-                val skaffoldYaml = SkaffoldYamlConfiguration(file)
+    fun getSkaffoldVersion(file: VirtualFile): String? =
+            try {
+                if (isValidYamlFile(file)) {
+                    val skaffoldYaml = SkaffoldYamlConfiguration(file)
 
-                if (isValidSkaffoldFile(skaffoldYaml)) {
-                    skaffoldYaml.skaffoldVersion
+                    if (isValidSkaffoldFile(skaffoldYaml)) {
+                        skaffoldYaml.skaffoldVersion
+                    }
                 }
-            }
 
-            null
-        } catch (ex: Exception) {
-            // If version can't be read, return null
-            null
-        }
-    }
+                null
+            } catch (ex: Exception) {
+                // If version can't be read, return null
+                null
+            }
 
     /**
      * Finds all Skaffold configuration YAML files in the given project.
