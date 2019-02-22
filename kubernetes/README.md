@@ -1,5 +1,5 @@
 # Kubernetes
-<img src="docs/images/kubernetes.png" alt="kubernetes" width="50" />
+<img src="docs/images/kubernetes.png" alt="kubernetes" width="75" />
 
 This plugin adds support for [Kubernetes](https://www.kubernetes.io) development into the [JetBrains family of IDEs](https://www.jetbrains.com/products.html), including IntelliJ (both Community and Ultimate editions), GoLand, PyCharm, WebStorm (and others).
 
