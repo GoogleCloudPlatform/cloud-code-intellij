@@ -9,8 +9,8 @@
 Cloud Tools for IntelliJ is a plugin that helps facilitates cloud development in the JetBrains 
 family of IDEs. This includes the following areas:
 
-* [Kubernetes](https://github.com/GoogleCloudPlatform/google-cloud-intellij/tree/master/kubernetes)
-* Google Cloud Platform
+* <img src="kubernetes/docs/images/kubernetes.png" alt="kubernetes" width="20" /> [Kubernetes](https://github.com/GoogleCloudPlatform/google-cloud-intellij/tree/master/kubernetes)
+* <img src="docs/images/gcp.png" alt="GCP" width="20" /> Google Cloud Platform
   * [Google Cloud Source Repositories](https://cloud.google.com/tools/cloud-repositories/) 
     Fully-featured private Git repositories hosted on Google Cloud Platform.
   * The [Google Cloud Debugger](https://cloud.google.com/tools/cloud-debugger/) 
