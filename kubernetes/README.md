@@ -38,7 +38,7 @@ This plugin uses familiar Kubernetes and container tools to bring you a rich Kub
 If you'd like to try out the Kubernetes features, you can install the nightly release:
 
 1) Copy this URL:<br />
-   `https://plugins.jetbrains.com/plugins/alpha/8079`
+   `https://plugins.jetbrains.com/plugins/nightly/8079`
 2) Use the copied URL to add a Custom Plugin URL, following [these instructions](https://www.jetbrains.com/idea/help/managing-enterprise-plugin-repositories.html)
 3) Search for the `Google Cloud Tools` plugin and install it
 
