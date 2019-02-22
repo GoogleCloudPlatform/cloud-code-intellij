@@ -74,4 +74,12 @@ class SkaffoldSchemaFileProviderTest {
 
         assertThat(skaffoldSchemaFileProvider.isAvailable(virtualFile)).isFalse()
     }
+
+    @Test
+    fun `isAvailable returns false when skaffold version returns null`() {
+        every { skaffoldFileService.getSkaffoldVersion(any()) } answers { null }
+        every { skaffoldFileService.isSkaffoldFile(any()) } answers { true }
+
+        assertThat(skaffoldSchemaFileProvider.isAvailable(virtualFile)).isFalse()
+    }
 }
