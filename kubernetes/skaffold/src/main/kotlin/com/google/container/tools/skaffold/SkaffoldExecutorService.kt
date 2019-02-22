@@ -45,6 +45,15 @@ abstract class SkaffoldExecutorService {
     /** Path for Skaffold executable, any form supported by [ProcessBuilder] */
     protected abstract var skaffoldExecutablePath: Path
 
+    fun getSystemPath(): String = System.getenv("PATH")
+
+    fun isSkaffoldAvailable(): Boolean = getSystemPath().split(File.pathSeparator)
+            .asSequence()
+            .map { it + File.separator + "skaffold" } // convert each to a possible path to the executable
+            .any {
+                File(it).exists() && File(it).canExecute()
+            }
+
     /**
      * Creates Skaffold command line from the given settings and returns resulting launched
      * Skaffold system process.

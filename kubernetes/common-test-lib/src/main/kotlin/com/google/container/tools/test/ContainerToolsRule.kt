@@ -132,7 +132,6 @@ class ContainerToolsRule(private val testInstance: Any) : TestRule {
                     FileUtil.writeToFile(file, it.contents)
                 }
             }
-
             filesToDelete.add(file)
             member.setter.call(testInstance, file)
         }
