@@ -1,5 +1,4 @@
-![Google Cloud Platform Logo](https://cloud.google.com/_static/images/gcp-logo.png)
-# Google Cloud Tools for IntelliJ plugin
+# Cloud Tools for IntelliJ plugin
 
 ![Build Status](https://storage.googleapis.com/cloud-tools-for-java-kokoro-build-badges/intellij-ubuntu-master-orb.svg)
 ![Build Status](https://storage.googleapis.com/cloud-tools-for-java-kokoro-build-badges/intellij-windows-master-orb.svg)
@@ -7,67 +6,39 @@
 ![Build Status](https://storage.googleapis.com/cloud-tools-for-java-kokoro-build-badges/intellij-ubuntu-master-previous-version-orb.svg)
 ![Build Status](https://storage.googleapis.com/cloud-tools-for-java-kokoro-build-badges/intellij-ubuntu-master-eap-orb.svg)
 
-The plugin integrates the [Google Cloud Platform](https://cloud.google.com/)
-into the IntelliJ IDEA UI. Currently this includes:
+Cloud Tools for IntelliJ is a plugin that helps facilitates cloud development in the JetBrains 
+family of IDEs. This includes the following areas:
 
-* [Google Cloud Source Repositories](https://cloud.google.com/tools/cloud-repositories/) 
-  Fully-featured private Git repositories hosted on Google Cloud Platform.
-* The [Google Cloud Debugger](https://cloud.google.com/tools/cloud-debugger/) 
-  The Cloud Debugger can inspect the state of a Java application running on 
-  [Google App Engine](https://cloud.google.com/appengine/)
-  at any code location without stopping the application.
-* [Google App Engine](https://cloud.google.com/appengine/docs/) deployment via the Cloud SDK.
-* [Google Cloud Storage](https://cloud.google.com/storage/) 
-  Browse your Google Cloud Storage buckets.
-* [Google Cloud Java Client Libraries](https://cloud.google.com/tools/intellij/docs/client-libraries) 
-  Add Java client libraries to your project, enable Google Cloud APIs, and create service accounts.
+* <img src="kubernetes/docs/images/kubernetes.png" alt="kubernetes" width="20" /> [Kubernetes](https://github.com/GoogleCloudPlatform/google-cloud-intellij/tree/master/kubernetes)
+* <img src="docs/images/gcp.png" alt="GCP" width="20" /> Google Cloud Platform
+  * [Google Cloud Source Repositories](https://cloud.google.com/tools/cloud-repositories/) 
+    Fully-featured private Git repositories hosted on Google Cloud Platform.
+  * The [Google Cloud Debugger](https://cloud.google.com/tools/cloud-debugger/) 
+    The Cloud Debugger can inspect the state of a Java application running on 
+    [Google App Engine](https://cloud.google.com/appengine/)
+    at any code location without stopping the application.
+  * [Google App Engine](https://cloud.google.com/appengine/docs/) deployment via the Cloud SDK.
+  * [Google Cloud Storage](https://cloud.google.com/storage/) 
+    Browse your Google Cloud Storage buckets.
+  * [Google Cloud Java Client Libraries](https://cloud.google.com/tools/intellij/docs/client-libraries) 
+    Add Java client libraries to your project, enable Google Cloud APIs, and create service accounts.
 
-For detailed user documentation go to our documentation
- [website](https://cloud.google.com/tools/intellij/docs/?utm_source=github&utm_medium=google-cloud-intellij&utm_campaign=ToolsforIntelliJ).
+    (_For detailed user documentation on GCP features, visit our documentation_
+ [website](https://cloud.google.com/tools/intellij/docs/?utm_source=github&utm_medium=google-cloud-intellij&utm_campaign=ToolsforIntelliJ)).
 
 ## Supported Platforms
 
-The Cloud Tools for IntelliJ plugin primarily supports the following IDEs, version 2017.1 or later:
+The Cloud Tools for IntelliJ plugin supports the entire JetBrains family of IDEs, versions 2018.2 or 
+later for Kubernetes support, and 2017.2 for everything else. Both the free and paid editions of the
+IDEs are supported. 
 
-* IntelliJ IDEA Community Edition 
-* IntelliJ IDEA Ultimate Edition
+For GCP functionality, full support is available for IntelliJ IDEA Ultimate Edition, with limited
+support for the other platforms. See this [feature matrix](docs/gcp-feature-matrix.md) 
+for more details.
 
-In addition to IntelliJ IDEA, the plugin provides limited support for the following IDEs, version 2017.1 or later:
-* PyCharm (Professional and Community Editions)
-* WebStorm
-* PhpStorm
-* Rider
-* CLion
-* RubyMine
-* GoLand
-* AppCode
-
-This table displays the features available in the IDEs:
-
-| | IntelliJ IDEA - Ultimate | IntelliJ IDEA - Community | All other IntelliJ platform based IDEs |
-|---|:---:|:---:|:---:|
-| Create App Engine standard environment App | :heavy_check_mark: | :x: | :x: |
-| Create App Engine flexible environment App | :heavy_check_mark: | :heavy_check_mark: | :x: |
-| Run and Debug App Engine<br>standard environment App Locally | :heavy_check_mark: | :heavy_check_mark: \* | :x: |
-| Deploy App Engine flexible environment App | :heavy_check_mark: | :heavy_check_mark: | :x: |
-| Deploy App Engine standard environment App | :heavy_check_mark: | :heavy_check_mark: \** | :x: |
-| Manage Cloud Client Libraries | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
-| Browse files in Cloud Storage | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
-| Use VCS for Source Control | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
-| Debug using Stackdriver | :heavy_check_mark: | :heavy_check_mark: | :x: |
-| Auto-manage the Cloud SDK | :heavy_check_mark: | :heavy_check_mark: | :x: |
-
-<p><b>*</b> You can follow the
-  <a href="https://cloud.google.com/tools/intellij/docs/deploy-local#debugging_your_application_locally_on_community_edition">debugging your
-    application locally on Community Edition</a> instructions to use the Maven
-  or Gradle plugins for your local run.</p>
-
-<p><b>**</b> You can deploy Maven-based projects using the IntelliJ IDEA
-  Community Edition to the App Engine standard environment.</p>
-  
 ## Installation
 
-You can find our plugin in the Jetbrains plugin repository by going to IntelliJ -> Settings -> Browse Repositories, and search for 'Google Cloud Tools'. 
+You can find our plugin in the Jetbrains plugin repository by going to IntelliJ -> Settings -> Browse Repositories, and search for `Google Cloud Tools`. 
 
 ### Pre-releases 
 
