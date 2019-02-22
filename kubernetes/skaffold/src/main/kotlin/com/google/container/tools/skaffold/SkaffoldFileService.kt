@@ -73,10 +73,9 @@ class SkaffoldFileService {
      * @param project IDE project to search Skaffold file in
      * @return List of Skaffold configuration files in the project.
      */
-    fun findSkaffoldFiles(project: Project): List<VirtualFile> {
-        return FileTypeIndex.getFiles(YAMLFileType.YML, GlobalSearchScope.allScope(project))
-                .filter { isSkaffoldFile(it) }
-    }
+    fun findSkaffoldFiles(project: Project): List<VirtualFile> =
+            FileTypeIndex.getFiles(YAMLFileType.YML, GlobalSearchScope.allScope(project))
+                    .filter { isSkaffoldFile(it) }
 
     private fun isValidYamlFile(file: VirtualFile): Boolean =
             with(file) {
