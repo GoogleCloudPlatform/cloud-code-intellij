@@ -6,8 +6,8 @@
 ![Build Status](https://storage.googleapis.com/cloud-tools-for-java-kokoro-build-badges/intellij-ubuntu-master-previous-version-orb.svg)
 ![Build Status](https://storage.googleapis.com/cloud-tools-for-java-kokoro-build-badges/intellij-ubuntu-master-eap-orb.svg)
 
-Cloud Tools for IntelliJ is a plugin that helps facilitates cloud development. This includes the 
-following areas:
+Cloud Tools for IntelliJ is a plugin that helps facilitates cloud development in the JetBrains 
+family of IDEs. This includes the following areas:
 
 * [Kubernetes](https://github.com/GoogleCloudPlatform/google-cloud-intellij/tree/master/kubernetes)
 * Google Cloud Platform
