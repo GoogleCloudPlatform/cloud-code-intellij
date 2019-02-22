@@ -37,12 +37,9 @@ class SkaffoldSchemaFileProvider(private val skaffoldSchemaVersion: String)
      * Returns true if the currently open file is a valid Skaffold file, and the Skaffold version
      * associated with this schema provider matches the Skaffold version in the currently open file.
      */
-    override fun isAvailable(file: VirtualFile): Boolean {
-        val skaffoldVersion: String? = SkaffoldFileService.instance.getSkaffoldVersion(file)
-
-        return SkaffoldFileService.instance.isSkaffoldFile(file) &&
-                skaffoldVersion == skaffoldSchemaVersion
-    }
+    override fun isAvailable(file: VirtualFile): Boolean =
+            SkaffoldFileService.instance.isSkaffoldFile(file) &&
+                    SkaffoldFileService.instance.getSkaffoldVersion(file) == skaffoldSchemaVersion
 
     override fun getSchemaFile(): VirtualFile? {
         return JsonSchemaProviderFactory
