@@ -408,6 +408,7 @@ public class CloudAttachDialog extends DialogWrapper {
     BasicAction.saveAll();
 
     if (syncResult == null) {
+      buildResult();
       checkSyncStashState();
     }
 
