@@ -16,7 +16,9 @@
 
 package com.google.container.tools.skaffold.run
 
+import com.google.container.tools.skaffold.SkaffoldExecutorService
 import com.google.container.tools.skaffold.SkaffoldExecutorSettings
+import com.google.container.tools.skaffold.message
 import com.google.container.tools.skaffold.run.ui.SkaffoldDevSettingsEditor
 import com.google.container.tools.skaffold.run.ui.SkaffoldSingleRunSettingsEditor
 import com.intellij.execution.Executor
@@ -24,6 +26,7 @@ import com.intellij.execution.configurations.ConfigurationFactory
 import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.execution.configurations.RunConfigurationBase
 import com.intellij.execution.configurations.RunProfileState
+import com.intellij.execution.configurations.RuntimeConfigurationWarning
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
@@ -100,5 +103,11 @@ abstract class AbstractSkaffoldRunConfiguration(
         super.writeExternal(element)
 
         XmlSerializer.serializeInto(this, element)
+    }
+
+    override fun checkConfiguration() {
+        if (!SkaffoldExecutorService.instance.isSkaffoldAvailable()) {
+            throw RuntimeConfigurationWarning(message("skaffold.not.on.system.error"))
+        }
     }
 }

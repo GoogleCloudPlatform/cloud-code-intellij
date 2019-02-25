@@ -129,6 +129,8 @@ class SkaffoldCommandLineStateTest {
             projectBaseDir + "/skaffold.yaml"
         }
 
+        every { SkaffoldExecutorService.instance.isSkaffoldAvailable() } answers { true }
+
         skaffoldCommandLineState = SkaffoldCommandLineState(
             mockExecutionEnvironment,
             SkaffoldExecutorSettings.ExecutionMode.DEV
@@ -140,5 +142,33 @@ class SkaffoldCommandLineStateTest {
                 projectBaseDir
             )
         )
+    }
+
+    @Test
+    fun `A run error is thrown if skaffold is not in the system PATH`() {
+        every { SkaffoldExecutorService.instance.isSkaffoldAvailable() } answers { false }
+
+        skaffoldCommandLineState = SkaffoldCommandLineState(
+            mockExecutionEnvironment,
+            SkaffoldExecutorSettings.ExecutionMode.DEV
+        )
+
+        expectThrows(
+            ExecutionException::class,
+            ThrowableRunnable { skaffoldCommandLineState.startProcess() })
+    }
+
+    @Test
+    fun `A run error is not thrown if skaffold is in the system PATH`() {
+        every { SkaffoldExecutorService.instance.isSkaffoldAvailable() } answers { true }
+
+        skaffoldCommandLineState = SkaffoldCommandLineState(
+            mockExecutionEnvironment,
+            SkaffoldExecutorSettings.ExecutionMode.DEV
+        )
+
+        skaffoldCommandLineState.startProcess()
+
+        assertThat(skaffoldSettingsCapturingSlot.captured.workingDirectory).isNotNull()
     }
 }

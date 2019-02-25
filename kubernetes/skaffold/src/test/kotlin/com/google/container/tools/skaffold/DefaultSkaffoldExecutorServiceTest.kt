@@ -18,6 +18,7 @@ package com.google.container.tools.skaffold
 
 import com.google.common.truth.Truth.assertThat
 import com.google.container.tools.test.ContainerToolsRule
+import com.google.container.tools.test.TestFile
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.spyk
@@ -36,6 +37,12 @@ class DefaultSkaffoldExecutorServiceTest {
 
     @MockK
     private lateinit var mockProcess: Process
+
+    @TestFile(name = "skaffold", contents = "Some contents")
+    private lateinit var testSkaffoldFile: File
+
+    @TestFile(name = "notSkaffold", contents = "Some contents")
+    private lateinit var testNotSkaffoldFile: File
 
     @Before
     fun setUp() {
@@ -225,5 +232,26 @@ class DefaultSkaffoldExecutorServiceTest {
         )
 
         assertThat(result.commandLine).isEqualTo("skaffold dev --filename test.yaml")
+    }
+
+    @Test
+    fun `isSkaffoldAvailable returns true when skaffold is available`() {
+        testSkaffoldFile.setExecutable(true)
+        every { defaultSkaffoldExecutorService.getSystemPath() } answers { testSkaffoldFile.parent }
+        assertThat(defaultSkaffoldExecutorService.isSkaffoldAvailable()).isTrue()
+    }
+
+    @Test
+    fun `isSkaffoldAvailable returns false when skaffold is not available`() {
+        every { defaultSkaffoldExecutorService.getSystemPath() } answers { "" }
+        assertThat(defaultSkaffoldExecutorService.isSkaffoldAvailable()).isFalse()
+    }
+
+    @Test
+    fun `isSkaffoldAvailable returns false when skaffold is not available in valid system paths`() {
+        every { defaultSkaffoldExecutorService.getSystemPath() } answers {
+            testNotSkaffoldFile.parent
+        }
+        assertThat(defaultSkaffoldExecutorService.isSkaffoldAvailable()).isFalse()
     }
 }
