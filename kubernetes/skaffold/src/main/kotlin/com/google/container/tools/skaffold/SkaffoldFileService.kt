@@ -58,10 +58,12 @@ class SkaffoldFileService {
 
                     if (isValidSkaffoldFile(skaffoldYaml)) {
                         skaffoldYaml.skaffoldVersion
+                    } else {
+                        null
                     }
+                } else {
+                   null
                 }
-
-                null
             } catch (ex: Exception) {
                 // If version can't be read, return null
                 null
