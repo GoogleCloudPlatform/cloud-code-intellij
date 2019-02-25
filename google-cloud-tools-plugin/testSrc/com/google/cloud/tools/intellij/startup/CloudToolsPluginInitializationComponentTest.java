@@ -83,7 +83,7 @@ public class CloudToolsPluginInitializationComponentTest {
   }
 
   @Test
-  public void testInitComponent_usageTrackigIsSet_whenAllConditionsAreMet() {
+  public void testInitComponent_usageTrackingIsSet_whenAllConditionsAreMet() {
     Application mockApplication = spy(ApplicationManager.getApplication());
     when(mockApplication.isUnitTestMode()).thenReturn(false);
     ApplicationManager.setApplication(mockApplication, disposable);
@@ -97,7 +97,7 @@ public class CloudToolsPluginInitializationComponentTest {
   }
 
   @Test
-  public void testInitComponent_usageTrackigIsNotSet_whenTrackingNotAvailable() {
+  public void testInitComponent_usageTrackingIsNotSet_whenTrackingNotAvailable() {
     Application mockApplication = spy(ApplicationManager.getApplication());
     when(mockApplication.isUnitTestMode()).thenReturn(false);
     ApplicationManager.setApplication(mockApplication, disposable);
@@ -111,7 +111,7 @@ public class CloudToolsPluginInitializationComponentTest {
   }
 
   @Test
-  public void testInitComponent_usageTrackigIsNotSet_whenTrackingPreferenceAlreadySet() {
+  public void testInitComponent_usageTrackingIsNotSet_whenTrackingPreferenceAlreadySet() {
     Application mockApplication = spy(ApplicationManager.getApplication());
     when(mockApplication.isUnitTestMode()).thenReturn(false);
     ApplicationManager.setApplication(mockApplication, disposable);
