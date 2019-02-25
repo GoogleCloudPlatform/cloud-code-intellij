@@ -37,21 +37,37 @@ class SkaffoldFileService {
     /**
      * Checks if a given file is a valid Skaffold configuration file based on type and API version.
      */
-    fun isSkaffoldFile(file: VirtualFile): Boolean {
-        with(file) {
-            if (!isDirectory && fileType is YAMLFileType && isValid) {
-                try {
-                    val skaffoldYaml = SkaffoldYamlConfiguration(this)
-                    return skaffoldYaml.apiVersion?.startsWith(SKAFFOLD_API_HEADER) == true
-                } catch (ex: Exception) {
-                    // We don't care about I/O or scan exceptions here since we only need to know if
-                    // the YAML file was in the proper format.
-                    return false
-                }
+    fun isSkaffoldFile(file: VirtualFile): Boolean =
+            try {
+                isValidYamlFile(file) && isValidSkaffoldFile(SkaffoldYamlConfiguration(file))
+            } catch (ex: Exception) {
+                // We don't care about I/O or scan exceptions here since we only need to know if
+                // the YAML file was in the proper format.
+                false
             }
-        }
-        return false
-    }
+
+    /**
+     * Returns the version of Skaffold as defined in skaffold.yaml, or null if it can't be read.
+     *
+     * The version is represented as skaffold/[version] in the yaml.
+     */
+    fun getSkaffoldVersion(file: VirtualFile): String? =
+            try {
+                if (isValidYamlFile(file)) {
+                    val skaffoldYaml = SkaffoldYamlConfiguration(file)
+
+                    if (isValidSkaffoldFile(skaffoldYaml)) {
+                        skaffoldYaml.skaffoldVersion
+                    } else {
+                        null
+                    }
+                } else {
+                    null
+                }
+            } catch (ex: Exception) {
+                // If version can't be read, return null
+                null
+            }
 
     /**
      * Finds all Skaffold configuration YAML files in the given project.
@@ -59,8 +75,18 @@ class SkaffoldFileService {
      * @param project IDE project to search Skaffold file in
      * @return List of Skaffold configuration files in the project.
      */
-    fun findSkaffoldFiles(project: Project): List<VirtualFile> {
-        return FileTypeIndex.getFiles(YAMLFileType.YML, GlobalSearchScope.allScope(project))
-            .filter { isSkaffoldFile(it) }
-    }
+    fun findSkaffoldFiles(project: Project): List<VirtualFile> =
+            FileTypeIndex.getFiles(YAMLFileType.YML, GlobalSearchScope.allScope(project))
+                    .filter { isSkaffoldFile(it) }
+
+    private fun isValidYamlFile(file: VirtualFile): Boolean =
+            with(file) {
+                !isDirectory && fileType is YAMLFileType && isValid
+            }
+
+    /**
+     * A file is a valid Skaffold file if it has the correct API header.
+     */
+    private fun isValidSkaffoldFile(skaffoldYamlConfiguration: SkaffoldYamlConfiguration): Boolean =
+            skaffoldYamlConfiguration.apiVersion?.startsWith(SKAFFOLD_API_HEADER) == true
 }

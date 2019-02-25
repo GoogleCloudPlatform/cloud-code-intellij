@@ -60,6 +60,11 @@ class SkaffoldYamlConfiguration(skaffoldYamlFile: VirtualFile, project: Project?
     /** apiVersion of Skaffold configuration file, in the form of skaffold/v{number} */
     val apiVersion: String? = skaffoldYamlMap["apiVersion"]?.toString()
 
+    /** skaffold version portion of the apiVersion string skaffold/[skaffold-version] */
+    val skaffoldVersion: String? = skaffoldYamlMap["apiVersion"]?.toString()?.let {
+        it.split("/")[1]
+    }
+
     /**
      * Skaffold profiles: map of profile name to a list of profile objects, each represented by
      * a map. If there are no profiles, empty map is returned.

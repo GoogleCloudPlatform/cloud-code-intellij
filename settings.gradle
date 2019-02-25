@@ -30,6 +30,5 @@ include 'google-cloud-sdk'
 include 'kubernetes'
 include 'kubernetes:core'
 include 'kubernetes:skaffold'
-include 'kubernetes:skaffold-editing'
 include 'kubernetes:common-test-lib'
 

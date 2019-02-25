@@ -82,4 +82,30 @@ class SkaffoldFileServiceTest {
             assertThat(skaffoldFiles).isEmpty()
         }
     }
+
+    @Test
+    fun `skaffold version is parsed in valid skaffold file`() {
+        val skaffoldFile = MockVirtualFile.file("skaffold.yaml")
+        skaffoldFile.setText(
+            """
+            apiVersion: skaffold/v1beta1
+            kind: Config
+        """
+        )
+
+        assertThat(skaffoldFileService.getSkaffoldVersion(skaffoldFile)).isEqualTo("v1beta1")
+    }
+
+    @Test
+    fun `skaffold version is null with invalid apiVersion`() {
+        val skaffoldFile = MockVirtualFile.file("skaffold.yaml")
+        skaffoldFile.setText(
+            """
+            apiVersion: notvalid
+            kind: Config
+        """
+        )
+
+        assertThat(skaffoldFileService.getSkaffoldVersion(skaffoldFile)).isNull()
+    }
 }
