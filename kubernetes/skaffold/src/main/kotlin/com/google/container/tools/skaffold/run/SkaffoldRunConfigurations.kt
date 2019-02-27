@@ -107,7 +107,7 @@ abstract class AbstractSkaffoldRunConfiguration(
 
     override fun checkConfiguration() {
         if (!SkaffoldExecutorService.instance.isSkaffoldAvailable()) {
-            throw RuntimeConfigurationWarning(message("skaffold.not.on.system.error"))
+            throw RuntimeConfigurationWarning(message("skaffold.run.config.not.on.system.error"))
         }
     }
 }

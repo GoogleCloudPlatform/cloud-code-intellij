@@ -83,6 +83,8 @@ public class CloudToolsPluginInitializationComponent implements ApplicationCompo
               TrackerMessageBundle.message("notification.group.display.id"),
               NotificationDisplayType.STICKY_BALLOON);
       UsageTrackerNotification.getInstance().showNotification();
+
+      UsageTrackingManagementService.getInstance().setTrackingPreference(true);
     }
   }
 
