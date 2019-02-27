@@ -27,6 +27,7 @@ import com.jetbrains.jsonSchema.extension.JsonSchemaProviderFactory
 class SkaffoldSchemaProviderFactory : JsonSchemaProviderFactory {
     override fun getProviders(project: Project): MutableList<JsonSchemaFileProvider> {
         return mutableListOf(
+                SkaffoldSchemaFileProvider("v1beta6"),
                 SkaffoldSchemaFileProvider("v1beta5"),
                 SkaffoldSchemaFileProvider("v1beta4"),
                 SkaffoldSchemaFileProvider("v1beta3"),
