@@ -25,32 +25,54 @@
       "description": "top level config object that is parsed from a skaffold.yaml"
     },
     "BuildConfig": {
-      "properties": {
-        "artifacts": {
-          "items": {
-            "$ref": "#/definitions/Artifact"
-          },
-          "type": "array"
-        },
-        "tagPolicy": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false,
       "anyOf": [
         {
           "properties": {
-            "local": {
-              "$ref": "#/definitions/LocalBuild"
+            "artifacts": {
+              "items": {
+                "$ref": "#/definitions/Artifact"
+              },
+              "type": "array"
+            },
+            "tagPolicy": {
+              "type": "string"
             }
-          }
+          },
+          "additionalProperties": false
         },
         {
           "properties": {
+            "artifacts": {
+              "items": {
+                "$ref": "#/definitions/Artifact"
+              },
+              "type": "array"
+            },
+            "tagPolicy": {
+              "type": "string"
+            },
+            "local": {
+              "$ref": "#/definitions/LocalBuild"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "artifacts": {
+              "items": {
+                "$ref": "#/definitions/Artifact"
+              },
+              "type": "array"
+            },
+            "tagPolicy": {
+              "type": "string"
+            },
             "googleCloudBuild": {
               "$ref": "#/definitions/GoogleCloudBuild"
             }
-          }
+          },
+          "additionalProperties": false
         }
       ],
       "description": "contains all the configuration for the build steps"
@@ -85,26 +107,36 @@
       "additionalProperties": false
     },
     "DeployConfig": {
-      "properties": {
-        "name": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false,
       "anyOf": [
         {
           "properties": {
-            "helm": {
-              "$ref": "#/definitions/HelmDeploy"
+            "name": {
+              "type": "string"
             }
-          }
+          },
+          "additionalProperties": false
         },
         {
           "properties": {
+            "name": {
+              "type": "string"
+            },
+            "helm": {
+              "$ref": "#/definitions/HelmDeploy"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "name": {
+              "type": "string"
+            },
             "kubectl": {
               "$ref": "#/definitions/KubectlDeploy"
             }
-          }
+          },
+          "additionalProperties": false
         }
       ],
       "description": "contains all the configuration needed by the deploy steps"
