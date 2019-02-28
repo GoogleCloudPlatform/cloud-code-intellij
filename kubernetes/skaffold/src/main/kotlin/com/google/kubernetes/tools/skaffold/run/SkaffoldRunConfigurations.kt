@@ -75,6 +75,10 @@ class SkaffoldDevConfiguration(
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
             SkaffoldDevSettingsEditor()
 
+    /**
+     * Returns the execution mode depending on the execution environment, i.e. if it was run in
+     * either 'run' or 'debug' mode.
+     */
     @VisibleForTesting
     fun getExecutionMode(environment: ExecutionEnvironment) = when (environment.executor) {
             is DefaultRunExecutor -> SkaffoldExecutorSettings.ExecutionMode.DEV
