@@ -28,46 +28,76 @@ import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.process.KillableProcessHandler
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.runners.ExecutionEnvironment
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import java.io.File
 
-class SkaffoldDevCommandLineState(environment: ExecutionEnvironment): SkaffoldCommandLineState(environment) {
-    override fun getExecutionMode(): SkaffoldExecutorSettings.ExecutionMode = when (environment.executor) {
-           is DefaultRunExecutor -> SkaffoldExecutorSettings.ExecutionMode.DEV
-           is DefaultDebugExecutor -> SkaffoldExecutorSettings.ExecutionMode.DEBUG
-           else -> throw RuntimeException("todo")
-        }
+/**
+ * Implementation of [SkaffoldCommandLineState] for continuous deployment, "dev" mode.
+ */
+class SkaffoldDevCommandLineState(environment: ExecutionEnvironment)
+    : SkaffoldCommandLineState(environment) {
 
+    /**
+     * Returns the appropriate [SkaffoldExecutorSettings.ExecutionMode] base on the executor that is
+     * used for this environment. This depends on if the run configuration was started in "run" or
+     * "debug" mode.
+     */
+    override fun getExecutionMode()
+            : SkaffoldExecutorSettings.ExecutionMode = when (environment.executor) {
+        is DefaultRunExecutor -> SkaffoldExecutorSettings.ExecutionMode.DEV
+        is DefaultDebugExecutor -> SkaffoldExecutorSettings.ExecutionMode.DEBUG
+        else -> throw RuntimeException("Unexpected Skaffold executor type found: " +
+                "${environment.executor}.")
+    }
+
+    /**
+     * Do not explicitly tail logs in "dev" mode since Skaffold will automatically stream the logs
+     * in the running process.
+     */
     override fun tailDeploymentLogs(runConfiguration: RunConfiguration): Boolean = false
 }
 
-class SkaffoldRunCommandLineState(environment: ExecutionEnvironment): SkaffoldCommandLineState(environment) {
+/**
+ * Implementation of [SkaffoldCommandLineState] for single run deployment mode.
+ */
+class SkaffoldRunCommandLineState(environment: ExecutionEnvironment)
+    : SkaffoldCommandLineState(environment) {
+    private val log = Logger.getInstance(this::class.java)
+
+    /**
+     * Returns the single run [SkaffoldExecutorSettings.ExecutionMode].
+     */
     override fun getExecutionMode(): SkaffoldExecutorSettings.ExecutionMode =
             SkaffoldExecutorSettings.ExecutionMode.SINGLE_RUN
 
+    /**
+     * The deployment logs should be tailed if stored in the run configuration settings due to user
+     * selection.
+     */
     override fun tailDeploymentLogs(runConfiguration: RunConfiguration): Boolean =
-           if (runConfiguration is SkaffoldSingleRunConfiguration) {
-               runConfiguration.tailDeploymentLogs
-           } else {
-               // TODO this is unexpected, log
-               false
-           }
+            if (runConfiguration is SkaffoldSingleRunConfiguration) {
+                runConfiguration.tailDeploymentLogs
+            } else {
+                log.warn("Unexpected Skaffold run configuration type detected for Skaffold run " +
+                        "mode. Will not tail logs")
+                false
+            }
 }
 
 /**
- * Runs Skaffold on command line in both "run"/"dev" modes based on the given
- * [AbstractSkaffoldRunConfiguration] and current IDE project. [startProcess] checks configuration
- * and constructs command line to launch Skaffold process. Base class manages console
- * window output and graceful process shutdown (also see [KillableProcessHandler])
+ * Runs Skaffold on command line based on the given [AbstractSkaffoldRunConfiguration] and current
+ * IDE project. [startProcess] checks configuration and constructs command line to launch Skaffold
+ * process. Base class manages console window output and graceful process shutdown (also see
+ * [KillableProcessHandler])
  *
  * @param environment Execution environment provided by IDE
- * @param executionMode Skaffold  mode execution, i.e. DEV
  */
 abstract class SkaffoldCommandLineState(
-    environment: ExecutionEnvironment
+        environment: ExecutionEnvironment
 ) : CommandLineState(environment) {
 
     abstract fun getExecutionMode(): SkaffoldExecutorSettings.ExecutionMode
@@ -76,12 +106,12 @@ abstract class SkaffoldCommandLineState(
     public override fun startProcess(): ProcessHandler {
 
         val runConfiguration: RunConfiguration? =
-            environment.runnerAndConfigurationSettings?.configuration
+                environment.runnerAndConfigurationSettings?.configuration
         val projectBaseDir: VirtualFile? = environment.project.guessProjectDir()
         // ensure the configuration is valid for execution - settings are of supported type,
         // project is valid and Skaffold file is present.
         if (runConfiguration == null || runConfiguration !is AbstractSkaffoldRunConfiguration ||
-            projectBaseDir == null
+                projectBaseDir == null
         ) {
             throw ExecutionException(message("skaffold.corrupted.run.settings"))
         }
@@ -94,22 +124,22 @@ abstract class SkaffoldCommandLineState(
         }
 
         val configFile: VirtualFile? = LocalFileSystem.getInstance()
-            .findFileByPath(runConfiguration.skaffoldConfigurationFilePath!!)
+                .findFileByPath(runConfiguration.skaffoldConfigurationFilePath!!)
         // use project dir relative location for cleaner command line representation
         val skaffoldConfigurationFilePath: String? = VfsUtilCore.getRelativeLocation(
-            configFile, projectBaseDir
+                configFile, projectBaseDir
         )
 
         val skaffoldProcess = SkaffoldExecutorService.instance.executeSkaffold(
-            SkaffoldExecutorSettings(
-                getExecutionMode(),
-                skaffoldConfigurationFilePath,
-                skaffoldProfile = runConfiguration.skaffoldProfile,
-                workingDirectory = File(projectBaseDir.path),
-                skaffoldLabels = SkaffoldLabels.defaultLabels,
-                tailLogsAfterDeploy = tailDeploymentLogs(runConfiguration),
-                defaultImageRepo = runConfiguration.imageRepositoryOverride
-            )
+                SkaffoldExecutorSettings(
+                        getExecutionMode(),
+                        skaffoldConfigurationFilePath,
+                        skaffoldProfile = runConfiguration.skaffoldProfile,
+                        workingDirectory = File(projectBaseDir.path),
+                        skaffoldLabels = SkaffoldLabels.defaultLabels,
+                        tailLogsAfterDeploy = tailDeploymentLogs(runConfiguration),
+                        defaultImageRepo = runConfiguration.imageRepositoryOverride
+                )
         )
         return KillableProcessHandler(skaffoldProcess.process, skaffoldProcess.commandLine)
     }

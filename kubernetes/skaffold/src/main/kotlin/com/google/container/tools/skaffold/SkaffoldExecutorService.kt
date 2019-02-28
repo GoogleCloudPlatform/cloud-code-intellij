@@ -160,7 +160,7 @@ data class SkaffoldExecutorSettings(
     val defaultImageRepo: String? = null
 ) {
 
-    /** Execution mode for Skaffold, single run, continuous development, etc. */
+    /** Execution mode for Skaffold, single run, continuous development (run or debug mode), etc. */
     enum class ExecutionMode(val modeFlag: String) {
         SINGLE_RUN("run"),
         DEV("dev"),

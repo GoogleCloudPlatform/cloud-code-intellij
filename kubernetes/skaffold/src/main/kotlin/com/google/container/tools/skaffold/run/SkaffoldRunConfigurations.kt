@@ -17,7 +17,6 @@
 package com.google.container.tools.skaffold.run
 
 import com.google.container.tools.skaffold.SkaffoldExecutorService
-import com.google.container.tools.skaffold.SkaffoldExecutorSettings
 import com.google.container.tools.skaffold.message
 import com.google.container.tools.skaffold.run.ui.SkaffoldDevSettingsEditor
 import com.google.container.tools.skaffold.run.ui.SkaffoldSingleRunSettingsEditor
