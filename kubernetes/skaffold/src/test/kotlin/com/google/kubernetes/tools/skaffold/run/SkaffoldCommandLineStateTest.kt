@@ -17,13 +17,13 @@
 package com.google.kubernetes.tools.skaffold.run
 
 import com.google.common.truth.Truth.assertThat
-import com.google.container.tools.core.PluginInfo
+import com.google.kubernetes.tools.core.PluginInfo
 import com.google.kubernetes.tools.skaffold.SkaffoldExecutorService
 import com.google.kubernetes.tools.skaffold.SkaffoldExecutorSettings
 import com.google.kubernetes.tools.skaffold.SkaffoldProcess
-import com.google.container.tools.test.ContainerToolsRule
-import com.google.container.tools.test.TestService
-import com.google.container.tools.test.expectThrows
+import com.google.kubernetes.tools.test.ContainerToolsRule
+import com.google.kubernetes.tools.test.TestService
+import com.google.kubernetes.tools.test.expectThrows
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.RunnerAndConfigurationSettings
 import com.intellij.execution.configurations.RunConfigurationBase
@@ -99,8 +99,8 @@ class SkaffoldCommandLineStateTest {
         )
 
         val exception = expectThrows(
-            ExecutionException::class,
-            ThrowableRunnable { skaffoldCommandLineState.startProcess() })
+                ExecutionException::class,
+                ThrowableRunnable { skaffoldCommandLineState.startProcess() })
         assertThat(exception.message).isEqualTo(
             "Your Skaffold run configuration is corrupted. Please re-create it to fix."
         )
@@ -116,8 +116,8 @@ class SkaffoldCommandLineStateTest {
         )
 
         val exception = expectThrows(
-            ExecutionException::class,
-            ThrowableRunnable { skaffoldCommandLineState.startProcess() })
+                ExecutionException::class,
+                ThrowableRunnable { skaffoldCommandLineState.startProcess() })
         assertThat(exception.message).isEqualTo("Skaffold configuration file is not selected.")
     }
 
@@ -154,8 +154,8 @@ class SkaffoldCommandLineStateTest {
         )
 
         expectThrows(
-            ExecutionException::class,
-            ThrowableRunnable { skaffoldCommandLineState.startProcess() })
+                ExecutionException::class,
+                ThrowableRunnable { skaffoldCommandLineState.startProcess() })
     }
 
     @Test

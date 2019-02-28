@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.container.tools.core
+package com.google.kubernetes.tools.core
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor
 import com.intellij.ide.plugins.PluginManager

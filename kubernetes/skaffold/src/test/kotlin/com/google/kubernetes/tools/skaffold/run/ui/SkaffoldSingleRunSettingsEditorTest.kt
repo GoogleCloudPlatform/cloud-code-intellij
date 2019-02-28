@@ -21,9 +21,9 @@ import com.google.kubernetes.tools.skaffold.SkaffoldFileService
 import com.google.kubernetes.tools.skaffold.run.SkaffoldRunConfigurationType
 import com.google.kubernetes.tools.skaffold.run.SkaffoldSingleRunConfiguration
 import com.google.kubernetes.tools.skaffold.run.SkaffoldSingleRunConfigurationFactory
-import com.google.container.tools.test.ContainerToolsRule
-import com.google.container.tools.test.TestService
-import com.google.container.tools.test.UiTest
+import com.google.kubernetes.tools.test.ContainerToolsRule
+import com.google.kubernetes.tools.test.TestService
+import com.google.kubernetes.tools.test.UiTest
 import com.intellij.mock.MockVirtualFile
 import com.intellij.testFramework.EdtTestUtil
 import com.intellij.util.ThrowableRunnable

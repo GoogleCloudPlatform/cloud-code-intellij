@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.container.tools.test
+package com.google.kubernetes.tools.test
 
 import com.intellij.util.ThrowableRunnable
 import kotlin.reflect.KClass

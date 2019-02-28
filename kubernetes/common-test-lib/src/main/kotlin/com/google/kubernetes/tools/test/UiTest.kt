@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.container.tools.test
+package com.google.kubernetes.tools.test
 
 /**
  * Indicates that the annotated test method should be run on UI event dispatch thread (EDT).
