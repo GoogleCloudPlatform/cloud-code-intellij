@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.container.tools.skaffold.run
+package com.google.kubernetes.tools.skaffold.run
 
 import com.intellij.execution.configurations.RunProfile
 import com.intellij.execution.configurations.RunProfileState
