@@ -16,7 +16,9 @@
 
 package com.google.kubernetes.tools.skaffold.run
 
+import com.google.common.annotations.VisibleForTesting
 import com.google.kubernetes.tools.skaffold.SkaffoldExecutorService
+import com.google.kubernetes.tools.skaffold.SkaffoldExecutorSettings
 import com.google.kubernetes.tools.skaffold.message
 import com.google.kubernetes.tools.skaffold.run.ui.SkaffoldDevSettingsEditor
 import com.google.kubernetes.tools.skaffold.run.ui.SkaffoldSingleRunSettingsEditor
@@ -26,6 +28,8 @@ import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.execution.configurations.RunConfigurationBase
 import com.intellij.execution.configurations.RunProfileState
 import com.intellij.execution.configurations.RuntimeConfigurationWarning
+import com.intellij.execution.executors.DefaultDebugExecutor
+import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
@@ -33,7 +37,7 @@ import com.intellij.util.xmlb.XmlSerializer
 import org.jdom.Element
 
 /**
-
+ * Template configuration for Skaffold single run configuration, serving as a base for all new
  * configurations created by a user. Has its own UI settings and editor and provides execution state
  * once "skaffold run" executes.
  */
@@ -47,10 +51,10 @@ class SkaffoldSingleRunConfiguration(
     var tailDeploymentLogs: Boolean = false
 
     override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState? =
-        SkaffoldRunCommandLineState(environment)
+            SkaffoldCommandLineState(environment, SkaffoldExecutorSettings.ExecutionMode.SINGLE_RUN)
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
-        SkaffoldSingleRunSettingsEditor()
+            SkaffoldSingleRunSettingsEditor()
 }
 
 /**
@@ -64,11 +68,20 @@ class SkaffoldDevConfiguration(
     name: String
 ) : AbstractSkaffoldRunConfiguration(project, factory, name) {
 
-    override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState? =
-        SkaffoldDevCommandLineState(environment)
+    override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState? {
+        return SkaffoldCommandLineState(environment, getExecutionMode(environment))
+    }
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
-        SkaffoldDevSettingsEditor()
+            SkaffoldDevSettingsEditor()
+
+    @VisibleForTesting
+    fun getExecutionMode(environment: ExecutionEnvironment) = when (environment.executor) {
+            is DefaultRunExecutor -> SkaffoldExecutorSettings.ExecutionMode.DEV
+            is DefaultDebugExecutor -> SkaffoldExecutorSettings.ExecutionMode.DEBUG
+            else -> throw RuntimeException("Unexpected Skaffold executor type found: " +
+                    "${environment.executor}.")
+        }
 }
 
 /**

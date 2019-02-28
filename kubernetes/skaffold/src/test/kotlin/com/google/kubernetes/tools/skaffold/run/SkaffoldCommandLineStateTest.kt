@@ -101,8 +101,9 @@ class SkaffoldCommandLineStateTest {
         val invalidSkaffoldRunConfiguration = mockk<RunConfigurationBase<Element>>()
         every { mockRunnerSettings.configuration } answers { invalidSkaffoldRunConfiguration }
 
-        skaffoldCommandLineState = SkaffoldDevCommandLineState(
-            mockExecutionEnvironment
+        skaffoldCommandLineState = SkaffoldCommandLineState(
+            mockExecutionEnvironment,
+            SkaffoldExecutorSettings.ExecutionMode.DEV
         )
 
         val exception = expectThrows(
@@ -117,8 +118,9 @@ class SkaffoldCommandLineStateTest {
     fun `null Skaffold config file results in execution exception`() {
         every { mockDevConfiguration.skaffoldConfigurationFilePath } answers { null }
 
-        skaffoldCommandLineState = SkaffoldDevCommandLineState(
-            mockExecutionEnvironment
+        skaffoldCommandLineState = SkaffoldCommandLineState(
+            mockExecutionEnvironment,
+            SkaffoldExecutorSettings.ExecutionMode.DEV
         )
 
         val exception = expectThrows(
@@ -137,8 +139,9 @@ class SkaffoldCommandLineStateTest {
 
         every { SkaffoldExecutorService.instance.isSkaffoldAvailable() } answers { true }
 
-        skaffoldCommandLineState = SkaffoldDevCommandLineState(
-            mockExecutionEnvironment
+        skaffoldCommandLineState = SkaffoldCommandLineState(
+            mockExecutionEnvironment,
+            SkaffoldExecutorSettings.ExecutionMode.DEV
         )
         skaffoldCommandLineState.startProcess()
 
@@ -153,8 +156,9 @@ class SkaffoldCommandLineStateTest {
     fun `A run error is thrown if skaffold is not in the system PATH`() {
         every { SkaffoldExecutorService.instance.isSkaffoldAvailable() } answers { false }
 
-        skaffoldCommandLineState = SkaffoldDevCommandLineState(
-            mockExecutionEnvironment
+        skaffoldCommandLineState = SkaffoldCommandLineState(
+            mockExecutionEnvironment,
+            SkaffoldExecutorSettings.ExecutionMode.DEV
         )
 
         expectThrows(
@@ -166,49 +170,13 @@ class SkaffoldCommandLineStateTest {
     fun `A run error is not thrown if skaffold is in the system PATH`() {
         every { SkaffoldExecutorService.instance.isSkaffoldAvailable() } answers { true }
 
-        skaffoldCommandLineState = SkaffoldDevCommandLineState(
-            mockExecutionEnvironment
+        skaffoldCommandLineState = SkaffoldCommandLineState(
+            mockExecutionEnvironment,
+            SkaffoldExecutorSettings.ExecutionMode.DEV
         )
 
         skaffoldCommandLineState.startProcess()
 
         assertThat(skaffoldSettingsCapturingSlot.captured.workingDirectory).isNotNull()
-    }
-
-    @Test
-    fun `Skaffold dev with a run executor returns dev execution mode`() {
-        every { SkaffoldExecutorService.instance.isSkaffoldAvailable() } answers { true }
-
-        skaffoldCommandLineState = SkaffoldDevCommandLineState(
-            mockExecutionEnvironment
-        )
-
-        assertThat(skaffoldCommandLineState.getExecutionMode())
-                .isEqualTo(SkaffoldExecutorSettings.ExecutionMode.DEV)
-    }
-
-    @Test
-    fun `Skaffold dev with a debug executor returns dubug execution mode`() {
-        every { SkaffoldExecutorService.instance.isSkaffoldAvailable() } answers { true }
-        every { mockExecutionEnvironment.executor } answers { mockDebugExecutor }
-
-        skaffoldCommandLineState = SkaffoldDevCommandLineState(
-            mockExecutionEnvironment
-        )
-
-        assertThat(skaffoldCommandLineState.getExecutionMode())
-                .isEqualTo(SkaffoldExecutorSettings.ExecutionMode.DEBUG)
-    }
-
-    @Test
-    fun `Skaffold run returns single run execution mode`() {
-        every { SkaffoldExecutorService.instance.isSkaffoldAvailable() } answers { true }
-
-        skaffoldCommandLineState = SkaffoldRunCommandLineState(
-            mockExecutionEnvironment
-        )
-
-        assertThat(skaffoldCommandLineState.getExecutionMode())
-                .isEqualTo(SkaffoldExecutorSettings.ExecutionMode.SINGLE_RUN)
     }
 }
