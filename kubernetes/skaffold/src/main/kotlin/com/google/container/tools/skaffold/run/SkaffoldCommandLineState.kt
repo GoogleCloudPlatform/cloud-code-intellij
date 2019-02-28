@@ -38,16 +38,16 @@ import java.io.File
 /**
  * Implementation of [SkaffoldCommandLineState] for continuous deployment, "dev" mode.
  */
-class SkaffoldDevCommandLineState(environment: ExecutionEnvironment)
-    : SkaffoldCommandLineState(environment) {
+class SkaffoldDevCommandLineState(environment: ExecutionEnvironment) :
+        SkaffoldCommandLineState(environment) {
 
     /**
      * Returns the appropriate [SkaffoldExecutorSettings.ExecutionMode] base on the executor that is
      * used for this environment. This depends on if the run configuration was started in "run" or
      * "debug" mode.
      */
-    override fun getExecutionMode()
-            : SkaffoldExecutorSettings.ExecutionMode = when (environment.executor) {
+    override fun getExecutionMode():
+            SkaffoldExecutorSettings.ExecutionMode = when (environment.executor) {
         is DefaultRunExecutor -> SkaffoldExecutorSettings.ExecutionMode.DEV
         is DefaultDebugExecutor -> SkaffoldExecutorSettings.ExecutionMode.DEBUG
         else -> throw RuntimeException("Unexpected Skaffold executor type found: " +
@@ -97,7 +97,7 @@ class SkaffoldRunCommandLineState(environment: ExecutionEnvironment)
  * @param environment Execution environment provided by IDE
  */
 abstract class SkaffoldCommandLineState(
-        environment: ExecutionEnvironment
+    environment: ExecutionEnvironment
 ) : CommandLineState(environment) {
 
     abstract fun getExecutionMode(): SkaffoldExecutorSettings.ExecutionMode
