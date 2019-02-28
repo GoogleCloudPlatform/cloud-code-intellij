@@ -28,6 +28,7 @@ import com.intellij.execution.ExecutionException
 import com.intellij.execution.RunnerAndConfigurationSettings
 import com.intellij.execution.configurations.RunConfigurationBase
 import com.intellij.execution.configurations.SearchScopeProvider
+import com.intellij.execution.executors.DefaultDebugExecutor
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.project.guessProjectDir
@@ -54,7 +55,9 @@ class SkaffoldCommandLineStateTest {
     @MockK
     private lateinit var mockExecutionEnvironment: ExecutionEnvironment
     @MockK
-    private lateinit var mockExecutor: DefaultRunExecutor
+    private lateinit var mockRunExecutor: DefaultRunExecutor
+    @MockK
+    private lateinit var mockDebugExecutor: DefaultDebugExecutor
     @MockK
     private lateinit var mockRunnerSettings: RunnerAndConfigurationSettings
     @MockK
@@ -74,7 +77,7 @@ class SkaffoldCommandLineStateTest {
             mockExecutionEnvironment.runnerAndConfigurationSettings
         } answers { mockRunnerSettings }
 
-        every { mockExecutionEnvironment.executor} answers { mockExecutor }
+        every { mockExecutionEnvironment.executor} answers { mockRunExecutor }
 
         every { mockRunnerSettings.configuration } answers { mockDevConfiguration }
         // pass project into the CLI state
@@ -170,5 +173,30 @@ class SkaffoldCommandLineStateTest {
         skaffoldCommandLineState.startProcess()
 
         assertThat(skaffoldSettingsCapturingSlot.captured.workingDirectory).isNotNull()
+    }
+
+    @Test
+    fun `Skaffold dev with a run executor returns dev execution mode`() {
+        every { SkaffoldExecutorService.instance.isSkaffoldAvailable() } answers { true }
+
+        skaffoldCommandLineState = SkaffoldDevCommandLineState(
+            mockExecutionEnvironment
+        )
+
+        assertThat(skaffoldCommandLineState.getExecutionMode())
+                .isEqualTo(SkaffoldExecutorSettings.ExecutionMode.DEV)
+    }
+
+    @Test
+    fun `Skaffold dev with a debug executor returns dubug execution mode`() {
+        every { SkaffoldExecutorService.instance.isSkaffoldAvailable() } answers { true }
+        every { mockExecutionEnvironment.executor} answers { mockDebugExecutor }
+
+        skaffoldCommandLineState = SkaffoldDevCommandLineState(
+            mockExecutionEnvironment
+        )
+
+        assertThat(skaffoldCommandLineState.getExecutionMode())
+                .isEqualTo(SkaffoldExecutorSettings.ExecutionMode.DEBUG)
     }
 }
