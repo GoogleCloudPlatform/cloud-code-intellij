@@ -21,7 +21,11 @@ import com.google.kubernetes.tools.skaffold.message
 import com.google.kubernetes.tools.skaffold.run.ui.SkaffoldDevSettingsEditor
 import com.google.kubernetes.tools.skaffold.run.ui.SkaffoldSingleRunSettingsEditor
 import com.intellij.execution.Executor
-import com.intellij.execution.configurations.*
+import com.intellij.execution.configurations.ConfigurationFactory
+import com.intellij.execution.configurations.RunConfiguration
+import com.intellij.execution.configurations.RunConfigurationBase
+import com.intellij.execution.configurations.RunProfileState
+import com.intellij.execution.configurations.RuntimeConfigurationWarning
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
@@ -29,7 +33,7 @@ import com.intellij.util.xmlb.XmlSerializer
 import org.jdom.Element
 
 /**
- * Template configuration for Skaffold single run configuration, serving as a base for all new
+
  * configurations created by a user. Has its own UI settings and editor and provides execution state
  * once "skaffold run" executes.
  */

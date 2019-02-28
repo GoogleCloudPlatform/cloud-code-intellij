@@ -40,8 +40,8 @@ class SkaffoldDebugProgramRunner : DefaultProgramRunner() {
 
     override fun getRunnerId(): String = SKAFFOLD_DEBUG_RUNNER_ID
 
-    override fun doExecute(state: RunProfileState, environment: ExecutionEnvironment)
-            : RunContentDescriptor? {
+    override fun doExecute(state: RunProfileState, environment: ExecutionEnvironment):
+            RunContentDescriptor? {
         // TODO implement in later PRs
         return super.doExecute(state, environment)
     }
