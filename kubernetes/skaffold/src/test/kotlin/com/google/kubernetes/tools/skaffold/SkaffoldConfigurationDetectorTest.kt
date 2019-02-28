@@ -18,9 +18,9 @@ package com.google.kubernetes.tools.skaffold
 
 import com.google.common.truth.Truth.assertThat
 import com.google.kubernetes.tools.skaffold.run.SkaffoldDevConfiguration
-import com.google.container.tools.test.ContainerToolsRule
-import com.google.container.tools.test.TestService
-import com.google.container.tools.test.UiTest
+import com.google.kubernetes.tools.test.ContainerToolsRule
+import com.google.kubernetes.tools.test.TestService
+import com.google.kubernetes.tools.test.UiTest
 import com.intellij.execution.RunManager
 import com.intellij.execution.RunnerAndConfigurationSettings
 import com.intellij.execution.configurations.ConfigurationFactory

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.container.tools.core.util
+package com.google.kubernetes.tools.core.util
 
 import com.intellij.CommonBundle
 import org.jetbrains.annotations.PropertyKey

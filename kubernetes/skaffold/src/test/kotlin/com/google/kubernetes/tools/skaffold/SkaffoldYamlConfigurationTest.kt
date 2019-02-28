@@ -17,7 +17,7 @@
 package com.google.kubernetes.tools.skaffold
 
 import com.google.common.truth.Truth.assertThat
-import com.google.container.tools.test.expectThrows
+import com.google.kubernetes.tools.test.expectThrows
 import com.intellij.mock.MockVirtualFile
 import com.intellij.util.ThrowableRunnable
 import org.junit.Test
@@ -101,8 +101,8 @@ class SkaffoldYamlConfigurationTest {
         )
 
         expectThrows(
-            Exception::class,
-            ThrowableRunnable { SkaffoldYamlConfiguration(skaffoldYamlFile) })
+                Exception::class,
+                ThrowableRunnable { SkaffoldYamlConfiguration(skaffoldYamlFile) })
     }
 
     @Test
@@ -111,7 +111,7 @@ class SkaffoldYamlConfigurationTest {
         skaffoldYamlFile.setText("")
 
         expectThrows(
-            Exception::class,
-            ThrowableRunnable { SkaffoldYamlConfiguration(skaffoldYamlFile) })
+                Exception::class,
+                ThrowableRunnable { SkaffoldYamlConfiguration(skaffoldYamlFile) })
     }
 }

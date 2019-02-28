@@ -18,7 +18,7 @@ package com.google.kubernetes.tools.skaffold
 
 import com.google.cloud.tools.intellij.analytics.UsageTrackerService
 import com.google.common.annotations.VisibleForTesting
-import com.google.container.tools.core.PLUGIN_NOTIFICATION_DISPLAY_GROUP_ID
+import com.google.kubernetes.tools.core.PLUGIN_NOTIFICATION_DISPLAY_GROUP_ID
 import com.google.kubernetes.tools.skaffold.metrics.SKAFFOLD_AUTO_CREATE_CONFIGURATIONS
 import com.google.kubernetes.tools.skaffold.run.AbstractSkaffoldRunConfiguration
 import com.google.kubernetes.tools.skaffold.run.SkaffoldDevConfigurationFactory
@@ -61,7 +61,7 @@ class SkaffoldConfigurationDetector(val project: Project) : ProjectComponent {
     private val logger = Logger.getInstance(SkaffoldConfigurationDetector::class.java)
 
     private val NOTIFICATION_GROUP = NotificationGroup(
-        PLUGIN_NOTIFICATION_DISPLAY_GROUP_ID,
+            PLUGIN_NOTIFICATION_DISPLAY_GROUP_ID,
         NotificationDisplayType.BALLOON,
         true,
         null,

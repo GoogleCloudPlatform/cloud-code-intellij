@@ -1,4 +1,4 @@
-package com.google.container.tools.test
+package com.google.kubernetes.tools.test
 
 /**
  * Marks a temporary [java.io.File] used for testing purposes.
