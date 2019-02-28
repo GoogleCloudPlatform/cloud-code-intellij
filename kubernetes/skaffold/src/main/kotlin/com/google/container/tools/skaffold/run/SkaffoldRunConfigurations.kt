@@ -48,7 +48,7 @@ class SkaffoldSingleRunConfiguration(
     var tailDeploymentLogs: Boolean = false
 
     override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState? =
-        SkaffoldCommandLineState(environment, SkaffoldExecutorSettings.ExecutionMode.SINGLE_RUN)
+        SkaffoldRunCommandLineState(environment)
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
         SkaffoldSingleRunSettingsEditor()
@@ -66,7 +66,7 @@ class SkaffoldDevConfiguration(
 ) : AbstractSkaffoldRunConfiguration(project, factory, name) {
 
     override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState? =
-        SkaffoldCommandLineState(environment, SkaffoldExecutorSettings.ExecutionMode.DEV)
+        SkaffoldDevCommandLineState(environment)
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
         SkaffoldDevSettingsEditor()

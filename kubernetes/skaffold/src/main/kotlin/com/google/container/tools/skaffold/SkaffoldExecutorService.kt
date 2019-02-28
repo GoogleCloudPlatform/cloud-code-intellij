@@ -163,7 +163,8 @@ data class SkaffoldExecutorSettings(
     /** Execution mode for Skaffold, single run, continuous development, etc. */
     enum class ExecutionMode(val modeFlag: String) {
         SINGLE_RUN("run"),
-        DEV("dev")
+        DEV("dev"),
+        DEBUG("debug")
     }
 }
 

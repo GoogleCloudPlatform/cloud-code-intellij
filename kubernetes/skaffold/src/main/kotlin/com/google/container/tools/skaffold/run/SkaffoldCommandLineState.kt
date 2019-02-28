@@ -23,6 +23,8 @@ import com.google.container.tools.skaffold.message
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.configurations.CommandLineState
 import com.intellij.execution.configurations.RunConfiguration
+import com.intellij.execution.executors.DefaultDebugExecutor
+import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.process.KillableProcessHandler
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.runners.ExecutionEnvironment
@@ -31,6 +33,29 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import java.io.File
+
+class SkaffoldDevCommandLineState(environment: ExecutionEnvironment): SkaffoldCommandLineState(environment) {
+    override fun getExecutionMode(): SkaffoldExecutorSettings.ExecutionMode = when (environment.executor) {
+           is DefaultRunExecutor -> SkaffoldExecutorSettings.ExecutionMode.DEV
+           is DefaultDebugExecutor -> SkaffoldExecutorSettings.ExecutionMode.DEBUG
+           else -> throw RuntimeException("todo")
+        }
+
+    override fun tailDeploymentLogs(runConfiguration: RunConfiguration): Boolean = false
+}
+
+class SkaffoldRunCommandLineState(environment: ExecutionEnvironment): SkaffoldCommandLineState(environment) {
+    override fun getExecutionMode(): SkaffoldExecutorSettings.ExecutionMode =
+            SkaffoldExecutorSettings.ExecutionMode.SINGLE_RUN
+
+    override fun tailDeploymentLogs(runConfiguration: RunConfiguration): Boolean =
+           if (runConfiguration is SkaffoldSingleRunConfiguration) {
+               runConfiguration.tailDeploymentLogs
+           } else {
+               // TODO this is unexpected, log
+               false
+           }
+}
 
 /**
  * Runs Skaffold on command line in both "run"/"dev" modes based on the given
@@ -41,10 +66,13 @@ import java.io.File
  * @param environment Execution environment provided by IDE
  * @param executionMode Skaffold  mode execution, i.e. DEV
  */
-class SkaffoldCommandLineState(
-    environment: ExecutionEnvironment,
-    val executionMode: SkaffoldExecutorSettings.ExecutionMode
+abstract class SkaffoldCommandLineState(
+    environment: ExecutionEnvironment
 ) : CommandLineState(environment) {
+
+    abstract fun getExecutionMode(): SkaffoldExecutorSettings.ExecutionMode
+    abstract fun tailDeploymentLogs(runConfiguration: RunConfiguration): Boolean
+
     public override fun startProcess(): ProcessHandler {
 
         val runConfiguration: RunConfiguration? =
@@ -72,17 +100,14 @@ class SkaffoldCommandLineState(
             configFile, projectBaseDir
         )
 
-        // custom settings for single deployment (run) mode
-        val singleRunConfiguration: SkaffoldSingleRunConfiguration? =
-            if (runConfiguration is SkaffoldSingleRunConfiguration) runConfiguration else null
         val skaffoldProcess = SkaffoldExecutorService.instance.executeSkaffold(
             SkaffoldExecutorSettings(
-                executionMode,
+                getExecutionMode(),
                 skaffoldConfigurationFilePath,
                 skaffoldProfile = runConfiguration.skaffoldProfile,
                 workingDirectory = File(projectBaseDir.path),
                 skaffoldLabels = SkaffoldLabels.defaultLabels,
-                tailLogsAfterDeploy = singleRunConfiguration?.tailDeploymentLogs,
+                tailLogsAfterDeploy = tailDeploymentLogs(runConfiguration),
                 defaultImageRepo = runConfiguration.imageRepositoryOverride
             )
         )
