@@ -18,8 +18,8 @@ package com.google.kubernetes.tools.skaffold.editing
 
 import com.google.common.truth.Truth.assertThat
 import com.google.kubernetes.tools.skaffold.SkaffoldFileService
-import com.google.container.tools.test.ContainerToolsRule
-import com.google.container.tools.test.TestService
+import com.google.kubernetes.tools.test.ContainerToolsRule
+import com.google.kubernetes.tools.test.TestService
 import com.intellij.openapi.vfs.VirtualFile
 import io.mockk.every
 import io.mockk.impl.annotations.MockK

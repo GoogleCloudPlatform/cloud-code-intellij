@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.container.tools.core
+package com.google.kubernetes.tools.core
 
 /**
  * Single notification ID that should be used in any Notifications explicitly

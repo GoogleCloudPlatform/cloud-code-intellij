@@ -17,7 +17,7 @@
 package com.google.kubernetes.tools.skaffold
 
 import com.google.common.annotations.VisibleForTesting
-import com.google.container.tools.core.PluginInfo
+import com.google.kubernetes.tools.core.PluginInfo
 import com.intellij.openapi.application.ApplicationInfo
 
 const val IDE_LABEL = "ide"

@@ -17,9 +17,9 @@
 package com.google.kubernetes.tools.skaffold
 
 import com.google.common.truth.Truth.assertThat
-import com.google.container.tools.core.PluginInfo
-import com.google.container.tools.test.ContainerToolsRule
-import com.google.container.tools.test.TestService
+import com.google.kubernetes.tools.core.PluginInfo
+import com.google.kubernetes.tools.test.ContainerToolsRule
+import com.google.kubernetes.tools.test.TestService
 import com.intellij.openapi.application.ApplicationInfo
 import io.mockk.every
 import io.mockk.impl.annotations.MockK

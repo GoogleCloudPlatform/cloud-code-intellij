@@ -17,8 +17,8 @@
 package com.google.kubernetes.tools.skaffold.run.ui
 
 import com.google.common.truth.Truth.assertThat
-import com.google.container.tools.test.ContainerToolsRule
-import com.google.container.tools.test.UiTest
+import com.google.kubernetes.tools.test.ContainerToolsRule
+import com.google.kubernetes.tools.test.UiTest
 import com.intellij.mock.MockVirtualFile
 import org.junit.Rule
 import org.junit.Test
