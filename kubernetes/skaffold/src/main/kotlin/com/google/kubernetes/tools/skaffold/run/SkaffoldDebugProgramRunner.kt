@@ -29,6 +29,7 @@ private const val SKAFFOLD_DEBUG_RUNNER_ID = "SkaffoldDebugProgramRunner"
  * A program runner for executing Skaffold continuous deployment in debug mode.
  */
 class SkaffoldDebugProgramRunner : DefaultProgramRunner() {
+
     /**
      * Debug should be enabled if this is a [SkaffoldDevConfiguration] and the executor is a debug
      * executor.
