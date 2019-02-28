@@ -46,7 +46,7 @@
         <defaultLiveTemplatesProvider
                 implementation="com.google.kubernetes.tools.skaffold.editing.SkaffoldLiveTemplatesProvider"/>
 
-        <!--<programRunner implementation="com.google.container.tools.skaffold.run.SkaffoldDebugProgramRunner" />-->
+        <!--<programRunner implementation="com.google.kubernetes.tools.skaffold.run.SkaffoldDebugProgramRunner" />-->
     </extensions>
 
     <extensions defaultExtensionNs="JavaScript">
