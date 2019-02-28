@@ -28,6 +28,7 @@ import com.intellij.execution.ExecutionException
 import com.intellij.execution.RunnerAndConfigurationSettings
 import com.intellij.execution.configurations.RunConfigurationBase
 import com.intellij.execution.configurations.SearchScopeProvider
+import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.util.ThrowableRunnable
@@ -53,6 +54,8 @@ class SkaffoldCommandLineStateTest {
     @MockK
     private lateinit var mockExecutionEnvironment: ExecutionEnvironment
     @MockK
+    private lateinit var mockExecutor: DefaultRunExecutor
+    @MockK
     private lateinit var mockRunnerSettings: RunnerAndConfigurationSettings
     @MockK
     private lateinit var mockDevConfiguration: SkaffoldDevConfiguration
@@ -70,6 +73,8 @@ class SkaffoldCommandLineStateTest {
         every {
             mockExecutionEnvironment.runnerAndConfigurationSettings
         } answers { mockRunnerSettings }
+
+        every { mockExecutionEnvironment.executor} answers { mockExecutor }
 
         every { mockRunnerSettings.configuration } answers { mockDevConfiguration }
         // pass project into the CLI state
