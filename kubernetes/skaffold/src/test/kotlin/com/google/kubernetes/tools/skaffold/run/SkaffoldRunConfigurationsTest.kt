@@ -31,6 +31,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+/**
+ * Tests for [SkaffoldDevConfiguration] and [SkaffoldSingleRunConfiguration].
+ */
 class SkaffoldRunConfigurationsTest {
     @get:Rule
     val containerToolsRule = ContainerToolsRule(this)
