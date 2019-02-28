@@ -199,4 +199,16 @@ class SkaffoldCommandLineStateTest {
         assertThat(skaffoldCommandLineState.getExecutionMode())
                 .isEqualTo(SkaffoldExecutorSettings.ExecutionMode.DEBUG)
     }
+
+    @Test
+    fun `Skaffold run returns single run execution mode`() {
+        every { SkaffoldExecutorService.instance.isSkaffoldAvailable() } answers { true }
+
+        skaffoldCommandLineState = SkaffoldRunCommandLineState(
+            mockExecutionEnvironment
+        )
+
+        assertThat(skaffoldCommandLineState.getExecutionMode())
+                .isEqualTo(SkaffoldExecutorSettings.ExecutionMode.SINGLE_RUN)
+    }
 }
