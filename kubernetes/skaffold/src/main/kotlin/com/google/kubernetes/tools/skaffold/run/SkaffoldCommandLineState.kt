@@ -58,7 +58,7 @@ class SkaffoldDevCommandLineState(environment: ExecutionEnvironment) :
      * Do not explicitly tail logs in "dev" mode since Skaffold will automatically stream the logs
      * in the running process.
      */
-    override fun tailDeploymentLogs(runConfiguration: RunConfiguration): Boolean = false
+    override fun shouldTailDeploymentLogs(runConfiguration: RunConfiguration): Boolean = false
 }
 
 /**
@@ -78,7 +78,7 @@ class SkaffoldRunCommandLineState(environment: ExecutionEnvironment)
      * The deployment logs should be tailed if stored in the run configuration settings due to user
      * selection.
      */
-    override fun tailDeploymentLogs(runConfiguration: RunConfiguration): Boolean =
+    override fun shouldTailDeploymentLogs(runConfiguration: RunConfiguration): Boolean =
             if (runConfiguration is SkaffoldSingleRunConfiguration) {
                 runConfiguration.tailDeploymentLogs
             } else {
@@ -101,7 +101,7 @@ abstract class SkaffoldCommandLineState(
 ) : CommandLineState(environment) {
 
     abstract fun getExecutionMode(): SkaffoldExecutorSettings.ExecutionMode
-    abstract fun tailDeploymentLogs(runConfiguration: RunConfiguration): Boolean
+    abstract fun shouldTailDeploymentLogs(runConfiguration: RunConfiguration): Boolean
 
     public override fun startProcess(): ProcessHandler {
 
@@ -137,7 +137,7 @@ abstract class SkaffoldCommandLineState(
                         skaffoldProfile = runConfiguration.skaffoldProfile,
                         workingDirectory = File(projectBaseDir.path),
                         skaffoldLabels = SkaffoldLabels.defaultLabels,
-                        tailLogsAfterDeploy = tailDeploymentLogs(runConfiguration),
+                        tailLogsAfterDeploy = shouldTailDeploymentLogs(runConfiguration),
                         defaultImageRepo = runConfiguration.imageRepositoryOverride
                 )
         )
