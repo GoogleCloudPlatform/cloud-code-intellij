@@ -93,9 +93,8 @@ class SkaffoldCommandLineStateTest {
         val invalidSkaffoldRunConfiguration = mockk<RunConfigurationBase<Element>>()
         every { mockRunnerSettings.configuration } answers { invalidSkaffoldRunConfiguration }
 
-        skaffoldCommandLineState = SkaffoldCommandLineState(
-            mockExecutionEnvironment,
-            SkaffoldExecutorSettings.ExecutionMode.DEV
+        skaffoldCommandLineState = SkaffoldDevCommandLineState(
+            mockExecutionEnvironment
         )
 
         val exception = expectThrows(
@@ -110,9 +109,8 @@ class SkaffoldCommandLineStateTest {
     fun `null Skaffold config file results in execution exception`() {
         every { mockDevConfiguration.skaffoldConfigurationFilePath } answers { null }
 
-        skaffoldCommandLineState = SkaffoldCommandLineState(
-            mockExecutionEnvironment,
-            SkaffoldExecutorSettings.ExecutionMode.DEV
+        skaffoldCommandLineState = SkaffoldDevCommandLineState(
+            mockExecutionEnvironment
         )
 
         val exception = expectThrows(
@@ -131,9 +129,8 @@ class SkaffoldCommandLineStateTest {
 
         every { SkaffoldExecutorService.instance.isSkaffoldAvailable() } answers { true }
 
-        skaffoldCommandLineState = SkaffoldCommandLineState(
-            mockExecutionEnvironment,
-            SkaffoldExecutorSettings.ExecutionMode.DEV
+        skaffoldCommandLineState = SkaffoldDevCommandLineState(
+            mockExecutionEnvironment
         )
         skaffoldCommandLineState.startProcess()
 
@@ -148,9 +145,8 @@ class SkaffoldCommandLineStateTest {
     fun `A run error is thrown if skaffold is not in the system PATH`() {
         every { SkaffoldExecutorService.instance.isSkaffoldAvailable() } answers { false }
 
-        skaffoldCommandLineState = SkaffoldCommandLineState(
-            mockExecutionEnvironment,
-            SkaffoldExecutorSettings.ExecutionMode.DEV
+        skaffoldCommandLineState = SkaffoldDevCommandLineState(
+            mockExecutionEnvironment
         )
 
         expectThrows(
@@ -162,9 +158,8 @@ class SkaffoldCommandLineStateTest {
     fun `A run error is not thrown if skaffold is in the system PATH`() {
         every { SkaffoldExecutorService.instance.isSkaffoldAvailable() } answers { true }
 
-        skaffoldCommandLineState = SkaffoldCommandLineState(
-            mockExecutionEnvironment,
-            SkaffoldExecutorSettings.ExecutionMode.DEV
+        skaffoldCommandLineState = SkaffoldDevCommandLineState(
+            mockExecutionEnvironment
         )
 
         skaffoldCommandLineState.startProcess()
