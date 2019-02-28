@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.container.tools.test
+package com.google.kubernetes.tools.test
 
 /**
  * Indicates that the annotated field should replace the registered service in the application's

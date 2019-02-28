@@ -19,10 +19,10 @@ package com.google.kubernetes.tools.skaffold.run.ui
 import com.google.common.truth.Truth.assertThat
 import com.google.kubernetes.tools.skaffold.SkaffoldFileService
 import com.google.kubernetes.tools.skaffold.run.AbstractSkaffoldRunConfiguration
-import com.google.container.tools.test.ContainerToolsRule
-import com.google.container.tools.test.TestService
-import com.google.container.tools.test.UiTest
-import com.google.container.tools.test.expectThrows
+import com.google.kubernetes.tools.test.ContainerToolsRule
+import com.google.kubernetes.tools.test.TestService
+import com.google.kubernetes.tools.test.UiTest
+import com.google.kubernetes.tools.test.expectThrows
 import com.intellij.mock.MockVirtualFile
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.testFramework.EdtTestUtil
@@ -74,8 +74,8 @@ class BaseSkaffoldSettingsEditorTest {
         baseSkaffoldSettingsEditor.resetFrom(mockSkaffoldSettings)
 
         expectThrows(
-            ConfigurationException::class,
-            ThrowableRunnable { baseSkaffoldSettingsEditor.applyTo(mockSkaffoldSettings) })
+                ConfigurationException::class,
+                ThrowableRunnable { baseSkaffoldSettingsEditor.applyTo(mockSkaffoldSettings) })
     }
 
     @Test
@@ -85,8 +85,8 @@ class BaseSkaffoldSettingsEditorTest {
         baseSkaffoldSettingsEditor.resetFrom(mockSkaffoldSettings)
 
         expectThrows(
-            ConfigurationException::class,
-            ThrowableRunnable { baseSkaffoldSettingsEditor.applyTo(mockSkaffoldSettings) })
+                ConfigurationException::class,
+                ThrowableRunnable { baseSkaffoldSettingsEditor.applyTo(mockSkaffoldSettings) })
     }
 
     @Test

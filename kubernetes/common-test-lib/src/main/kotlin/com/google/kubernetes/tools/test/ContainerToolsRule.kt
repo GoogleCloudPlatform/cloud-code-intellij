@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.container.tools.test
+package com.google.kubernetes.tools.test
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.io.FileUtil
