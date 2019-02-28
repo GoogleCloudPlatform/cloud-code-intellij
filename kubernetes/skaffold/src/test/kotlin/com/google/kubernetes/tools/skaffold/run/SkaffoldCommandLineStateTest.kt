@@ -77,7 +77,7 @@ class SkaffoldCommandLineStateTest {
             mockExecutionEnvironment.runnerAndConfigurationSettings
         } answers { mockRunnerSettings }
 
-        every { mockExecutionEnvironment.executor} answers { mockRunExecutor }
+        every { mockExecutionEnvironment.executor } answers { mockRunExecutor }
 
         every { mockRunnerSettings.configuration } answers { mockDevConfiguration }
         // pass project into the CLI state
@@ -190,7 +190,7 @@ class SkaffoldCommandLineStateTest {
     @Test
     fun `Skaffold dev with a debug executor returns dubug execution mode`() {
         every { SkaffoldExecutorService.instance.isSkaffoldAvailable() } answers { true }
-        every { mockExecutionEnvironment.executor} answers { mockDebugExecutor }
+        every { mockExecutionEnvironment.executor } answers { mockDebugExecutor }
 
         skaffoldCommandLineState = SkaffoldDevCommandLineState(
             mockExecutionEnvironment
