@@ -51,10 +51,10 @@ class SkaffoldSingleRunConfiguration(
     var tailDeploymentLogs: Boolean = false
 
     override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState? =
-            SkaffoldCommandLineState(environment, SkaffoldExecutorSettings.ExecutionMode.SINGLE_RUN)
+        SkaffoldCommandLineState(environment, SkaffoldExecutorSettings.ExecutionMode.SINGLE_RUN)
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
-            SkaffoldSingleRunSettingsEditor()
+        SkaffoldSingleRunSettingsEditor()
 }
 
 /**
@@ -73,7 +73,7 @@ class SkaffoldDevConfiguration(
     }
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
-            SkaffoldDevSettingsEditor()
+        SkaffoldDevSettingsEditor()
 
     /**
      * Returns the execution mode depending on the execution environment, i.e. if it was run in
