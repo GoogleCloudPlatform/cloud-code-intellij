@@ -33,39 +33,71 @@
       "additionalProperties": false
     },
     "BuildConfig": {
-      "properties": {
-        "artifacts": {
-          "items": {
-            "$ref": "#/definitions/Artifact"
-          },
-          "type": "array"
-        },
-        "tagPolicy": {
-          "$ref": "#/definitions/TagPolicy"
-        }
-      },
-      "additionalProperties": false,
       "anyOf": [
         {
           "properties": {
+            "artifacts": {
+              "items": {
+                "$ref": "#/definitions/Artifact"
+              },
+              "type": "array"
+            },
+            "tagPolicy": {
+              "$ref": "#/definitions/TagPolicy"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "artifacts": {
+              "items": {
+                "$ref": "#/definitions/Artifact"
+              },
+              "type": "array"
+            },
+            "tagPolicy": {
+              "$ref": "#/definitions/TagPolicy"
+            },
             "local": {
               "$ref": "#/definitions/LocalBuild"
             }
-          }
+          },
+          "additionalProperties": false
         },
         {
           "properties": {
+            "artifacts": {
+              "items": {
+                "$ref": "#/definitions/Artifact"
+              },
+              "type": "array"
+            },
+            "tagPolicy": {
+              "$ref": "#/definitions/TagPolicy"
+            },
             "googleCloudBuild": {
               "$ref": "#/definitions/GoogleCloudBuild"
             }
-          }
+          },
+          "additionalProperties": false
         },
         {
           "properties": {
+            "artifacts": {
+              "items": {
+                "$ref": "#/definitions/Artifact"
+              },
+              "type": "array"
+            },
+            "tagPolicy": {
+              "$ref": "#/definitions/TagPolicy"
+            },
             "kaniko": {
               "$ref": "#/definitions/KanikoBuild"
             }
-          }
+          },
+          "additionalProperties": false
         }
       ],
       "description": "contains all the configuration for the build steps"
@@ -89,11 +121,9 @@
       "description": "contains all the configuration for the tagging step"
     },
     "ShaTagger": {
-      "additionalProperties": false,
       "description": "contains the configuration for the SHA tagger."
     },
     "GitTagger": {
-      "additionalProperties": false,
       "description": "contains the configuration for the git tagger."
     },
     "EnvTemplateTagger": {
@@ -177,7 +207,6 @@
       "description": "contains the fields needed to do a remote build on Google Cloud Build."
     },
     "LocalDir": {
-      "additionalProperties": false,
       "description": "represents the local directory kaniko build context"
     },
     "KanikoBuildContext": {
@@ -254,7 +283,6 @@
       "items": {
         "$ref": "#/definitions/TestCase"
       },
-      "additionalProperties": false,
       "type": "array"
     },
     "TestCase": {
@@ -274,28 +302,33 @@
       "description": "a struct containing all the specified test configuration for an image."
     },
     "DeployConfig": {
-      "additionalProperties": false,
       "anyOf": [
+        {
+          "additionalProperties": false
+        },
         {
           "properties": {
             "helm": {
               "$ref": "#/definitions/HelmDeploy"
             }
-          }
+          },
+          "additionalProperties": false
         },
         {
           "properties": {
             "kubectl": {
               "$ref": "#/definitions/KubectlDeploy"
             }
-          }
+          },
+          "additionalProperties": false
         },
         {
           "properties": {
             "kustomize": {
               "$ref": "#/definitions/KustomizeDeploy"
             }
-          }
+          },
+          "additionalProperties": false
         }
       ],
       "description": "contains all the configuration needed by the deploy steps"
@@ -472,21 +505,25 @@
       "description": "represents parameters for packaging helm chart."
     },
     "HelmImageStrategy": {
-      "additionalProperties": false,
       "anyOf": [
+        {
+          "additionalProperties": false
+        },
         {
           "properties": {
             "fqn": {
               "$ref": "#/definitions/HelmFQNConfig"
             }
-          }
+          },
+          "additionalProperties": false
         },
         {
           "properties": {
             "helm": {
               "$ref": "#/definitions/HelmConventionConfig"
             }
-          }
+          },
+          "additionalProperties": false
         }
       ]
     },
@@ -511,54 +548,111 @@
       "description": "represents image config to use the FullyQualifiedImageName as param to set"
     },
     "HelmConventionConfig": {
-      "additionalProperties": false,
       "description": "represents image config in the syntax of image.repository and image.tag"
     },
     "Artifact": {
-      "properties": {
-        "image": {
-          "type": "string"
-        },
-        "context": {
-          "type": "string"
-        },
-        "sync": {
-          "additionalProperties": {
-            "type": "string"
-          },
-          "type": "object",
-          "default": "{}"
-        }
-      },
-      "additionalProperties": false,
       "anyOf": [
         {
           "properties": {
+            "image": {
+              "type": "string"
+            },
+            "context": {
+              "type": "string"
+            },
+            "sync": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object",
+              "default": "{}"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "image": {
+              "type": "string"
+            },
+            "context": {
+              "type": "string"
+            },
+            "sync": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object",
+              "default": "{}"
+            },
             "docker": {
               "$ref": "#/definitions/DockerArtifact"
             }
-          }
+          },
+          "additionalProperties": false
         },
         {
           "properties": {
+            "image": {
+              "type": "string"
+            },
+            "context": {
+              "type": "string"
+            },
+            "sync": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object",
+              "default": "{}"
+            },
             "bazel": {
               "$ref": "#/definitions/BazelArtifact"
             }
-          }
+          },
+          "additionalProperties": false
         },
         {
           "properties": {
+            "image": {
+              "type": "string"
+            },
+            "context": {
+              "type": "string"
+            },
+            "sync": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object",
+              "default": "{}"
+            },
             "jibMaven": {
               "$ref": "#/definitions/JibMavenArtifact"
             }
-          }
+          },
+          "additionalProperties": false
         },
         {
           "properties": {
+            "image": {
+              "type": "string"
+            },
+            "context": {
+              "type": "string"
+            },
+            "sync": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object",
+              "default": "{}"
+            },
             "jibGradle": {
               "$ref": "#/definitions/JibGradleArtifact"
             }
-          }
+          },
+          "additionalProperties": false
         }
       ],
       "description": "represents items that need to be built, along with the context in which they should be built."
