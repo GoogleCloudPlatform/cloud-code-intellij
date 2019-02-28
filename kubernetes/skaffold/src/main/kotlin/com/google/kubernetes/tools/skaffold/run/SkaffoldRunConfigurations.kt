@@ -68,9 +68,8 @@ class SkaffoldDevConfiguration(
     name: String
 ) : AbstractSkaffoldRunConfiguration(project, factory, name) {
 
-    override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState? {
-        return SkaffoldCommandLineState(environment, getExecutionMode(environment))
-    }
+    override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState? =
+        SkaffoldCommandLineState(environment, getExecutionMode(environment))
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
         SkaffoldDevSettingsEditor()
