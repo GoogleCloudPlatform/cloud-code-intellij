@@ -39,7 +39,7 @@
       <action id="GoogleCloudTools.AppEngineStandardLocalRun"
               class="com.google.cloud.tools.intellij.appengine.java.ultimate.server.run.AppEngineStandardLocalRunToolsMenuAction" />
         <separator/>
-        <add-to-group group-id="GoogleCloudTools" anchor="first"/>
+        <add-to-group group-id="GoogleCloudTools.AppEngine.General" anchor="last"/>
     </group>
   </actions>
 </idea-plugin>

@@ -35,7 +35,12 @@
     </extensionPoints>
 
     <actions>
-        <group id="GoogleCloudTools.AppEngine">
+        <group id="GoogleCloudTools.AppEngine.General" class="com.google.cloud.tools.intellij.appengine.java.util.AppEngineGeneralMenuGroupAction"
+                popup="true">
+            <add-to-group group-id="GoogleCloudTools" anchor="first"/>
+        </group>
+
+        <group id="GoogleCloudTools.AppEngine.Support">
             <group id="GoogleCloudTools.AddAppEngineFrameworkSupport"
                    class="com.google.cloud.tools.intellij.appengine.java.facet.AddAppEngineFrameworkSupportMenuGroupAction"
                    popup="true">
@@ -47,9 +52,7 @@
             <action id="GoogleCloudTools.AppEngineDeploy"
                     class="com.google.cloud.tools.intellij.appengine.java.cloud.AppEngineDeployToolsMenuAction"/>
             <separator/>
-            <add-to-group group-id="GoogleCloudTools"
-                          relative-to-action="GoogleCloudTools.stackdriver.debugger"
-                          anchor="before"/>
+            <add-to-group group-id="GoogleCloudTools.AppEngine.General" anchor="first"/>
         </group>
     </actions>
 
