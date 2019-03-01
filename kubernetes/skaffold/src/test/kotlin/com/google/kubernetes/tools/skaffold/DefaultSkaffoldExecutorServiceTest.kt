@@ -17,7 +17,7 @@
 package com.google.kubernetes.tools.skaffold
 
 import com.google.common.truth.Truth.assertThat
-import com.google.container.tools.core.settings.KubernetesSettingsService
+import com.google.kubernetes.tools.core.settings.KubernetesSettingsService
 import com.google.kubernetes.tools.test.ContainerToolsRule
 import com.google.kubernetes.tools.test.TestFile
 import com.google.kubernetes.tools.test.TestService

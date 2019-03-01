@@ -18,7 +18,7 @@ package com.google.kubernetes.tools.skaffold
 
 import com.google.cloud.tools.intellij.analytics.UsageTrackerService
 import com.google.common.annotations.VisibleForTesting
-import com.google.container.tools.core.settings.KubernetesSettingsService
+import com.google.kubernetes.tools.core.settings.KubernetesSettingsService
 import com.google.kubernetes.tools.skaffold.SkaffoldExecutorSettings.ExecutionMode
 import com.google.kubernetes.tools.skaffold.metrics.METADATA_ERROR_MESSAGE_KEY
 import com.google.kubernetes.tools.skaffold.metrics.SKAFFOLD_DEV_RUN_FAIL

@@ -17,7 +17,7 @@
 package com.google.kubernetes.tools.skaffold.run
 
 import com.google.common.annotations.VisibleForTesting
-import com.google.container.tools.core.settings.KubernetesSettingsConfigurable
+import com.google.kubernetes.tools.core.settings.KubernetesSettingsConfigurable
 import com.google.kubernetes.tools.skaffold.SkaffoldExecutorService
 import com.google.kubernetes.tools.skaffold.SkaffoldExecutorSettings
 import com.google.kubernetes.tools.skaffold.message
