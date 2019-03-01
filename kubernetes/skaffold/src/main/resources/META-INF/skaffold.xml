@@ -21,35 +21,35 @@
     <project-components>
         <component>
             <implementation-class>
-                com.google.container.tools.skaffold.SkaffoldConfigurationDetector
+                com.google.kubernetes.tools.skaffold.SkaffoldConfigurationDetector
             </implementation-class>
         </component>
         <component>
             <implementation-class>
-                com.google.container.tools.skaffold.SkaffoldConfigurationRunManagerListener
+                com.google.kubernetes.tools.skaffold.SkaffoldConfigurationRunManagerListener
             </implementation-class>
         </component>
     </project-components>
 
     <extensions defaultExtensionNs="com.intellij">
         <configurationType
-                implementation="com.google.container.tools.skaffold.run.SkaffoldRunConfigurationType"/>
+                implementation="com.google.kubernetes.tools.skaffold.run.SkaffoldRunConfigurationType"/>
 
         <applicationService
-                serviceImplementation="com.google.container.tools.skaffold.SkaffoldFileService"/>
+                serviceImplementation="com.google.kubernetes.tools.skaffold.SkaffoldFileService"/>
 
         <applicationService
                 serviceInterface="com.google.container.tools.skaffold.SkaffoldExecutorService"
                 serviceImplementation="com.google.container.tools.skaffold.DefaultSkaffoldExecutorService"/>
 
-        <liveTemplateContext implementation="com.google.container.tools.skaffold.editing.SkaffoldContextType"/>
+        <liveTemplateContext implementation="com.google.kubernetes.tools.skaffold.editing.SkaffoldContextType"/>
         <defaultLiveTemplatesProvider
-                implementation="com.google.container.tools.skaffold.editing.SkaffoldLiveTemplatesProvider"/>
+                implementation="com.google.kubernetes.tools.skaffold.editing.SkaffoldLiveTemplatesProvider"/>
 
         <!--<programRunner implementation="com.google.container.tools.skaffold.run.SkaffoldDebugProgramRunner" />-->
     </extensions>
 
     <extensions defaultExtensionNs="JavaScript">
-        <JsonSchema.ProviderFactory implementation="com.google.container.tools.skaffold.editing.SkaffoldSchemaProviderFactory" />
+        <JsonSchema.ProviderFactory implementation="com.google.kubernetes.tools.skaffold.editing.SkaffoldSchemaProviderFactory" />
     </extensions>
 </idea-plugin>

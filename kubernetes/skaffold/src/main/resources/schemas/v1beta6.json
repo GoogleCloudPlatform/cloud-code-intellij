@@ -817,6 +817,11 @@
         "releases"
       ],
       "properties": {
+        "flags": {
+          "$ref": "#/definitions/HelmDeployFlags",
+          "description": "Optional flags to send to the helm command",
+          "x-intellij-html-description": "Optional flags to send to the helm command\n"
+        },
         "releases": {
           "items": {
             "$ref": "#/definitions/HelmRelease"
@@ -827,11 +832,45 @@
         }
       },
       "preferredOrder": [
-        "releases"
+        "releases",
+        "flags"
       ],
       "additionalProperties": false,
       "description": "(beta) uses the `helm` CLI to apply the charts to the cluster.",
       "x-intellij-html-description": "(beta) uses the <code>helm</code> CLI to apply the charts to the cluster.\n"
+    },
+    "HelmDeployFlags": {
+      "properties": {
+        "global": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "default": "[]"
+        },
+        "install": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "default": "[]"
+        },
+        "upgrade": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "default": "[]"
+        }
+      },
+      "preferredOrder": [
+        "global",
+        "install",
+        "upgrade"
+      ],
+      "additionalProperties": false,
+      "description": "describes additional options flags that are passed on the command line to helm either on every command (Global), on install (Install) or on update (Update).",
+      "x-intellij-html-description": "describes additional options flags that are passed on the command line to helm either on every command (Global), on install (Install) or on update (Update).\n"
     },
     "HelmFQNConfig": {
       "properties": {
