@@ -16,6 +16,7 @@
 
 package com.google.container.tools.core.settings
 
+import com.google.common.annotations.VisibleForTesting
 import com.intellij.core.CoreBundle
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.options.Configurable
@@ -29,6 +30,8 @@ import javax.swing.JComponent
  * Creates a "Kubernetes" menu item under the "Google" menu item in the IDE Settings.
  */
 class KubernetesSettingsConfigurable : Configurable {
+
+    @VisibleForTesting
     val skaffoldBrowser = TextFieldWithBrowseButton()
 
     init {
