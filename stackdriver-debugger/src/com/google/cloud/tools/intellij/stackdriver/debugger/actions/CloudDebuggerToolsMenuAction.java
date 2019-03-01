@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.stackdriver.debugger;
+package com.google.cloud.tools.intellij.stackdriver.debugger.actions;
 
 import com.google.cloud.tools.intellij.CloudToolsRunConfigurationAction;
+import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugConfigType;
+import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
+import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerIcons;
 
 /** Creates a shortcut to the Stackdriver debugger configuration in the tools menu. */
 public class CloudDebuggerToolsMenuAction extends CloudToolsRunConfigurationAction {
