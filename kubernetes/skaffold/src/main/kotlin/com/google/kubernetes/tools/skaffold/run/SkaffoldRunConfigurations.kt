@@ -29,7 +29,6 @@ import com.intellij.execution.configurations.RunConfigurationBase
 import com.intellij.execution.configurations.RunProfileState
 import com.intellij.execution.configurations.RuntimeConfigurationWarning
 import com.intellij.execution.executors.DefaultDebugExecutor
-import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
@@ -81,7 +80,7 @@ class SkaffoldDevConfiguration(
     @VisibleForTesting
     fun getExecutionMode(environment: ExecutionEnvironment) = when (environment.executor) {
             is DefaultDebugExecutor -> SkaffoldExecutorSettings.ExecutionMode.DEBUG
-            else ->  SkaffoldExecutorSettings.ExecutionMode.DEV
+            else -> SkaffoldExecutorSettings.ExecutionMode.DEV
         }
 }
 
