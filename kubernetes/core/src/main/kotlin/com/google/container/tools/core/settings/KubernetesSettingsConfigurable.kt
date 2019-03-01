@@ -76,6 +76,7 @@ class KubernetesSettingsConfigurable : Configurable {
                 CoreBundle.message(
                         "kubernetes.settings.dependencies.panel.title"), 0, Insets(0, 0, 0, 0))
 
+        // Wrapping in an extra panel so that the titled border shows up properly
         return panel {
             row {
                 dependenciesPanel()
