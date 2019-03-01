@@ -16,6 +16,7 @@
 
 package com.google.container.tools.core.settings
 
+import com.intellij.core.CoreBundle
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
@@ -24,12 +25,15 @@ import com.intellij.ui.layout.panel
 import java.awt.Insets
 import javax.swing.JComponent
 
+/**
+ * Creates a "Kubernetes" menu item under the "Google" menu item in the IDE Settings.
+ */
 class KubernetesSettingsConfigurable : Configurable {
     val skaffoldBrowser = TextFieldWithBrowseButton()
 
     init {
         skaffoldBrowser.addBrowseFolderListener(
-                "Browse to Skaffold executable",
+                CoreBundle.message("kubernetes.settings.dependencies.skaffold.browse.title"),
                 null /*description*/,
                 null /*project*/,
                 FileChooserDescriptor(
@@ -60,12 +64,14 @@ class KubernetesSettingsConfigurable : Configurable {
     override fun createComponent(): JComponent? {
         val dependenciesPanel = panel {
 
-            row("Path to Skaffold executable:") {
+            row(CoreBundle.message("kubernetes.settings.dependencies.skaffold.selector.title")) {
                 skaffoldBrowser(grow)
             }
         }
 
-        dependenciesPanel.border = IdeaTitledBorder("Dependencies", 0, Insets(0, 0, 0, 0))
+        dependenciesPanel.border = IdeaTitledBorder(
+                CoreBundle.message(
+                        "kubernetes.settings.dependencies.panel.title"), 0, Insets(0, 0, 0, 0))
 
         return panel {
             row {
