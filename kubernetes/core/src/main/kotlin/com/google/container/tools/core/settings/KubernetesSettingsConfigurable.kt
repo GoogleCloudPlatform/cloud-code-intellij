@@ -26,9 +26,6 @@ import com.intellij.ui.layout.panel
 import java.awt.Insets
 import javax.swing.JComponent
 
-private const val SKAFFOLD_INSTALLATION_INSTRUCTIONS_LINK
-        = "https://skaffold.dev/docs/getting-started/#installing-skaffold"
-
 /**
  * Creates a "Kubernetes" menu item under the "Google" menu item in the IDE Settings.
  */
@@ -72,8 +69,7 @@ class KubernetesSettingsConfigurable : Configurable {
                 skaffoldBrowser(grow)
             }
 
-            noteRow(CoreBundle.message("kubernetes.settings.dependencies.skaffold.note",
-                    SKAFFOLD_INSTALLATION_INSTRUCTIONS_LINK))
+            noteRow(CoreBundle.message("kubernetes.settings.dependencies.skaffold.note"))
         }
 
         dependenciesPanel.border = IdeaTitledBorder(
