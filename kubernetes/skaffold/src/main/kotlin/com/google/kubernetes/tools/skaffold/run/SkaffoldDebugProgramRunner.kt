@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.container.tools.skaffold.run
+package com.google.kubernetes.tools.skaffold.run
 
 import com.intellij.execution.configurations.RunProfile
 import com.intellij.execution.configurations.RunProfileState
@@ -25,15 +25,24 @@ import com.intellij.execution.ui.RunContentDescriptor
 
 private const val SKAFFOLD_DEBUG_RUNNER_ID = "SkaffoldDebugProgramRunner"
 
+/**
+ * A program runner for executing Skaffold continuous deployment in debug mode.
+ */
 class SkaffoldDebugProgramRunner : DefaultProgramRunner() {
+
+    /**
+     * Debug should be enabled if this is a [SkaffoldDevConfiguration] and the executor is a debug
+     * executor.
+     */
     override fun canRun(executorId: String, profile: RunProfile): Boolean {
         return profile is SkaffoldDevConfiguration && executorId == DefaultDebugExecutor.EXECUTOR_ID
     }
 
     override fun getRunnerId(): String = SKAFFOLD_DEBUG_RUNNER_ID
 
-    // TODO, needs to debug the modules selected from the UI
-    override fun doExecute(state: RunProfileState, environment: ExecutionEnvironment): RunContentDescriptor? {
+    override fun doExecute(state: RunProfileState, environment: ExecutionEnvironment):
+            RunContentDescriptor? {
+        // TODO implement in later PRs
         return super.doExecute(state, environment)
     }
 }
