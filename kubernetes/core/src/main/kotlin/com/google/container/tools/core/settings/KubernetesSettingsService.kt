@@ -21,19 +21,25 @@ import com.intellij.openapi.components.ServiceManager
 
 private const val SKAFFOLD_EXECUTABLE_PATH_KEY = "SKAFFOLD_EXECUTABLE_PATH"
 
+/**
+ * An application service backed by a persistance [PropertiesComponent] used to store values from
+ * the Kubernetes settings menu.
+ */
 class KubernetesSettingsService {
     companion object {
         val instance: KubernetesSettingsService
             get() = ServiceManager.getService(KubernetesSettingsService::class.java)!!
     }
 
-
     private val propertiesComponent = PropertiesComponent.getInstance()
 
+    /**
+     * Getter and setter for the path to the Skaffold executable. Stores and retrieves the value
+     * from the persisted [PropertiesComponent].
+     */
     var skaffoldExecutablePath: String
         get() = propertiesComponent.getValue(SKAFFOLD_EXECUTABLE_PATH_KEY) ?: ""
         set(path) {
             propertiesComponent.setValue(SKAFFOLD_EXECUTABLE_PATH_KEY, path)
         }
-
 }

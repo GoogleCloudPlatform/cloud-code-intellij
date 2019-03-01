@@ -16,7 +16,7 @@
 
 package com.google.container.tools.core.settings
 
-import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
+import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.border.IdeaTitledBorder
@@ -28,7 +28,17 @@ class KubernetesSettingsConfigurable : Configurable {
     val skaffoldBrowser = TextFieldWithBrowseButton()
 
     init {
-        skaffoldBrowser.addBrowseFolderListener("Browse to Skaffold executable", null, null, FileChooserDescriptorFactory.createSingleFileDescriptor())
+        skaffoldBrowser.addBrowseFolderListener(
+                "Browse to Skaffold executable",
+                null /*description*/,
+                null /*project*/,
+                FileChooserDescriptor(
+                        true /*chooseFiles*/,
+                        false /*chooseFolders*/,
+                        false /*chooseJars*/,
+                        false /*chooseJarsAsFiles*/,
+                        false /*chooseJarContents*/,
+                        false /*chooseMultiple*/))
     }
 
     override fun isModified(): Boolean {
@@ -53,7 +63,6 @@ class KubernetesSettingsConfigurable : Configurable {
             row("Path to Skaffold executable:") {
                 skaffoldBrowser(grow)
             }
-
         }
 
         dependenciesPanel.border = IdeaTitledBorder("Dependencies", 0, Insets(0, 0, 0, 0))
@@ -64,5 +73,4 @@ class KubernetesSettingsConfigurable : Configurable {
             }
         }
     }
-
 }
