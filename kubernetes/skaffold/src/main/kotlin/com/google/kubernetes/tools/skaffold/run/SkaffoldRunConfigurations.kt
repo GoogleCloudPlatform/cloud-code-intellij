@@ -80,10 +80,8 @@ class SkaffoldDevConfiguration(
      */
     @VisibleForTesting
     fun getExecutionMode(environment: ExecutionEnvironment) = when (environment.executor) {
-            is DefaultRunExecutor -> SkaffoldExecutorSettings.ExecutionMode.DEV
             is DefaultDebugExecutor -> SkaffoldExecutorSettings.ExecutionMode.DEBUG
-            else -> throw RuntimeException("Unexpected Skaffold executor type found: " +
-                    "${environment.executor}.")
+            else ->  SkaffoldExecutorSettings.ExecutionMode.DEV
         }
 }
 

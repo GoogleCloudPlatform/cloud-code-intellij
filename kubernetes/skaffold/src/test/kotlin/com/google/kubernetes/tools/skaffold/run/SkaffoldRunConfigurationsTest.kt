@@ -17,14 +17,12 @@
 package com.google.kubernetes.tools.skaffold.run
 
 import com.google.common.truth.Truth
-import com.google.container.tools.test.ContainerToolsRule
-import com.google.container.tools.test.expectThrows
 import com.google.kubernetes.tools.skaffold.SkaffoldExecutorSettings
+import com.google.kubernetes.tools.test.ContainerToolsRule
 import com.intellij.execution.Executor
 import com.intellij.execution.executors.DefaultDebugExecutor
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.runners.ExecutionEnvironment
-import com.intellij.util.ThrowableRunnable
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import org.junit.Before
@@ -77,11 +75,9 @@ class SkaffoldRunConfigurationsTest {
     }
 
     @Test
-    fun `Skaffold dev with an unrecognized executor throws exception`() {
+    fun `Skaffold dev with an unrecognized uses dev executore`() {
         every { executionEnvironment.executor } answers { mockExecutor }
-        expectThrows(
-                RuntimeException::class,
-                ThrowableRunnable { skaffoldDevConfiguration
-                        .getExecutionMode(executionEnvironment) })
+        Truth.assertThat(skaffoldDevConfiguration.getExecutionMode(executionEnvironment))
+                .isEqualTo(SkaffoldExecutorSettings.ExecutionMode.DEV)
     }
 }
