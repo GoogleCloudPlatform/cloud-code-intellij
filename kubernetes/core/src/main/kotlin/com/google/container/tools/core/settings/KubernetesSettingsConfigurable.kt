@@ -17,7 +17,7 @@
 package com.google.container.tools.core.settings
 
 import com.google.common.annotations.VisibleForTesting
-import com.intellij.core.CoreBundle
+import com.google.kubernetes.tools.core.util.CoreBundle
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
@@ -52,9 +52,7 @@ class KubernetesSettingsConfigurable : Configurable {
         return KubernetesSettingsService.instance.skaffoldExecutablePath != skaffoldBrowser.text
     }
 
-    override fun getDisplayName(): String {
-        return "Kubernetes"
-    }
+    override fun getDisplayName(): String = CoreBundle.message("kubernetes.settings.name")
 
     override fun apply() {
         KubernetesSettingsService.instance.skaffoldExecutablePath = skaffoldBrowser.text
