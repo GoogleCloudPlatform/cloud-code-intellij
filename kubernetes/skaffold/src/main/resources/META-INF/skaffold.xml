@@ -39,8 +39,8 @@
                 serviceImplementation="com.google.kubernetes.tools.skaffold.SkaffoldFileService"/>
 
         <applicationService
-                serviceInterface="com.google.container.tools.skaffold.SkaffoldExecutorService"
-                serviceImplementation="com.google.container.tools.skaffold.DefaultSkaffoldExecutorService"/>
+                serviceInterface="com.google.kubernetes.tools.skaffold.SkaffoldExecutorService"
+                serviceImplementation="com.google.kubernetes.tools.skaffold.DefaultSkaffoldExecutorService"/>
 
         <liveTemplateContext implementation="com.google.kubernetes.tools.skaffold.editing.SkaffoldContextType"/>
         <defaultLiveTemplatesProvider
