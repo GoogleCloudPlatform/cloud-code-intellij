@@ -31,11 +31,15 @@
                 serviceImplementation="com.google.cloud.tools.intellij.cloudapis.CloudLibrariesService"/>
     </extensions>
     <actions>
+        <group id="GoogleCloudTools.cloudapis.general"
+            class="com.google.cloud.tools.intellij.cloudapis.CloudLibrariesGeneralMenuGroup" popup="true">
+            <add-to-group group-id="GoogleCloudTools"  anchor="after" relative-to-action="GoogleCloudTools.AppEngine.General"/>
+        </group>
+
         <group id="GoogleCloudTools.cloudapis">
             <action id="GoogleCloudTools.AddCloudLibraries"
                     class="com.google.cloud.tools.intellij.cloudapis.AddCloudLibrariesAction"/>
-            <separator/>
-            <add-to-group group-id="GoogleCloudTools" anchor="first"/>
+            <add-to-group group-id="GoogleCloudTools.cloudapis.general"/>
         </group>
     </actions>
 
