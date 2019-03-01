@@ -16,6 +16,7 @@
 
 package com.google.kubernetes.tools.skaffold.run
 
+import com.google.common.annotations.VisibleForTesting
 import com.google.kubernetes.tools.skaffold.SkaffoldExecutorService
 import com.google.kubernetes.tools.skaffold.SkaffoldExecutorSettings
 import com.google.kubernetes.tools.skaffold.message
@@ -27,6 +28,7 @@ import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.execution.configurations.RunConfigurationBase
 import com.intellij.execution.configurations.RunProfileState
 import com.intellij.execution.configurations.RuntimeConfigurationWarning
+import com.intellij.execution.executors.DefaultDebugExecutor
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
@@ -66,10 +68,20 @@ class SkaffoldDevConfiguration(
 ) : AbstractSkaffoldRunConfiguration(project, factory, name) {
 
     override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState? =
-        SkaffoldCommandLineState(environment, SkaffoldExecutorSettings.ExecutionMode.DEV)
+        SkaffoldCommandLineState(environment, getExecutionMode(environment))
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
         SkaffoldDevSettingsEditor()
+
+    /**
+     * Returns the execution mode depending on the execution environment, i.e. if it was run in
+     * either 'run' or 'debug' mode.
+     */
+    @VisibleForTesting
+    fun getExecutionMode(environment: ExecutionEnvironment) = when (environment.executor) {
+            is DefaultDebugExecutor -> SkaffoldExecutorSettings.ExecutionMode.DEBUG
+            else -> SkaffoldExecutorSettings.ExecutionMode.DEV
+        }
 }
 
 /**
