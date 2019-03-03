@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.stackdriver.debugger;
+package com.google.cloud.tools.intellij.cloudapis;
 
-import com.google.cloud.tools.intellij.CloudToolsRunConfigurationAction;
+import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
 
-/** Creates a shortcut to the Stackdriver debugger configuration in the tools menu. */
-public class CloudDebuggerToolsMenuAction extends CloudToolsRunConfigurationAction {
+/** General menu group for all Cloud APIs related actions, including all menu sub-groups. */
+public class CloudLibrariesGeneralMenuGroup extends DefaultActionGroup {
 
-  public CloudDebuggerToolsMenuAction() {
-    super(
-        CloudDebugConfigType.getInstance(),
-        StackdriverDebuggerBundle.message("appengine.tools.menu.debug.text"),
-        StackdriverDebuggerBundle.message("appengine.tools.menu.debug.description"),
-        StackdriverDebuggerIcons.STACKDRIVER_DEBUGGER);
+  public CloudLibrariesGeneralMenuGroup() {
+    getTemplatePresentation()
+        .setText(GoogleCloudApisMessageBundle.message("cloud.libraries.general.menu.group.text"));
+    getTemplatePresentation().setIcon(GoogleCloudCoreIcons.CLOUD);
   }
 }
