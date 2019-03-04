@@ -17,7 +17,6 @@
 package com.google.cloud.tools.intellij.stackdriver.debugger.actions;
 
 import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
-import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerIcons;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 
 /** General menu group for all Cloud Debugger related actions, including all menu sub-groups. */
@@ -26,6 +25,5 @@ public class CloudDebuggerGeneralMenuGroupAction extends DefaultActionGroup {
   public CloudDebuggerGeneralMenuGroupAction() {
     getTemplatePresentation()
         .setText(StackdriverDebuggerBundle.message("clouddebug.general.menu.group.text"));
-    getTemplatePresentation().setIcon(StackdriverDebuggerIcons.STACKDRIVER_DEBUGGER);
   }
 }

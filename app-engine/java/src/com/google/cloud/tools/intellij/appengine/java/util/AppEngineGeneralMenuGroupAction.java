@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.appengine.java.util;
 
-import com.google.cloud.tools.intellij.appengine.java.AppEngineIcons;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 
@@ -26,6 +25,5 @@ public class AppEngineGeneralMenuGroupAction extends DefaultActionGroup {
   public AppEngineGeneralMenuGroupAction() {
     getTemplatePresentation()
         .setText(AppEngineMessageBundle.message("appengine.general.group.menu.text"));
-    getTemplatePresentation().setIcon(AppEngineIcons.APP_ENGINE);
   }
 }

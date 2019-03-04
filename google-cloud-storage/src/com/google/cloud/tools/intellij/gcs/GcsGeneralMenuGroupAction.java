@@ -24,6 +24,5 @@ public class GcsGeneralMenuGroupAction extends DefaultActionGroup {
   public GcsGeneralMenuGroupAction() {
     getTemplatePresentation()
         .setText(GoogleCloudStorageMessageBundle.message("gcs.tools.general.menu.group.text"));
-    getTemplatePresentation().setIcon(GoogleCloudStorageIcons.CLOUD_STORAGE);
   }
 }
