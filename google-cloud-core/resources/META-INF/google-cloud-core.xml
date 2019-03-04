@@ -29,12 +29,19 @@
       <add-to-group group-id="NavBarToolBar" anchor="last"  />
     </action>
 
-    <group id="CloudCodeGoogle" class="com.google.cloud.tools.intellij.CloudCodeTopMenuGroupAction" popup="true">
+    <group id="CloudCodeGoogle" class="com.google.cloud.tools.intellij.action.CloudCodeTopMenuGroupAction" popup="true">
       <add-to-group group-id="ToolsMenu" anchor="last"/>
     </group>
 
-    <group id="GoogleCloudTools" class="com.google.cloud.tools.intellij.CloudToolsMenuGroupAction" popup="true">
+    <group id="GoogleCloudTools" class="com.google.cloud.tools.intellij.action.CloudToolsMenuGroupAction" popup="true">
         <add-to-group group-id="CloudCodeGoogle" anchor="last"/>
+    </group>
+
+      <!-- App engine menu group is initialized in the core plugin making sure bits of App engine support all get access to it regardless of load order. -->
+    <group id="GoogleCloudTools.AppEngine.General"
+           class="com.google.cloud.tools.intellij.action.AppEngineGeneralMenuGroupAction"
+           popup="true">
+        <add-to-group group-id="GoogleCloudTools" anchor="first"/>
     </group>
   </actions>
 

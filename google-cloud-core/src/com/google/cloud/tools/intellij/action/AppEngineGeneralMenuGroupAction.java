@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.appengine.java.util;
+package com.google.cloud.tools.intellij.action;
 
-import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
+import com.google.cloud.tools.intellij.GoogleCloudCoreMessageBundle;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 
 /** General menu group for all App Engine related actions, including all menu sub-groups. */
 public class AppEngineGeneralMenuGroupAction extends DefaultActionGroup {
 
   public AppEngineGeneralMenuGroupAction() {
-    getTemplatePresentation()
-        .setText(AppEngineMessageBundle.message("appengine.general.group.menu.text"));
+    getTemplatePresentation().setText(GoogleCloudCoreMessageBundle.message("appengine.general.group.menu.text"));
   }
 }
