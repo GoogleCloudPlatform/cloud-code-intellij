@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.container.tools.core.settings
+package com.google.kubernetes.tools.core.settings
 
 import com.google.common.annotations.VisibleForTesting
 import com.google.kubernetes.tools.core.util.CoreBundle
