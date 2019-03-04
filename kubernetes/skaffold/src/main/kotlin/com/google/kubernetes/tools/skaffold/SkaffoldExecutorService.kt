@@ -18,6 +18,7 @@ package com.google.kubernetes.tools.skaffold
 
 import com.google.cloud.tools.intellij.analytics.UsageTrackerService
 import com.google.common.annotations.VisibleForTesting
+import com.google.kubernetes.tools.core.settings.KubernetesSettingsService
 import com.google.kubernetes.tools.skaffold.SkaffoldExecutorSettings.ExecutionMode
 import com.google.kubernetes.tools.skaffold.metrics.METADATA_ERROR_MESSAGE_KEY
 import com.google.kubernetes.tools.skaffold.metrics.SKAFFOLD_DEV_RUN_FAIL
@@ -47,12 +48,18 @@ abstract class SkaffoldExecutorService {
 
     fun getSystemPath(): String = System.getenv("PATH")
 
-    fun isSkaffoldAvailable(): Boolean = getSystemPath().split(File.pathSeparator)
-            .asSequence()
-            .map { it + File.separator + "skaffold" } // convert each to a possible path to the executable
-            .any {
-                File(it).exists() && File(it).canExecute()
-            }
+    fun isSkaffoldAvailable(): Boolean {
+        val skaffoldPathOverride = KubernetesSettingsService.instance.skaffoldExecutablePath
+
+        val isSkaffoldOnPath = getSystemPath().split(File.pathSeparator)
+                .asSequence()
+                .map { it + File.separator + "skaffold" }
+                .any {
+                    File(it).exists() && File(it).canExecute()
+                }
+
+        return skaffoldPathOverride.isNotBlank() || isSkaffoldOnPath
+    }
 
     /**
      * Creates Skaffold command line from the given settings and returns resulting launched
@@ -177,10 +184,22 @@ data class SkaffoldExecutorSettings(
 data class SkaffoldProcess(val process: Process, val commandLine: String)
 
 /**
- * Default implementation of Skaffold execution service, where Skaffold executable is assumed to
- * be already installed on the system and be available in PATH.
+ * Default implementation of Skaffold executor service. The Skaffold executable is first pulled
+ * from the Kubernetes settings, and then the PATH if unavailable in the settings.
  */
 class DefaultSkaffoldExecutorService : SkaffoldExecutorService() {
-    // use executable available in PATH
+    /**
+     * First try to find Skaffold in the Kubernetes settings under Google -> Kubernetes.
+     * If not found, then try to find it on the user's PATH.
+     */
     override var skaffoldExecutablePath: Path = Paths.get("skaffold")
+        get() {
+            val skaffoldPathOverride = KubernetesSettingsService.instance.skaffoldExecutablePath
+
+            return if (skaffoldPathOverride.isNotBlank()) {
+                Paths.get(skaffoldPathOverride.trim())
+            } else {
+                field
+            }
+        }
 }

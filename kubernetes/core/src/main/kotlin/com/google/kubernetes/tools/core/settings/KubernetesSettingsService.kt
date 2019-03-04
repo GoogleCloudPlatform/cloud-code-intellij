@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.container.tools.core.settings
+package com.google.kubernetes.tools.core.settings
 
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.components.ServiceManager
