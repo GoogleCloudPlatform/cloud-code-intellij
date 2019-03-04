@@ -23,6 +23,7 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 public class AppEngineGeneralMenuGroupAction extends DefaultActionGroup {
 
   public AppEngineGeneralMenuGroupAction() {
-    getTemplatePresentation().setText(GoogleCloudCoreMessageBundle.message("appengine.general.group.menu.text"));
+    getTemplatePresentation()
+        .setText(GoogleCloudCoreMessageBundle.message("appengine.general.group.menu.text"));
   }
 }
