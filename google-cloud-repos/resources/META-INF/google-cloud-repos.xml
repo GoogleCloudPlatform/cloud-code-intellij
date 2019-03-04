@@ -38,10 +38,15 @@
             <add-to-group group-id="Vcs.Import"/>
         </action>
 
+        <group id="GoogleCloudTools.csr.general"
+               class="com.google.cloud.tools.intellij.csr.CloudRepositoryGeneralMenuGroupAction"
+               popup="true">
+            <add-to-group group-id="GoogleCloudTools" anchor="after" relative-to-action="GoogleCloudTools.cloudapis.general"/>
+        </group>
+
         <group id="GoogleCloudTools.csr">
             <reference ref="GoogleCloudTools.UploadSourceToGCP"/>
-            <separator/>
-            <add-to-group group-id="GoogleCloudTools"/>
+            <add-to-group group-id="GoogleCloudTools.csr.general"/>
         </group>
     </actions>
 </idea-plugin>
