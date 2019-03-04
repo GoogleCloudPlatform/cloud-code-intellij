@@ -44,7 +44,7 @@ abstract class SkaffoldExecutorService {
     }
 
     /** Path for Skaffold executable, any form supported by [ProcessBuilder] */
-    protected abstract fun getSkaffoldExecutablePath(): Path
+    protected abstract var skaffoldExecutablePath: Path
 
     fun getSystemPath(): String = System.getenv("PATH")
 
@@ -72,7 +72,7 @@ abstract class SkaffoldExecutorService {
         SkaffoldProcess {
         val commandList = mutableListOf<String>()
         with(commandList) {
-            add(getSkaffoldExecutablePath().toString())
+            add(skaffoldExecutablePath.toString())
             add(settings.executionMode.modeFlag)
             settings.skaffoldConfigurationFilePath?.let {
                 add("--filename")
@@ -192,13 +192,14 @@ class DefaultSkaffoldExecutorService : SkaffoldExecutorService() {
      * First try to find Skaffold in the Kubernetes settings under Google -> Kubernetes.
      * If not found, then try to find it on the user's PATH.
      */
-    override fun getSkaffoldExecutablePath(): Path {
-        val skaffoldPathOverride = KubernetesSettingsService.instance.skaffoldExecutablePath
+    override var skaffoldExecutablePath: Path = Paths.get("skaffold")
+        get() {
+            val skaffoldPathOverride = KubernetesSettingsService.instance.skaffoldExecutablePath
 
-        return if (skaffoldPathOverride.isNotBlank()) {
-            Paths.get(skaffoldPathOverride.trim())
-        } else {
-            Paths.get("skaffold")
+            return if (skaffoldPathOverride.isNotBlank()) {
+                Paths.get(skaffoldPathOverride.trim())
+            } else {
+                field
+            }
         }
-    }
 }
