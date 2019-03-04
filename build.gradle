@@ -65,6 +65,9 @@ subprojects {
         updateSinceUntilBuild = false
         downloadSources = true
         intellijRepo = intellijRepoUrl
+        if (project.properties["alternativeIdePath"] != null) {
+            alternativeIdePath = project.properties["alternativeIdePath"]
+        }
     }
 
     configurations.runtime {
