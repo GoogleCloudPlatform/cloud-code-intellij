@@ -17,8 +17,10 @@
 package com.google.kubernetes.tools.skaffold
 
 import com.google.common.truth.Truth.assertThat
+import com.google.kubernetes.tools.core.settings.KubernetesSettingsService
 import com.google.kubernetes.tools.test.ContainerToolsRule
 import com.google.kubernetes.tools.test.TestFile
+import com.google.kubernetes.tools.test.TestService
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.spyk
@@ -43,6 +45,10 @@ class DefaultSkaffoldExecutorServiceTest {
 
     @TestFile(name = "notSkaffold", contents = "Some contents")
     private lateinit var testNotSkaffoldFile: File
+
+    @TestService
+    @MockK
+    private lateinit var kubernetesSettingsService: KubernetesSettingsService
 
     @Before
     fun setUp() {
@@ -235,14 +241,14 @@ class DefaultSkaffoldExecutorServiceTest {
     }
 
     @Test
-    fun `isSkaffoldAvailable returns true when skaffold is available`() {
+    fun `isSkaffoldAvailable returns true when skaffold is on the PATH only`() {
         testSkaffoldFile.setExecutable(true)
         every { defaultSkaffoldExecutorService.getSystemPath() } answers { testSkaffoldFile.parent }
         assertThat(defaultSkaffoldExecutorService.isSkaffoldAvailable()).isTrue()
     }
 
     @Test
-    fun `isSkaffoldAvailable returns false when skaffold is not available`() {
+    fun `isSkaffoldAvailable returns false when skaffold is not on the PATH or in settings`() {
         every { defaultSkaffoldExecutorService.getSystemPath() } answers { "" }
         assertThat(defaultSkaffoldExecutorService.isSkaffoldAvailable()).isFalse()
     }
@@ -253,5 +259,15 @@ class DefaultSkaffoldExecutorServiceTest {
             testNotSkaffoldFile.parent
         }
         assertThat(defaultSkaffoldExecutorService.isSkaffoldAvailable()).isFalse()
+    }
+
+    @Test
+    fun `isSkaffoldAvailable returns true when skaffold is configured in the settings only`() {
+        every { defaultSkaffoldExecutorService.getSystemPath() } answers {
+            testNotSkaffoldFile.parent
+        }
+        every { kubernetesSettingsService.skaffoldExecutablePath } answers { "/path/to/skaffold" }
+
+        assertThat(defaultSkaffoldExecutorService.isSkaffoldAvailable()).isTrue()
     }
 }

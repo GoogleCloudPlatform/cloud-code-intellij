@@ -18,9 +18,9 @@
 <idea-plugin>
     <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceImplementation="com.google.kubernetes.tools.core.PluginInfo"/>
-        <applicationService serviceImplementation="com.google.container.tools.core.settings.KubernetesSettingsService"/>
+        <applicationService serviceImplementation="com.google.kubernetes.tools.core.settings.KubernetesSettingsService"/>
 
-        <!--<applicationConfigurable parentId="google.settings" id="google.kubernetes.settings"-->
-                                 <!--instance="com.google.container.tools.core.settings.KubernetesSettingsConfigurable" />-->
+        <applicationConfigurable parentId="google.settings" id="google.kubernetes.settings"
+                                 instance="com.google.kubernetes.tools.core.settings.KubernetesSettingsConfigurable" />
     </extensions>
 </idea-plugin>
