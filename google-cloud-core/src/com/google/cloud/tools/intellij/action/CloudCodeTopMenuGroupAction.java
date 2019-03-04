@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij;
+package com.google.cloud.tools.intellij.action;
 
+import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
+import com.google.cloud.tools.intellij.GoogleCloudCoreMessageBundle;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 
 /**
- * Creates the tools menu top-level menu group for Cloud Tools. All relevant shortcuts are sub-menu
- * items of this.
+ * Top menu group for all plugin visible actions that are expressed with menu items. All K8s and
+ * Google Cloud functionality is nested under this group. See plugin.xml for structure.
  */
-public class CloudToolsMenuGroupAction extends DefaultActionGroup {
-
-  public CloudToolsMenuGroupAction() {
+public class CloudCodeTopMenuGroupAction extends DefaultActionGroup {
+  public CloudCodeTopMenuGroupAction() {
     getTemplatePresentation()
-        .setText(GoogleCloudCoreMessageBundle.message("cloud.tools.group.menu.text"));
+        .setText(GoogleCloudCoreMessageBundle.message("cloud.code.top.group.menu.text"));
     getTemplatePresentation().setIcon(GoogleCloudCoreIcons.CLOUD);
   }
 }

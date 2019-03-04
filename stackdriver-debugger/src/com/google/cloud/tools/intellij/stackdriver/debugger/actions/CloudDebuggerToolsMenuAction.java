@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.stackdriver.debugger.actions;
 
-import com.google.cloud.tools.intellij.CloudToolsRunConfigurationAction;
+import com.google.cloud.tools.intellij.action.CloudToolsRunConfigurationAction;
 import com.google.cloud.tools.intellij.stackdriver.debugger.CloudDebugConfigType;
 import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerIcons;
