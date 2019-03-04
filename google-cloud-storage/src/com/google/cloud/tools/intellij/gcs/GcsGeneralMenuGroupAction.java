@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package com.google.cloud.tools.intellij.stackdriver.debugger.actions;
+package com.google.cloud.tools.intellij.gcs;
 
-import com.google.cloud.tools.intellij.stackdriver.debugger.StackdriverDebuggerBundle;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 
-/** General menu group for all Cloud Debugger related actions, including all menu sub-groups. */
-public class CloudDebuggerGeneralMenuGroupAction extends DefaultActionGroup {
+/** General menu group for all GCS related actions, including all menu sub-groups. */
+public class GcsGeneralMenuGroupAction extends DefaultActionGroup {
 
-  public CloudDebuggerGeneralMenuGroupAction() {
+  public GcsGeneralMenuGroupAction() {
     getTemplatePresentation()
-        .setText(StackdriverDebuggerBundle.message("clouddebug.general.menu.group.text"));
+        .setText(GoogleCloudStorageMessageBundle.message("gcs.tools.general.menu.group.text"));
   }
 }
