@@ -27,7 +27,7 @@
         <group id="GoogleCloudTools.gcs.general"
                class="com.google.cloud.tools.intellij.gcs.GcsGeneralMenuGroupAction"
                popup="true">
-            <add-to-group group-id="GoogleCloudTools" anchor="after" relative-to-action="GoogleCloudTools.cloudapis.general"/>
+            <add-to-group group-id="GoogleCloudTools" anchor="after" relative-to-action="GoogleCloudTools.csr.general"/>
         </group>
 
         <group id="GoogleCloudTools.gcs">

@@ -16,7 +16,6 @@
 
 package com.google.cloud.tools.intellij.csr;
 
-import com.google.cloud.tools.intellij.GoogleCloudCoreIcons;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 
 /** General menu group for all Cloud Debugger related actions, including all menu sub-groups. */
@@ -25,6 +24,5 @@ public class CloudRepositoryGeneralMenuGroupAction extends DefaultActionGroup {
   public CloudRepositoryGeneralMenuGroupAction() {
     getTemplatePresentation()
         .setText(CloudReposMessageBundle.message("cloud.repos.general.menu.group.text"));
-    getTemplatePresentation().setIcon(GoogleCloudCoreIcons.CLOUD);
   }
 }
