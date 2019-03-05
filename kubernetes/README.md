@@ -43,6 +43,10 @@ If you'd like to try out the Kubernetes features, you can install the nightly re
 2) Use the copied URL to add a Custom Plugin URL, following [these instructions](https://www.jetbrains.com/idea/help/managing-enterprise-plugin-repositories.html)
 3) Search for the `Google Cloud Tools` plugin and install it
 
+
+## Frequently Asked Questions (FAQ)
+See the Google Cloud Tools Kubernetes FAQ.
+
 ## Getting started
 
 The plugin works in any of the  [JetBrains family of IDEs](https://www.jetbrains.com/products.html). The following shows an example using Kubernetes with Java and Spring Boot in IntelliJ IDEA (Community or Ultimate editions). Follow the installation steps above to install the plugin. Restart your IDE if prompted to activate the plugin.
