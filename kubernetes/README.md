@@ -10,6 +10,7 @@ This plugin adds support for [Kubernetes](https://www.kubernetes.io) development
  * [Features](#features)
   * [Prerequisites and required dependencies](#prerequisites-and-required-dependencies)
   * [Installing the plugin into your IDE](#installing-the-plugin-into-your-ide)
+  * [Frequently asked questions](#frequently-asked-questions-faq)
   * [Getting started](#getting-started)
      * [Specifying image repository](#specifying-image-repository)
      * [Continuous development on Kubernetes](#continuous-development-on-kubernetes)
