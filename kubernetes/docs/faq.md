@@ -2,15 +2,16 @@
 
 If you have a question that is not answered below, please [submit an issue](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues).
 
-[Could not find Skaffold installation.](#could-not-find-skaffold-installation)\
-[Blah.](#gcr-authentication-path-missing)
+[How do I fix missing Skaffold installation errors?](#how-do-i-fix-missing-skaffold-installation-errors)\
+[How do I fix 'executable not found on PATH' errors?](#how-do-i-fix-executable-not-found-on-path-errors)
 
-### Could not find Skaffold installation
+### How do I fix missing Skaffold installation errors? 
 
 [Skaffold](https://skaffold.dev/) is a tool required by Cloud Tools plugin for Kubernetes 
 deployment and continuous development. The plugin attempts to find the Skaffold binary on the system 
 PATH. If you don't have Skaffold installed, or the plugin simply could not detect the installation 
-(TODO link to more general PATH issue), you may see the follow error:
+(possibly due to [PATH issues](#how-do-i-fix-executable-not-found-on-path-errors)), you may see the 
+follow error:
 
 <img src="images/missing-skaffold-warning.png" alt="missing-skaffold-warning" width="700"/>
 
@@ -21,3 +22,4 @@ and manually browse to the executable:
 
 <img src="images/skaffold-manual-select.png" alt="skaffold-manual-select" width="700"/>
 
+### How do I fix 'executable not found on PATH' errors?
