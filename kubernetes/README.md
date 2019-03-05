@@ -45,7 +45,7 @@ If you'd like to try out the Kubernetes features, you can install the nightly re
 
 
 ## Frequently Asked Questions (FAQ)
-See the Google Cloud Tools Kubernetes FAQ.
+See the [Google Cloud Tools Kubernetes FAQ](docs/faq.md).
 
 ## Getting started
 
