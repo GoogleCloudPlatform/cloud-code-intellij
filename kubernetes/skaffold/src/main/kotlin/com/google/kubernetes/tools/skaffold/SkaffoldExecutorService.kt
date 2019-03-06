@@ -139,7 +139,8 @@ abstract class SkaffoldExecutorService {
         commandList: List<String>
     ): Process {
         val generalCommandLine = GeneralCommandLine(commandList)
-        generalCommandLine.withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
+        generalCommandLine.withParentEnvironmentType(
+                GeneralCommandLine.ParentEnvironmentType.CONSOLE)
         workingDirectory?.let { generalCommandLine.workDirectory = it }
 
         return generalCommandLine.createProcess()
