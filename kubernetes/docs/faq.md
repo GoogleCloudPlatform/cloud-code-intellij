@@ -24,3 +24,27 @@ and manually browse to the executable:
 
 ### How do I fix 'executable not found on PATH' errors?
 
+If, during deployment or continuous development, you are getting errors in the form of 
+`executable file not found in $PATH`, for example:
+```
+time="2018-11-01T12:46:38-04:00" level=fatal msg="exiting dev mode because the first build failed: building [gcr.io/**/my-proj]: tagging: pushing: getting auth config for gcr.io/**/my-proj:3c275201-dirty-50f870d: getting auth config: error getting credentials - err: exec: \"docker-credential-gcr\": executable file not found in $PATH, out: ``"
+```
+
+then you may be running into the problem where the IDE is not inheriting the shell environment variables. 
+This can happen in some environments when the PATH variables are defined in `.bash_profile` or `.bash_rc`
+and the IDE is launched from the GUI, causing the IDE not to see the PATH variables.
+
+While, unfortunately, there isn't an optimal solution, there best workaround is to launch the IDE 
+from the terminal:
+
+First, follow [these](https://www.jetbrains.com/help/idea/working-with-the-ide-features-from-command-line.html)
+instructions to enable a command-line launcher. Then launch the IDE from the terminal.
+
+For example, to launch IntelliJ IDEA on OSX from the terminal, navigate to the project you wish to 
+open, then execute:
+
+`idea .`
+
+Similarly, to launch PyCharm, execute:
+
+`charm .`
