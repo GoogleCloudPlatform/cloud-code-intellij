@@ -25,6 +25,7 @@ import com.google.kubernetes.tools.skaffold.metrics.SKAFFOLD_DEV_RUN_FAIL
 import com.google.kubernetes.tools.skaffold.metrics.SKAFFOLD_DEV_RUN_SUCCESS
 import com.google.kubernetes.tools.skaffold.metrics.SKAFFOLD_SINGLE_RUN_FAIL
 import com.google.kubernetes.tools.skaffold.metrics.SKAFFOLD_SINGLE_RUN_SUCCESS
+import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.components.ServiceManager
 import java.io.File
 import java.nio.file.Path
@@ -137,10 +138,11 @@ abstract class SkaffoldExecutorService {
         workingDirectory: File?,
         commandList: List<String>
     ): Process {
-        val processBuilder = ProcessBuilder()
-        workingDirectory?.let { processBuilder.directory(it) }
+        val generalCommandLine = GeneralCommandLine(commandList)
+        generalCommandLine.withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
+        workingDirectory?.let { generalCommandLine.workDirectory = it }
 
-        return processBuilder.command(commandList).start()
+        return generalCommandLine.createProcess()
     }
 }
 
@@ -192,7 +194,7 @@ class DefaultSkaffoldExecutorService : SkaffoldExecutorService() {
      * First try to find Skaffold in the Kubernetes settings under Google -> Kubernetes.
      * If not found, then try to find it on the user's PATH.
      */
-    override var skaffoldExecutablePath: Path = Paths.get("skaffold")
+    override var skaffoldExecutablePath: Path = Paths.get("/usr/local/bin/skaffold")
         get() {
             val skaffoldPathOverride = KubernetesSettingsService.instance.skaffoldExecutablePath
 
