@@ -31,20 +31,23 @@ time="2018-11-01T12:46:38-04:00" level=fatal msg="exiting dev mode because the f
 ```
 
 then you may be running into the problem where the IDE is not inheriting the shell environment variables. 
-This can happen in some environments when the PATH variables are defined in `.bash_profile` or `.bash_rc`
+This can happen in some linux environments when the PATH variables are defined in `.bash_profile` or `.bash_rc`
 and the IDE is launched from the GUI, causing the IDE not to see the PATH variables.
 
-While, unfortunately, there isn't an optimal solution, there best workaround is to launch the IDE 
-from the terminal:
+While, unfortunately, there isn't an optimal solution, the following are a couple workarounds: 
 
-First, follow [these](https://www.jetbrains.com/help/idea/working-with-the-ide-features-from-command-line.html)
-instructions to enable a command-line launcher. Then launch the IDE from the terminal.
+1) Launch the IDE from the terminal
 
-For example, to launch IntelliJ IDEA on OSX or Linux from the terminal, navigate to the project you 
-wish to open, then execute:
+   First, follow [these](https://www.jetbrains.com/help/idea/working-with-the-ide-features-from-command-line.html)
+   instructions to enable a command-line launcher. Then launch the IDE from the terminal.
 
-`idea .`
+   For example, to launch IntelliJ IDEA from the terminal, navigate to the project you 
+   wish to open, then execute:
 
-Similarly, to launch PyCharm, execute:
+   `idea .`
 
-`charm .`
+   Similarly, to launch PyCharm, execute:
+
+   `charm .`
+
+2) Set the the PATH variables in a system-wide location such as `/etc/environment`.
