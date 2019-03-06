@@ -40,8 +40,8 @@ from the terminal:
 First, follow [these](https://www.jetbrains.com/help/idea/working-with-the-ide-features-from-command-line.html)
 instructions to enable a command-line launcher. Then launch the IDE from the terminal.
 
-For example, to launch IntelliJ IDEA on OSX from the terminal, navigate to the project you wish to 
-open, then execute:
+For example, to launch IntelliJ IDEA on OSX or Linux from the terminal, navigate to the project you 
+wish to open, then execute:
 
 `idea .`
 
