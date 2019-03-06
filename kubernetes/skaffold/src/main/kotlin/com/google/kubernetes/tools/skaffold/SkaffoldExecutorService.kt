@@ -194,7 +194,7 @@ class DefaultSkaffoldExecutorService : SkaffoldExecutorService() {
      * First try to find Skaffold in the Kubernetes settings under Google -> Kubernetes.
      * If not found, then try to find it on the user's PATH.
      */
-    override var skaffoldExecutablePath: Path = Paths.get("/usr/local/bin/skaffold")
+    override var skaffoldExecutablePath: Path = Paths.get("skaffold")
         get() {
             val skaffoldPathOverride = KubernetesSettingsService.instance.skaffoldExecutablePath
 
