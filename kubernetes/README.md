@@ -10,6 +10,7 @@ This plugin adds support for [Kubernetes](https://www.kubernetes.io) development
  * [Features](#features)
   * [Prerequisites and required dependencies](#prerequisites-and-required-dependencies)
   * [Installing the plugin into your IDE](#installing-the-plugin-into-your-ide)
+  * [Frequently asked questions](#frequently-asked-questions-faq)
   * [Getting started](#getting-started)
      * [Specifying image repository](#specifying-image-repository)
      * [Continuous development on Kubernetes](#continuous-development-on-kubernetes)
@@ -27,8 +28,11 @@ This plugin adds support for [Kubernetes](https://www.kubernetes.io) development
 
 ## Prerequisites and required dependencies
 
-This plugin uses familiar Kubernetes and container tools to bring you a rich Kubernetes experience in IntelliJ and other JetBrains IDEs. The following tools are expected to be installed and setup on your system and available in the system path:
+This plugin uses familiar Kubernetes and container tools to bring you a rich Kubernetes experience in IntelliJ and other JetBrains IDEs. 
 
+The following tools are expected to be installed and setup on your system and available in the system path:
+
+* JetBrains IDE version 2018.2+, either Ultimate or Community editions.
 * [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) for working with Kubernetes clusters and managing Kubernetes deployments.
 * [Skaffold](https://skaffold.dev/docs/getting-started/) to support continuous development on a Kubernetes cluster, smart image building and tagging, and an array of supported deployment and build types.
 * [Docker](https://www.docker.com/) for building and pushing your container images. *Note*: Docker is optional if you are using [Jib to build your container images](https://github.com/GoogleContainerTools/jib).
@@ -42,6 +46,10 @@ If you'd like to try out the Kubernetes features, you can install the nightly re
    `https://plugins.jetbrains.com/plugins/nightly/8079`
 2) Use the copied URL to add a Custom Plugin URL, following [these instructions](https://www.jetbrains.com/idea/help/managing-enterprise-plugin-repositories.html)
 3) Search for the `Google Cloud Tools` plugin and install it
+
+
+## Frequently Asked Questions (FAQ)
+See the [Google Cloud Tools Kubernetes FAQ](docs/faq.md).
 
 ## Getting started
 
