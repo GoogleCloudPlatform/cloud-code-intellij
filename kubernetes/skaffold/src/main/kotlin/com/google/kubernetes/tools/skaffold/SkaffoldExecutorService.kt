@@ -59,7 +59,8 @@ abstract class SkaffoldExecutorService {
 
             // Set a timeout of 150ms since we want this check to be quick - it can be called from
             // the UI thread. If it takes longer (but still no exception is thrown) then we assume
-            // it is available to avoid false negatives.
+            // it is available to avoid false negatives (thinking skaffold is unavailable when it
+            // really just took longer than expected to execute).
             val completed = process.waitFor(150, TimeUnit.MILLISECONDS)
 
             return !completed || process.exitValue() == 0
