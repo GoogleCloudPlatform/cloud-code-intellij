@@ -10,6 +10,7 @@ This plugin adds support for [Kubernetes](https://www.kubernetes.io) development
  * [Features](#features)
   * [Prerequisites and required dependencies](#prerequisites-and-required-dependencies)
   * [Installing the plugin into your IDE](#installing-the-plugin-into-your-ide)
+  * [Frequently asked questions](#frequently-asked-questions-faq)
   * [Getting started](#getting-started)
      * [Specifying image repository](#specifying-image-repository)
      * [Continuous development on Kubernetes](#continuous-development-on-kubernetes)
@@ -42,6 +43,10 @@ If you'd like to try out the Kubernetes features, you can install the nightly re
    `https://plugins.jetbrains.com/plugins/nightly/8079`
 2) Use the copied URL to add a Custom Plugin URL, following [these instructions](https://www.jetbrains.com/idea/help/managing-enterprise-plugin-repositories.html)
 3) Search for the `Google Cloud Tools` plugin and install it
+
+
+## Frequently Asked Questions (FAQ)
+See the [Google Cloud Tools Kubernetes FAQ](docs/faq.md).
 
 ## Getting started
 
