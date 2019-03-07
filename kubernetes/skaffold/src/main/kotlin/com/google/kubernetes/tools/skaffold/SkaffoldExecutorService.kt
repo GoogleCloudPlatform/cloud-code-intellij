@@ -30,6 +30,7 @@ import com.intellij.openapi.components.ServiceManager
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.concurrent.TimeUnit
 
 /**
  * Abstract implementation for Skaffold execution service. This service builds and launches Skaffold
@@ -50,13 +51,19 @@ abstract class SkaffoldExecutorService {
     /**
      * Checks if Skaffold is available by executing a 'skaffold version' command. If the process
      * exit code is 0, then Skaffold is considered available.
+     *
      */
     fun isSkaffoldAvailable(): Boolean {
         return try {
             val process = executeSkaffold(SkaffoldExecutorSettings(ExecutionMode.VERSION)).process
-            process.waitFor()
 
-            return process.exitValue() == 0
+            // Set a timeout of 150ms since we want this check to be quick - it can be called from
+            // the UI thread. If it takes longer (but still no exception is thrown) then we assume
+            // it is available to avoid false positives.
+            val completed = process.waitFor(150, TimeUnit.MILLISECONDS)
+            System.out.println("completed: $completed")
+
+            return !completed || process.exitValue() == 0
         } catch (e: Exception) {
             // Command failed to execute - Skaffold is not available
             false

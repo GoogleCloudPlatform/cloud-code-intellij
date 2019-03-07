@@ -245,6 +245,13 @@ class DefaultSkaffoldExecutorServiceTest {
     }
 
     @Test
+    fun `isSkaffoldAvailable returns true when skaffold execution times out`() {
+        mockSkaffoldExecution()
+        every { mockProcess.waitFor(any(), any()) } answers { false }
+        assertThat(defaultSkaffoldExecutorService.isSkaffoldAvailable()).isTrue()
+    }
+
+    @Test
     fun `isSkaffoldAvailable returns false when skaffold execution throws exception`() {
         mockSkaffoldExecution()
         every { defaultSkaffoldExecutorService.executeSkaffold(any()) } throws Exception()
@@ -257,6 +264,6 @@ class DefaultSkaffoldExecutorServiceTest {
         } answers { mockSkaffoldProcess }
 
         every { mockSkaffoldProcess.process } answers { mockProcess }
-        every { mockProcess.waitFor() } answers { 0 }
+        every { mockProcess.waitFor(any(), any()) } answers { true }
     }
 }
