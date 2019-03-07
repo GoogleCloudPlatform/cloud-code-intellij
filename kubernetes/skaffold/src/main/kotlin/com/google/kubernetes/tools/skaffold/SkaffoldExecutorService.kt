@@ -30,6 +30,7 @@ import com.intellij.openapi.components.ServiceManager
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.system.measureTimeMillis
 
 /**
  * Abstract implementation for Skaffold execution service. This service builds and launches Skaffold
@@ -49,17 +50,20 @@ abstract class SkaffoldExecutorService {
 
     fun getSystemPath(): String = System.getenv("PATH")
 
+    /**
+     * Checks if Skaffold is available by executing a 'skaffold version' command. If the process
+     * exit code is 0, then Skaffold is considered available.
+     */
     fun isSkaffoldAvailable(): Boolean {
-        val skaffoldPathOverride = KubernetesSettingsService.instance.skaffoldExecutablePath
+        return try {
+            val process = executeSkaffold(SkaffoldExecutorSettings(ExecutionMode.VERSION)).process
+            process.waitFor()
 
-        val isSkaffoldOnPath = getSystemPath().split(File.pathSeparator)
-                .asSequence()
-                .map { it + File.separator + "skaffold" }
-                .any {
-                    File(it).exists() && File(it).canExecute()
-                }
-
-        return skaffoldPathOverride.isNotBlank() || isSkaffoldOnPath
+            return process.exitValue() == 0
+        } catch (e: Exception) {
+            // Command failed to execute - Skaffold is not available
+            false
+        }
     }
 
     /**
@@ -174,7 +178,8 @@ data class SkaffoldExecutorSettings(
     enum class ExecutionMode(val modeFlag: String) {
         SINGLE_RUN("run"),
         DEV("dev"),
-        DEBUG("debug")
+        DEBUG("debug"),
+        VERSION("version")
     }
 }
 
