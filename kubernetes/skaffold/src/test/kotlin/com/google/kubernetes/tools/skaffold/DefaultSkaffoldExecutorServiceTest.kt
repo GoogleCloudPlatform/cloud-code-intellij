@@ -17,10 +17,7 @@
 package com.google.kubernetes.tools.skaffold
 
 import com.google.common.truth.Truth.assertThat
-import com.google.kubernetes.tools.core.settings.KubernetesSettingsService
 import com.google.kubernetes.tools.test.ContainerToolsRule
-import com.google.kubernetes.tools.test.TestFile
-import com.google.kubernetes.tools.test.TestService
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.spyk
@@ -40,15 +37,8 @@ class DefaultSkaffoldExecutorServiceTest {
     @MockK
     private lateinit var mockProcess: Process
 
-    @TestFile(name = "skaffold", contents = "Some contents")
-    private lateinit var testSkaffoldFile: File
-
-    @TestFile(name = "notSkaffold", contents = "Some contents")
-    private lateinit var testNotSkaffoldFile: File
-
-    @TestService
     @MockK
-    private lateinit var kubernetesSettingsService: KubernetesSettingsService
+    private lateinit var mockSkaffoldProcess: SkaffoldProcess
 
     @Before
     fun setUp() {
@@ -241,33 +231,39 @@ class DefaultSkaffoldExecutorServiceTest {
     }
 
     @Test
-    fun `isSkaffoldAvailable returns true when skaffold is on the PATH only`() {
-        testSkaffoldFile.setExecutable(true)
-        every { defaultSkaffoldExecutorService.getSystemPath() } answers { testSkaffoldFile.parent }
+    fun `isSkaffoldAvailable returns true when skaffold execution returns 0 exit code`() {
+        mockSkaffoldExecution()
+        every { mockProcess.exitValue() } answers { 0 }
         assertThat(defaultSkaffoldExecutorService.isSkaffoldAvailable()).isTrue()
     }
 
     @Test
-    fun `isSkaffoldAvailable returns false when skaffold is not on the PATH or in settings`() {
-        every { defaultSkaffoldExecutorService.getSystemPath() } answers { "" }
+    fun `isSkaffoldAvailable returns false when skaffold execution returns 1 exit code`() {
+        mockSkaffoldExecution()
+        every { mockProcess.exitValue() } answers { 1 }
         assertThat(defaultSkaffoldExecutorService.isSkaffoldAvailable()).isFalse()
     }
 
     @Test
-    fun `isSkaffoldAvailable returns false when skaffold is not available in valid system paths`() {
-        every { defaultSkaffoldExecutorService.getSystemPath() } answers {
-            testNotSkaffoldFile.parent
-        }
-        assertThat(defaultSkaffoldExecutorService.isSkaffoldAvailable()).isFalse()
-    }
-
-    @Test
-    fun `isSkaffoldAvailable returns true when skaffold is configured in the settings only`() {
-        every { defaultSkaffoldExecutorService.getSystemPath() } answers {
-            testNotSkaffoldFile.parent
-        }
-        every { kubernetesSettingsService.skaffoldExecutablePath } answers { "/path/to/skaffold" }
-
+    fun `isSkaffoldAvailable returns true when skaffold execution times out`() {
+        mockSkaffoldExecution()
+        every { mockProcess.waitFor(any(), any()) } answers { false }
         assertThat(defaultSkaffoldExecutorService.isSkaffoldAvailable()).isTrue()
+    }
+
+    @Test
+    fun `isSkaffoldAvailable returns false when skaffold execution throws exception`() {
+        mockSkaffoldExecution()
+        every { defaultSkaffoldExecutorService.executeSkaffold(any()) } throws Exception()
+        assertThat(defaultSkaffoldExecutorService.isSkaffoldAvailable()).isFalse()
+    }
+
+    private fun mockSkaffoldExecution() {
+        every {
+            defaultSkaffoldExecutorService.executeSkaffold(any())
+        } answers { mockSkaffoldProcess }
+
+        every { mockSkaffoldProcess.process } answers { mockProcess }
+        every { mockProcess.waitFor(any(), any()) } answers { true }
     }
 }

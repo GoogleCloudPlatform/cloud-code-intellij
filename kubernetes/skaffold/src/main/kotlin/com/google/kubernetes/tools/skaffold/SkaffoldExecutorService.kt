@@ -30,6 +30,7 @@ import com.intellij.openapi.components.ServiceManager
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.concurrent.TimeUnit
 
 /**
  * Abstract implementation for Skaffold execution service. This service builds and launches Skaffold
@@ -47,19 +48,26 @@ abstract class SkaffoldExecutorService {
     /** Path for Skaffold executable, any form supported by [ProcessBuilder] */
     protected abstract var skaffoldExecutablePath: Path
 
-    fun getSystemPath(): String = System.getenv("PATH")
-
+    /**
+     * Checks if Skaffold is available by executing a 'skaffold version' command. If the process
+     * exit code is 0, then Skaffold is considered available.
+     *
+     */
     fun isSkaffoldAvailable(): Boolean {
-        val skaffoldPathOverride = KubernetesSettingsService.instance.skaffoldExecutablePath
+        return try {
+            val process = executeSkaffold(SkaffoldExecutorSettings(ExecutionMode.VERSION)).process
 
-        val isSkaffoldOnPath = getSystemPath().split(File.pathSeparator)
-                .asSequence()
-                .map { it + File.separator + "skaffold" }
-                .any {
-                    File(it).exists() && File(it).canExecute()
-                }
+            // Set a timeout of 150ms since we want this check to be quick - it can be called from
+            // the UI thread. If it takes longer (but still no exception is thrown) then we assume
+            // it is available to avoid false negatives (thinking skaffold is unavailable when it
+            // really just took longer than expected to execute).
+            val completed = process.waitFor(150, TimeUnit.MILLISECONDS)
 
-        return skaffoldPathOverride.isNotBlank() || isSkaffoldOnPath
+            return !completed || process.exitValue() == 0
+        } catch (e: Exception) {
+            // Command failed to execute - Skaffold is not available
+            false
+        }
     }
 
     /**
@@ -174,7 +182,8 @@ data class SkaffoldExecutorSettings(
     enum class ExecutionMode(val modeFlag: String) {
         SINGLE_RUN("run"),
         DEV("dev"),
-        DEBUG("debug")
+        DEBUG("debug"),
+        VERSION("version")
     }
 }
 
