@@ -30,7 +30,6 @@ import com.intellij.openapi.components.ServiceManager
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
-import kotlin.system.measureTimeMillis
 
 /**
  * Abstract implementation for Skaffold execution service. This service builds and launches Skaffold
@@ -47,8 +46,6 @@ abstract class SkaffoldExecutorService {
 
     /** Path for Skaffold executable, any form supported by [ProcessBuilder] */
     protected abstract var skaffoldExecutablePath: Path
-
-    fun getSystemPath(): String = System.getenv("PATH")
 
     /**
      * Checks if Skaffold is available by executing a 'skaffold version' command. If the process
