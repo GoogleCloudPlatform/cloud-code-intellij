@@ -7,7 +7,7 @@ If you have a question that is not answered below, please [submit an issue](http
 
 ### How do I fix missing Skaffold installation errors? 
 
-[Skaffold](https://skaffold.dev/) is a tool required by Cloud Tools plugin for Kubernetes 
+[Skaffold](https://skaffold.dev/) is a tool required by the Cloud Tools plugin for Kubernetes 
 deployment and continuous development. The plugin attempts to find the Skaffold binary on the system 
 PATH. If you don't have Skaffold installed, or the plugin simply could not detect the installation 
 (possibly due to [PATH issues](#how-do-i-fix-executable-not-found-on-path-errors)), you may see the 
@@ -34,7 +34,7 @@ then you may be running into the problem where the IDE is not inheriting the she
 This can happen in some linux environments when the PATH variables are defined in `.bash_profile` or `.bash_rc`
 and the IDE is launched from the GUI, causing the IDE not to see the PATH variables.
 
-While, unfortunately, there isn't an optimal solution, the following are a couple workarounds: 
+While, unfortunately, there isn't an optimal solution, the following are a couple workarounds in linux: 
 
 1) Launch the IDE from the terminal
 
