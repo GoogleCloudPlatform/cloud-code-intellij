@@ -61,7 +61,6 @@ abstract class SkaffoldExecutorService {
             // the UI thread. If it takes longer (but still no exception is thrown) then we assume
             // it is available to avoid false positives.
             val completed = process.waitFor(150, TimeUnit.MILLISECONDS)
-            System.out.println("completed: $completed")
 
             return !completed || process.exitValue() == 0
         } catch (e: Exception) {
