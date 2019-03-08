@@ -108,4 +108,12 @@ class KubernetesSettingsConfigurableTest {
 
         Truth.assertThat(kubernetesSettingsConfigurable.isModified).isFalse()
     }
+
+    @Test
+    @UiTest
+    fun `skaffold warning is not shown by default`() {
+        kubernetesSettingsConfigurable.createComponent()
+        Truth.assertThat(kubernetesSettingsConfigurable.skaffoldNotExecutableWarning.isVisible)
+                .isFalse()
+    }
 }

@@ -40,7 +40,8 @@ import javax.swing.event.DocumentListener
  */
 class KubernetesSettingsConfigurable : Configurable {
 
-    private val skaffoldNotExecutableWarning =
+    @VisibleForTesting
+    val skaffoldNotExecutableWarning =
             JLabel(CoreBundle.message(
                     "kubernetes.settings.dependencies.skaffold.not.executable.warning"))
 
