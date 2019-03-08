@@ -17,7 +17,8 @@ follow error in the Run Configuration:
 
 To fix this, either
 1) [Install Skaffold](https://skaffold.dev/docs/getting-started/#installing-skaffold) and ensure that it is added to the PATH.
-2) If Skaffold is installed and it is still not detected, visit `Settings > Google > Kubernetes`, 
+2) Ensure the Skaffold executable name is `skaffold` on Linux and Mac systems, or `skaffold.exe` on Windows.
+3) If Skaffold is installed and it is still not detected, visit `Settings > Google > Kubernetes`, 
 and manually browse to the executable:
 
 <img src="images/skaffold-manual-select.png" alt="skaffold-manual-select" width="700"/>
@@ -31,10 +32,10 @@ time="2018-11-01T12:46:38-04:00" level=fatal msg="exiting dev mode because the f
 ```
 
 then you may be running into the problem where the IDE is not inheriting the shell environment variables. 
-This can happen in some linux environments when the PATH variables are defined in `.bash_profile` or `.bash_rc`
+This can happen in some Linux environments when the PATH variables are defined in `.bash_profile` or `.bash_rc`
 and the IDE is launched from the GUI, causing the IDE not to see the PATH variables.
 
-While, unfortunately, there isn't an optimal solution, the following are a couple workarounds in linux: 
+While, unfortunately, there isn't an optimal solution, the following are a couple workarounds in Linux: 
 
 1) Launch the IDE from the terminal
 
