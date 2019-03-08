@@ -129,10 +129,9 @@ abstract class AbstractSkaffoldRunConfiguration(
                         }
 
                         kubernetesConfigurable?.let {
-                            ShowSettingsUtil.getInstance()
-                                    .showSettingsDialog(
-                                            project,
-                                            it.instanceClass)
+                            ShowSettingsUtil.getInstance().showSettingsDialog(
+                                    project,
+                                    it.instanceClass)
                         }
                     })
         }
