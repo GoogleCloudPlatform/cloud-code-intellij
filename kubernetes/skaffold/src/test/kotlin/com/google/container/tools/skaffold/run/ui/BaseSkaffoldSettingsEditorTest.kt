@@ -100,7 +100,7 @@ class BaseSkaffoldSettingsEditorTest {
 
         // capture settings update
         every {
-            mockSkaffoldSettings setProperty "skaffoldConfigurationFilePath" value any<String>()
+            mockSkaffoldSettings setProperty "kubectlConfigurationFilePath" value any<String>()
         } propertyType String::class answers {
             assertThat(value).isEqualTo(skaffoldFile.path)
         }

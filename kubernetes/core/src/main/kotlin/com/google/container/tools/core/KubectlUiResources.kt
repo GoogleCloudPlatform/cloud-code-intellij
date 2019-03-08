@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-package com.google.container.tools.core.util
+package com.google.container.tools.core
 
+import com.google.common.annotations.VisibleForTesting
 import com.intellij.CommonBundle
+import com.intellij.openapi.util.IconLoader
 import org.jetbrains.annotations.PropertyKey
 import java.util.ResourceBundle
+
+//internal val SKAFFOLD_ICON = IconLoader.getIcon("/icons/skaffold.png")
 
 private const val BUNDLE_NAME = "messages.KubectlBundle"
 
 /**
- * Message bundle manager for core module.
+ * Returns message by provided key from kubectl message bundle with optional parameters.
  */
-object CoreBundle {
-
-    /**
-     * Returns messages for the given key from the CoreBundle message bundle with optional
-     * parameters.
-     */
-    fun message(
-        @PropertyKey(resourceBundle = BUNDLE_NAME) key: String,
-        vararg params: String
-    ): String = CommonBundle.message(ResourceBundle.getBundle(BUNDLE_NAME), key, params)
+@VisibleForTesting
+fun message(
+    @PropertyKey(resourceBundle = BUNDLE_NAME) key: String,
+    vararg params: String
+): String {
+    return CommonBundle.message(ResourceBundle.getBundle(BUNDLE_NAME), key, params)
 }

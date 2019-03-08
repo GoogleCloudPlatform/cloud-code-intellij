@@ -16,6 +16,7 @@
 
 dependencies {
     testCompile(project(":common-test-lib"))
+    compile(project(":google-cloud-core"))
 
     // TODO replace with maven central dependency once published
 //    compile(files("../lib/ide-analytics-common-0.1.0-SNAPSHOT.jar"))
