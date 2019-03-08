@@ -17,7 +17,6 @@
 package com.google.kubernetes.tools.skaffold.run
 
 import com.google.common.annotations.VisibleForTesting
-import com.google.kubernetes.tools.core.settings.KubernetesSettingsConfigurable
 import com.google.kubernetes.tools.skaffold.SkaffoldExecutorService
 import com.google.kubernetes.tools.skaffold.SkaffoldExecutorSettings
 import com.google.kubernetes.tools.skaffold.message
@@ -31,6 +30,7 @@ import com.intellij.execution.configurations.RunProfileState
 import com.intellij.execution.configurations.RuntimeConfigurationWarning
 import com.intellij.execution.executors.DefaultDebugExecutor
 import com.intellij.execution.runners.ExecutionEnvironment
+import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
@@ -123,10 +123,17 @@ abstract class AbstractSkaffoldRunConfiguration(
         if (!SkaffoldExecutorService.instance.isSkaffoldAvailable()) {
             throw RuntimeConfigurationWarning(message("skaffold.run.config.not.on.system.error"),
                     Runnable {
-                        ShowSettingsUtil.getInstance()
-                                .showSettingsDialog(
-                                        project,
-                                        KubernetesSettingsConfigurable::class.java)
+                        val kubernetesConfigurable =
+                                Configurable.APPLICATION_CONFIGURABLE.extensionList.find {
+                            it.id == "google.kubernetes.settings"
+                        }
+
+                        kubernetesConfigurable?.let {
+                            ShowSettingsUtil.getInstance()
+                                    .showSettingsDialog(
+                                            project,
+                                            it.instanceClass)
+                        }
                     })
         }
     }

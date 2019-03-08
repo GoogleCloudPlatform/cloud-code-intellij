@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.kubernetes.tools.core.settings
+package com.google.kubernetes.tools.settings
 
 import com.google.common.truth.Truth
+import com.google.kubernetes.tools.core.settings.KubernetesSettingsService
 import com.google.kubernetes.tools.test.ContainerToolsRule
 import com.google.kubernetes.tools.test.TestService
 import com.google.kubernetes.tools.test.UiTest
