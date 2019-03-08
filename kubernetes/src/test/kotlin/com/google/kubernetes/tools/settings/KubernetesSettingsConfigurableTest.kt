@@ -116,4 +116,24 @@ class KubernetesSettingsConfigurableTest {
         Truth.assertThat(kubernetesSettingsConfigurable.skaffoldNotExecutableWarning.isVisible)
                 .isFalse()
     }
+
+    @Test
+    @UiTest
+    fun `skaffold warning is not shown when field is empty`() {
+        kubernetesSettingsConfigurable.createComponent()
+        kubernetesSettingsConfigurable.skaffoldBrowser.text = ""
+
+        Truth.assertThat(kubernetesSettingsConfigurable.skaffoldNotExecutableWarning.isVisible)
+                .isFalse()
+    }
+
+    @Test
+    @UiTest
+    fun `skaffold warning is shown when skaffold is not executable`() {
+        kubernetesSettingsConfigurable.createComponent()
+        kubernetesSettingsConfigurable.skaffoldBrowser.text = "/invalid/path/skaffold"
+
+        Truth.assertThat(kubernetesSettingsConfigurable.skaffoldNotExecutableWarning.isVisible)
+                .isTrue()
+    }
 }

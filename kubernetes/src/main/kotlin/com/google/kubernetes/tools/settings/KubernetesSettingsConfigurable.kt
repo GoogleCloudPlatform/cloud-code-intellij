@@ -85,8 +85,8 @@ class KubernetesSettingsConfigurable : Configurable {
             private fun checkSkaffold() {
                 skaffoldExecutorService.skaffoldExecutablePath = Paths.get(skaffoldBrowser.text)
 
-                skaffoldNotExecutableWarning.isVisible =
-                        !skaffoldExecutorService.isSkaffoldAvailable()
+                skaffoldNotExecutableWarning.isVisible = skaffoldBrowser.text.isEmpty()
+                        || !skaffoldExecutorService.isSkaffoldAvailable()
             }
         })
     }
