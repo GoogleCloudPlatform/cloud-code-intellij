@@ -37,6 +37,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.util.xmlb.XmlSerializer
 import org.jdom.Element
 
+private const val KUBERNETES_SETTINGS_CONFIGURABLE_ID = "google.kubernetes.settings"
+
 /**
  * Template configuration for Skaffold single run configuration, serving as a base for all new
  * configurations created by a user. Has its own UI settings and editor and provides execution state
@@ -125,7 +127,7 @@ abstract class AbstractSkaffoldRunConfiguration(
                     Runnable {
                         val kubernetesConfigurable =
                                 Configurable.APPLICATION_CONFIGURABLE.extensionList.find {
-                            it.id == "google.kubernetes.settings"
+                            it.id == KUBERNETES_SETTINGS_CONFIGURABLE_ID
                         }
 
                         kubernetesConfigurable?.let {
