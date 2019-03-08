@@ -80,7 +80,7 @@ class KubernetesSettingsConfigurable : Configurable {
 
             /**
              * Checks if the input path to the executable is a valid executable. If not, show a
-             * warning.
+             * warning. Don't show the warning if the field is empty.
              */
             private fun checkSkaffold() {
                 skaffoldExecutorService.skaffoldExecutablePath = Paths.get(skaffoldBrowser.text)
