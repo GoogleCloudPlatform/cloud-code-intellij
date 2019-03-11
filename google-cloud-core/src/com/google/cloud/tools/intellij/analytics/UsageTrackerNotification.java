@@ -46,29 +46,26 @@ public class UsageTrackerNotification {
   /** Show the notification panel. */
   public void showNotification() {
     NotificationListener listener =
-        new NotificationListener() {
-          @Override
-          public void hyperlinkUpdate(Notification notification, HyperlinkEvent event) {
-            if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-              final String description = event.getDescription();
-              if ("allow".equals(description)) {
-                usageTrackingManagementService.setTrackingPreference(true);
-                notification.expire();
-              } else if ("decline".equals(description)) {
-                usageTrackingManagementService.setTrackingPreference(false);
-                notification.expire();
-              } else if ("policy".equals(description)) {
-                try {
-                  BrowserUtil.browse(new URL(UsageTrackerPanel.PRIVACY_POLICY_URL));
-                } catch (MalformedURLException ex) {
-                  LOG.error(ex);
-                }
-                notification.expire();
-              } else if ("settings".equals(description)) {
-                final ShowSettingsUtil util = ShowSettingsUtil.getInstance();
-                util.showSettingsDialog(null, UsageTrackerConfigurable.class);
-                notification.expire();
+        (notification, event) -> {
+          if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+            final String description = event.getDescription();
+            if ("allow".equals(description)) {
+              usageTrackingManagementService.setTrackingPreference(true);
+              notification.expire();
+            } else if ("decline".equals(description)) {
+              usageTrackingManagementService.setTrackingPreference(false);
+              notification.expire();
+            } else if ("policy".equals(description)) {
+              try {
+                BrowserUtil.browse(new URL(UsageTrackerPanel.PRIVACY_POLICY_URL));
+              } catch (MalformedURLException ex) {
+                LOG.error(ex);
               }
+              notification.expire();
+            } else if ("settings".equals(description)) {
+              final ShowSettingsUtil util = ShowSettingsUtil.getInstance();
+              util.showSettingsDialog(null, UsageTrackerConfigurable.class);
+              notification.expire();
             }
           }
         };
