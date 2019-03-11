@@ -55,14 +55,14 @@ See the [Google Cloud Tools Kubernetes FAQ](docs/faq.md).
 
 The plugin works in any of the  [JetBrains family of IDEs](https://www.jetbrains.com/products.html). The following shows an example using Kubernetes with Java and Spring Boot in IntelliJ IDEA (Community or Ultimate editions). Follow the installation steps above to install the plugin. Restart your IDE if prompted to activate the plugin.
 
-Before we start, make sure [all required dependencies](https://github.com/GoogleContainerTools/google-container-tools-intellij#prerequisites-and-required-dependencies) are available on your machine.
+Before we start, make sure [all required dependencies](https://github.com/GoogleCloudPlatform/google-cloud-intellij#prerequisites-and-required-dependencies) are available on your machine.
 
 Clone the repository to your local machine to get your copy of the repository:
 ```
-git clone https://github.com/GoogleContainerTools/google-container-tools-intellij.git
+git clone https://github.com/GoogleCloudPlatform/google-cloud-intellij.git
 ```
 
-Open the `hello-spring-boot` example from `google-container-tools/examples` directory with your IntelliJ IDE. You can either point to the directory or to the Maven build file (`pom.xml`). The project opens and loads:
+Open the `hello-spring-boot` example from `kubernetes/examples` directory with your IntelliJ IDE. You can either point to the directory or to the Maven build file (`pom.xml`). The project opens and loads:
 
 <img src="docs/images/sb-hello-world-project.png" alt="opened Spring Boot hello world project" width="500"/> 
 
