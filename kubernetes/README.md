@@ -84,6 +84,15 @@ However, before we can deploy and develop, we need to make sure we have access t
 
 ![specify your repository in run target settings](docs/images/default-image-repo-settings.png)
 
+You only need to specify the repository. Here are some examples:
+
+* Docker Hub: `docker.io/{account}`
+* GCP Container Repository (GCR): `gcr.io/{project_id}`
+* AWS Container Repository (ECR): `{aws_account_id}.dkr.ecr.{region}.amazonaws.com/{my-app}`
+* Azure Container Registry (ACR): `{my_acr_name}.azurecr.io/{my-app}`
+
+The resulting image name is concatenated from the specified default image repository and the image name specified in the project Kubernetes resources. For this example, and GCR image repository as the default one, the resulting full image name would be `gcr.io/{project_id}/gcr.io/gcp-dev-tools/hello-spring-boot`. 
+
 *Note*: this step is not required when you work with your own Kubernetes manifests and Skaffold configuration where you specify a repository and an image name that are accessible to you.
 
 ### Continuous development on Kubernetes
