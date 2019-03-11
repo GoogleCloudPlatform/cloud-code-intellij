@@ -84,7 +84,7 @@ However, before we can deploy and develop, we need to make sure we have access t
 
 ![specify your repository in run target settings](docs/images/default-image-repo-settings.png)
 
-You only need to specify the repository. Here are some examples:
+Here are examples of how to specify the default image repository for some common registries:
 
 * Docker Hub: `docker.io/{account}`
 * GCP Container Repository (GCR): `gcr.io/{project_id}`
