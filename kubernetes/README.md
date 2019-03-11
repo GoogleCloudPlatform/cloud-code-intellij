@@ -104,7 +104,7 @@ As you can see, Spring Boot application initializes and launches built-in web se
 
 ![automatic port-forwarding](docs/images/auto-port-forward-hello-world.png)
 
-Navigate your browser to `localhost:8080` to access the Spring Boot application running on your Kubernetes cluster. Alternatively, use `curl` command to interact with the application:
+Navigate your browser to [localhost:8080](http://localhost:8080) to access the Spring Boot application running on your Kubernetes cluster. Alternatively, use `curl` command to interact with the application:
 
 <img src="docs/images/browser-root.png" alt="browser showing root page of the application" width="350"/> 
 
@@ -126,7 +126,7 @@ Now, let’s add more features to our Spring Boot project and see how they get d
     }
 ```
 
-Save the changes (`Ctrl-S`) or build the project (use `Build -> Build Project` menu or the toolbar icon). The plugin picks up the changes, re-builds the project and image, and deploys the updated image to your Kubernetes cluster. You can watch the progress and deployment logs in the console window. Once the changes are propagated, we can confirm the updates by visiting the newly created endpoint:
+Save the changes (`Ctrl-S`) or build the project (use `Build -> Build Project` menu or the toolbar icon). The plugin picks up the changes, re-builds the project and image, and deploys the updated image to your Kubernetes cluster. You can watch the progress and deployment logs in the console window. Once the changes are propagated, we can confirm the updates by visiting the newly created endpoint at [localhost:8080/greeting?name=User](http://localhost:8080/greeting?name=User):
 
 ![browser showing new greeting page of the application](docs/images/browser-greeting.png)
 
