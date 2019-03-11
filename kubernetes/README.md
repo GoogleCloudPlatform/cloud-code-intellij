@@ -62,7 +62,7 @@ Clone the repository to your local machine to get your copy of the repository:
 git clone https://github.com/GoogleCloudPlatform/google-cloud-intellij.git
 ```
 
-Open the `hello-spring-boot` example from `kubernetes/examples` directory with your IntelliJ IDE. You can either point to the directory or to the Maven build file (`pom.xml`). The project opens and loads:
+Open the `hello-spring=boot` example project in your IDE. It is located in the `kubernetes/examples/hello-spring-boot` directory in the project you just cloned. The project opens and loads:
 
 <img src="docs/images/sb-hello-world-project.png" alt="opened Spring Boot hello world project" width="500"/> 
 
