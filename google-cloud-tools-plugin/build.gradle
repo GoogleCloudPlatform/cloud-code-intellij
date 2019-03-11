@@ -58,10 +58,7 @@ dependencies {
     compile(project(':app-engine:java:gradle'))
     compile(project(':app-engine:java:ultimate'))
     compile(project(':stackdriver-debugger'))
-
     compile(project(':kubernetes'))
-    compile(project(':kubernetes:core'))
-    compile(project(':kubernetes:skaffold'))
 
     compile 'com.google.protobuf:protobuf-java:2.5.0'
     compile 'com.google.apis:google-api-services-clouddebugger:v2-rev7-1.21.0'
