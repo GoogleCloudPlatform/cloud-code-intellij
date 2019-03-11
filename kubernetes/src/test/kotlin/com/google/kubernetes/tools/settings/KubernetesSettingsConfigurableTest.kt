@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.kubernetes.tools.core.settings
+package com.google.kubernetes.tools.settings
 
 import com.google.common.truth.Truth
+import com.google.kubernetes.tools.core.settings.KubernetesSettingsService
 import com.google.kubernetes.tools.test.ContainerToolsRule
 import com.google.kubernetes.tools.test.TestService
 import com.google.kubernetes.tools.test.UiTest
@@ -106,5 +107,33 @@ class KubernetesSettingsConfigurableTest {
         kubernetesSettingsConfigurable.skaffoldBrowser.text = ""
 
         Truth.assertThat(kubernetesSettingsConfigurable.isModified).isFalse()
+    }
+
+    @Test
+    @UiTest
+    fun `skaffold warning is not shown by default`() {
+        kubernetesSettingsConfigurable.createComponent()
+        Truth.assertThat(kubernetesSettingsConfigurable.skaffoldNotExecutableWarning.isVisible)
+                .isFalse()
+    }
+
+    @Test
+    @UiTest
+    fun `skaffold warning is not shown when field is empty`() {
+        kubernetesSettingsConfigurable.createComponent()
+        kubernetesSettingsConfigurable.skaffoldBrowser.text = ""
+
+        Truth.assertThat(kubernetesSettingsConfigurable.skaffoldNotExecutableWarning.isVisible)
+                .isFalse()
+    }
+
+    @Test
+    @UiTest
+    fun `skaffold warning is shown when skaffold is not executable`() {
+        kubernetesSettingsConfigurable.createComponent()
+        kubernetesSettingsConfigurable.skaffoldBrowser.text = "/invalid/path/skaffold"
+
+        Truth.assertThat(kubernetesSettingsConfigurable.skaffoldNotExecutableWarning.isVisible)
+                .isTrue()
     }
 }
