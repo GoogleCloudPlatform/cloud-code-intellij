@@ -55,20 +55,20 @@ See the [Google Cloud Tools Kubernetes FAQ](docs/faq.md).
 
 The plugin works in any of the  [JetBrains family of IDEs](https://www.jetbrains.com/products.html). The following shows an example using Kubernetes with Java and Spring Boot in IntelliJ IDEA (Community or Ultimate editions). Follow the installation steps above to install the plugin. Restart your IDE if prompted to activate the plugin.
 
-Before we start, make sure [all required dependencies](https://github.com/GoogleContainerTools/google-container-tools-intellij#prerequisites-and-required-dependencies) are available on your machine.
+Before we start, make sure [all required dependencies](https://github.com/GoogleCloudPlatform/google-cloud-intellij/tree/master/kubernetes#prerequisites-and-required-dependencies) are available on your machine.
 
 Clone the repository to your local machine to get your copy of the repository:
 ```
-git clone https://github.com/GoogleContainerTools/google-container-tools-intellij.git
+git clone https://github.com/GoogleCloudPlatform/google-cloud-intellij.git
 ```
 
-Open the `hello-spring-boot` example from `google-container-tools/examples` directory with your IntelliJ IDE. You can either point to the directory or to the Maven build file (`pom.xml`). The project opens and loads:
+Open the `hello-spring-boot` example from `kubernetes/examples` directory with your IntelliJ IDE. You can either point to the directory or to the Maven build file (`pom.xml`). The project opens and loads:
 
 <img src="docs/images/sb-hello-world-project.png" alt="opened Spring Boot hello world project" width="500"/> 
 
 This project is a simple web application created with [the popular Spring Boot framework](https://spring.io/projects/spring-boot). It uses the [Jib Maven plugin](https://github.com/GoogleContainerTools/jib) to build a container image for the project, without needing to create a Dockerfile.
 
-Once the project loads, the plugin will detect the Skaffold configuration and prompt to create the Kubernetes targets. The notification shows:
+Once the project loads, the plugin will detect the Skaffold configuration and prompt to create the Kubernetes targets. The notification shows (if it disappears, you can find it in the Event Log in the bottom right of the IDE):
 
 <img src="docs/images/k8s-skaffold-notification.png" alt="Kubernetes with Skaffold notification" width="400"/> 
 
@@ -113,7 +113,7 @@ As you can see, Spring Boot application initializes and launches built-in web se
 
 ![automatic port-forwarding](docs/images/auto-port-forward-hello-world.png)
 
-Navigate your browser to `localhost:8080` to access the Spring Boot application running on your Kubernetes cluster. Alternatively, use `curl` command to interact with the application:
+Navigate your browser to [localhost:8080](http://localhost:8080) to access the Spring Boot application running on your Kubernetes cluster. Alternatively, use `curl` command to interact with the application:
 
 <img src="docs/images/browser-root.png" alt="browser showing root page of the application" width="350"/> 
 
@@ -135,7 +135,7 @@ Now, let’s add more features to our Spring Boot project and see how they get d
     }
 ```
 
-Save the changes (`Ctrl-S`) or build the project (use `Build -> Build Project` menu or the toolbar icon). The plugin picks up the changes, re-builds the project and image, and deploys the updated image to your Kubernetes cluster. You can watch the progress and deployment logs in the console window. Once the changes are propagated, we can confirm the updates by visiting the newly created endpoint:
+Save the changes (`Ctrl-S`) or build the project (use `Build -> Build Project` menu or the toolbar icon). The plugin picks up the changes, re-builds the project and image, and deploys the updated image to your Kubernetes cluster. You can watch the progress and deployment logs in the console window. Once the changes are propagated, we can confirm the updates by visiting the newly created endpoint at [localhost:8080/greeting?name=User](http://localhost:8080/greeting?name=User):
 
 ![browser showing new greeting page of the application](docs/images/browser-greeting.png)
 
