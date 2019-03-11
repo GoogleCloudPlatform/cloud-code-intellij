@@ -55,7 +55,7 @@ See the [Google Cloud Tools Kubernetes FAQ](docs/faq.md).
 
 The plugin works in any of the  [JetBrains family of IDEs](https://www.jetbrains.com/products.html). The following shows an example using Kubernetes with Java and Spring Boot in IntelliJ IDEA (Community or Ultimate editions). Follow the installation steps above to install the plugin. Restart your IDE if prompted to activate the plugin.
 
-Before we start, make sure [all required dependencies](https://github.com/GoogleCloudPlatform/google-cloud-intellij#prerequisites-and-required-dependencies) are available on your machine.
+Before we start, make sure [all required dependencies](https://github.com/GoogleCloudPlatform/google-cloud-intellij/tree/master/kubernetes#prerequisites-and-required-dependencies) are available on your machine.
 
 Clone the repository to your local machine to get your copy of the repository:
 ```
