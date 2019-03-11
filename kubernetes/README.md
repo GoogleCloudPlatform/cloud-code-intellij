@@ -62,7 +62,7 @@ Clone the repository to your local machine to get your copy of the repository:
 git clone https://github.com/GoogleCloudPlatform/google-cloud-intellij.git
 ```
 
-Open the `hello-spring-boot` example from `kubernetes/examples` directory with your IntelliJ IDE. You can either point to the directory or to the Maven build file (`pom.xml`). The project opens and loads:
+Open the `hello-spring-boot` example project in your IDE. It is located in the `kubernetes/examples/hello-spring-boot` directory in the project you just cloned. The project opens and loads:
 
 <img src="docs/images/sb-hello-world-project.png" alt="opened Spring Boot hello world project" width="500"/> 
 
@@ -83,6 +83,15 @@ Now the new run targets can be used to build the project and deploy it to Kubern
 However, before we can deploy and develop, we need to make sure we have access to the image repository where the project image is about to be pushed. By default the project is configured to use [Google Container Registry](https://cloud.google.com/container-registry/) and a development project for the plugin which you probably don’t have access to. Once you have your repository set up ([Google Container Registry](https://cloud.google.com/container-registry/), [DockerHub](https://hub.docker.com/), private repository, etc.), you can edit the run targets and specify it as a *default image repository* in run target settings:
 
 ![specify your repository in run target settings](docs/images/default-image-repo-settings.png)
+
+Here are examples of how to specify the default image repository for some common registries:
+
+* Docker Hub: `docker.io/{account}`
+* GCP Container Repository (GCR): `gcr.io/{project_id}`
+* AWS Container Repository (ECR): `{aws_account_id}.dkr.ecr.{region}.amazonaws.com/{my-app}`
+* Azure Container Registry (ACR): `{my_acr_name}.azurecr.io/{my-app}`
+
+The resulting image name is concatenated from the specified default image repository and the image name from the project Kubernetes resources. For this `hello-spring-boot` example, and GCR image repository as the default one, the resulting full image name would be `gcr.io/{project_id}/gcr.io/gcp-dev-tools/hello-spring-boot`. 
 
 *Note*: this step is not required when you work with your own Kubernetes manifests and Skaffold configuration where you specify a repository and an image name that are accessible to you.
 
