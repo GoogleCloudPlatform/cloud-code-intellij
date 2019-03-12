@@ -27,6 +27,7 @@ import com.google.kubernetes.tools.skaffold.metrics.SKAFFOLD_SINGLE_RUN_FAIL
 import com.google.kubernetes.tools.skaffold.metrics.SKAFFOLD_SINGLE_RUN_SUCCESS
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.util.EnvironmentUtil
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -149,6 +150,11 @@ abstract class SkaffoldExecutorService {
         val generalCommandLine = GeneralCommandLine(commandList)
         generalCommandLine.withParentEnvironmentType(
                 GeneralCommandLine.ParentEnvironmentType.CONSOLE)
+
+        // For some environments (e.g. *nix) the shell environment is not accessed from the GUI
+        // this ensures that the shell environment is read and included
+        generalCommandLine.withEnvironment(EnvironmentUtil.ShellEnvReader().readShellEnv())
+
         workingDirectory?.let { generalCommandLine.workDirectory = it }
 
         return generalCommandLine.createProcess()
