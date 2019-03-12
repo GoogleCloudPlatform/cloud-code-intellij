@@ -155,7 +155,8 @@ abstract class SkaffoldExecutorService {
                 GeneralCommandLine.ParentEnvironmentType.CONSOLE)
 
         // For some environments (e.g. *nix) the shell environment is not accessed from the GUI
-        // this ensures that the shell environment is read and included
+        // this ensures that the shell environment is read and included. If the shell environment
+        // reader returns an empty map, [GeneralCommandLine#withEnvironment] will be a noop.
         try {
             generalCommandLine.withEnvironment(EnvironmentUtil.ShellEnvReader().readShellEnv())
         } catch (e: Exception) {
