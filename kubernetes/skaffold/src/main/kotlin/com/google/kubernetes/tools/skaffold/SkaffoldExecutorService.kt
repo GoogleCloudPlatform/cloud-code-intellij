@@ -46,7 +46,7 @@ abstract class SkaffoldExecutorService {
     }
 
     /** Path for Skaffold executable, any form supported by [ProcessBuilder] */
-    protected abstract var skaffoldExecutablePath: Path
+    abstract var skaffoldExecutablePath: Path
 
     /**
      * Checks if Skaffold is available by executing a 'skaffold version' command. If the process

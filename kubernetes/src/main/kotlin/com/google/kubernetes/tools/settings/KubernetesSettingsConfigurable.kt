@@ -14,22 +14,36 @@
  * limitations under the License.
  */
 
-package com.google.kubernetes.tools.core.settings
+package com.google.kubernetes.tools.settings
 
 import com.google.common.annotations.VisibleForTesting
+import com.google.kubernetes.tools.core.settings.KubernetesSettingsService
 import com.google.kubernetes.tools.core.util.CoreBundle
+import com.google.kubernetes.tools.skaffold.SkaffoldExecutorService
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.border.IdeaTitledBorder
 import com.intellij.ui.layout.panel
+import java.awt.Color
 import java.awt.Insets
+import java.nio.file.Path
+import java.nio.file.Paths
 import javax.swing.JComponent
+import javax.swing.JLabel
+import javax.swing.event.DocumentEvent
+import javax.swing.event.DocumentListener
 
 /**
  * Creates a "Kubernetes" menu item under the "Google" menu item in the IDE Settings.
  */
 class KubernetesSettingsConfigurable : Configurable {
+
+    @VisibleForTesting
+    val skaffoldNotExecutableWarning =
+            JLabel(CoreBundle.message(
+                    "kubernetes.settings.dependencies.skaffold.not.executable.warning"))
 
     @VisibleForTesting
     val skaffoldBrowser = TextFieldWithBrowseButton()
@@ -46,6 +60,35 @@ class KubernetesSettingsConfigurable : Configurable {
                         false /*chooseJarsAsFiles*/,
                         false /*chooseJarContents*/,
                         false /*chooseMultiple*/))
+
+        skaffoldBrowser.textField.document.addDocumentListener(object : DocumentListener {
+            val skaffoldExecutorService = object : SkaffoldExecutorService() {
+                override var skaffoldExecutablePath: Path = Paths.get(skaffoldBrowser.text)
+            }
+
+            override fun changedUpdate(event: DocumentEvent?) {
+                checkSkaffold()
+            }
+
+            override fun insertUpdate(event: DocumentEvent?) {
+                checkSkaffold()
+            }
+
+            override fun removeUpdate(event: DocumentEvent?) {
+                checkSkaffold()
+            }
+
+            /**
+             * Checks if the input path to the executable is a valid executable. If not, show a
+             * warning. Don't show the warning if the field is empty.
+             */
+            private fun checkSkaffold() {
+                skaffoldExecutorService.skaffoldExecutablePath = Paths.get(skaffoldBrowser.text)
+
+                skaffoldNotExecutableWarning.isVisible = !skaffoldBrowser.text.isEmpty() &&
+                        !skaffoldExecutorService.isSkaffoldAvailable()
+            }
+        })
     }
 
     override fun isModified(): Boolean {
@@ -63,13 +106,20 @@ class KubernetesSettingsConfigurable : Configurable {
     }
 
     override fun createComponent(): JComponent? {
-        val dependenciesPanel = panel {
+        skaffoldNotExecutableWarning.icon = AllIcons.General.Warning
+        skaffoldNotExecutableWarning.foreground = Color.RED
+        skaffoldNotExecutableWarning.isVisible = false
 
+        val dependenciesPanel = panel {
             row(CoreBundle.message("kubernetes.settings.dependencies.skaffold.selector.title")) {
                 skaffoldBrowser(grow)
             }
 
             noteRow(CoreBundle.message("kubernetes.settings.dependencies.skaffold.note"))
+
+            row {
+                skaffoldNotExecutableWarning()
+            }
         }
 
         dependenciesPanel.border = IdeaTitledBorder(
