@@ -17,7 +17,7 @@
 <!-- Declares core/utility IDE extensions and components for Container Tools -->
 <idea-plugin>
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceImplementation="com.google.container.tools.core.PluginInfo"/>
-
+        <applicationService serviceImplementation="com.google.kubernetes.tools.core.PluginInfo"/>
+        <applicationService serviceImplementation="com.google.kubernetes.tools.core.settings.KubernetesSettingsService"/>
     </extensions>
 </idea-plugin>

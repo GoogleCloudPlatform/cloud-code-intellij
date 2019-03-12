@@ -56,6 +56,7 @@ repositories {
 
 dependencies {
     compile(project(":kubernetes:core"))
+    compile(project(":kubernetes:skaffold"))
 
     compile("com.google.protobuf:protobuf-java:2.5.0")
 

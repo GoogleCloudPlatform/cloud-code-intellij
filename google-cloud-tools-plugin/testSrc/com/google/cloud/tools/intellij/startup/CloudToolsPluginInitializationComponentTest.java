@@ -16,6 +16,7 @@
 
 package com.google.cloud.tools.intellij.startup;
 
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
@@ -23,6 +24,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.cloud.tools.intellij.analytics.UsageTrackingManagementService;
 import com.google.cloud.tools.intellij.login.IntegratedGoogleLoginService;
 import com.google.cloud.tools.intellij.service.ApplicationPluginInfoService;
 import com.google.cloud.tools.intellij.service.PluginConfigurationService;
@@ -49,6 +51,7 @@ public class CloudToolsPluginInitializationComponentTest {
   @Mock @TestService PluginConfigurationService pluginConfigurationService;
   @Mock @TestService ApplicationPluginInfoService applicationInfoService;
   @Mock @TestService IntegratedGoogleLoginService googleLoginService;
+  @Mock @TestService UsageTrackingManagementService usageTrackingManagementService;
 
   private Application application;
   CloudToolsPluginInitializationComponent testComponent;
@@ -77,6 +80,48 @@ public class CloudToolsPluginInitializationComponentTest {
     when(pluginInfoService.shouldEnableErrorFeedbackReporting()).thenReturn(false);
     testComponent.initComponent();
     verify(pluginConfigurationService, never()).enabledGoogleFeedbackErrorReporting(anyString());
+  }
+
+  @Test
+  public void testInitComponent_usageTrackingIsSet_whenAllConditionsAreMet() {
+    Application mockApplication = spy(ApplicationManager.getApplication());
+    when(mockApplication.isUnitTestMode()).thenReturn(false);
+    ApplicationManager.setApplication(mockApplication, disposable);
+
+    when(usageTrackingManagementService.isUsageTrackingAvailable()).thenReturn(true);
+    when(usageTrackingManagementService.hasUserRecordedTrackingPreference()).thenReturn(false);
+
+    testComponent.initComponent();
+
+    verify(usageTrackingManagementService).setTrackingPreference(true);
+  }
+
+  @Test
+  public void testInitComponent_usageTrackingIsNotSet_whenTrackingNotAvailable() {
+    Application mockApplication = spy(ApplicationManager.getApplication());
+    when(mockApplication.isUnitTestMode()).thenReturn(false);
+    ApplicationManager.setApplication(mockApplication, disposable);
+
+    when(usageTrackingManagementService.isUsageTrackingAvailable()).thenReturn(false);
+    when(usageTrackingManagementService.hasUserRecordedTrackingPreference()).thenReturn(false);
+
+    testComponent.initComponent();
+
+    verify(usageTrackingManagementService, never()).setTrackingPreference(anyBoolean());
+  }
+
+  @Test
+  public void testInitComponent_usageTrackingIsNotSet_whenTrackingPreferenceAlreadySet() {
+    Application mockApplication = spy(ApplicationManager.getApplication());
+    when(mockApplication.isUnitTestMode()).thenReturn(false);
+    ApplicationManager.setApplication(mockApplication, disposable);
+
+    when(usageTrackingManagementService.isUsageTrackingAvailable()).thenReturn(true);
+    when(usageTrackingManagementService.hasUserRecordedTrackingPreference()).thenReturn(true);
+
+    testComponent.initComponent();
+
+    verify(usageTrackingManagementService, never()).setTrackingPreference(anyBoolean());
   }
 
   @Test

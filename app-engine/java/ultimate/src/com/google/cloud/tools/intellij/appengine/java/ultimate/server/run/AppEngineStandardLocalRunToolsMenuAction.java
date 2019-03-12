@@ -16,7 +16,7 @@
 
 package com.google.cloud.tools.intellij.appengine.java.ultimate.server.run;
 
-import com.google.cloud.tools.intellij.CloudToolsRunConfigurationAction;
+import com.google.cloud.tools.intellij.action.CloudToolsRunConfigurationAction;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineIcons;
 import com.google.cloud.tools.intellij.appengine.java.AppEngineMessageBundle;
 import com.google.cloud.tools.intellij.appengine.java.project.AppEngineProjectService;

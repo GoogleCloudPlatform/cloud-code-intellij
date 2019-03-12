@@ -10,6 +10,7 @@ This plugin adds support for [Kubernetes](https://www.kubernetes.io) development
  * [Features](#features)
   * [Prerequisites and required dependencies](#prerequisites-and-required-dependencies)
   * [Installing the plugin into your IDE](#installing-the-plugin-into-your-ide)
+  * [Frequently asked questions](#frequently-asked-questions-faq)
   * [Getting started](#getting-started)
      * [Specifying image repository](#specifying-image-repository)
      * [Continuous development on Kubernetes](#continuous-development-on-kubernetes)
@@ -23,12 +24,15 @@ This plugin adds support for [Kubernetes](https://www.kubernetes.io) development
 * One click **deployment to Kubernetes clusters right from your IDE** using [Skaffold](https://skaffold.dev/docs/getting-started/). Configure Skaffold to use your desired build and deployment strategies: works with kubectl, Helm, Google Cloud Build (for remote builds), Jib and Kanico.
 * **Continuous development on Kubernetes**. Watches the dependencies of your docker image or Jib Java project for changes, so that on any change, Skaffold builds and deploys your application to a Kubernetes cluster.
 * Automatic discovery and support for project with existing Skaffold configuration, in any language supported by your preferred JetBrains IDE.
-* Initial support for Skaffold configuration file editing and smart templates.
+* Skaffold configuration file **editing support and smart templates**.
 
 ## Prerequisites and required dependencies
 
-This plugin uses familiar Kubernetes and container tools to bring you a rich Kubernetes experience in IntelliJ and other JetBrains IDEs. The following tools are expected to be installed and setup on your system and available in the system path:
+This plugin uses familiar Kubernetes and container tools to bring you a rich Kubernetes experience in IntelliJ and other JetBrains IDEs. 
 
+The following tools are expected to be installed and setup on your system and available in the system path:
+
+* JetBrains IDE version 2018.2+, either Ultimate or Community editions.
 * [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) for working with Kubernetes clusters and managing Kubernetes deployments.
 * [Skaffold](https://skaffold.dev/docs/getting-started/) to support continuous development on a Kubernetes cluster, smart image building and tagging, and an array of supported deployment and build types.
 * [Docker](https://www.docker.com/) for building and pushing your container images. *Note*: Docker is optional if you are using [Jib to build your container images](https://github.com/GoogleContainerTools/jib).
@@ -43,24 +47,28 @@ If you'd like to try out the Kubernetes features, you can install the nightly re
 2) Use the copied URL to add a Custom Plugin URL, following [these instructions](https://www.jetbrains.com/idea/help/managing-enterprise-plugin-repositories.html)
 3) Search for the `Google Cloud Tools` plugin and install it
 
+
+## Frequently Asked Questions (FAQ)
+See the [Google Cloud Tools Kubernetes FAQ](docs/faq.md).
+
 ## Getting started
 
 The plugin works in any of the  [JetBrains family of IDEs](https://www.jetbrains.com/products.html). The following shows an example using Kubernetes with Java and Spring Boot in IntelliJ IDEA (Community or Ultimate editions). Follow the installation steps above to install the plugin. Restart your IDE if prompted to activate the plugin.
 
-Before we start, make sure [all required dependencies](https://github.com/GoogleContainerTools/google-container-tools-intellij#prerequisites-and-required-dependencies) are available on your machine.
+Before we start, make sure [all required dependencies](https://github.com/GoogleCloudPlatform/google-cloud-intellij/tree/master/kubernetes#prerequisites-and-required-dependencies) are available on your machine.
 
 Clone the repository to your local machine to get your copy of the repository:
 ```
-git clone https://github.com/GoogleContainerTools/google-container-tools-intellij.git
+git clone https://github.com/GoogleCloudPlatform/google-cloud-intellij.git
 ```
 
-Open the `hello-spring-boot` example from `google-container-tools/examples` directory with your IntelliJ IDE. You can either point to the directory or to the Maven build file (`pom.xml`). The project opens and loads:
+Open the `hello-spring-boot` example project in your IDE. It is located in the `kubernetes/examples/hello-spring-boot` directory in the project you just cloned. The project opens and loads:
 
 <img src="docs/images/sb-hello-world-project.png" alt="opened Spring Boot hello world project" width="500"/> 
 
 This project is a simple web application created with [the popular Spring Boot framework](https://spring.io/projects/spring-boot). It uses the [Jib Maven plugin](https://github.com/GoogleContainerTools/jib) to build a container image for the project, without needing to create a Dockerfile.
 
-Once the project loads, the plugin will detect the Skaffold configuration and prompt to create the Kubernetes targets. The notification shows:
+Once the project loads, the plugin will detect the Skaffold configuration and prompt to create the Kubernetes targets. The notification shows (if it disappears, you can find it in the Event Log in the bottom right of the IDE):
 
 <img src="docs/images/k8s-skaffold-notification.png" alt="Kubernetes with Skaffold notification" width="400"/> 
 
@@ -75,6 +83,15 @@ Now the new run targets can be used to build the project and deploy it to Kubern
 However, before we can deploy and develop, we need to make sure we have access to the image repository where the project image is about to be pushed. By default the project is configured to use [Google Container Registry](https://cloud.google.com/container-registry/) and a development project for the plugin which you probably don’t have access to. Once you have your repository set up ([Google Container Registry](https://cloud.google.com/container-registry/), [DockerHub](https://hub.docker.com/), private repository, etc.), you can edit the run targets and specify it as a *default image repository* in run target settings:
 
 ![specify your repository in run target settings](docs/images/default-image-repo-settings.png)
+
+Here are examples of how to specify the default image repository for some common registries:
+
+* Docker Hub: `docker.io/{account}`
+* GCP Container Repository (GCR): `gcr.io/{project_id}`
+* AWS Container Repository (ECR): `{aws_account_id}.dkr.ecr.{region}.amazonaws.com/{my-app}`
+* Azure Container Registry (ACR): `{my_acr_name}.azurecr.io/{my-app}`
+
+The resulting image name is concatenated from the specified default image repository and the image name from the project Kubernetes resources. For this `hello-spring-boot` example, and GCR image repository as the default one, the resulting full image name would be `gcr.io/{project_id}/gcr.io/gcp-dev-tools/hello-spring-boot`. 
 
 *Note*: this step is not required when you work with your own Kubernetes manifests and Skaffold configuration where you specify a repository and an image name that are accessible to you.
 
@@ -96,7 +113,7 @@ As you can see, Spring Boot application initializes and launches built-in web se
 
 ![automatic port-forwarding](docs/images/auto-port-forward-hello-world.png)
 
-Navigate your browser to `localhost:8080` to access the Spring Boot application running on your Kubernetes cluster. Alternatively, use `curl` command to interact with the application:
+Navigate your browser to [localhost:8080](http://localhost:8080) to access the Spring Boot application running on your Kubernetes cluster. Alternatively, use `curl` command to interact with the application:
 
 <img src="docs/images/browser-root.png" alt="browser showing root page of the application" width="350"/> 
 
@@ -118,7 +135,7 @@ Now, let’s add more features to our Spring Boot project and see how they get d
     }
 ```
 
-Save the changes (`Ctrl-S`) or build the project (use `Build -> Build Project` menu or the toolbar icon). The plugin picks up the changes, re-builds the project and image, and deploys the updated image to your Kubernetes cluster. You can watch the progress and deployment logs in the console window. Once the changes are propagated, we can confirm the updates by visiting the newly created endpoint:
+Save the changes (`Ctrl-S`) or build the project (use `Build -> Build Project` menu or the toolbar icon). The plugin picks up the changes, re-builds the project and image, and deploys the updated image to your Kubernetes cluster. You can watch the progress and deployment logs in the console window. Once the changes are propagated, we can confirm the updates by visiting the newly created endpoint at [localhost:8080/greeting?name=User](http://localhost:8080/greeting?name=User):
 
 ![browser showing new greeting page of the application](docs/images/browser-greeting.png)
 
