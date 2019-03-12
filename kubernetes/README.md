@@ -155,7 +155,7 @@ You can use the other Kubernetes run target to build the image and deploy the pr
 ## Setup existing Kubernetes projects with the plugin
 
 You can open any project with a configured container image build (using Dockerfile or [Jib](https://github.com/GoogleContainerTools/jib)) and Kubernetes manifests, and use it with the plugin. The only additional bit of configuration is a Skaffold YAML file that you can create from a provided template. Here is a quick tutorial:
-* Create new file names `skaffold.yaml` in the root directory of you project (right-click -> `New` -> `File`).
+* Create new file named `skaffold.yaml` in the root directory of your project (right-click -> `New` -> `File`).
 * Type `skaffold` and accept proposed Skaffold live template:
 
 ![create Skaffold YAML from template](docs/images/skaffold-yaml-template.gif)
