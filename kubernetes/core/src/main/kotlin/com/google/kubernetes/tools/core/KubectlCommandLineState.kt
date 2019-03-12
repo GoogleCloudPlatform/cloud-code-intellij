@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.container.tools.core
+package com.google.kubernetes.tools.core
 
-import com.google.container.tools.core.util.CoreBundle.message
+
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.Executor
 import com.intellij.execution.configurations.*
@@ -26,8 +26,6 @@ import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
-import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.xmlb.XmlSerializer
 import org.jdom.Element
@@ -53,37 +51,27 @@ class KubectlCommandLineState(
         val runConfiguration: RunConfiguration? =
             environment.runnerAndConfigurationSettings?.configuration
         val projectBaseDir: VirtualFile? = environment.project.guessProjectDir()
+
         // ensure the configuration is valid for execution - settings are of supported type,
-        // project is valid and Skaffold file is present.
-        if (runConfiguration == null  || runConfiguration !is KubectlRunConfiguration || projectBaseDir == null) {
-            throw ExecutionException(message("kubectl.corrupted.run.settings"))
-        }
-        if (runConfiguration.kubectlConfigurationFilePath == null) {
-            throw ExecutionException(message("kubectl.no.file.selected.error"))
-        }
 
         if (!KubectlExecutorService.instance.isKubectlAvailable()) {
             throw ExecutionException(message("kubectl.not.on.system.error"))
         }
 
-        val configFile: VirtualFile? = LocalFileSystem.getInstance()
-            .findFileByPath(runConfiguration.kubectlConfigurationFilePath!!)
-        // use project dir relative location for cleaner command line representation
-        val skaffoldConfigurationFilePath: String? = VfsUtilCore.getRelativeLocation(
-            configFile, projectBaseDir
-        )
-//kubectlConfigurationFilePath,
-//                skaffoldProfile = runConfiguration.skaffoldProfile,
-// skaffoldLabels = SkaffoldLabels.defaultLabels,
-//                tailLogsAfterDeploy = singleRunConfiguration?.tailDeploymentLogs,
-//                defaultImageRepo = runConfiguration.imageRepositoryOverride
+        if (runConfiguration == null  ||
+                runConfiguration !is KubectlRunConfiguration ||
+                projectBaseDir == null ||
+                !(runConfiguration as KubectlRunConfiguration).validConfigurationFlags()) {
+            throw ExecutionException(message("kubectl.corrupted.run.settings"))
+        }
+
 
         val kubectlProcess = KubectlExecutorService.instance.executeKubectl(
-            KubectlExecutorSettings(
-                executionMode = executionMode,
-                workingDirectory = File(projectBaseDir.path),
-                executionFlags = listOf()
-            )
+                KubectlExecutorSettings(
+                        executionMode = executionMode,
+                        workingDirectory = File(projectBaseDir.path),
+                        executionFlags = runConfiguration.configurationFlags
+                )
         )
         return KillableProcessHandler(kubectlProcess.process, kubectlProcess.commandLine)
     }
@@ -98,12 +86,17 @@ class KubectlRunConfiguration( project: Project,
      * Persisted Skaffold config file absolute path for Skaffold run configurations.
      * See more at [com.intellij.openapi.vfs.VirtualFile.getPath]
      */
-    var kubectlConfigurationFilePath: String? = null
 
-    var skaffoldProfile: String? = null
+    var configurationFlags: List<String> = listOf()
 
-    /** Image repository to use with a Skaffold run target instead of one configured by default. */
-    var imageRepositoryOverride: String? = null
+    /**  TODO:zaria
+     * check to see if the flags are valid for the
+     * run mode. i.e. "kubectl version -f x.yaml" is invalid
+     **/
+
+    fun validConfigurationFlags():Boolean{
+        return true
+    }
 
     override fun readExternal(element: Element) {
         super.readExternal(element)

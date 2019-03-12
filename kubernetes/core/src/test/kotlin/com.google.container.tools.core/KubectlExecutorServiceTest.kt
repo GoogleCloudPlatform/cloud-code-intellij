@@ -17,169 +17,108 @@
 package com.google.container.tools.core
 
 import com.google.common.truth.Truth
+import com.google.kubernetes.tools.test.ContainerToolsRule
+import com.google.kubernetes.tools.test.TestFile
+import com.google.kubernetes.tools.core.KubectlExecutorService
+import com.google.kubernetes.tools.core.KubectlExecutorSettings
+import com.google.kubernetes.tools.core.KubectlProcess
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.spyk
-import io.mockk.verify
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 
 /** Unit tests for [KubectlExecutorService] */
 class DefaultKubectlExecutorServiceTest {
+    @get:Rule
+    val containerToolsRule = ContainerToolsRule(this)
 
     private lateinit var kubectlExecutorService: KubectlExecutorService
 
     @MockK
+    private lateinit var mockKubectlProcess: KubectlProcess
+
+    @MockK
     private lateinit var mockProcess: Process
+
+    @TestFile(name = "myFile1", contents = "")
+    private lateinit var myFile1: File
+
+    @TestFile(name = "myFile2", contents = "")
+    private lateinit var myFile2: File
 
     @Before
     fun setUp() {
-        var kubectlExecutorService = spyk(KubectlExecutorService())
+        kubectlExecutorService = spyk(KubectlExecutorService())
         every { kubectlExecutorService.createProcess(any(), any()) } answers { mockProcess }
     }
 
     @Test
-    fun `single run with no arguments launches kubectl run`() {
-//        val result = kubectlExecutorService.executeKubectl(
-//                KubectlExecutorSettings(
-//                        KubectlExecutorSettings.ExecutionMode.SINGLE_RUN
-//                )
-//        )
-//
-//        Truth.assertThat(result.commandLine).isEqualTo("kubectl run")
+    fun `single run with no arguments launches kubectl config`() {
+        val result = kubectlExecutorService.executeKubectl(
+                KubectlExecutorSettings(
+                        KubectlExecutorSettings.ExecutionMode.CONFIG
+                )
+        )
+
+        Truth.assertThat(result.commandLine).isEqualTo("kubectl config")
     }
 
 
     @Test
-    fun `kubectl config filename argument generates valid kubectl filename flag`() {
-//        val result = kubectlExecutorService.executeKubectl(
-//                KubectlExecutorSettings(
-//                        KubectlExecutorSettings.ExecutionMode.DEV,
-//                        kubectlConfigurationFilePath = "test.yaml"
-//                )
-//        )
-//
-//        Truth.assertThat(result.commandLine).isEqualTo("kubectl dev --filename test.yaml")
+    fun `kubectl create filename argument generates valid kubectl filename flag`() {
+        val result = kubectlExecutorService.executeKubectl(
+                KubectlExecutorSettings(
+                        KubectlExecutorSettings.ExecutionMode.CREATE,
+                        executionFlags = arrayListOf("-f", "./my1.yaml", "-f", "./my2.yaml")
+                )
+        )
+
+        Truth.assertThat(result.commandLine).isEqualTo("kubectl create -f ./my1.yaml -f ./my2.yaml" )
     }
 
     @Test
-    fun `working directory is passed on to process builder`() {
-//        kubectlExecutorService.executeKubectl(
-//                KubectlExecutorSettings(
-//                        KubectlExecutorSettings.ExecutionMode.DEV,
-//                        kubectlConfigurationFilePath = "test.yaml",
-//                        workingDirectory = File("/tmp")
-//                )
-//        )
-//
-//        verify { kubectlExecutorService.createProcess(File("/tmp"), any()) }
-    }
-
-    @Test
-    fun `empty kubectl label list does not generate label flags`() {
-//        val kubectlLabels = KubectlLabels()
-//
-//        val result = kubectlExecutorService.executeKubectl(
-//                KubectlExecutorSettings(
-//                        KubectlExecutorSettings.ExecutionMode.DEV,
-//                        kubectlConfigurationFilePath = "test.yaml",
-//                        kubectlLabels = kubectlLabels
-//                )
-//        )
-//
-//        Truth.assertThat(result.commandLine).isEqualTo("kubectl dev --filename test.yaml")
-    }
-
-    @Test
-    fun `single kubectl label list generates correct label flag`() {
-//        val kubectlLabels = KubectlLabels()
-//        kubectlLabels.labels["ide"] = "testIde"
-//
-//        val result = kubectlExecutorService.executeKubectl(
-//                KubectlExecutorSettings(
-//                        KubectlExecutorSettings.ExecutionMode.DEV,
-//                        kubectlConfigurationFilePath = "test.yaml",
-//                        kubectlLabels = kubectlLabels
-//                )
-//        )
-//
-//        Truth.assertThat(result.commandLine).isEqualTo(
-//                "kubectl dev --filename test.yaml --label ide=testIde"
-//        )
-    }
-
-    @Test
-    fun `multiple kubectl label list generates correct label flag set`() {
-//        val kubectlLabels = KubectlLabels()
-//        kubectlLabels.labels["ide"] = "testIde"
-//        kubectlLabels.labels["name"] = "unitTest"
-//        kubectlLabels.labels["version"] = "1"
-//
-//        val result = kubectlExecutorService.executeKubectl(
-//                KubectlExecutorSettings(
-//                        KubectlExecutorSettings.ExecutionMode.DEV,
-//                        kubectlConfigurationFilePath = "test.yaml",
-//                        kubectlLabels = kubectlLabels
-//                )
-//        )
-//
-//        Truth.assertThat(result.commandLine).isEqualTo(
-//                "kubectl dev --filename test.yaml " +
-//                        "--label ide=testIde --label name=unitTest --label version=1"
-//        )
+    fun `kubectl create filename argument executes`() {
+        val result = kubectlExecutorService.executeKubectl(
+                KubectlExecutorSettings(
+                        KubectlExecutorSettings.ExecutionMode.CREATE,
+                        executionFlags = arrayListOf("-f", myFile1.path, "-f", myFile2.path)
+                )
+        )
+        result.process.waitFor(2, TimeUnit.SECONDS)
+        Truth.assertThat(result.process.exitValue()).isEqualTo(0 )
     }
 
 
     @Test
-    fun `added profile name generates valid command line`() {
-//        val result = kubectlExecutorService.executeKubectl(
-//                KubectlExecutorSettings(
-//                        KubectlExecutorSettings.ExecutionMode.DEV,
-//                        kubectlConfigurationFilePath = "profiles.yaml",
-//                        kubectlProfile = "cloudBuild"
-//                )
-//        )
-//
-//        Truth.assertThat(result.commandLine).isEqualTo(
-//                "kubectl dev --filename profiles.yaml " +
-//                        "--profile cloudBuild"
-//        )
-    }
-
-    @Test
-    fun `null profile name generates valid command line`() {
-//        val result = kubectlExecutorService.executeKubectl(
-//                KubectlExecutorSettings(
-//                        KubectlExecutorSettings.ExecutionMode.SINGLE_RUN,
-//                        kubectlConfigurationFilePath = "test.yaml",
-//                        kubectlProfile = null
-//                )
-//        )
-//
-//        Truth.assertThat(result.commandLine).isEqualTo("kubectl run --filename test.yaml")
+    fun `kubectl invalid create arguments throws error`() {
+        val result = kubectlExecutorService.executeKubectl(
+                KubectlExecutorSettings(
+                        KubectlExecutorSettings.ExecutionMode.RUN,
+                        executionFlags = arrayListOf("-f", myFile1.path, "-f", myFile2.path)
+                )
+        )
+        result.process.waitFor(2, TimeUnit.SECONDS)
+        Truth.assertThat(result.process.exitValue()).isEqualTo(1 )
     }
 
 
     @Test
     fun `isKubectlAvailable returns true when kubectl is available`() {
-//        testKubectlFile.setExecutable(true)
-//        every { kubectlExecutorService.getSystemPath() } answers { testKubectlFile.parent }
-//        Truth.assertThat(kubectlExecutorService.isKubectlAvailable()).isTrue()
+        every{ kubectlExecutorService.executeKubectl(any())} answers {mockKubectlProcess}
+        every{ mockKubectlProcess.process.exitValue()} answers {0}
+        Truth.assertThat(kubectlExecutorService.isKubectlAvailable()).isTrue()
     }
 
     @Test
     fun `isKubectlAvailable returns false when kubectl is not available`() {
-//        every { kubectlExecutorService.getSystemPath() } answers { "" }
-//        Truth.assertThat(kubectlExecutorService.isKubectlAvailable()).isFalse()
+        every{ kubectlExecutorService.executeKubectl(any())} answers {mockKubectlProcess}
+        every{ mockKubectlProcess.process.exitValue()} answers {1}
+        Truth.assertThat(kubectlExecutorService.isKubectlAvailable()).isFalse()
     }
 
-    @Test
-    fun `isKubectlAvailable returns false when kubectl is not available in valid system paths`() {
-//        every { kubectlExecutorService.getSystemPath() } answers {
-//            testNotKubectlFile.parent
-//        }
-//        Truth.assertThat(kubectlExecutorService.isKubectlAvailable()).isFalse()
-    }
 }

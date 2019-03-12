@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.container.tools.core
+package com.google.kubernetes.tools.core
 
 import com.google.cloud.tools.intellij.analytics.UsageTrackerService
-import com.google.common.annotations.VisibleForTesting
-import com.intellij.openapi.application.PathManager.getSystemPath
 import com.intellij.openapi.components.ServiceManager
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 const val KUBECTL_SUCCESS = "kubectl.run"
 const val KUBECTL_FAIL = "kubectl.fail"
@@ -35,7 +34,15 @@ class KubectlExecutorService {
 
     var kubectlExecutablePath: String = "kubectl"
 
-    fun isKubectlAvailable():Boolean = getSystemPath().equals("")
+    fun isKubectlAvailable():Boolean=
+        try {
+            val settings = KubectlExecutorSettings(KubectlExecutorSettings.ExecutionMode.VERSION)
+            val process = executeKubectl(settings).process
+            process.waitFor(2, TimeUnit.SECONDS)
+            process.exitValue() == 0
+        } catch (e: Exception) {
+            false
+        }
 
 
     fun createProcess(
@@ -65,6 +72,7 @@ class KubectlExecutorService {
             )
 
             // track event based on execution mode.
+
             UsageTrackerService.getInstance().trackEvent(KUBECTL_SUCCESS).ping()
             return kubectlProcess
         } catch (e: Exception) {
@@ -93,12 +101,8 @@ data class KubectlProcess(val process: Process, val commandLine: String)
 
 data class KubectlExecutorSettings(
         val executionMode: ExecutionMode,
-//        val kubectlConfigurationFilePath: String? = null,
-//        val skaffoldProfile: String? = null,
         val workingDirectory: File? = null,
         val executionFlags: List<String> = ArrayList()
-//        val tailLogsAfterDeploy: Boolean? = null,
-//        val defaultImageRepo: String? = null
 ) {
 
     /** Execution mode for Skaffold, single run, continuous development, etc. */
@@ -110,6 +114,8 @@ data class KubectlExecutorSettings(
         ROLLOUT("rollout"),
         SCALE("scale"),
         DELETE("delete"),
-        RUN("run")
+        RUN("run"),
+        VERSION("version")
     }
 }
+

@@ -16,21 +16,6 @@
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-//ext {
-//    kotlin_version = '1.2.0'
-//}
-
-buildscript {
-
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.0")
-
-    }
-}
-
 allprojects {
     intellij {
         setPlugins("yaml")
@@ -41,17 +26,11 @@ allprojects {
     }
 
     dependencies {
-        compile( "io.kubernetes:client-java:4.0.0")
-
         testCompile("io.mockk:mockk:+") {
             // this ensures kotlin plugin/version takes precedence, mockk updates less often
             exclude(group = "org.jetbrains.kotlin", module = "kotlin-reflect")
         }
     }
-}
-
-repositories {
-    mavenCentral()
 }
 
 dependencies {
@@ -61,8 +40,6 @@ dependencies {
     compile("com.google.protobuf:protobuf-java:2.5.0")
 
     testCompile(project(":kubernetes:common-test-lib"))
-
-    compile("compile /org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.0/")
 }
 
 inline operator fun <T : Task> T.invoke(a: T.() -> Unit): T = apply(a)

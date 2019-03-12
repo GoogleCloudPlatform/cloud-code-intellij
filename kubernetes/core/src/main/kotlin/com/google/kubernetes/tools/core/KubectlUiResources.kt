@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.container.tools.core
+package com.google.kubernetes.tools.core
 
 import com.google.common.annotations.VisibleForTesting
 import com.intellij.CommonBundle
-import com.intellij.openapi.util.IconLoader
 import org.jetbrains.annotations.PropertyKey
 import java.util.ResourceBundle
 
@@ -31,8 +30,8 @@ private const val BUNDLE_NAME = "messages.KubectlBundle"
  */
 @VisibleForTesting
 fun message(
-    @PropertyKey(resourceBundle = BUNDLE_NAME) key: String,
-    vararg params: String
+        @PropertyKey(resourceBundle = BUNDLE_NAME) key: String,
+        vararg params: String
 ): String {
     return CommonBundle.message(ResourceBundle.getBundle(BUNDLE_NAME), key, params)
 }
