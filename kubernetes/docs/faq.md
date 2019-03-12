@@ -37,7 +37,7 @@ and the IDE is launched from the GUI, causing the IDE not to see the PATH variab
 
 While, unfortunately, there isn't an optimal solution, the following are a couple workarounds in Linux: 
 
-1) Launch the IDE from the terminal
+- Launch the IDE from the terminal
 
    First, follow [these](https://www.jetbrains.com/help/idea/working-with-the-ide-features-from-command-line.html)
    instructions to enable a command-line launcher. Then launch the IDE from the terminal.
@@ -51,4 +51,5 @@ While, unfortunately, there isn't an optimal solution, the following are a coupl
 
    `charm .`
 
-2) Set the the PATH variables in a system-wide location such as `/etc/environment`.
+Or,
+- Set the the PATH variables in a system-wide location such as `/etc/environment`.
