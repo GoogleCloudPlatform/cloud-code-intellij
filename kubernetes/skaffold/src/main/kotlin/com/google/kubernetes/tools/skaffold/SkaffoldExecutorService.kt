@@ -27,6 +27,7 @@ import com.google.kubernetes.tools.skaffold.metrics.SKAFFOLD_SINGLE_RUN_FAIL
 import com.google.kubernetes.tools.skaffold.metrics.SKAFFOLD_SINGLE_RUN_SUCCESS
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.util.EnvironmentUtil
 import java.io.File
 import java.nio.file.Path
@@ -45,6 +46,8 @@ abstract class SkaffoldExecutorService {
         val instance
             get() = ServiceManager.getService(SkaffoldExecutorService::class.java)!!
     }
+
+    private val log = Logger.getInstance(this::class.java)
 
     /** Path for Skaffold executable, any form supported by [ProcessBuilder] */
     abstract var skaffoldExecutablePath: Path
@@ -153,7 +156,12 @@ abstract class SkaffoldExecutorService {
 
         // For some environments (e.g. *nix) the shell environment is not accessed from the GUI
         // this ensures that the shell environment is read and included
-        generalCommandLine.withEnvironment(EnvironmentUtil.ShellEnvReader().readShellEnv())
+        try {
+            generalCommandLine.withEnvironment(EnvironmentUtil.ShellEnvReader().readShellEnv())
+        } catch (e: Exception) {
+            log.warn("Exception occurred reading the shell environment. Continue process " +
+                    "creation with already loaded environment")
+        }
 
         workingDirectory?.let { generalCommandLine.workDirectory = it }
 
