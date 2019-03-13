@@ -70,4 +70,4 @@ Then you may be running into [this known issue](https://github.com/GoogleCloudPl
 As a workaround in the [Spring Boot hello-world project](https://github.com/GoogleCloudPlatform/google-cloud-intellij/tree/master/kubernetes/examples/hello-spring-boot) 
 you can change the Skaffold project from the `default` project to the `docker` profile in your Kubernetes Run Configuration:
 
-<img src="images/docker-skaffold-profile.png" alt="docker skaffold profile" width="400"/>
+<img src="images/docker-skaffold-profile.png" alt="docker skaffold profile" width="550"/>
