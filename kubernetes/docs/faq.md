@@ -3,7 +3,7 @@
 If you have a question that is not answered below, please [submit an issue](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues).
 
 [How do I fix missing Skaffold installation errors?](#how-do-i-fix-missing-skaffold-installation-errors)\
-[How do I fix 'executable not found on PATH' errors?](#how-do-i-fix-executable-not-found-on-path-errors)
+[How do I fix 'executable not found on PATH' errors?](#how-do-i-fix-executable-not-found-on-path-errors)\
 [How do I fix Maven wrapper errors in the hello-world example project?](#how-do-i-fix-maven-wrapper-errors-in-the-hello-world-example-project)
 
 
