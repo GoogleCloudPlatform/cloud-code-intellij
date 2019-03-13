@@ -1,5 +1,11 @@
 # Getting started with a Kubernetes deployment using IntelliJ, Java and Spring Boot
 
+* [Specifying image repository](#specifying-image-repository)
+* [Continuous development on Kubernetes](#continuous-development-on-kubernetes)
+* [Adding new features](#adding-new-features)
+* [Deployment to Kubernetes](#deployment-to-kubernetes)
+
+
 The plugin works in any of the  [JetBrains family of IDEs](https://www.jetbrains.com/products.html). The following shows an example using Kubernetes with Java and Spring Boot in IntelliJ IDEA (Community or Ultimate editions). Follow the [installation steps](../README.md#installing-the-plugin-into-your-ide) to install the plugin. Restart your IDE if prompted to activate the plugin.
 
 Before we start, make sure [all required dependencies](../README.md#prerequisites-and-required-dependencies) are available on your machine.
@@ -96,3 +102,6 @@ You can continue adding and testing new features and have them redeployed automa
 ### Deployment to Kubernetes
 
 You can use the other Kubernetes run target to build the image and deploy the project to your Kubernetes cluster once. Unlike continuous development, your project sources and dependencies are not watched, and the Skaffold process finishes once the image and deployment are complete.
+
+<img src="images/deploy-k8s-action.png" alt="deploy run target click" width="400"/>
+ 
