@@ -17,9 +17,7 @@
 package com.google.kubernetes.tools.skaffold.run
 
 import com.google.common.annotations.VisibleForTesting
-import com.google.kubernetes.tools.skaffold.SkaffoldExecutorService
 import com.google.kubernetes.tools.skaffold.SkaffoldExecutorSettings
-import com.google.kubernetes.tools.skaffold.message
 import com.google.kubernetes.tools.skaffold.run.ui.SkaffoldDevSettingsEditor
 import com.google.kubernetes.tools.skaffold.run.ui.SkaffoldSingleRunSettingsEditor
 import com.intellij.execution.Executor
@@ -27,17 +25,12 @@ import com.intellij.execution.configurations.ConfigurationFactory
 import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.execution.configurations.RunConfigurationBase
 import com.intellij.execution.configurations.RunProfileState
-import com.intellij.execution.configurations.RuntimeConfigurationWarning
 import com.intellij.execution.executors.DefaultDebugExecutor
 import com.intellij.execution.runners.ExecutionEnvironment
-import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.options.SettingsEditor
-import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
 import com.intellij.util.xmlb.XmlSerializer
 import org.jdom.Element
-
-private const val KUBERNETES_SETTINGS_CONFIGURABLE_ID = "google.kubernetes.settings"
 
 /**
  * Template configuration for Skaffold single run configuration, serving as a base for all new
@@ -119,23 +112,5 @@ abstract class AbstractSkaffoldRunConfiguration(
         super.writeExternal(element)
 
         XmlSerializer.serializeInto(this, element)
-    }
-
-    override fun checkConfiguration() {
-        if (!SkaffoldExecutorService.instance.isSkaffoldAvailable()) {
-            throw RuntimeConfigurationWarning(message("skaffold.run.config.not.on.system.error"),
-                    Runnable {
-                        val kubernetesConfigurable =
-                                Configurable.APPLICATION_CONFIGURABLE.extensionList.find {
-                            it.id == KUBERNETES_SETTINGS_CONFIGURABLE_ID
-                        }
-
-                        kubernetesConfigurable?.let {
-                            ShowSettingsUtil.getInstance().showSettingsDialog(
-                                    project,
-                                    it.instanceClass)
-                        }
-                    })
-        }
     }
 }
