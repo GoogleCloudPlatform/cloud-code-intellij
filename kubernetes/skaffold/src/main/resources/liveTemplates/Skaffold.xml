@@ -1,5 +1,5 @@
 <templateSet group="Skaffold">
-  <template name="skaffold" value="apiVersion: skaffold/v1beta1&#10;kind: Config&#10;build:&#10;  artifacts:&#10;    - image: $IMAGE$ &#10;deploy:&#10;  kubectl:&#10;      manifests:&#10;     - $MANIFEST$&#10;    &#10;" description="Skaffold Config" toReformat="true" toShortenFQNames="true">
+  <template name="skaffold" value="apiVersion: skaffold/v1beta6&#10;kind: Config&#10;build:&#10;  artifacts:&#10;    - image: $IMAGE$ &#10;deploy:&#10;  kubectl:&#10;      manifests:&#10;     - $MANIFEST$&#10;    &#10;" description="Skaffold Config" toReformat="true" toShortenFQNames="true">
     <variable name="IMAGE" expression="" defaultValue="" alwaysStopAt="true" />
     <variable name="MANIFEST" expression="" defaultValue="" alwaysStopAt="true" />
     <context>
