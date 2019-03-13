@@ -1,4 +1,4 @@
-# Setup existing Kubernetes projects with the plugin
+# Set up existing Kubernetes projects with the plugin
 
 You can open any existing project already configured with Kubernetes manifests and a Dockerfile (or [Jib](https://github.com/GoogleContainerTools/jib)), and use it with the plugin. The only additional bit of configuration is a Skaffold YAML file that you can create from a provided template. Here is a quick tutorial:
 * Create new file named `skaffold.yaml` in the root directory of your project (right-click -> `New` -> `File`).

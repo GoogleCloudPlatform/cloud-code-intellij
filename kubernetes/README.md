@@ -12,7 +12,7 @@ This plugin adds support for [Kubernetes](https://www.kubernetes.io) development
   * [Installing the plugin into your IDE](#installing-the-plugin-into-your-ide)
   * [Frequently asked questions](#frequently-asked-questions-faq)
   * [Getting started](#getting-started)
-  * [Setup existing Kubernetes projects with the plugin](#setup-existing-kubernetes-projects-with-the-plugin)
+  * [Set up existing Kubernetes projects with the plugin](#set-up-existing-kubernetes-projects-with-the-plugin)
 
 
 ## Features
@@ -51,7 +51,7 @@ See the [Google Cloud Tools Kubernetes FAQ](docs/faq.md).
 
 See the [Getting started with a Kubernetes deployment using Java and Spring Boot](docs/gettings-started.md) 
 
-## Setup existing Kubernetes projects with the plugin
+## Set up existing Kubernetes projects with the plugin
 
 You can open any existing project already configured with Kubernetes manifests and a Dockerfile (or [Jib](https://github.com/GoogleContainerTools/jib)), and use it with the plugin. [Please follow this quick tutorial](docs/existing-k8s-projects.md).
  
