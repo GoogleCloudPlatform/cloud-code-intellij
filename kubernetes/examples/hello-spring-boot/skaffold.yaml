@@ -5,8 +5,13 @@ build:
   - image: gcr.io/gcp-dev-tools/hello-spring-boot
     jibMaven: {}
 
-# optional profile to run the jib build on Google Cloud Build
 profiles:
+  # optional profile to run the Jib build on Google Cloud Build
   - name: gcb
     build:
       googleCloudBuild: {}
+  # optional profile to run the build using Docker instead of Jib
+  - name: docker
+    build:
+      artifacts:
+        - image: gcr.io/gcp-dev-tools/hello-spring-boot
