@@ -1,10 +1,12 @@
 # Getting started with a Kubernetes deployment using IntelliJ, Java and Spring Boot
 
+* [Set up](#set-up)
 * [Specifying image repository](#specifying-image-repository)
 * [Continuous development on Kubernetes](#continuous-development-on-kubernetes)
 * [Adding new features](#adding-new-features)
 * [Deployment to Kubernetes](#deployment-to-kubernetes)
 
+### Set up
 
 The plugin works in any of the  [JetBrains family of IDEs](https://www.jetbrains.com/products.html). The following shows an example using Kubernetes with Java and Spring Boot in IntelliJ IDEA (Community or Ultimate editions). Follow the [installation steps](../README.md#installing-the-plugin-into-your-ide) to install the plugin. Restart your IDE if prompted to activate the plugin.
 
