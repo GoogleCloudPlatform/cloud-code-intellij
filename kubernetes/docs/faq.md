@@ -3,7 +3,9 @@
 If you have a question that is not answered below, please [submit an issue](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues).
 
 [How do I fix missing Skaffold installation errors?](#how-do-i-fix-missing-skaffold-installation-errors)\
-[How do I fix 'executable not found on PATH' errors?](#how-do-i-fix-executable-not-found-on-path-errors)
+[How do I fix 'executable not found on PATH' errors?](#how-do-i-fix-executable-not-found-on-path-errors)\
+[How do I fix Maven wrapper errors in the hello-world example project?](#how-do-i-fix-maven-wrapper-errors-in-the-hello-world-example-project)
+
 
 ### How do I fix missing Skaffold installation errors? 
 
@@ -53,3 +55,19 @@ While, unfortunately, there isn't an optimal solution, the following are a coupl
 
 Or,
 - Set the the PATH variables in a system-wide location such as `/etc/environment`.
+
+### How do I fix Maven wrapper errors in the hello-world example project?
+
+If you are getting errors in the form:
+
+```
+time="2019-03-08T11:13:45-05:00" level=fatal msg="watching files for artifact gcr.io/gcp-dev-tools/hello-spring-boot: listing files: 
+listing files: getting jibMaven dependencies: unable to stat file Found \"C:\\Users\\***\\google-cloud-intellij\\kubernetes\\examples\\hello-spring-boot\\.mvn\\wrapper\\maven-wrapper.jar\": CreateFile Found \"C:\\Users\\***\\google-cloud-intellij\\kubernetes\\examples\\hello-spring-boot\\.mvn\\wrapper\\maven-wrapper.jar\": The filename, directory name, or volume label syntax is incorrect."
+```
+
+Then you may be running into [this known issue](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2427).
+
+As a workaround in the [Spring Boot hello-world project](https://github.com/GoogleCloudPlatform/google-cloud-intellij/tree/master/kubernetes/examples/hello-spring-boot) 
+you can change the Skaffold project from the `default` project to the `docker` profile in your Kubernetes Run Configuration:
+
+<img src="images/docker-skaffold-profile.png" alt="docker skaffold profile" width="550"/>
