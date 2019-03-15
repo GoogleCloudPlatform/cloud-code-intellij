@@ -19,6 +19,7 @@ package com.google.kubernetes.tools.core
 import com.google.cloud.tools.intellij.analytics.UsageTrackerService
 import com.intellij.openapi.components.ServiceManager
 import java.io.File
+import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
 const val KUBECTL_SUCCESS = "kubectl.run"
