@@ -35,65 +35,18 @@ class KubectlAPI {
     fun configGetClusters(): String{
         val configurationFlags = listOf("get-clusters")
         val executionMode = KubectlExecutorSettings.ExecutionMode.CONFIG
-        val process = startProcess(executionMode, configurationFlags)
+        val process = KubectlExecutorService.instance.startProcess(executionMode, configurationFlags)
         return if (!process.isNullOrBlank()) process else ""
     }
 
     fun configSetCluster(name:String): Boolean { //use-context to set the active context
         val configurationFlags = listOf("set-cluster", name)
         val executionMode = KubectlExecutorSettings.ExecutionMode.CONFIG
-        val process = startProcess(executionMode, configurationFlags)
+        val process = KubectlExecutorService.instance.startProcess(executionMode, configurationFlags)
         return (!process.isNullOrBlank())
     }
 
 
-    fun startProcess(
-            executionMode: KubectlExecutorSettings.ExecutionMode,
-            configurationFlags:List<String> ): String? {
-        // ensure the configuration is valid for execution - settings are of supported type,
 
-
-//        throw RuntimeException("wtf")
-        try {
-
-            if (!KubectlExecutorService.instance.isKubectlAvailable()) {
-                throw ExecutionException(message("kubectl.not.on.system.error"))
-            }
-
-            val n1 =KubectlExecutorSettings(
-                    executionMode = executionMode,
-                    executionFlags = configurationFlags
-            )
-
-            val n2 = KubectlExecutorService.instance.executeKubectl(n1)
-            val executingProcess =  n2.process
-
-            executingProcess.waitFor(2, TimeUnit.SECONDS)
-
-            if(executingProcess.exitValue() == 0 ) {
-                val reader = BufferedReader(InputStreamReader(executingProcess.inputStream))
-                var builder = StringBuilder()
-                var line = reader.readLine()
-                while (line != null) {
-                    builder.append(line)
-                    builder.append(System.getProperty("line.separator"))
-                }
-                return builder.toString()
-
-
-//                ProcessBuilder builder = new ProcessBuilder("command goes here");
-//                builder.redirectErrorStream(true);
-//                Process process = builder.start();
-//                InputStream is = process.getInputStream();
-//                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-            } else {
-                throw ExecutionException(message("kubectl.invalid.flags.error"))
-            }
-
-        } catch (e: Exception){
-            throw ExecutionException(e)
-            return null
-        }
-    }
 
 }

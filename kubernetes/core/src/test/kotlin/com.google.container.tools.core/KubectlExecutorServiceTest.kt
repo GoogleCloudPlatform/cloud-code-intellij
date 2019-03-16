@@ -54,7 +54,7 @@ class DefaultKubectlExecutorServiceTest {
     @Before
     fun setUp() {
         kubectlExecutorService = spyk(KubectlExecutorService())
-        every { kubectlExecutorService.createProcess(any(), any()) } answers { mockProcess }
+//        every { kubectlExecutorService.createProcess(any(), any()) } answers { mockProcess }
     }
 
     @Test
@@ -66,6 +66,19 @@ class DefaultKubectlExecutorServiceTest {
         )
 
         Truth.assertThat(result.commandLine).isEqualTo("kubectl config")
+    }
+
+    @Test
+    fun `startProcess with version returns the version`() {
+        every { kubectlExecutorService.isKubectlAvailable() } answers {true }
+        val result = kubectlExecutorService.startProcess(
+                KubectlExecutorSettings.ExecutionMode.CONFIG,
+                listOf("view"))
+        print(result)
+        Truth.assertThat(true).isFalse()
+//        Truth.assertThat(result).isEqualTo("kubectl config")
+        //kubectl config view
+        //kubectl get services
     }
 
 

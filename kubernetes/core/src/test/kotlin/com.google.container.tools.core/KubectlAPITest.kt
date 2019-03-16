@@ -87,52 +87,39 @@ class KubectlAPITest {
 
     @Before
     fun setUp() {
-        every { mockKubectlExecutorService.isKubectlAvailable() } answers {true}
+//        every { mockKubectlExecutorService.isKubectlAvailable() } answers {true}
 
         mockKubectlAPI = KubectlAPI()
 
         // Kubectl executor answer mocks
-        val mockKubectlProcess: KubectlProcess = mockk(relaxed = true)
+//        val mockKubectlProcess: KubectlProcess = mockk(relaxed = true)
 //        every {
 //            mockKubectlExecutorService.executeKubectl(capture(kubectlSettingsCapturingSlot))
 //        } answers { mockKubectlProcess }
     }
 
-    @Test
-    fun `startProcess with version returns the version`() {
-        val result = mockKubectlAPI.startProcess(
-                KubectlExecutorSettings.ExecutionMode.VERSION,
-                listOf())
-        print(result)
-        Truth.assertThat(true).isFalse()
-//        Truth.assertThat(result).isEqualTo("kubectl config")
-    }
 
     @Test
     fun `configGetClusters returns the clusters`() {
-        val result = mockKubectlAPI.startProcess(
-                KubectlExecutorSettings.ExecutionMode.VERSION,
-                listOf()).toString()
+        val result = mockKubectlAPI.configGetClusters()
 
-        Truth.assertThat(result).isEqualTo("kubectl config")
+        Truth.assertThat(result).isNotEmpty()
     }
 
     @Test
     fun `configSetCluster sets the cluster context`() {
-        val result = mockKubectlAPI.startProcess(
-                KubectlExecutorSettings.ExecutionMode.VERSION,
-                listOf()).toString()
+        val result = mockKubectlAPI.configSetCluster("gke_fresh-yen-230921_us-central1_gaetestexample")
 
-        Truth.assertThat(result).isEqualTo("kubectl config")
+        Truth.assertThat(result).isTrue()
     }
 
     @Test
     fun `configSetCluster fails on invalid name output`() {
-        val result = mockKubectlAPI.startProcess(
-                KubectlExecutorSettings.ExecutionMode.VERSION,
-                listOf()).toString()
-
-        Truth.assertThat(result).isEqualTo("kubectl config")
+//        val result = mockKubectlAPI.startProcess(
+//                KubectlExecutorSettings.ExecutionMode.VERSION,
+//                listOf()).toString()
+//
+//        Truth.assertThat(result).isEqualTo("kubectl config")
     }
 
 }

@@ -18,7 +18,9 @@ package com.google.kubernetes.tools.core
 
 import com.google.cloud.tools.intellij.analytics.UsageTrackerService
 import com.intellij.openapi.components.ServiceManager
+import java.io.BufferedReader
 import java.io.File
+import java.io.InputStreamReader
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
@@ -86,6 +88,48 @@ class KubectlExecutorService {
             // re-throw exception to make sure a user sees run resulted in an error and sees error
             // message.
             throw e
+        }
+    }
+
+    fun startProcess(
+            executionMode: KubectlExecutorSettings.ExecutionMode,
+            configurationFlags:List<String> ): String? {
+        // ensure the configuration is valid for execution - settings are of supported type,
+
+        try {
+
+            if (!isKubectlAvailable()) {
+                throw Exception(message("kubectl.not.on.system.error"))
+            }
+
+            val n1 =KubectlExecutorSettings(
+                    executionMode = executionMode,
+                    executionFlags = configurationFlags
+            )
+
+            val n2 = executeKubectl(n1)
+            val executingProcess =  n2.process
+
+            executingProcess.waitFor(2, TimeUnit.SECONDS)
+
+            if(executingProcess.exitValue() == 0 ) {
+                val reader = BufferedReader(InputStreamReader(executingProcess.inputStream))
+                var builder = StringBuilder()
+                var line = reader.readLine()
+                while (line != null) {
+                    System.out.println(line)
+                    builder.append(line)
+                    builder.append(System.getProperty("line.separator"))
+                    line = reader.readLine()
+                }
+                return builder.toString()
+            } else {
+                throw com.intellij.execution.ExecutionException(message("kubectl.invalid.flags.error"))
+            }
+
+        } catch (e: Exception){
+            throw com.intellij.execution.ExecutionException(e)
+            return null
         }
     }
 }
