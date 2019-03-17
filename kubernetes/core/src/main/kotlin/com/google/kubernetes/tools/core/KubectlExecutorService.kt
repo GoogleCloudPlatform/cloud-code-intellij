@@ -16,12 +16,11 @@
 
 package com.google.kubernetes.tools.core
 
+import com.intellij.execution.ExecutionException
 import com.google.cloud.tools.intellij.analytics.UsageTrackerService
 import com.intellij.openapi.components.ServiceManager
 import java.io.BufferedReader
-import java.io.File
 import java.io.InputStreamReader
-import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
 const val KUBECTL_SUCCESS = "kubectl.run"
@@ -37,6 +36,10 @@ class KubectlExecutorService {
 
     var kubectlExecutablePath: String = "kubectl"
 
+    /**
+     * run kubectl version to make sure that kubectl is available, if there's no response after
+     *  a couple of seconds then it is not available.
+     */
     fun isKubectlAvailable():Boolean=
         try {
             val settings = KubectlExecutorSettings(KubectlExecutorSettings.ExecutionMode.VERSION)
@@ -48,18 +51,13 @@ class KubectlExecutorService {
         }
 
 
-    fun createProcess(
-            workingDirectory: File?,
-            commandList: List<String>
-    ): Process {
-        val processBuilder = ProcessBuilder()
-        workingDirectory?.let { processBuilder.directory(it) }
-
-        return processBuilder.command(commandList).start()
-    }
-
+    /**
+     * Parse through command line arguments and try to execute the command
+     */
     fun executeKubectl(settings: KubectlExecutorSettings): KubectlProcess {
+
         val commandList = mutableListOf<String>()
+
         with(commandList) {
             add(kubectlExecutablePath)
             add(settings.executionMode.modeFlag)
@@ -69,19 +67,20 @@ class KubectlExecutorService {
         }
 
         try {
+            val processBuilder = ProcessBuilder()
+            val startedProcess = processBuilder.command(commandList).start()
             val kubectlProcess = KubectlProcess(
-                    createProcess(settings.workingDirectory, commandList),
-                    commandLine = commandList.joinToString(" ")
+                    startedProcess,
+                    commandList.joinToString(" ")
             )
-
             // track event based on execution mode.
-
             UsageTrackerService.getInstance().trackEvent(KUBECTL_SUCCESS).ping()
             return kubectlProcess
-        } catch (e: Exception) {
-            val skaffoldFailEventName = KUBECTL_FAIL
 
-            UsageTrackerService.getInstance().trackEvent(skaffoldFailEventName)
+        } catch (e: Exception) {
+            val kubectlFailEventName = KUBECTL_FAIL
+
+            UsageTrackerService.getInstance().trackEvent(kubectlFailEventName)
                     .addMetadata(
                             METADATA_ERROR_MESSAGE_KEY, e.javaClass.name
                     ).ping()
@@ -91,76 +90,113 @@ class KubectlExecutorService {
         }
     }
 
+    /**
+     * Check if kubectl is available, Check if the flags supplied are valid. Create and start the
+     * command line process passed in
+     */
+
+    fun processOutputToString(executingProcess: Process): String{
+        val reader = BufferedReader(InputStreamReader(executingProcess.inputStream))
+        var builder = StringBuilder()
+        var line = reader.readLine()
+        while (line != null) {
+            builder.append(line)
+            line = reader.readLine()
+            //so that there's no trailing or leading whitespace
+            if (line != null) builder.append(System.getProperty("line.separator"))
+        }
+        return builder.toString()
+    }
+
+    /**
+     * Check if kubectl is available, Check if the flags supplied are valid. Create and start the
+     * command line process passed in
+     */
     fun startProcess(
             executionMode: KubectlExecutorSettings.ExecutionMode,
-            configurationFlags:List<String> ): String? {
-        // ensure the configuration is valid for execution - settings are of supported type,
+            configurationFlags:List<String> ): String {
 
-        try {
-
-            if (!isKubectlAvailable()) {
-                throw Exception(message("kubectl.not.on.system.error"))
-            }
-
-            val n1 =KubectlExecutorSettings(
-                    executionMode = executionMode,
-                    executionFlags = configurationFlags
-            )
-
-            val n2 = executeKubectl(n1)
-            val executingProcess =  n2.process
-
-            executingProcess.waitFor(2, TimeUnit.SECONDS)
-
-            if(executingProcess.exitValue() == 0 ) {
-                val reader = BufferedReader(InputStreamReader(executingProcess.inputStream))
-                var builder = StringBuilder()
-                var line = reader.readLine()
-                while (line != null) {
-                    System.out.println(line)
-                    builder.append(line)
-                    builder.append(System.getProperty("line.separator"))
-                    line = reader.readLine()
-                }
-                return builder.toString()
-            } else {
-                throw com.intellij.execution.ExecutionException(message("kubectl.invalid.flags.error"))
-            }
-
-        } catch (e: Exception){
-            throw com.intellij.execution.ExecutionException(e)
-            return null
+        if (!isKubectlAvailable()) {
+            throw ExecutionException(message("kubectl.not.on.system.error"))
         }
+
+        val executorSettings =KubectlExecutorSettings(
+                executionMode = executionMode,
+                executionFlags = configurationFlags
+        )
+
+        if (!executorSettings.hasValidFlags()){
+            throw ExecutionException(message("kubectl.invalid.flags.error"))
+        }
+
+        val executingProcess =  executeKubectl(executorSettings).process
+
+        executingProcess.waitFor(2, TimeUnit.SECONDS)
+
+        if(executingProcess.exitValue() == 0 ) {
+            return processOutputToString(executingProcess)
+        } else {
+            throw ExecutionException(message("kubectl.unknown.error"))
+        }
+
     }
 }
 
 
 
 /**
- * Data object with launched Skaffold process and its command line.
+ * Data object with launched Kubectl process and its command line.
  *
- * @property process System process for Skaffold.
+ * @property process System process for Kubectl.
  * @property commandLine Command line used to launch the process.
  */
 data class KubectlProcess(val process: Process, val commandLine: String)
 
 data class KubectlExecutorSettings(
         val executionMode: ExecutionMode,
-        val workingDirectory: File? = null,
         val executionFlags: List<String> = ArrayList()
 ) {
 
-    /** Execution mode for Skaffold, single run, continuous development, etc. */
+    /** Execution mode for Kubectl, single run, continuous development, etc. */
     enum class ExecutionMode(val modeFlag: String) {
         CONFIG("config"),
         CREATE("create"),
-        GET("get"),
-        PATCH("patch"),
-        ROLLOUT("rollout"),
-        SCALE("scale"),
-        DELETE("delete"),
-        RUN("run"),
         VERSION("version")
+    }
+
+    /** Map to check if flags are valid for an execution mode */
+    private val acceptedFlagsMap = mapOf(
+            "-f" to ExecutionMode.CREATE,
+            "get-clusters" to ExecutionMode.CONFIG,
+            "set-cluster" to ExecutionMode.CONFIG
+    )
+
+    /** Make sure the mode actually support the flags */
+    fun hasValidFlags(): Boolean{
+        var skip = false
+        for (flag in executionFlags.listIterator()){
+            //if it's a value, don't check it. We're only checking flags
+            if (skip) {
+                skip=false
+                continue
+            }
+
+            if (flag.contains("=")){
+                //don't skip the next argument
+                val flagAndValue=flag.split("=")
+                val justTheFlag= flagAndValue[0]
+                val modeOfFlag = acceptedFlagsMap.get(justTheFlag)
+                if (modeOfFlag != executionMode) return false
+
+            } else {
+                //skip the next argument
+                val modeOfFlag = acceptedFlagsMap.get(flag)
+                if (modeOfFlag != executionMode) return false
+                skip = true
+            }
+
+        }
+        return true
     }
 }
 
