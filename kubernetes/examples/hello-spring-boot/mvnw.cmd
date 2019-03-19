@@ -128,7 +128,8 @@ FOR /F "tokens=1,2 delims==" %%A IN (%MAVEN_PROJECTBASEDIR%\.mvn\wrapper\maven-w
 @REM Extension to allow automatically downloading the maven-wrapper.jar from Maven-central
 @REM This allows using the maven wrapper in projects that prohibit checking in binary data.
 if exist %WRAPPER_JAR% (
-    echo Found %WRAPPER_JAR%
+@REM commenting out echo as workaround for https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2427
+@REM echo Found %WRAPPER_JAR%
 ) else (
     echo Couldn't find %WRAPPER_JAR%, downloading it ...
 	echo Downloading from: %DOWNLOAD_URL%
