@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.kubernetes.tools.core
+package com.google.kubernetes.tools.kubectl
 
 import com.intellij.execution.ExecutionException
 import com.google.cloud.tools.intellij.analytics.UsageTrackerService
@@ -43,7 +43,7 @@ class KubectlExecutorService {
         try {
             val settings = KubectlExecutorSettings(KubectlExecutorSettings.ExecutionMode.VERSION)
             val process = executeKubectl(settings).process
-            process.waitFor(2, TimeUnit.SECONDS)
+            process.waitFor(1, TimeUnit.SECONDS)
             process.exitValue() == 0
         } catch (e: Exception) {
             false
@@ -71,8 +71,6 @@ class KubectlExecutorService {
                     startedProcess,
                     commandList.joinToString(" ")
             )
-            // track event based on execution mode.
-            UsageTrackerService.getInstance().trackEvent(KUBECTL_SUCCESS).ping()
             return kubectlProcess
         } catch (e: Exception) {
             val kubectlFailEventName = KUBECTL_FAIL
@@ -81,8 +79,6 @@ class KubectlExecutorService {
                     .addMetadata(
                             METADATA_ERROR_MESSAGE_KEY, e.javaClass.name
                     ).ping()
-            // re-throw exception to make sure a user sees run resulted in an error and sees error
-            // message.
             throw e
         }
     }
@@ -91,7 +87,6 @@ class KubectlExecutorService {
      * Check if kubectl is available, Check if the flags supplied are valid. Create and start the
      * command line process passed in
      */
-
     fun processOutputToString(executingProcess: Process): String {
         val reader = BufferedReader(InputStreamReader(executingProcess.inputStream))
         val builder = StringBuilder()
@@ -107,11 +102,12 @@ class KubectlExecutorService {
 
     /**
      * Check if kubectl is available, Check if the flags supplied are valid. Create and start the
-     * command line process passed in
+     * command line process passed in. This method waits until the process has been completed and
+     * needs to be run in a separate background thread.
      */
     fun startProcess(
-        executionMode: KubectlExecutorSettings.ExecutionMode,
-        configurationFlags: List<String>
+            executionMode: KubectlExecutorSettings.ExecutionMode,
+            configurationFlags: List<String>
     ): String {
 
         if (!isKubectlAvailable()) {
@@ -125,7 +121,7 @@ class KubectlExecutorService {
 
         val executingProcess = executeKubectl(executorSettings).process
 
-        executingProcess.waitFor(2, TimeUnit.SECONDS)
+        executingProcess.waitFor()
 
         if (executingProcess.exitValue() == 0 ) {
             return processOutputToString(executingProcess)
@@ -144,8 +140,8 @@ class KubectlExecutorService {
 data class KubectlProcess(val process: Process, val commandLine: String)
 
 data class KubectlExecutorSettings(
-    val executionMode: ExecutionMode,
-    val executionFlags: List<String> = ArrayList()
+        val executionMode: ExecutionMode,
+        val executionFlags: List<String> = ArrayList()
 ) {
 
     /** Execution mode for Kubectl, single run, continuous development, etc. */

@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.google.container.tools.core
+package com.google.container.tools.kubectl
 
 import com.google.common.truth.Truth
 import com.google.kubernetes.tools.test.ContainerToolsRule
 import com.google.kubernetes.tools.test.TestFile
-import com.google.kubernetes.tools.core.KubectlExecutorService
-import com.google.kubernetes.tools.core.KubectlExecutorSettings
-import com.google.kubernetes.tools.core.KubectlProcess
-import com.google.kubernetes.tools.core.message
+import com.google.kubernetes.tools.kubectl.KubectlExecutorService
+import com.google.kubernetes.tools.kubectl.KubectlExecutorSettings
+import com.google.kubernetes.tools.kubectl.KubectlProcess
+import com.google.kubernetes.tools.kubectl.message
 import com.google.kubernetes.tools.test.expectThrows
 import com.intellij.execution.ExecutionException
 import com.intellij.util.ThrowableRunnable
@@ -132,7 +132,7 @@ class DefaultKubectlExecutorServiceTest {
         }
         Truth.assertThat(kubectlExecutorService.processOutputToString(mockProcess)).isEqualTo("version 1.2.3")
     }
-    
+
 
     @Test
     fun `startProcess throws an exception if Kubectl isn't available`(){
