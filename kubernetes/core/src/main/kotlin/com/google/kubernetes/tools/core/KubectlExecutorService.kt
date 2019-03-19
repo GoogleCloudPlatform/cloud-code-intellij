@@ -33,14 +33,13 @@ class KubectlExecutorService {
             get() = ServiceManager.getService(KubectlExecutorService::class.java)!!
     }
 
-
     var kubectlExecutablePath: String = "kubectl"
 
     /**
      * run kubectl version to make sure that kubectl is available, if there's no response after
      *  a couple of seconds then it is not available.
      */
-    fun isKubectlAvailable():Boolean=
+    fun isKubectlAvailable(): Boolean =
         try {
             val settings = KubectlExecutorSettings(KubectlExecutorSettings.ExecutionMode.VERSION)
             val process = executeKubectl(settings).process
@@ -49,7 +48,6 @@ class KubectlExecutorService {
         } catch (e: Exception) {
             false
         }
-
 
     /**
      * Parse through command line arguments and try to execute the command
@@ -61,7 +59,7 @@ class KubectlExecutorService {
         with(commandList) {
             add(kubectlExecutablePath)
             add(settings.executionMode.modeFlag)
-            settings.executionFlags?.forEach {
+            settings.executionFlags.forEach {
                 add(it)
             }
         }
@@ -76,7 +74,6 @@ class KubectlExecutorService {
             // track event based on execution mode.
             UsageTrackerService.getInstance().trackEvent(KUBECTL_SUCCESS).ping()
             return kubectlProcess
-
         } catch (e: Exception) {
             val kubectlFailEventName = KUBECTL_FAIL
 
@@ -95,9 +92,9 @@ class KubectlExecutorService {
      * command line process passed in
      */
 
-    fun processOutputToString(executingProcess: Process): String{
+    fun processOutputToString(executingProcess: Process): String {
         val reader = BufferedReader(InputStreamReader(executingProcess.inputStream))
-        var builder = StringBuilder()
+        val builder = StringBuilder()
         var line = reader.readLine()
         while (line != null) {
             builder.append(line)
@@ -113,36 +110,30 @@ class KubectlExecutorService {
      * command line process passed in
      */
     fun startProcess(
-            executionMode: KubectlExecutorSettings.ExecutionMode,
-            configurationFlags:List<String> ): String {
+        executionMode: KubectlExecutorSettings.ExecutionMode,
+        configurationFlags: List<String>
+    ): String {
 
         if (!isKubectlAvailable()) {
             throw ExecutionException(message("kubectl.not.on.system.error"))
         }
 
-        val executorSettings =KubectlExecutorSettings(
+        val executorSettings = KubectlExecutorSettings(
                 executionMode = executionMode,
                 executionFlags = configurationFlags
         )
 
-        if (!executorSettings.hasValidFlags()){
-            throw ExecutionException(message("kubectl.invalid.flags.error"))
-        }
-
-        val executingProcess =  executeKubectl(executorSettings).process
+        val executingProcess = executeKubectl(executorSettings).process
 
         executingProcess.waitFor(2, TimeUnit.SECONDS)
 
-        if(executingProcess.exitValue() == 0 ) {
+        if (executingProcess.exitValue() == 0 ) {
             return processOutputToString(executingProcess)
         } else {
             throw ExecutionException(message("kubectl.unknown.error"))
         }
-
     }
 }
-
-
 
 /**
  * Data object with launched Kubectl process and its command line.
@@ -153,8 +144,8 @@ class KubectlExecutorService {
 data class KubectlProcess(val process: Process, val commandLine: String)
 
 data class KubectlExecutorSettings(
-        val executionMode: ExecutionMode,
-        val executionFlags: List<String> = ArrayList()
+    val executionMode: ExecutionMode,
+    val executionFlags: List<String> = ArrayList()
 ) {
 
     /** Execution mode for Kubectl, single run, continuous development, etc. */
@@ -171,32 +162,5 @@ data class KubectlExecutorSettings(
             "set-cluster" to ExecutionMode.CONFIG
     )
 
-    /** Make sure the mode actually support the flags */
-    fun hasValidFlags(): Boolean{
-        var skip = false
-        for (flag in executionFlags.listIterator()){
-            //if it's a value, don't check it. We're only checking flags
-            if (skip) {
-                skip=false
-                continue
-            }
 
-            if (flag.contains("=")){
-                //don't skip the next argument
-                val flagAndValue=flag.split("=")
-                val justTheFlag= flagAndValue[0]
-                val modeOfFlag = acceptedFlagsMap.get(justTheFlag)
-                if (modeOfFlag != executionMode) return false
-
-            } else {
-                //skip the next argument
-                val modeOfFlag = acceptedFlagsMap.get(flag)
-                if (modeOfFlag != executionMode) return false
-                skip = true
-            }
-
-        }
-        return true
-    }
 }
-

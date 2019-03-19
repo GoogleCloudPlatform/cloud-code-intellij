@@ -127,40 +127,12 @@ class DefaultKubectlExecutorServiceTest {
     @Test
     fun `processOutputToString converts the output of a process to a string`(){
         val processResult = "version 1.2.3"
-        every {mockProcess.inputStream} answers {processResult.byteInputStream(StandardCharsets.UTF_8)}
+        every {mockProcess.inputStream} answers {
+            processResult.byteInputStream(StandardCharsets.UTF_8)
+        }
         Truth.assertThat(kubectlExecutorService.processOutputToString(mockProcess)).isEqualTo("version 1.2.3")
     }
-
-
-    @Test
-    fun `hasValidFlags returns true with valid flags that have no equals sign`(){
-        val mockSettings = KubectlExecutorSettings(
-                KubectlExecutorSettings.ExecutionMode.CONFIG,
-                arrayListOf("set-cluster", "development", "set-cluster", "development")
-        )
-        Truth.assertThat(mockSettings.hasValidFlags()).isTrue()
-    }
-
-    @Test
-    fun `hasValidFlags returns true with valid flags that contain equals`(){
-        val mockSettings = KubectlExecutorSettings(
-                KubectlExecutorSettings.ExecutionMode.CONFIG,
-                arrayListOf("--kubeconfig=config-demo", "set-cluster", "development")
-        )
-        Truth.assertThat(mockSettings.hasValidFlags()).isFalse()
-    }
-
-    @Test
-    fun `hasValidFlags returns false with invalid flags`(){
-        val mockSettings = KubectlExecutorSettings(KubectlExecutorSettings.ExecutionMode.VERSION, arrayListOf("-f"))
-        Truth.assertThat(mockSettings.hasValidFlags()).isFalse()
-    }
-
-    @Test
-    fun `hasValidFlags returns true with no flags`(){
-        val mockSettings = KubectlExecutorSettings(KubectlExecutorSettings.ExecutionMode.VERSION, arrayListOf())
-        Truth.assertThat(mockSettings.hasValidFlags()).isTrue()
-    }
+    
 
     @Test
     fun `startProcess throws an exception if Kubectl isn't available`(){
