@@ -20,7 +20,11 @@ import com.google.cloud.tools.intellij.analytics.UsageTrackerService
 import com.google.common.annotations.VisibleForTesting
 import com.google.kubernetes.tools.core.settings.KubernetesSettingsService
 import com.google.kubernetes.tools.skaffold.SkaffoldExecutorSettings.ExecutionMode
-import com.google.kubernetes.tools.skaffold.metrics.*
+import com.google.kubernetes.tools.skaffold.metrics.METADATA_ERROR_MESSAGE_KEY
+import com.google.kubernetes.tools.skaffold.metrics.SKAFFOLD_DEV_RUN_FAIL
+import com.google.kubernetes.tools.skaffold.metrics.SKAFFOLD_DEV_RUN_SUCCESS
+import com.google.kubernetes.tools.skaffold.metrics.SKAFFOLD_SINGLE_RUN_FAIL
+import com.google.kubernetes.tools.skaffold.metrics.SKAFFOLD_SINGLE_RUN_SUCCESS
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.diagnostic.Logger
@@ -113,9 +117,14 @@ abstract class SkaffoldExecutorService {
             // the following settings only apply to `init` mode.
             if (settings.executionMode == ExecutionMode.INIT) {
                 // the flags are mutually exclusive, and shouldn't be used together.
+                if (settings.analyzeOnInit && settings.forceInit) {
+                    throw InvalidSkaffoldConfiguration(
+                            "skaffold init should not combine --analyze and --force flags")
+                }
+
                 if (settings.analyzeOnInit) {
                     add("--analyze")
-                } else if  (settings.forceInit) {
+                } else if (settings.forceInit) {
                     add("--force")
                 }
             }
@@ -185,6 +194,9 @@ abstract class SkaffoldExecutorService {
  * @property commandLine Command line used to launch the process.
  */
 data class SkaffoldProcess(val process: Process, val commandLine: String)
+
+/** Runtime exception thrown when Skaffold configuration is invalid. */
+class InvalidSkaffoldConfiguration(errorMessage: String) : RuntimeException(errorMessage)
 
 /**
  * Default implementation of Skaffold executor service. The Skaffold executable is first pulled

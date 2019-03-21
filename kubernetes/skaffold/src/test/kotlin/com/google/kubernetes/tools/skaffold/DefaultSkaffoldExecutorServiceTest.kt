@@ -18,6 +18,8 @@ package com.google.kubernetes.tools.skaffold
 
 import com.google.common.truth.Truth.assertThat
 import com.google.kubernetes.tools.test.ContainerToolsRule
+import com.google.kubernetes.tools.test.expectThrows
+import com.intellij.util.ThrowableRunnable
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.spyk
@@ -269,16 +271,16 @@ class DefaultSkaffoldExecutorServiceTest {
     }
 
     @Test
-    fun `skaffold init with both analyze and force only uses analyze flag`() {
-        val result = defaultSkaffoldExecutorService.executeSkaffold(
-                SkaffoldExecutorSettings(
-                        SkaffoldExecutorSettings.ExecutionMode.INIT,
-                        analyzeOnInit = true,
-                        forceInit = true
-                )
-        )
-
-        assertThat(result.commandLine).isEqualTo("skaffold init --analyze")
+    fun `skaffold init with both analyze and force throws invalid configuration exception`() {
+        expectThrows(InvalidSkaffoldConfiguration::class, ThrowableRunnable {
+            defaultSkaffoldExecutorService.executeSkaffold(
+                    SkaffoldExecutorSettings(
+                            SkaffoldExecutorSettings.ExecutionMode.INIT,
+                            analyzeOnInit = true,
+                            forceInit = true
+                    )
+            )
+        })
     }
 
     @Test
