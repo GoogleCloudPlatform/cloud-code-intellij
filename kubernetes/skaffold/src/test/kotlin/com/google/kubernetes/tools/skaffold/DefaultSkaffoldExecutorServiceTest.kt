@@ -18,6 +18,8 @@ package com.google.kubernetes.tools.skaffold
 
 import com.google.common.truth.Truth.assertThat
 import com.google.kubernetes.tools.test.ContainerToolsRule
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
 import io.mockk.spyk
 import io.mockk.verify
 import org.junit.Before
@@ -32,9 +34,13 @@ class DefaultSkaffoldExecutorServiceTest {
 
     private lateinit var defaultSkaffoldExecutorService: DefaultSkaffoldExecutorService
 
+    @MockK
+    private lateinit var mockProcess: Process
+
     @Before
     fun setUp() {
         defaultSkaffoldExecutorService = spyk(DefaultSkaffoldExecutorService())
+        every { defaultSkaffoldExecutorService.createProcess(any(), any()) } answers { mockProcess }
     }
 
     @Test
@@ -260,6 +266,19 @@ class DefaultSkaffoldExecutorServiceTest {
         )
 
         assertThat(result.commandLine).isEqualTo("skaffold init")
+    }
+
+    @Test
+    fun `skaffold init with both analyze and force only uses analyze flag`() {
+        val result = defaultSkaffoldExecutorService.executeSkaffold(
+                SkaffoldExecutorSettings(
+                        SkaffoldExecutorSettings.ExecutionMode.INIT,
+                        analyzeOnInit = true,
+                        forceInit = true
+                )
+        )
+
+        assertThat(result.commandLine).isEqualTo("skaffold init --analyze")
     }
 
     @Test
