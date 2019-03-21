@@ -267,7 +267,9 @@ class DefaultSkaffoldExecutorServiceTest {
         val result = defaultSkaffoldExecutorService.executeSkaffold(
                 SkaffoldExecutorSettings(
                         SkaffoldExecutorSettings.ExecutionMode.DEV,
-                        skaffoldConfigurationFilePath = "check.yaml"
+                        skaffoldConfigurationFilePath = "check.yaml",
+                        analyzeOnInit = true,
+                        forceInit = true
                 )
         )
 

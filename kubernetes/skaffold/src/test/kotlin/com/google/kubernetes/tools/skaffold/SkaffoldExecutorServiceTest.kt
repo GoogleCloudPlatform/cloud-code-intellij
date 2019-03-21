@@ -25,6 +25,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+/** Unit tests for [SkaffoldExecutorService] functionality. */
 class SkaffoldExecutorServiceTest {
     @get:Rule
     val containerToolsRule = ContainerToolsRule(this)
