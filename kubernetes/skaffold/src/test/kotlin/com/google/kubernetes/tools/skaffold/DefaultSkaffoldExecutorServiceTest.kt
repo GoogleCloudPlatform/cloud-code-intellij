@@ -164,6 +164,8 @@ class DefaultSkaffoldExecutorServiceTest {
         assertThat(result.commandLine).isEqualTo("skaffold dev --filename skaffold.yaml")
     }
 
+    // skaffold profile tests
+
     @Test
     fun `added profile name generates valid command line`() {
         val result = defaultSkaffoldExecutorService.executeSkaffold(
@@ -193,6 +195,8 @@ class DefaultSkaffoldExecutorServiceTest {
         assertThat(result.commandLine).isEqualTo("skaffold run --filename test.yaml")
     }
 
+    // skaffold default image repo tests
+
     @Test
     fun `added default image repo name generates valid command line`() {
         val result = defaultSkaffoldExecutorService.executeSkaffold(
@@ -219,5 +223,54 @@ class DefaultSkaffoldExecutorServiceTest {
         )
 
         assertThat(result.commandLine).isEqualTo("skaffold dev --filename test.yaml")
+    }
+
+    // skaffold init tests
+
+    @Test
+    fun `skaffold init with analyze generates valid command line`() {
+        val result = defaultSkaffoldExecutorService.executeSkaffold(
+                SkaffoldExecutorSettings(
+                        SkaffoldExecutorSettings.ExecutionMode.INIT,
+                        analyzeOnInit = true
+                )
+        )
+
+        assertThat(result.commandLine).isEqualTo("skaffold init --analyze")
+    }
+
+    @Test
+    fun `skaffold init with force generates valid command line`() {
+        val result = defaultSkaffoldExecutorService.executeSkaffold(
+                SkaffoldExecutorSettings(
+                        SkaffoldExecutorSettings.ExecutionMode.INIT,
+                        forceInit = true
+                )
+        )
+
+        assertThat(result.commandLine).isEqualTo("skaffold init --force")
+    }
+
+    @Test
+    fun `skaffold init without additional flags generates valid command line`() {
+        val result = defaultSkaffoldExecutorService.executeSkaffold(
+                SkaffoldExecutorSettings(
+                        SkaffoldExecutorSettings.ExecutionMode.INIT
+                )
+        )
+
+        assertThat(result.commandLine).isEqualTo("skaffold init")
+    }
+
+    @Test
+    fun `given non-init Skaffold mode, analyze and force flags do not apply to command line`() {
+        val result = defaultSkaffoldExecutorService.executeSkaffold(
+                SkaffoldExecutorSettings(
+                        SkaffoldExecutorSettings.ExecutionMode.DEV,
+                        skaffoldConfigurationFilePath = "check.yaml"
+                )
+        )
+
+        assertThat(result.commandLine).isEqualTo("skaffold dev --filename check.yaml")
     }
 }
