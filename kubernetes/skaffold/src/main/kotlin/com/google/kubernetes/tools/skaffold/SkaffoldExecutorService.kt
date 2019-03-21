@@ -113,6 +113,17 @@ abstract class SkaffoldExecutorService {
                 add("--default-repo")
                 add(it)
             }
+
+            // the following settings only apply to `init` mode.
+            if (settings.executionMode == ExecutionMode.INIT) {
+                if (settings.analyzeOnInit) {
+                    add("--analyze")
+                }
+
+                if (settings.forceInit) {
+                    add("--force")
+                }
+            }
         }
 
         try {
