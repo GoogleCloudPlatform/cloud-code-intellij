@@ -11,19 +11,17 @@ family of IDEs.
 
 ## Features
 
-* <img src="kubernetes/docs/images/kubernetes.png" alt="kubernetes" width="20" /> [Kubernetes](https://github.com/GoogleCloudPlatform/google-cloud-intellij/tree/master/kubernetes)
-* <img src="docs/images/gcp.png" alt="GCP" width="20" /> Google Cloud Platform
-  * [Google Cloud Source Repositories](https://cloud.google.com/tools/cloud-repositories/) 
-    Fully-featured private Git repositories hosted on Google Cloud Platform.
-  * The [Google Cloud Debugger](https://cloud.google.com/tools/cloud-debugger/) 
-    The Cloud Debugger can inspect the state of a Java application running on 
-    [Google App Engine](https://cloud.google.com/appengine/)
-    at any code location without stopping the application.
-  * [Google App Engine](https://cloud.google.com/appengine/docs/) deployment via the Cloud SDK.
-  * [Google Cloud Storage](https://cloud.google.com/storage/) 
-    Browse your Google Cloud Storage buckets.
-  * [Google Cloud Java Client Libraries](https://cloud.google.com/tools/intellij/docs/client-libraries) 
-    Add Java client libraries to your project, enable Google Cloud APIs, and create service accounts.
+* [Kubernetes](https://github.com/GoogleCloudPlatform/google-cloud-intellij/tree/master/kubernetes)
+* [Google Cloud Java Client Libraries](https://cloud.google.com/tools/intellij/docs/client-libraries) 
+  Add Java client libraries to your project, enable Google Cloud APIs, and create service accounts.
+* [Google Cloud Storage](https://cloud.google.com/storage/) 
+  Browse your Google Cloud Storage buckets.
+* [Google Cloud Source Repositories](https://cloud.google.com/tools/cloud-repositories/) 
+  Fully-featured private Git repositories hosted on Google Cloud Platform.
+* The [Google Cloud Debugger](https://cloud.google.com/tools/cloud-debugger/) 
+  The Cloud Debugger can inspect the state of a Java or Kotlin application running on 
+  GCP without stopping or slowing down the application.
+* [Google App Engine](https://cloud.google.com/appengine/docs/) deployment via the Cloud SDK.
 
     (_For detailed user documentation on GCP features, visit our documentation_
  [website](https://cloud.google.com/tools/intellij/docs/?utm_source=github&utm_medium=google-cloud-intellij&utm_campaign=ToolsforIntelliJ)).
