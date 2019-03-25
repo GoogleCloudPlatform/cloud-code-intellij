@@ -18,6 +18,8 @@ package com.google.kubernetes.tools.skaffold
 
 import com.google.common.truth.Truth.assertThat
 import com.google.kubernetes.tools.test.ContainerToolsRule
+import com.google.kubernetes.tools.test.expectThrows
+import com.intellij.util.ThrowableRunnable
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.spyk
@@ -36,9 +38,6 @@ class DefaultSkaffoldExecutorServiceTest {
 
     @MockK
     private lateinit var mockProcess: Process
-
-    @MockK
-    private lateinit var mockSkaffoldProcess: SkaffoldProcess
 
     @Before
     fun setUp() {
@@ -173,6 +172,8 @@ class DefaultSkaffoldExecutorServiceTest {
         assertThat(result.commandLine).isEqualTo("skaffold dev --filename skaffold.yaml")
     }
 
+    // skaffold profile tests
+
     @Test
     fun `added profile name generates valid command line`() {
         val result = defaultSkaffoldExecutorService.executeSkaffold(
@@ -202,6 +203,8 @@ class DefaultSkaffoldExecutorServiceTest {
         assertThat(result.commandLine).isEqualTo("skaffold run --filename test.yaml")
     }
 
+    // skaffold default image repo tests
+
     @Test
     fun `added default image repo name generates valid command line`() {
         val result = defaultSkaffoldExecutorService.executeSkaffold(
@@ -230,40 +233,67 @@ class DefaultSkaffoldExecutorServiceTest {
         assertThat(result.commandLine).isEqualTo("skaffold dev --filename test.yaml")
     }
 
+    // skaffold init tests
+
     @Test
-    fun `isSkaffoldAvailable returns true when skaffold execution returns 0 exit code`() {
-        mockSkaffoldExecution()
-        every { mockProcess.exitValue() } answers { 0 }
-        assertThat(defaultSkaffoldExecutorService.isSkaffoldAvailable()).isTrue()
+    fun `skaffold init with analyze generates valid command line`() {
+        val result = defaultSkaffoldExecutorService.executeSkaffold(
+                SkaffoldExecutorSettings(
+                        SkaffoldExecutorSettings.ExecutionMode.INIT,
+                        analyzeOnInit = true
+                )
+        )
+
+        assertThat(result.commandLine).isEqualTo("skaffold init --analyze")
     }
 
     @Test
-    fun `isSkaffoldAvailable returns false when skaffold execution returns 1 exit code`() {
-        mockSkaffoldExecution()
-        every { mockProcess.exitValue() } answers { 1 }
-        assertThat(defaultSkaffoldExecutorService.isSkaffoldAvailable()).isFalse()
+    fun `skaffold init with force generates valid command line`() {
+        val result = defaultSkaffoldExecutorService.executeSkaffold(
+                SkaffoldExecutorSettings(
+                        SkaffoldExecutorSettings.ExecutionMode.INIT,
+                        forceInit = true
+                )
+        )
+
+        assertThat(result.commandLine).isEqualTo("skaffold init --force")
     }
 
     @Test
-    fun `isSkaffoldAvailable returns true when skaffold execution times out`() {
-        mockSkaffoldExecution()
-        every { mockProcess.waitFor(any(), any()) } answers { false }
-        assertThat(defaultSkaffoldExecutorService.isSkaffoldAvailable()).isTrue()
+    fun `skaffold init without additional flags generates valid command line`() {
+        val result = defaultSkaffoldExecutorService.executeSkaffold(
+                SkaffoldExecutorSettings(
+                        SkaffoldExecutorSettings.ExecutionMode.INIT
+                )
+        )
+
+        assertThat(result.commandLine).isEqualTo("skaffold init")
     }
 
     @Test
-    fun `isSkaffoldAvailable returns false when skaffold execution throws exception`() {
-        mockSkaffoldExecution()
-        every { defaultSkaffoldExecutorService.executeSkaffold(any()) } throws Exception()
-        assertThat(defaultSkaffoldExecutorService.isSkaffoldAvailable()).isFalse()
+    fun `skaffold init with both analyze and force throws invalid configuration exception`() {
+        expectThrows(InvalidSkaffoldConfiguration::class, ThrowableRunnable {
+            defaultSkaffoldExecutorService.executeSkaffold(
+                    SkaffoldExecutorSettings(
+                            SkaffoldExecutorSettings.ExecutionMode.INIT,
+                            analyzeOnInit = true,
+                            forceInit = true
+                    )
+            )
+        })
     }
 
-    private fun mockSkaffoldExecution() {
-        every {
-            defaultSkaffoldExecutorService.executeSkaffold(any())
-        } answers { mockSkaffoldProcess }
+    @Test
+    fun `given non-init Skaffold mode, analyze and force flags do not apply to command line`() {
+        val result = defaultSkaffoldExecutorService.executeSkaffold(
+                SkaffoldExecutorSettings(
+                        SkaffoldExecutorSettings.ExecutionMode.DEV,
+                        skaffoldConfigurationFilePath = "check.yaml",
+                        analyzeOnInit = true,
+                        forceInit = true
+                )
+        )
 
-        every { mockSkaffoldProcess.process } answers { mockProcess }
-        every { mockProcess.waitFor(any(), any()) } answers { true }
+        assertThat(result.commandLine).isEqualTo("skaffold dev --filename check.yaml")
     }
 }
