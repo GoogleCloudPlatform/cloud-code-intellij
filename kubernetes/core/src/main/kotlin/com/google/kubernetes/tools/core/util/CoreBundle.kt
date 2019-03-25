@@ -20,7 +20,7 @@ import com.intellij.CommonBundle
 import org.jetbrains.annotations.PropertyKey
 import java.util.ResourceBundle
 
-private const val BUNDLE_NAME = "messages.KubectlBundle"
+private const val BUNDLE_NAME = "messages.CoreBundle"
 
 /**
  * Message bundle manager for core module.

@@ -18,12 +18,12 @@ package com.google.kubernetes.tools.kubectl
 
 import com.intellij.execution.ExecutionException
 import com.google.cloud.tools.intellij.analytics.UsageTrackerService
+import com.google.common.annotations.VisibleForTesting
 import com.intellij.openapi.components.ServiceManager
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.concurrent.TimeUnit
 
-const val KUBECTL_SUCCESS = "kubectl.run"
 const val KUBECTL_FAIL = "kubectl.fail"
 const val METADATA_ERROR_MESSAGE_KEY = "error.message"
 
@@ -39,10 +39,11 @@ class KubectlExecutorService {
      * run kubectl version to make sure that kubectl is available, if there's no response after
      *  a couple of seconds then it is not available.
      */
+    @VisibleForTesting
     fun isKubectlAvailable(): Boolean =
         try {
             val settings = KubectlExecutorSettings(KubectlExecutorSettings.ExecutionMode.VERSION)
-            val process = executeKubectl(settings).process
+            val process = runKubectlCommand(settings).process
             process.waitFor(1, TimeUnit.SECONDS)
             process.exitValue() == 0
         } catch (e: Exception) {
@@ -52,7 +53,8 @@ class KubectlExecutorService {
     /**
      * Parse through command line arguments and try to execute the command
      */
-    fun executeKubectl(settings: KubectlExecutorSettings): KubectlProcess {
+    @VisibleForTesting
+    fun runKubectlCommand(settings: KubectlExecutorSettings): KubectlProcess {
 
         val commandList = mutableListOf<String>()
 
@@ -85,8 +87,43 @@ class KubectlExecutorService {
 
     /**
      * Check if kubectl is available, Check if the flags supplied are valid. Create and start the
+     * command line process passed in. This method waits until the process has been completed and
+     * needs to be run in a separate background thread.
+     *
+     * @param executionMode
+     * @param
+     * @return
+     */
+    fun getKubectlOutputBlocking(
+        executionMode: KubectlExecutorSettings.ExecutionMode,
+        configurationFlags: List<String>
+    ): String {
+
+        if (!isKubectlAvailable()) {
+            throw ExecutionException(message("kubectl.not.on.system.error"))
+        }
+
+        val executorSettings = KubectlExecutorSettings(
+                executionMode = executionMode,
+                executionFlags = configurationFlags
+        )
+
+        val executingProcess = runKubectlCommand(executorSettings).process
+
+        executingProcess.waitFor()
+
+        if (executingProcess.exitValue() == 0 ) {
+            return processOutputToString(executingProcess)
+        } else {
+            throw ExecutionException(message("kubectl.unknown.error"))
+        }
+    }
+
+    /**
+     * Check if kubectl is available, Check if the flags supplied are valid. Create and start the
      * command line process passed in
      */
+    @VisibleForTesting
     fun processOutputToString(executingProcess: Process): String {
         val reader = BufferedReader(InputStreamReader(executingProcess.inputStream))
         val builder = StringBuilder()
@@ -99,36 +136,6 @@ class KubectlExecutorService {
         }
         return builder.toString()
     }
-
-    /**
-     * Check if kubectl is available, Check if the flags supplied are valid. Create and start the
-     * command line process passed in. This method waits until the process has been completed and
-     * needs to be run in a separate background thread.
-     */
-    fun startProcess(
-            executionMode: KubectlExecutorSettings.ExecutionMode,
-            configurationFlags: List<String>
-    ): String {
-
-        if (!isKubectlAvailable()) {
-            throw ExecutionException(message("kubectl.not.on.system.error"))
-        }
-
-        val executorSettings = KubectlExecutorSettings(
-                executionMode = executionMode,
-                executionFlags = configurationFlags
-        )
-
-        val executingProcess = executeKubectl(executorSettings).process
-
-        executingProcess.waitFor()
-
-        if (executingProcess.exitValue() == 0 ) {
-            return processOutputToString(executingProcess)
-        } else {
-            throw ExecutionException(message("kubectl.unknown.error"))
-        }
-    }
 }
 
 /**
@@ -140,8 +147,8 @@ class KubectlExecutorService {
 data class KubectlProcess(val process: Process, val commandLine: String)
 
 data class KubectlExecutorSettings(
-        val executionMode: ExecutionMode,
-        val executionFlags: List<String> = ArrayList()
+    val executionMode: ExecutionMode,
+    val executionFlags: List<String> = ArrayList()
 ) {
 
     /** Execution mode for Kubectl, single run, continuous development, etc. */
@@ -150,13 +157,4 @@ data class KubectlExecutorSettings(
         CREATE("create"),
         VERSION("version")
     }
-
-    /** Map to check if flags are valid for an execution mode */
-    private val acceptedFlagsMap = mapOf(
-            "-f" to ExecutionMode.CREATE,
-            "get-clusters" to ExecutionMode.CONFIG,
-            "set-cluster" to ExecutionMode.CONFIG
-    )
-
-
 }

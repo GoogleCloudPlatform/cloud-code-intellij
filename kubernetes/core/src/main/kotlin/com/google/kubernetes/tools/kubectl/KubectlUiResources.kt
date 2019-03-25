@@ -23,15 +23,15 @@ import java.util.ResourceBundle
 
 //internal val SKAFFOLD_ICON = IconLoader.getIcon("/icons/skaffold.png")
 
-private const val BUNDLE_NAME = "messages.KubectlBundle"
+private const val BUNDLE_NAME = "messages.CoreBundle"
 
 /**
  * Returns message by provided key from kubectl message bundle with optional parameters.
  */
 @VisibleForTesting
 fun message(
-        @PropertyKey(resourceBundle = BUNDLE_NAME) key: String,
-        vararg params: String
+    @PropertyKey(resourceBundle = BUNDLE_NAME) key: String,
+    vararg params: String
 ): String {
     return CommonBundle.message(ResourceBundle.getBundle(BUNDLE_NAME), key, params)
 }

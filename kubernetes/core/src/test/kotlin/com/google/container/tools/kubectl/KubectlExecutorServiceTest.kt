@@ -37,7 +37,6 @@ import java.nio.charset.StandardCharsets
 
 import java.util.concurrent.TimeUnit
 
-
 /** Unit tests for [KubectlExecutorService] */
 class DefaultKubectlExecutorServiceTest {
     @get:Rule
@@ -64,7 +63,7 @@ class DefaultKubectlExecutorServiceTest {
 
     @Test
     fun `single run with no arguments launches kubectl config`() {
-        val result = kubectlExecutorService.executeKubectl(
+        val result = kubectlExecutorService.runKubectlCommand(
                 KubectlExecutorSettings(
                         KubectlExecutorSettings.ExecutionMode.CONFIG
                 )
@@ -72,22 +71,22 @@ class DefaultKubectlExecutorServiceTest {
         Truth.assertThat(result.commandLine).isEqualTo("kubectl config")
     }
 
-
     @Test
     fun `kubectl create filename argument generates valid kubectl filename flag`() {
-        val result = kubectlExecutorService.executeKubectl(
+        val result = kubectlExecutorService.runKubectlCommand(
                 KubectlExecutorSettings(
                         KubectlExecutorSettings.ExecutionMode.CREATE,
                         executionFlags = arrayListOf("-f", "./my1.yaml", "-f", "./my2.yaml")
                 )
         )
 
-        Truth.assertThat(result.commandLine).isEqualTo("kubectl create -f ./my1.yaml -f ./my2.yaml" )
+        Truth.assertThat(result.commandLine).isEqualTo(
+                "kubectl create -f ./my1.yaml -f ./my2.yaml" )
     }
 
     @Test
     fun `kubectl create fake filename argument executes with exit value of 1`() {
-        val result = kubectlExecutorService.executeKubectl(
+        val result = kubectlExecutorService.runKubectlCommand(
                 KubectlExecutorSettings(
                         KubectlExecutorSettings.ExecutionMode.CREATE,
                         executionFlags = arrayListOf("-f", myFile1.path, "-f", myFile2.path)
@@ -97,10 +96,9 @@ class DefaultKubectlExecutorServiceTest {
         Truth.assertThat(result.process.exitValue()).isEqualTo(1 )
     }
 
-
     @Test
     fun `kubectl invalid create arguments throws error`() {
-        val result = kubectlExecutorService.executeKubectl(
+        val result = kubectlExecutorService.runKubectlCommand(
                 KubectlExecutorSettings(
                         KubectlExecutorSettings.ExecutionMode.VERSION,
                         executionFlags = arrayListOf("-f", myFile1.path, "-f", myFile2.path)
@@ -112,66 +110,79 @@ class DefaultKubectlExecutorServiceTest {
 
     @Test
     fun `isKubectlAvailable returns true when kubectl is available`() {
-        every{ kubectlExecutorService.executeKubectl(any())} answers {mockKubectlProcess}
-        every{ mockKubectlProcess.process.exitValue()} answers {0}
+        every { kubectlExecutorService.runKubectlCommand(any()) } answers { mockKubectlProcess }
+        every { mockKubectlProcess.process.exitValue() } answers { 0 }
         Truth.assertThat(kubectlExecutorService.isKubectlAvailable()).isTrue()
     }
 
     @Test
     fun `isKubectlAvailable returns false when kubectl is not available`() {
-        every{ kubectlExecutorService.executeKubectl(any())} answers {mockKubectlProcess}
-        every{ mockKubectlProcess.process.exitValue()} answers {1}
+        every { kubectlExecutorService.runKubectlCommand(any()) } answers { mockKubectlProcess }
+        every { mockKubectlProcess.process.exitValue() } answers { 1 }
         Truth.assertThat(kubectlExecutorService.isKubectlAvailable()).isFalse()
     }
 
     @Test
-    fun `processOutputToString converts the output of a process to a string`(){
+    fun `processOutputToString converts the output of a process to a string`() {
         val processResult = "version 1.2.3"
-        every {mockProcess.inputStream} answers {
+        every { mockProcess.inputStream } answers {
             processResult.byteInputStream(StandardCharsets.UTF_8)
         }
-        Truth.assertThat(kubectlExecutorService.processOutputToString(mockProcess)).isEqualTo("version 1.2.3")
+        Truth.assertThat(kubectlExecutorService.processOutputToString(mockProcess))
+                .isEqualTo("version 1.2.3")
     }
 
-
     @Test
-    fun `startProcess throws an exception if Kubectl isn't available`(){
-        every{ kubectlExecutorService.isKubectlAvailable()} answers {false}
+    fun `getKubectlOutputBlocking throws an exception if Kubectl isn't available`() {
+        every { kubectlExecutorService.isKubectlAvailable() } answers { false }
         val exception = expectThrows(
                 ExecutionException::class,
-                ThrowableRunnable { kubectlExecutorService.startProcess(KubectlExecutorSettings.ExecutionMode.VERSION, listOf()) })
+                ThrowableRunnable {
+                    kubectlExecutorService.getKubectlOutputBlocking(
+                        KubectlExecutorSettings.ExecutionMode.VERSION,
+                        listOf())
+                })
         Truth.assertThat(exception.message).isEqualTo(message("kubectl.not.on.system.error"))
     }
 
     @Test
-    fun `startProcess throws an exception if invalid flags are supplied`(){
+    fun `getKubectlOutputBlocking throws an exception if invalid flags are supplied`() {
         val exception = expectThrows(
                 ExecutionException::class,
-                ThrowableRunnable { kubectlExecutorService.startProcess(KubectlExecutorSettings.ExecutionMode.VERSION, listOf("-f", myFile1.path, "-f", myFile2.path)) })
+                ThrowableRunnable {
+                    kubectlExecutorService.getKubectlOutputBlocking(
+                        KubectlExecutorSettings.ExecutionMode.VERSION,
+                        listOf("-f", myFile1.path, "-f", myFile2.path))
+                })
         Truth.assertThat(exception.message).isEqualTo(message("kubectl.invalid.flags.error"))
     }
 
     @Test
-    fun `startProcess throws an exception if the process exitValue isn't 0`(){
-        every{ kubectlExecutorService.isKubectlAvailable()} answers {true}
-        every{ kubectlExecutorService.executeKubectl(any())} answers {mockKubectlProcess}
-        every{ mockKubectlProcess.process.exitValue()} answers {1}
+    fun `getKubectlOutputBlocking throws an exception if the process exitValue isn't 0`() {
+        every { kubectlExecutorService.isKubectlAvailable() } answers { true }
+        every { kubectlExecutorService.runKubectlCommand(any()) } answers { mockKubectlProcess }
+        every { mockKubectlProcess.process.exitValue() } answers { 1 }
         val exception = expectThrows(
                 ExecutionException::class,
-                ThrowableRunnable { kubectlExecutorService.startProcess(KubectlExecutorSettings.ExecutionMode.VERSION, listOf())})
+                ThrowableRunnable {
+                    kubectlExecutorService.getKubectlOutputBlocking(
+                            KubectlExecutorSettings.ExecutionMode.VERSION,
+                            listOf())
+                })
         Truth.assertThat(exception.message).isEqualTo(message("kubectl.unknown.error"))
     }
 
     @Test
-    fun `startProcess returns string output with valid inputs`(){
+    fun `getKubectlOutputBlocking returns string output with valid inputs`() {
         val expectedResponse = "this is the version"
-        every{ kubectlExecutorService.isKubectlAvailable()} answers {true}
-        every{ kubectlExecutorService.executeKubectl(any())} answers {mockKubectlProcess}
-        every{ mockKubectlProcess.process.exitValue()} answers {0}
-        every{ kubectlExecutorService.processOutputToString(any())} answers {expectedResponse}
-        val response = kubectlExecutorService.startProcess(KubectlExecutorSettings.ExecutionMode.VERSION, listOf())
+        every { kubectlExecutorService.isKubectlAvailable() } answers { true }
+        every { kubectlExecutorService.runKubectlCommand(any()) } answers { mockKubectlProcess }
+        every { mockKubectlProcess.process.exitValue() } answers { 0 }
+        every { kubectlExecutorService.processOutputToString(any()) } answers { expectedResponse }
+        val response = kubectlExecutorService.getKubectlOutputBlocking(
+                KubectlExecutorSettings.ExecutionMode.VERSION,
+                listOf()
+        )
         Truth.assertThat(response).isEqualTo(expectedResponse)
     }
-
-
 }
