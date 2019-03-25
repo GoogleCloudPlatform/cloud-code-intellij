@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.container.tools.kubectl
+package com.google.container.tools.core.kubectl
 
 import com.google.common.truth.Truth.assertThat
 import com.google.kubernetes.tools.test.ContainerToolsRule
