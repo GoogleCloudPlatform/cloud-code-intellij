@@ -11,7 +11,7 @@ family of IDEs.
 
 ## Features
 
-* [Kubernetes](https://github.com/GoogleCloudPlatform/google-cloud-intellij/tree/master/kubernetes)
+* [Kubernetes](https://github.com/GoogleCloudPlatform/google-cloud-intellij/tree/master/kubernetes) Streamline your Kubernetes development process in the JetBrains family of IDEs.
 * [Google Cloud Java Client Libraries](https://cloud.google.com/tools/intellij/docs/client-libraries) 
   Add Java client libraries to your project, enable Google Cloud APIs, and create service accounts.
 * [Google Cloud Storage](https://cloud.google.com/storage/) 
