@@ -37,7 +37,9 @@ import java.util.concurrent.TimeUnit
 /**
  * Abstract implementation for Skaffold execution service. This service builds and launches Skaffold
  * process from the given set of standard flags and settings.
- * Constructs Skaffold command line and build resulting process.
+ *
+ * Constructs Skaffold command line and builds resulting process.
+ *
  * Path to Skaffold executable must be set by subclasses.
  * [DefaultSkaffoldExecutorService] assumes Skaffold to be already installed and available.
  */
@@ -111,6 +113,21 @@ abstract class SkaffoldExecutorService {
                 add("--default-repo")
                 add(it)
             }
+
+            // the following settings only apply to `init` mode.
+            if (settings.executionMode == ExecutionMode.INIT) {
+                // the flags are mutually exclusive, and shouldn't be used together.
+                if (settings.analyzeOnInit && settings.forceInit) {
+                    throw InvalidSkaffoldConfiguration(
+                            "skaffold init should not combine --analyze and --force flags")
+                }
+
+                if (settings.analyzeOnInit) {
+                    add("--analyze")
+                } else if (settings.forceInit) {
+                    add("--force")
+                }
+            }
         }
 
         try {
@@ -171,44 +188,15 @@ abstract class SkaffoldExecutorService {
 }
 
 /**
- * Set of settings to control Skaffold execution, including flags and execution mode.
- *
- * @property executionMode Mandatory execution mode for Skaffold, see [ExecutionMode].
- * @property skaffoldConfigurationFilePath Optional, location of the Skaffold YAML
- *           configuration file. If not provided, default `skaffold.yaml` used.
- * @property skaffoldProfile Skaffold profile name, optional.
- * @property workingDirectory Optional, working directory where Skaffold needs to be launched.
- *           This is usually set to project working directory.
- * @property skaffoldLabels Kubernetes style labels to pass to Skaffold execution.
- * @property defaultImageRepo Default image repository to use instead of repo defined in Skaffold
- *           and Kubernetes manifests.
- */
-data class SkaffoldExecutorSettings(
-    val executionMode: ExecutionMode,
-    val skaffoldConfigurationFilePath: String? = null,
-    val skaffoldProfile: String? = null,
-    val workingDirectory: File? = null,
-    val skaffoldLabels: SkaffoldLabels? = null,
-    val tailLogsAfterDeploy: Boolean? = null,
-    val defaultImageRepo: String? = null
-) {
-
-    /** Execution mode for Skaffold, single run, continuous development (run or debug mode), etc. */
-    enum class ExecutionMode(val modeFlag: String) {
-        SINGLE_RUN("run"),
-        DEV("dev"),
-        DEBUG("debug"),
-        VERSION("version")
-    }
-}
-
-/**
  * Data object with launched Skaffold process and its command line.
  *
  * @property process System process for Skaffold.
  * @property commandLine Command line used to launch the process.
  */
 data class SkaffoldProcess(val process: Process, val commandLine: String)
+
+/** Runtime exception thrown when Skaffold configuration is invalid. */
+class InvalidSkaffoldConfiguration(errorMessage: String) : RuntimeException(errorMessage)
 
 /**
  * Default implementation of Skaffold executor service. The Skaffold executable is first pulled
