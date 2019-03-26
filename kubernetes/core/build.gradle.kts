@@ -15,5 +15,6 @@
  */
 
 dependencies {
+    compile(project(":google-cloud-core"))
     testCompile(project(":kubernetes:common-test-lib"))
 }
