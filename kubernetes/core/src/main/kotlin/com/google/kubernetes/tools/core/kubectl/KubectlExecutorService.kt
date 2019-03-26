@@ -28,6 +28,12 @@ import java.util.concurrent.TimeUnit
 const val KUBECTL_FAIL = "kubectl.fail"
 const val METADATA_ERROR_MESSAGE_KEY = "error.message"
 
+
+/**
+ * This service builds and launches kubectl process from the flags and configurations passed
+ * from [KubectlExecutorSettings].
+ */
+
 class KubectlExecutorService {
     companion object {
         val instance
@@ -40,7 +46,6 @@ class KubectlExecutorService {
      * run kubectl version to make sure that kubectl is available, if there's no response after
      *  a couple of seconds then it is not available.
      */
-
     fun isKubectlAvailable(): Boolean =
         try {
             val process = runKubectlCommand(KubectlExecutorSettings.ExecutionMode.VERSION.modeFlag)
