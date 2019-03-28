@@ -23,7 +23,7 @@ family of IDEs.
 ## Supported Platforms
 
 The Cloud Tools for IntelliJ plugin supports the entire JetBrains family of IDEs, versions 2018.2 or 
-later for Kubernetes support, and 2017.2 for everything else. Both the free and paid editions of the
+later. Both the free and paid editions of the
 IDEs are supported. 
 
 For GCP functionality, full support is available for IntelliJ IDEA Ultimate Edition, with limited
