@@ -34,18 +34,9 @@ The following tools are expected to be installed and setup on your system and av
 * [Docker](https://www.docker.com/) for building and pushing your container images. *Note*: Docker is optional if you are using [Jib to build your container images](https://github.com/GoogleContainerTools/jib).
 * Configured Kubernetes cluster. It could be a cluster for local development, such as [Minikube](https://kubernetes.io/docs/setup/minikube/) or [Docker Kubernetes](https://docs.docker.com/docker-for-mac/kubernetes/) cluster, or remote cluster, such as [Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine/) cluster. We recommend [Minikube](https://kubernetes.io/docs/setup/minikube/) cluster for local development.
 
-## Installing the plugin into your IDE
-
-If you'd like to try out the Kubernetes features, you can install the nightly release:
-
-1) Copy this URL:<br />
-   `https://plugins.jetbrains.com/plugins/nightly/8079`
-2) Use the copied URL to add a Custom Plugin URL, following [these instructions](https://www.jetbrains.com/idea/help/managing-enterprise-plugin-repositories.html)
-3) Search for the `Google Cloud Tools` plugin and install it
-
 
 ## Frequently Asked Questions (FAQ)
-See the [Google Cloud Tools Kubernetes FAQ](docs/faq.md).
+See the [Cloud Code Kubernetes FAQ](docs/faq.md).
 
 ## Getting started
 
