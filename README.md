@@ -36,8 +36,8 @@ You can find our plugin in the Jetbrains plugin repository by going to IntelliJ 
 * [Learn More](https://cloud.google.com/code): Learn more about the Cloud Code Project and what it has to offer.
 * [Documentation](https://cloud.google.com/code/docs/intellij/): Visit our official documentation to learn more.
 * [Kubernetes Sample Applications](https://github.com/GoogleCloudPlatform/cloud-code-samples): Starter applications for working with Kubernetes; available in Java, Node, Python, and Go.
-* [File an Issue](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues): If you discover an issue please file a bug and we will address it. 
-* [Request a Feature](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues): If you have any feature requests, please file a request.
+* [File an Issue](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/new): If you discover an issue please file a bug and we will address it. 
+* [Request a Feature](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/new): If you have any feature requests, please file a request.
 
 ### Pre-releases 
 
