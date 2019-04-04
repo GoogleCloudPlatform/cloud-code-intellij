@@ -9,7 +9,7 @@ If you have a question that is not answered below, please [submit an issue](http
 
 ### How do I fix missing Skaffold installation errors? 
 
-[Skaffold](https://skaffold.dev/) is a tool required by the Cloud Tools plugin for Kubernetes 
+[Skaffold](https://skaffold.dev/) is a tool required by the Cloud Code plugin for the Kubernetes features 
 deployment and continuous development. The plugin attempts to find the Skaffold binary on the system 
 PATH. If you don't have Skaffold installed, or the plugin simply could not detect the installation 
 (possibly due to [PATH issues](#how-do-i-fix-executable-not-found-on-path-errors)), you may see the 
