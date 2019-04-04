@@ -21,9 +21,8 @@ Google Cloud Platform products.
 
 ## Supported Platforms
 
-The Cloud Code for IntelliJ plugin supports the entire JetBrains family of IDEs, versions 2018.2 or 
-later. Both the free and paid editions of the
-IDEs are supported. 
+The Cloud Code for IntelliJ plugin supports JetBrains IDEs version 2018.2+: IntelliJ Ultimate or 
+Community, PyCharm Professional or Community, Webstorm, Goland, and other JetBrains IDEs.
 
 For GCP functionality, full support is available for IntelliJ IDEA Ultimate Edition, with limited
 support for the other platforms. See this [feature matrix](docs/gcp-feature-matrix.md) 

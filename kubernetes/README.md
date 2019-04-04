@@ -28,7 +28,6 @@ This plugin uses familiar Kubernetes and container tools to bring you a rich Kub
 
 The following tools are expected to be installed and setup on your system and available in the system path:
 
-* JetBrains IDE version 2018.2+, either Ultimate or Community editions.
 * [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) for working with Kubernetes clusters and managing Kubernetes deployments.
 * [Skaffold](https://skaffold.dev/docs/getting-started/) to support continuous development on a Kubernetes cluster, smart image building and tagging, and an array of supported deployment and build types.
 * [Docker](https://www.docker.com/) for building and pushing your container images. *Note*: Docker is optional if you are using [Jib to build your container images](https://github.com/GoogleContainerTools/jib).
