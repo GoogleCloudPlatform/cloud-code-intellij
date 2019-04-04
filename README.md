@@ -19,9 +19,6 @@ Google Cloud Platform products.
   GCP without stopping or slowing down the application.
 * [Google App Engine](https://cloud.google.com/appengine/docs/) deployment via the Cloud SDK.
 
-    (_For detailed user documentation on GCP features, visit our documentation_
- [website](https://cloud.google.com/tools/intellij/docs/?utm_source=github&utm_medium=google-cloud-intellij&utm_campaign=ToolsforIntelliJ)).
- 
 ## Supported Platforms
 
 The Cloud Code for IntelliJ plugin supports the entire JetBrains family of IDEs, versions 2018.2 or 
