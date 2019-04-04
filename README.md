@@ -1,4 +1,5 @@
 # Cloud Code for IntelliJ 
+<img src="docs/images/cloud_code.png" alt="Cloud Code" width="100" />
 
 Cloud Code for IntelliJ is a plugin that helps facilitates cloud-native in the JetBrains 
 family of IDEs. The plugin adds support for Kubernetes applications, as well as support for various
