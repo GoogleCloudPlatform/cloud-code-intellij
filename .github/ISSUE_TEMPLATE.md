@@ -1,7 +1,6 @@
-(Please ensure you are running the latest version of Cloud Tools for IntelliJ with _Help > Check for Updates_.)
+(Please ensure you are running the latest version of Cloud Cloud for IntelliJ with _Help > Check for Updates_.)
 
-- Cloud Tools for IntelliJ version:
-- Google Cloud SDK version _(run `gcloud version` on the command line)_:
+- Cloud Code for IntelliJ version:
 - OS:
 
 **What did you do?**
