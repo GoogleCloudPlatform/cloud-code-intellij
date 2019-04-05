@@ -1,5 +1,19 @@
 # Release notes
-This page documents production updates to Cloud Tools for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
+This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
+
+## 19.4.1
+<img src="/images/release-notes/cloud_code.png" alt="Cloud Code" width="100px" />
+
+Introducing Cloud Code for IntelliJ, formerly known as Cloud Tools for IntelliJ.
+
+Cloud Code provides a set of tools for working with [Kubernetes](https://kubernetes.io/) and the [Google Cloud Platform](https://cloud.google.com/). The plugin makes working with Kubernetes feel like editing and debugging local code, and integrates with various Google Cloud products to simplify your development process.
+
+### New Features
+[Kubernetes Support](https://github.com/GoogleCloudPlatform/google-cloud-intellij/tree/master/kubernetes)
+- Kubernetes deployment support - easily deploy your applications to Kubernetes from the IDE
+- Kubernetes continuous deployment - set up a local development workflow where the plugin monitors your code for changes and surfaces the changes live on a cluster, just like a local development server, except with the fidelity of running on a Kubernetes cluster
+- Tail logs from your containers
+- Support for editing [Skaffold](https://github.com/GoogleContainerTools/skaffold) configuration files - Skaffold powers the deployment experience
 
 ## 19.2.1
 
