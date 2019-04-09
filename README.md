@@ -25,7 +25,7 @@ The Cloud Code for IntelliJ plugin supports JetBrains IDEs version 2018.2+:
 * [IntelliJ IDEA Ultimate or Community](https://www.jetbrains.com/idea/)
 * [PyCharm Professional or Community](https://www.jetbrains.com/pycharm/)
 * [Webstorm](https://www.jetbrains.com/webstorm/)
-* [Goland](https://www.jetbrains.com/go/)
+* [GoLand](https://www.jetbrains.com/go/)
 * [other JetBrains IDEs](https://www.jetbrains.com/products.html)
 
 For GCP functionality, full support is available for IntelliJ IDEA Ultimate Edition, with limited
