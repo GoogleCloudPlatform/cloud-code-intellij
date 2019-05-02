@@ -56,9 +56,6 @@ channel. To install them please perform the following steps:
 You can also grab the latest nightly build of the plugin by following the same steps as above but 
 replacing 'alpha' with 'nightly' in the URLs.
 
-If you wish to build this plugin from source, please see the
-[contributor instructions](https://github.com/GoogleCloudPlatform/google-cloud-intellij/blob/master/CONTRIBUTING.md).
-
 ## FAQ
 
 See the [Cloud Code Kubernetes FAQ](kubernetes/docs/faq.md).
