@@ -7,7 +7,7 @@ This release introduces many bug fixes and stability improvements as well as som
 features in Cloud Code to improve the Kubernetes development experience.
 
 ### New Features
-- **Java Kubernetes debugging** - debug your Java Kubernetes applications as if they were running locally. Set breakpoints, step through code, etc., all against a live Kubernetes cluster running locally, GKE, or one of the cloud providers.
+- **Java Kubernetes debugging** - debug your Java Kubernetes applications as if they were running locally. Set breakpoints, step through code, etc., all against a live Kubernetes cluster running either locally, on GKE, or on one of the cloud providers.
 - **Kubernetes application bootstrapping**. Do you already have an existing Kubernetes application? It is now even easier to get started using Cloud Code. The plugin will detect your Kubernetes application and auto-create the Skaffold configuration for you so that you don't have to worry about it.
 - **Enhanced Kubernetes deployment**. The deployment and continuous development experience is now vastly improved. For instance, you can select the cluster you are deploying to right from the IDE, set environment variables, configure if your deployments are cleaned up after continuous development, and more.
 
