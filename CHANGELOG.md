@@ -1,6 +1,21 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## 19.5.1
+
+This release introduces many bug fixes and stability improvements as well as some exciting new 
+features in Cloud Code to improve the Kubernetes development experience.
+
+### New Features
+- **Java Kubernetes debugging** - debug your Java Kubernetes applications as if they were running locally. Set breakpoints, step through code, etc., all against a live Kubernetes cluster running locally, GKE, or one of the cloud providers.
+- **Kubernetes application bootstrapping**. Do you already have an existing Kubernetes application? It is now even easier to get started using Cloud Code. The plugin will detect your Kubernetes application and auto-create the Skaffold configuration for you so that you don't have to worry about it.
+- **Enhanced Kubernetes deployment**. The deployment and continuous development experience is now vastly improved. For instance, you can select the cluster you are deploying to right from the IDE, set environment variables, configure if your deployments are cleaned up after continuous development, and more.
+
+### Bug Fixes
+- Fix to system shell environment loading which potentially could hang the IDE during Kubernetes deployment. [2482](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2292) 
+- Fix NPE in App Engine local run. [2239](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2239) 
+- Gracefully terminate Skaffold process when IntelliJ is force quit. [2419](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2419) 
+
 ## 19.4.1
 <img src="/images/release-notes/cloud_code.png" alt="Cloud Code" width="100px" />
 
