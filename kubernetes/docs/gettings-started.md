@@ -80,6 +80,27 @@ Hello, World of Kubernetes with IntelliJ!
 
 You can check the details of the Kubernetes deployment and service using standard Kubernetes CLI commands (`kubectl get deploy`, etc.) or using Kubernetes dashboard for your Kubernetes cluster. The Kubernetes resources for the project are located in the `k8s` directory - there is one deployment and one service YAML file.
 
+### Debugging while developing continuously on Kubernetes
+
+**Note: Debugging support is currently available only for Java.**
+ 
+Cloud Code for IntelliJ allows you to easily debug your applications deployed to a Kubernetes cluster. You can debug an application on a local cluster (like Minikube or Docker Desktop), GKE, or any other Cloud provider.
+
+
+Furthermore, with Cloud Code's debugging support, you don't have to worry about any manual setup like setting up port forwarding or injecting language-specific debug arguments in the right way. All you need to do is have a Kubernetes application project with Cloud Code support.
+
+Click the debug action for 'Kubernetes Continuous Deploy' run action icon to start the development cycle in debug mode on your Kubernetes cluster.
+
+![debug with continuous mode](images/k8s-debug-target.png)
+
+Once the debugger can be attached, Cloud Code will attach a debug session:
+
+![Kubernetes debugger attached](images/k8s-debugger-attached.png)
+
+You can now perform all the tasks you normally do when debugging local code, like setting breakpoints and stepping through code, except with the added advantage of debugging against a live Kubernetes cluster:
+
+![Kubernetes debugger session](images/k8s-debugger-session.png)
+
 #### Adding new features
 
 Now, let’s add more features to our Spring Boot project and see how they get deployed to your Kubernetes cluster without stopping and removing the deployment, manually building and tagging the image, or updating the cluster. Open `HelloController.java` file from `src` and add a new HTTP request mapping:
@@ -91,7 +112,9 @@ Now, let’s add more features to our Spring Boot project and see how they get d
     }
 ```
 
-Save the changes (`Ctrl-S`) or build the project (use `Build -> Build Project` menu or the toolbar icon). The plugin picks up the changes, re-builds the project and image, and deploys the updated image to your Kubernetes cluster. You can watch the progress and deployment logs in the console window. Once the changes are propagated, we can confirm the updates by visiting the newly created endpoint at [localhost:8080/greeting?name=User](http://localhost:8080/greeting?name=User):
+Once changes are saved automatically by the IDE, the plugin picks up the changes, re-builds the project and image, and deploys the updated image to your Kubernetes cluster. Alternatively, you can also save the changes manually (`Ctrl-S`) or build the project (use `Build -> Build Project` menu or the toolbar icon) to pick up the changes.
+
+You can watch the progress and deployment logs in the console window. Once the changes are propagated, we can confirm the updates by visiting the newly created endpoint at [localhost:8080/greeting?name=User](http://localhost:8080/greeting?name=User):
 
 ![browser showing new greeting page of the application](images/browser-greeting.png)
 
