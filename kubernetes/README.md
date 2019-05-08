@@ -24,7 +24,7 @@ Cloud Code for IntelliJ plugin adds support for [Kubernetes](https://www.kuberne
 
 * One click **deployment to Kubernetes clusters right from your IDE** using [Skaffold](https://skaffold.dev/docs/getting-started/). Configure Skaffold to use your desired build and deployment strategies: works with kubectl, Helm, Google Cloud Build (for remote builds), Jib and Kanico.
 * **Continuous development on Kubernetes**. Watches the dependencies of your docker image or Jib Java project for changes, so that on any change, Skaffold builds and deploys your application to a Kubernetes cluster.
-* **Debugging on Kubernetes**. The plugin allows you to easily debug your applications deployed to a Kubernetes cluster. You can debug an application on a local cluster (like Minikube or Docker Desktop), GKE, or any other Cloud provider.
+* **Debugging on Kubernetes**. The plugin allows you to easily debug your Java applications deployed to a Kubernetes cluster. You can debug an application on a local cluster (like Minikube or Docker Desktop), GKE, or any other Cloud provider.
 * **Automatic discovery and support for Kubernetes projects** or projects with existing Skaffold configuration, in any language supported by your preferred JetBrains IDE.
 * Skaffold configuration file **editing support and smart templates**.
 
