@@ -92,7 +92,7 @@ Now, let’s add more features to our Spring Boot project and see how they get d
     }
 ```
 
-Once changes are saved automatically by the IDE, the plugin picks up the changes, re-builds the project and image, and deploys the updated image to your Kubernetes cluster. Alternatively, you can also save the changes manually (`Ctrl-S`) or build the project (use `Build -> Build Project` menu or the toolbar icon) to pick up the changes.
+Once the IDE saves the changes automatically, the plugin picks up the changes, re-builds the project and image, and deploys the updated image to your Kubernetes cluster. Alternatively, you can also save the changes manually (`Ctrl-S`) or build the project (use `Build -> Build Project` menu or the toolbar icon) to pick up the changes.
 
 You can watch the progress and deployment logs in the console window. Once the changes are propagated, we can confirm the updates by visiting the newly created endpoint at [localhost:8080/greeting?name=User](http://localhost:8080/greeting?name=User):
 
