@@ -55,7 +55,7 @@ The resulting image name is concatenated from the specified default image reposi
 
 Now you can set up a continuous development iteration cycle in your IDE. Click the run action for `Develop on Kubernetes` to start development cycle on your Kubernetes cluster:
 
-<img src="images/k8s-develop-run-icon.png" alt="run target click" width="400"/> 
+<img src="images/k8s-develop-run.png" alt="run target click" width="400"/> 
 
 The development cycle initiates and console window with the logs opens. The plugin uses Skaffold to build an image for the project, tag it, push it to the configured repository, and then uses `kubectl` to deploy the project Kubernetes manifests:
 
