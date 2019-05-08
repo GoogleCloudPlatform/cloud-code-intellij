@@ -4,6 +4,7 @@
 * [Specifying image repository](#specifying-image-repository)
 * [Continuous development on Kubernetes](#continuous-development-on-kubernetes)
 * [Adding new features](#adding-new-features)
+* [Debugging on Kubernetes](#debugging-on-kubernetes)
 * [Deployment to Kubernetes](#deployment-to-kubernetes)
 
 ### Set up
@@ -55,7 +56,7 @@ The resulting image name is concatenated from the specified default image reposi
 
 Now you can set up a continuous development iteration cycle in your IDE. Click the run action for `Develop on Kubernetes` to start development cycle on your Kubernetes cluster:
 
-<img src="images/k8s-develop-run-icon.png" alt="run target click" width="400"/> 
+<img src="images/k8s-develop-run.png" alt="run target click" width="300"/> 
 
 The development cycle initiates and console window with the logs opens. The plugin uses Skaffold to build an image for the project, tag it, push it to the configured repository, and then uses `kubectl` to deploy the project Kubernetes manifests:
 
@@ -91,7 +92,9 @@ Now, let’s add more features to our Spring Boot project and see how they get d
     }
 ```
 
-Save the changes (`Ctrl-S`) or build the project (use `Build -> Build Project` menu or the toolbar icon). The plugin picks up the changes, re-builds the project and image, and deploys the updated image to your Kubernetes cluster. You can watch the progress and deployment logs in the console window. Once the changes are propagated, we can confirm the updates by visiting the newly created endpoint at [localhost:8080/greeting?name=User](http://localhost:8080/greeting?name=User):
+Once the IDE saves the changes automatically, the plugin picks up the changes, re-builds the project and image, and deploys the updated image to your Kubernetes cluster. Alternatively, you can also save the changes manually (`Ctrl-S`) or build the project (use `Build -> Build Project` menu or the toolbar icon) to pick up the changes.
+
+You can watch the progress and deployment logs in the console window. Once the changes are propagated, we can confirm the updates by visiting the newly created endpoint at [localhost:8080/greeting?name=User](http://localhost:8080/greeting?name=User):
 
 ![browser showing new greeting page of the application](images/browser-greeting.png)
 
@@ -102,9 +105,30 @@ Hello from Kubernetes with IntelliJ, User!
 
 You can continue adding and testing new features and have them redeployed automatically to your Kubernetes cluster from your IDE on every change. Once you are finished, click `stop` to end the continuous development session. The plugin deletes all Kubernetes resources used for the development session.
 
+### Debugging on Kubernetes
+
+**Note: Debugging support is currently available only for Java.**
+ 
+Cloud Code for IntelliJ allows you to easily debug your applications deployed to a Kubernetes cluster. You can debug an application on a local cluster (like Minikube or Docker Desktop), GKE, or any other Cloud provider.
+
+
+Furthermore, with Cloud Code's debugging support, you don't have to worry about any manual setup like setting up port forwarding or injecting language-specific debug arguments in the right way. All you need to do is have a Kubernetes application project with Cloud Code support.
+
+Click the debug action for 'Kubernetes Continuous Deploy' run action icon to start the development cycle in debug mode on your Kubernetes cluster.
+
+![debug with continuous mode](images/k8s-debug-target.png)
+
+Once the debugger can be attached, Cloud Code will attach a debug session:
+
+![Kubernetes debugger attached](images/k8s-debugger-attached.png)
+
+You can now perform all the tasks you normally do when debugging local code, like setting breakpoints and stepping through code, except with the added advantage of debugging against a live Kubernetes cluster:
+
+![Kubernetes debugger session](images/k8s-debugger-session.png)
+
 ### Deployment to Kubernetes
 
 You can use the other Kubernetes run target to build the image and deploy the project to your Kubernetes cluster once. Unlike continuous development, your project sources and dependencies are not watched, and the Skaffold process finishes once the image and deployment are complete.
 
-<img src="images/deploy-k8s-action.png" alt="deploy run target click" width="400"/>
+<img src="images/deploy-k8s-action.png" alt="deploy run target click" width="300"/>
  
