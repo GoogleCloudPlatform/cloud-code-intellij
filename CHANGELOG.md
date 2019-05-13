@@ -1,6 +1,13 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## 19.5.2
+
+### Bug Fixes
+- Fixes issue where unsupported 'cleanup' flag is passed from the 'Deploy to Kubernetes' run configuration to the Skaffold run command. [2556](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2556)
+- Fixes potential UI freeze in the Kubernetes settings panel, and fixes increased CPU usage on some Linux platforms caused by a script reading the shell environment PATH. [2548](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2548)
+- Shows appropriate warning message in the Kubernetes run configurations if 'kubectl' is not found on the PATH. [2551](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2551)
+
 ## 19.5.1
 
 This release introduces many bug fixes and stability improvements as well as some exciting new 
