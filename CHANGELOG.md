@@ -1,7 +1,7 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## 19.5.2
+## 19.5.3
 
 ### Updates
 - Explicitly enable port-forwarding on all Kubernetes commands since it is now opt-in for Skaffold. [2562](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2562)
