@@ -1,7 +1,15 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## 19.7.1 - Latest Release
+## 19.7.2 - Latest Release
+
+### New Features
+- Kubernetes deployments now show clickable hyperlinks in the Event Log for quick access to locally port-forwarded services. [2611](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2611)
+
+### Bug Fixes
+- Fix for Google Cloud Storage exception caused by an illegal document offset value. [2491](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2491)
+
+## 19.7.1
 
 ### New Features
 - Config-free debugging of containers in any Kubernetes cluster for Node.js, in addition to Java and Kotlin. [2514](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2514)
