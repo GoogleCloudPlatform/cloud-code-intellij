@@ -34,7 +34,7 @@ for more details.
 
 ## Installation
 
-You can find our plugin in the Jetbrains plugin repository by going to IntelliJ -> Settings -> Browse Repositories, and search for `Cloud Code`. 
+You can find our plugin in the Jetbrains plugin repository by going to IntelliJ -> Settings -> Plugins , and search for `Cloud Code` in the 'Marketplace' tab. 
 
 ## Resources
 * [Learn More](https://cloud.google.com/code): Learn more about the Cloud Code Project and what it has to offer.
