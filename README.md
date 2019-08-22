@@ -25,6 +25,7 @@ Google Cloud Platform products.
 * [Kubernetes Sample Applications](https://github.com/GoogleCloudPlatform/cloud-code-samples): Starter applications for working with Kubernetes; available in Java, Node, Python, and Go.
 * [File an Issue](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/new): If you discover an issue please file a bug and we will address it. 
 * [Request a Feature](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/new): If you have any feature requests, please file a request.
+* [FAQ/Troubleshooting](https://cloud.google.com/code/docs/intellij/troubleshooting)
 
 ## Supported Platforms
 
