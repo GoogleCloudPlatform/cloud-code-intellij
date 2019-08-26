@@ -1,7 +1,17 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## 19.7.2 - Latest Release
+## 19.8.1 - Latest Release
+
+### New Features
+- Cloud Code will now automatically install key Kubernetes dependencies for you, including [Skaffold](https://skaffold.dev/docs/) and [Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/), helping you get up and running quickly.
+- Enhanced Kubernetes manifest editing support in all JetBrains IDEs. See errors highlighted in your config, and view quick documentation (see the [help pages](https://www.jetbrains.com/help/idea/viewing-reference-information.html#inline-quick-documentation) for more details including how to enable docs on mouse move).
+- Kubernetes deployment events in the event log now show more detailed and structured output for locally port-forwarded services.
+
+### Bug Fixes
+- Cloud Code will now execute the Skaffold process from the directory containing the Skaffold configuration file, fixing relative path issues for multi-service projects.
+
+## 19.7.2
 
 ### New Features
 - Kubernetes deployments now show clickable hyperlinks in the Event Log for quick access to locally port-forwarded services. [2611](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2611)
