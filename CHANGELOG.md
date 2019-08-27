@@ -5,8 +5,14 @@ This page documents production updates to Cloud Code for IntelliJ. You can check
 
 ### New Features
 - Cloud Code will now automatically install key Kubernetes dependencies for you, including [Skaffold](https://skaffold.dev/docs/) and [Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/), helping you get up and running quickly. Configure managed dependencies under Settings > Cloud Code > Kubernetes.
+\
+  ![dependency configuration](docs/images/managed-deps.png)
 - Enhanced Kubernetes manifest editing support in all JetBrains IDEs for various configuration files such as Cloud Build, Kustomize, and Kubernetes. See errors highlighted in your config, and view quick documentation (see the [help pages](https://www.jetbrains.com/help/idea/viewing-reference-information.html#inline-quick-documentation) for more details including how to enable docs on mouse move).
+\
+  ![editing support](docs/images/cloud-build.png)
 - Kubernetes deployment events in the event log now show more detailed and structured output for locally port-forwarded services.
+\
+  ![event log](docs/images/event-log.png)
 
 ### Bug Fixes
 - Cloud Code will now execute the Skaffold process from the directory containing the Skaffold configuration file, fixing relative path issues for multi-service projects.
