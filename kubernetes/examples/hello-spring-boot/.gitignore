@@ -1,8 +1,0 @@
-target
-.classpath
-.project
-.settings
-.vscode
-.idea/*
-!.idea/externalDependencies.xml
-
