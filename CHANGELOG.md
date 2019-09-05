@@ -1,7 +1,11 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## 19.7.2 - Latest Release
+## 19.9.1 - Latest Release
+
+- Kubernetes deployment events in the event log now show more detailed and structured output for locally port-forwarded services, including service name and namespace.
+
+## 19.7.2
 
 ### New Features
 - Kubernetes deployments now show clickable hyperlinks in the Event Log for quick access to locally port-forwarded services. [2611](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2611)
