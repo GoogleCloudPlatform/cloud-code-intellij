@@ -27,6 +27,10 @@ Cloud Code's Kubernetes support is now in Beta! This release includes many new f
 - Cloud Code will now execute the Skaffold process from the directory containing the Skaffold configuration file, fixing relative path issues for multi-service projects.
 - Skaffold configuration files will now validate properly when the JetBrains Kubernetes plugin is also installed.
 
+## 19.9.1 - Latest Release
+
+- Kubernetes deployment events in the event log now show more detailed and structured output for locally port-forwarded services, including service name and namespace.
+
 ## 19.7.2
 
 ### New Features
@@ -79,7 +83,7 @@ features in Cloud Code to improve the Kubernetes development experience.
 - Gracefully terminate Skaffold process when IntelliJ is force quit. [2419](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2419) 
 
 ## 19.4.1
-<img src="/images/release-notes/cloud_code.png" alt="Cloud Code" width="100px" />
+<img src="cloud_code.png" alt="Cloud Code" width="100px" />
 
 Introducing Cloud Code for IntelliJ, formerly known as Cloud Tools for IntelliJ.
 

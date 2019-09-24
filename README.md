@@ -1,5 +1,5 @@
 # Cloud Code for IntelliJ 
-<img src="docs/images/cloud_code.png" alt="Cloud Code" width="150" />
+<img src="cloud_code.png" alt="Cloud Code" width="150" />
 
 Cloud Code for IntelliJ is a plugin that helps facilitates cloud-native development in the JetBrains 
 family of IDEs. The plugin adds support for Kubernetes applications, as well as support for various
@@ -29,7 +29,7 @@ Google Cloud Platform products.
 
 ## Supported Platforms
 
-The Cloud Code for IntelliJ plugin supports JetBrains IDEs version 2018.2+: 
+The Cloud Code for IntelliJ plugin supports JetBrains IDEs version 2019.1+: 
 * [IntelliJ IDEA Ultimate or Community](https://www.jetbrains.com/idea/)
 * [PyCharm Professional or Community](https://www.jetbrains.com/pycharm/)
 * [WebStorm](https://www.jetbrains.com/webstorm/)
@@ -51,7 +51,7 @@ channel. To install them please perform the following steps:
 
 1. Install the Cloud Code plugin
     1. Copy this URL `https://plugins.jetbrains.com/plugins/alpha/8079`
-    1. Use the copied URL as the Custom Plugin URL when following [these instrucions](https://www.jetbrains.com/idea/help/managing-enterprise-plugin-repositories.html)
+    1. Use the copied URL as the Custom Plugin URL when following [these instructions](https://www.jetbrains.com/idea/help/managing-enterprise-plugin-repositories.html)
     1. Search for the 'Cloud Code' plugin and install it.
 
 You can also grab the latest nightly build of the plugin by following the same steps as above but 
