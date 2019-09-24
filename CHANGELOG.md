@@ -19,9 +19,6 @@ Cloud Code's Kubernetes support is now in Beta! This release includes many new f
 - Cloud Code now comes with Kubernetes starter templates in Java, Python, Node.js, and Go to help you quickly get started. File > New Project ... > Cloud Code Kubernetes.
 \
   ![editing support](docs/images/release-notes/starter-templates.png)
-- Kubernetes deployment events in the event log now show more detailed and structured output for locally port-forwarded services.
-\
-  ![event log](docs/images/release-notes/event-log.png)
 
 ### Bug Fixes
 - Cloud Code will now execute the Skaffold process from the directory containing the Skaffold configuration file, fixing relative path issues for multi-service projects.
