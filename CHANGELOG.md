@@ -13,7 +13,7 @@ Cloud Code's Kubernetes support is now in Beta! This release includes many new f
 - Cloud Code will now automatically install key Kubernetes dependencies for you, including [Skaffold](https://skaffold.dev/docs/) and [Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/), helping you get up and running quickly. Configure managed dependencies under Settings > Cloud Code > Kubernetes.
 \
   ![dependency configuration](docs/images/release-notes/managed-deps.png)
-- Enhanced Kubernetes manifest editing support in all JetBrains IDEs for various configuration files such as Cloud Build, Kustomize, and Kubernetes. See errors highlighted in your config, and view quick documentation (see the [help pages](https://www.jetbrains.com/help/idea/viewing-reference-information.html#inline-quick-documentation) for more details including how to enable docs on mouse move).
+- Enhanced editing support in all JetBrains IDEs for various configuration files such as Cloud Build, Kustomize, and Kubernetes. See errors highlighted in your config, and view quick documentation (see the [help pages](https://www.jetbrains.com/help/idea/viewing-reference-information.html#inline-quick-documentation) for more details including how to enable docs on mouse move). 
 \
   ![editing support](docs/images/release-notes/cloud-build.png)
 - Cloud Code now comes with Kubernetes starter templates in Java, Python, Node.js, and Go to help you quickly get started. File > New Project ... > Cloud Code Kubernetes.
