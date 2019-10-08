@@ -8,7 +8,11 @@ This release fixes several bugs and improves stability of the Cloud Code plugin.
 ### New Features
 
 - You can now drill down into your pods to view your containers. Stream logs directly from a running container.
+\
+  ![cluster browser](docs/images/release-notes/stream-containers.png)
 - New option to pin your Kubernetes deployments to whatever is set as your system-wide current context.
+\
+  ![cluster browser](docs/images/release-notes/current-context.png)
 - Copy Kubernetes resource names to the clipboard by right-clicking on a node in the Kubernetes Cluster Browser.
 - Refresh any Kubernetes resource individually to update its state.
 
