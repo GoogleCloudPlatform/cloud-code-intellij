@@ -1,7 +1,28 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## 19.9.2 - Latest Release
+## 19.10.1 - Latest Release
+
+This release fixes several bugs and improves stability of the Cloud Code plugin. It also contains enhancements to the Kubernetes Cluster Browser, including the ability to view containers in your pods and stream logs from them.
+
+### New Features
+
+- You can now drill down into your pods to view your containers. Stream logs directly from a running container.
+\
+  ![cluster browser](docs/images/release-notes/stream-containers.png)
+- New option to pin your Kubernetes deployments to whatever is set as your system-wide current context.
+\
+  ![cluster browser](docs/images/release-notes/current-context.png)
+- Copy Kubernetes resource names to the clipboard by right-clicking on a node in the Kubernetes Cluster Browser.
+- Refresh any Kubernetes resource individually to update its state.
+
+### Bug Fixes
+
+- Fixes a NPE caused by Maven-aware code for displaying a notification suggesting Spring Cloud GCP for Spring projects using GCP APIs.
+- Fixes an issue where the Cloud Code dependency installer could be stuck in a broken state, blocking Kubernetes deployments and debugging.
+- Fixed an exception that could occur during LSP initialization due to invalid document listener state.
+
+## 19.9.2
 
 ### New Features
 
