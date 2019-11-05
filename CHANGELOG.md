@@ -11,11 +11,11 @@ Note: This release updates the Kubernetes Run Configurations with new names and 
 \
   ![alternate kubconfigs](docs/images/release-notes/alternate-kubeconfigs.png)
 - **Configure Migrate for Anthos easily.** Cloud Code can assist you with editing your Migrate for Anthos configuration files:
-\    
+\
   ![migrate for anthos](docs/images/release-notes/migrate-for-anthos.png)
 - **Add Kubernetes support for your Jib Java projects.** With one click, the “Add Kubernetes Support” menu action can quickly add Cloud Code Kubernetes support for your projects that use Jib to build container images.
 - **Browse your CRDs.** The Kubernetes Cluster browser now includes a node for viewing your Custom Resource Definitions:
-\  
+\
   ![crds](docs/images/release-notes/crds.png)
 - **View the status of your Kubernetes deployments.** Kubernetes deployments now display status information and replica counts in the Cluster browser:
 \
