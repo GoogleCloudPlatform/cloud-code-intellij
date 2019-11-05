@@ -1,8 +1,107 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## 19.10.1 - Latest Release
+
+This release fixes several bugs and improves stability of the Cloud Code plugin. It also contains enhancements to the Kubernetes Cluster Browser, including the ability to view containers in your pods and stream logs from them.
+
+### New Features
+
+- You can now drill down into your pods to view your containers. Stream logs directly from a running container.
+\
+  ![cluster browser](docs/images/release-notes/stream-containers.png)
+- New option to pin your Kubernetes deployments to whatever is set as your system-wide current context.
+\
+  ![cluster browser](docs/images/release-notes/current-context.png)
+- Copy Kubernetes resource names to the clipboard by right-clicking on a node in the Kubernetes Cluster Browser.
+- Refresh any Kubernetes resource individually to update its state.
+
+### Bug Fixes
+
+- Fixes a NPE caused by Maven-aware code for displaying a notification suggesting Spring Cloud GCP for Spring projects using GCP APIs.
+- Fixes an issue where the Cloud Code dependency installer could be stuck in a broken state, blocking Kubernetes deployments and debugging.
+- Fixed an exception that could occur during LSP initialization due to invalid document listener state.
+
+## 19.9.2
+
+### New Features
+
+Cloud Code's Kubernetes support is now in Beta! This release includes many new features for Kubernetes developers:
+
+- Browse your Kubernetes clusters right from your IDE. View your pods, deployments, services and other resources. Stream logs and describe resources. View > Tool Windows > Kubernetes Explorer.
+\
+  ![cluster browser](docs/images/release-notes/cluster-browser.png)
+- Cloud Code will now automatically install key Kubernetes dependencies for you, including [Skaffold](https://skaffold.dev/docs/) and [Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/), helping you get up and running quickly. Configure managed dependencies under Settings > Cloud Code > Kubernetes.
+\
+  ![dependency configuration](docs/images/release-notes/managed-deps.png)
+- Enhanced editing support in all JetBrains IDEs for various configuration files such as Cloud Build, Kustomize, and Kubernetes. See errors highlighted in your config, and view quick documentation (see the [help pages](https://www.jetbrains.com/help/idea/viewing-reference-information.html#inline-quick-documentation) for more details including how to enable docs on mouse move). 
+\
+  ![editing support](docs/images/release-notes/cloud-build.png)
+- Cloud Code now comes with Kubernetes starter templates in Java, Python, Node.js, and Go to help you quickly get started. File > New Project ... > Cloud Code Kubernetes.
+\
+  ![editing support](docs/images/release-notes/starter-templates.png)
+
+### Bug Fixes
+- Cloud Code will now execute the Skaffold process from the directory containing the Skaffold configuration file, fixing relative path issues for multi-service projects.
+- Skaffold configuration files will now validate properly when the JetBrains Kubernetes plugin is also installed.
+
+## 19.9.1 - Latest Release
+
+- Kubernetes deployment events in the event log now show more detailed and structured output for locally port-forwarded services, including service name and namespace.
+
+## 19.7.2
+
+### New Features
+- Kubernetes deployments now show clickable hyperlinks in the Event Log for quick access to locally port-forwarded services. [2611](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2611)
+
+### Bug Fixes
+- Fix for Google Cloud Storage exception caused by an illegal document offset value. [2491](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2491)
+
+## 19.7.1
+
+### New Features
+- Config-free debugging of containers in any Kubernetes cluster for Node.js, in addition to Java and Kotlin. [2514](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2514)
+- Enhanced Kubernetes deploy and debug status output in the event log. [2567](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2567)
+- Kubernetes deployment output log colorization. [2460](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2460)
+
+### Updates
+- Support IntelliJ platforms version 2019.2. [2571](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2571)
+
+### Bug Fixes
+- Fix for allowing multiple simultaneous Kubernetes debug sessions. [2554](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2554)
+- Fix for displaying correct missing dependency messages in the Kubernetes run configurations. [2586](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2586)
+- Fix for IllegalStateException caused by missing Kubernetes context. [2606](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2606)
+- Fix for Stackdriver Debugger NPE. [2232](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2232)
+
+## 19.5.3
+
+### Updates
+- Explicitly enable port-forwarding on all Kubernetes commands since it is now opt-in for Skaffold. [2562](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2562)
+
+## 19.5.2
+
+### Bug Fixes
+- Fixes issue where unsupported 'cleanup' flag is passed from the 'Deploy to Kubernetes' run configuration to the Skaffold run command. [2556](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2556)
+- Fixes potential UI freeze in the Kubernetes settings panel, and fixes increased CPU usage on some Linux platforms caused by a script reading the shell environment PATH. [2548](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2548)
+- Shows appropriate warning message in the Kubernetes run configurations if 'kubectl' is not found on the PATH. [2551](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/2551)
+
+## 19.5.1
+
+This release introduces many bug fixes and stability improvements as well as some exciting new 
+features in Cloud Code to improve the Kubernetes development experience.
+
+### New Features
+- **Java Kubernetes debugging**. Debug your Java Kubernetes applications as if they were running locally. Set breakpoints, step through code, etc., all against a live Kubernetes cluster running locally, on GKE, or on one of the cloud providers.
+- **Kubernetes application bootstrapping**. Do you already have an existing Kubernetes application? It is now even easier to get started using Cloud Code. The plugin will detect your Kubernetes application and auto-create the Skaffold configuration for you so that you immediately develop and deploy.
+- **Enhanced Kubernetes deployment**. The deployment and continuous development experience is now vastly improved. For instance, you can select the cluster you are deploying to right from the IDE, set environment variables, configure if your deployments are cleaned up after continuous development, and more.
+
+### Bug Fixes
+- Fix to system shell environment loading which potentially could hang the IDE during Kubernetes deployment. [2482](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2292) 
+- Fix NPE in App Engine local run. [2239](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2239) 
+- Gracefully terminate Skaffold process when IntelliJ is force quit. [2419](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2419) 
+
 ## 19.4.1
-<img src="/images/release-notes/cloud_code.png" alt="Cloud Code" width="100px" />
+<img src="cloud_code.png" alt="Cloud Code" width="100px" />
 
 Introducing Cloud Code for IntelliJ, formerly known as Cloud Tools for IntelliJ.
 
