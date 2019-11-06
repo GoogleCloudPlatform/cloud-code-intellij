@@ -1,7 +1,35 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## 19.10.1 - Latest Release
+## 19.11.1 - Latest Release
+
+Note: This release updates the Kubernetes Run Configurations with new names and improved setting controls. Depending on your version of IntelliJ, you may be prompted to have your existing Cloud Code run configurations automatically converted to the new format. **Important: if you are running IntelliJ version 2019.2 through 2019.2.2, then you will likely have to update your IDE to the latest version to open existing Cloud Code projects (see a [IDEA-218071](https://youtrack.jetbrains.com/issue/IDEA-218071)) from the welcome screen.**
+
+### New Features
+
+- **Add alternate kubeconfig files.** If your workflow includes additional kubeconfig files, you can now select them for use in the Cloud Code plugin. They will then be recognized for deployment and cluster browsing:
+\
+  ![alternate kubconfigs](docs/images/release-notes/alternate-kubeconfigs.png)
+- **Configure Migrate for Anthos easily.** Cloud Code can assist you with editing your Migrate for Anthos configuration files:
+\
+  ![migrate for anthos](docs/images/release-notes/migrate-for-anthos.png)
+- **Add Kubernetes support for your Jib Java projects.** With one click, the “Add Kubernetes Support” menu action can quickly add Cloud Code Kubernetes support for your projects that use Jib to build container images.
+- **Browse your CRDs.** The Kubernetes Cluster browser now includes a node for viewing your Custom Resource Definitions:
+\
+  ![crds](docs/images/release-notes/crds.png)
+- **View the status of your Kubernetes deployments.** Kubernetes deployments now display status information and replica counts in the Cluster browser:
+\
+  ![deployment status](docs/images/release-notes/deployment-status.png)
+- **Debug your Go Applications in-cluster.** Cloud Code comes with one-click debugging of your Golang applications running in Kubernetes clusters:
+\
+  ![go debugging](docs/images/release-notes/go-debug.png)
+
+### Bug Fixes
+
+- Fixed a bug where loading your available CSR (Cloud Source Repositories) repos resulted in an error.
+- Fixed an issue where a login failure resulted in an exception. An error message is now shown.
+
+## 19.10.1
 
 This release fixes several bugs and improves stability of the Cloud Code plugin. It also contains enhancements to the Kubernetes Cluster Browser, including the ability to view containers in your pods and stream logs from them.
 
