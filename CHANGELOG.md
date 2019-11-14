@@ -1,7 +1,22 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## 19.11.1 - Latest Release
+## 19.11.2 - Latest Release
+
+This release fixes several bugs and improves stability of the Cloud Code plugin. It also contains the GA version of Skaffold, and enhancements to YAML editing support.
+
+### New Features
+
+- **Skaffold is now GA.** Skaffold, the Kubernetes development CLI tool that powers several features of Cloud Code, [is now generally available](https://cloud.google.com/blog/products/application-development/kubernetes-development-simplified-skaffold-is-now-ga). Cloud Code’s automatic dependency manager now includes the GA version of Skaffold.
+- **Snippets for more types of configuration files.** Cloud Code can now assist you with editing your Config Connector and Cloud Build configuration files:
+\
+  ![more configuration files](docs/images/release-notes/more-snippets.png)
+
+### Bug Fixes
+
+- Updated GCP login to use the new endpoint URL.
+
+## 19.11.1
 
 Note: This release updates the Kubernetes Run Configurations with new names and improved setting controls. Depending on your version of IntelliJ, you may be prompted to have your existing Cloud Code run configurations automatically converted to the new format. **Important: if you are running IntelliJ version 2019.2 through 2019.2.2, then you will likely have to update your IDE to the latest version to open existing Cloud Code projects (see a [IDEA-218071](https://youtrack.jetbrains.com/issue/IDEA-218071)) from the welcome screen.**
 
