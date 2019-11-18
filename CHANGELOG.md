@@ -3,7 +3,7 @@ This page documents production updates to Cloud Code for IntelliJ. You can check
 
 ## 19.11.3 - Latest Release
 
-We are pleased to announce that Cloud Code is now generally available.
+We are pleased to announce that Cloud Code is now GA!
 
 ### Bug Fixes
 
