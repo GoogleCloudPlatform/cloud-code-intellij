@@ -1,7 +1,15 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## 19.11.2 - Latest Release
+## 19.11.3 - Latest Release
+
+We are pleased to announce that Cloud Code is now generally available.
+
+### Bug Fixes
+
+- Updating Skaffold version provided by the dependency manager to 1.0.1 to fix issue with the cloudbuild profile using the sample projects.
+
+## 19.11.2
 
 This release fixes several bugs and improves stability of the Cloud Code plugin. It also contains the GA version of Skaffold, and enhancements to YAML editing support.
 
