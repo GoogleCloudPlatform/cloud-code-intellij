@@ -1,7 +1,17 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## 19.11.3 - Latest Release
+## 19.12.1 - Latest Release
+
+This release improves stability and support for the recently released version 2019.3 of IntelliJ and JetBrains family of IDEs.
+
+### Bug Fixes
+
+- Fixes intermittent errors loading Kubernetes samples from Cloud Code’s New Project wizard.
+- Fix for `It's prohibited to access index during event dispatching` exception that occurs occasionally when cloning a Kubernetes sample.
+- Catches IndexOutOfBounds exception in Cloud Code’s editing support when trying to convert an LSP position to an out of bounds document offset in the IDE.
+
+## 19.11.3
 
 We are pleased to announce that Cloud Code is now GA!
 
