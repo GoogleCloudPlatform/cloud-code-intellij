@@ -12,9 +12,9 @@ This page documents production updates to Cloud Code for IntelliJ. You can check
 - Fixes `NoSuchMethodError at KubernetesSettingsConfigurable.disposeUiResources` caused by incorrect coroutine `cancel` invocation.
 - Fixes possible UI thread freezes by using a more lightweight approach for detecting Skaffold configuration files.
 
-This release improves stability and support for the recently released version 2019.3 of IntelliJ and JetBrains family of IDEs.
-
 ## 19.12.1
+
+This release improves stability and support for the recently released version 2019.3 of IntelliJ and JetBrains family of IDEs.
 
 ### Bug Fixes
 
