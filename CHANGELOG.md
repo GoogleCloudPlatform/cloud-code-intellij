@@ -1,7 +1,19 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## 19.12.1 - Latest Release
+## 20.1.1 - Latest Release
+
+
+## 19.12.1
+
+### New Features
+
+- Adds a new Cloud Code Kubernetes setting to toggle the Kubernetes editing features on or off for compatibility with other plugins that provide overlapping support. Accessible under “Settings > Cloud Code > Kubernetes”.
+
+### Bug Fixes
+
+- Fixes `NoSuchMethodError at KubernetesSettingsConfigurable.disposeUiResources` caused by incorrect coroutine `cancel` invocation.
+- Fixes possible UI thread freezes by using a more lightweight approach for detecting Skaffold configuration files.
 
 This release improves stability and support for the recently released version 2019.3 of IntelliJ and JetBrains family of IDEs.
 
