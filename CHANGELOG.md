@@ -3,9 +3,6 @@ This page documents production updates to Cloud Code for IntelliJ. You can check
 
 ## 20.1.1 - Latest Release
 
-
-## 19.12.1
-
 ### New Features
 
 - Adds a new Cloud Code Kubernetes setting to toggle the Kubernetes editing features on or off for compatibility with other plugins that provide overlapping support. Accessible under “Settings > Cloud Code > Kubernetes”.
@@ -16,6 +13,8 @@ This page documents production updates to Cloud Code for IntelliJ. You can check
 - Fixes possible UI thread freezes by using a more lightweight approach for detecting Skaffold configuration files.
 
 This release improves stability and support for the recently released version 2019.3 of IntelliJ and JetBrains family of IDEs.
+
+## 19.12.1
 
 ### Bug Fixes
 
