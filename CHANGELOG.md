@@ -8,7 +8,7 @@ This page documents production updates to Cloud Code for IntelliJ. You can check
 - Easily view the YAML of a resource in your Kubernetes cluster right from the Kubernetes Explorer. Just navigate to a resource in the Kubernetes Explorer, such as a Pod, right click and select “View Remote YAML” 
 \
   ![view remote yaml](docs/images/release-notes/open-remote-yaml.png)
-- You can now re-open the welcome screen to view release notes and plugin details. Select: Tools > Cloud Code > Open Welcome Scree
+- You can now re-open the welcome screen to view release notes and plugin details. Select: Tools > Cloud Code > Open Welcome Screen
 - The plugin now works in the latest 2020 EAP version of IntelliJ (and other Jetbrains IDEs)
 - You can now view the versions of the plugin-managed dependencies (including Skaffold and Kubectl) from the settings under Settings > Cloud Code > Kubernetes
 
