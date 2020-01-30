@@ -1,7 +1,23 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## 20.1.1 - Latest Release
+## 20.1.2 - Latest Release
+
+### New Features
+
+- Easily view the YAML of a resource in your Kubernetes cluster right from the Kubernetes Explorer. Just navigate to a resource in the Kubernetes Explorer, such as a Pod, right click and select “View Remote YAML” 
+\
+  ![view remote yaml](docs/images/release-notes/open-remote-yaml.png)
+- You can now re-open the welcome screen to view release notes and plugin details. Select: Tools > Cloud Code > Open Welcome Scree
+- The plugin now works in the latest 2020 EAP version of IntelliJ (and other Jetbrains IDEs)
+- You can now view the versions of the plugin-managed dependencies (including Skaffold and Kubectl) from the settings under Settings > Cloud Code > Kubernetes
+
+### Updates
+
+- The Kubernetes sample project wizard now suggests an appropriate project title instead of `untitled*` 
+- The Kubernetes samples project wizard will now suggest that you install the language plugin corresponding to the selected template if it is not already installed
+
+## 20.1.1
 
 ### New Features
 
