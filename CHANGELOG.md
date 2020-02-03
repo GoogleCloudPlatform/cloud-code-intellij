@@ -1,7 +1,16 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## 20.1.2 - Latest Release
+## 20.1.3 - Latest Release
+
+Patch release following the 20.1.2 release of Cloud Code.
+
+### Bug Fixes
+
+- Fix backwards compatibility bug in the Kubernetes template wizard causing the missing language plugin warning to throw runtime errors in IntelliJ 2019.1
+- Fix backwards compatibility bug in the Kubernetes template wizard causing the project name suggestion logic to throw runtime errors in IntelliJ 2019.2 and lower by rolling back the change
+
+## 20.1.2
 
 ### New Features
 
