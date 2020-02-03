@@ -5,10 +5,6 @@ This page documents production updates to Cloud Code for IntelliJ. You can check
 
 Patch release following the 20.1.2 release of Cloud Code.
 
-### Updates
-
-- Updates the managed Skaffold version to 1.3.0
-
 ### Bug Fixes
 
 - Fix backwards compatibility bug in the Kubernetes template wizard causing the missing language plugin warning to throw runtime errors in IntelliJ 2019.1
