@@ -1,7 +1,24 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## 20.1.3 - Latest Release
+## 20.2.1 - Latest Release
+
+### New Features
+
+- **Enhanced Client Library Browser**. Now with a much improved UI, and support for more languages including Java, Python, Node.js, and Go! View available Google Cloud APIs, enable an API, view API status (enabled or disabled), and install client libraries to consume an API, all from within your IDE. Access via Tools > Cloud Code > Add Cloud Libraries and Manage Cloud APIs  
+\
+  ![view remote yaml](docs/images/release-notes/client-libraries.png)
+- **Revamped Image Path UX**. For Kubernetes projects, Cloud Code now ships with a significantly improved user experience for setting the image path (e.g. `gcr.io/{gcp-project-name}`). The field will even help suggest a path for you, if possible, based on your current active context.
+\
+  ![view remote yaml](docs/images/release-notes/default-image-path.png)
+- **Automatically created Kubernetes Run Configurations**. When cloning a Cloud Code Kubernetes sample project from the new project wizard, the Kubernetes run configurations are now automatically created, instead of requiring a click on a notification.
+
+### Bug Fixes
+- **Kubernetes Project Detection**. Fixed an issue with the Kubernetes project detection notification where accepting the prompt to create the run configurations didn’t do anything.
+- **2020.1 EAP**. Incremental fixes to support the latest 2020.1 EAP including a frequent runtime error: `window with id="Google Cloud Storage" isn't registered`. 
+- Fixed a language client IllegalStateException: `java.lang.IllegalStateException: completionItem.insertText must not be null`.
+
+## 20.1.3
 
 Patch release following the 20.1.2 release of Cloud Code.
 
