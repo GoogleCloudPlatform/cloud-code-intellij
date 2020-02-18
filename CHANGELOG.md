@@ -7,10 +7,10 @@ This page documents production updates to Cloud Code for IntelliJ. You can check
 
 - **Enhanced Client Library Browser**. Now with a much improved UI, and support for more languages including Java, Python, Node.js, and Go! View available Google Cloud APIs, enable an API, view API status (enabled or disabled), and install client libraries to consume an API, all from within your IDE. Access via Tools > Cloud Code > Add Cloud Libraries and Manage Cloud APIs  
 \
-  ![view remote yaml](docs/images/release-notes/client-libraries.png)
+  ![client library browser](docs/images/release-notes/client-libraries.png)
 - **Revamped Image Path UX**. For Kubernetes projects, Cloud Code now ships with a significantly improved user experience for setting the image path (e.g. `gcr.io/{gcp-project-name}`). The field will even help suggest a path for you, if possible, based on your current active context.
 \
-  ![view remote yaml](docs/images/release-notes/default-image-path.png)
+  ![default image path](docs/images/release-notes/default-image-path.png)
 - **Automatically created Kubernetes Run Configurations**. When cloning a Cloud Code Kubernetes sample project from the new project wizard, the Kubernetes run configurations are now automatically created, instead of requiring a click on a notification.
 
 ### Bug Fixes
