@@ -9,7 +9,7 @@ Cloud Code now makes it easy to deploy your services to Cloud Run fully managed 
 
 Follow the [Cloud Run quickstart guide](https://cloud.google.com/code/docs/intellij/quickstart-cloud-run), and use our built-in templates to get started quickly. Please file any feature requests or issues you encounter on our [GitHub repo](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/new)!
 
-![view remote yaml](docs/images/release-notes/cloud-run.png)
+![Cloud Run](docs/images/release-notes/cloud-run.png)
 
 ### New Features
 
