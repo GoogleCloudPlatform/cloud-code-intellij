@@ -1,7 +1,30 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## 20.2.1 - Latest Release
+## 20.4.1 - Latest Release
+
+We are pleased to announce [Cloud Run](https://cloud.google.com/run) support in Cloud Code for IntelliJ!
+
+Cloud Code now makes it easy to deploy your services to Cloud Run fully managed or Cloud Run for Anthos on GKE. You can view your deployed services right in the IDE with the Cloud Run Explorer.
+
+Follow the [Cloud Run quickstart guide](https://cloud.google.com/code/docs/intellij/quickstart-cloud-run), and use our built-in templates to get started quickly. Please file any feature requests or issues you encounter on our [GitHub repo](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/new)!
+
+![view remote yaml](docs/images/release-notes/cloud-run.png)
+
+### New Features
+
+- **Cloud Run** support in IntelliJ and JetBrains IDEs
+  - **Cloud Run starter templates** in Java, Node.js, Go, and Python to help you get started quickly
+  - **Deploy your Cloud Run services** directly from the IDE to Cloud Run fully managed or Cloud Run for Anthos on GKE
+  - **Browse your deployed Cloud Run services** without leaving the IDE with the built-in Cloud Run Explorer
+- Configure the log verbosity setting for the Skaffold output in the Kubernetes Run Configurations
+
+### Updates 
+
+- Improved UI for setting the default image repository in the Kubernetes Run Configurations 
+- Improved proxy support - the Kubernetes Explorer now respects configured IntelliJ proxy settings
+
+## 20.2.1
 
 ### New Features
 

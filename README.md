@@ -8,6 +8,7 @@ Google Cloud Platform products.
 ## Features
 
 * [Kubernetes](https://cloud.google.com/code/docs/intellij/quickstart-IDEA) Streamline your Kubernetes development process in the JetBrains family of IDEs.
+* [Cloud Run](https://cloud.google.com/code/docs/intellij/quickstart-cloud-run) Deploy and browse your Cloud Run services right from the IDE.
 * [Google Cloud Java Client Libraries](https://cloud.google.com/tools/intellij/docs/client-libraries) 
   Add Java client libraries to your project, enable Google Cloud APIs, and create service accounts.
 * [Google Cloud Storage](https://cloud.google.com/storage/) 
