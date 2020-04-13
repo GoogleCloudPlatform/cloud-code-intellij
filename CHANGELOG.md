@@ -1,7 +1,121 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## 19.10.1 - Latest Release
+## 20.2.1 - Latest Release
+
+### New Features
+
+- **Enhanced Client Library Browser**. Now with a much improved UI, and support for more languages including Java, Python, Node.js, and Go! View available Google Cloud APIs, enable an API, view API status (enabled or disabled), and install client libraries to consume an API, all from within your IDE. Access via Tools > Cloud Code > Add Cloud Libraries and Manage Cloud APIs  
+\
+  ![client library browser](docs/images/release-notes/client-libraries.png)
+- **Revamped Image Path UX**. For Kubernetes projects, Cloud Code now ships with a significantly improved user experience for setting the image path (e.g. `gcr.io/{gcp-project-name}`). The field will even help suggest a path for you, if possible, based on your current active context.
+\
+  ![default image path](docs/images/release-notes/default-image-path.png)
+- **Automatically created Kubernetes Run Configurations**. When cloning a Cloud Code Kubernetes sample project from the new project wizard, the Kubernetes run configurations are now automatically created, instead of requiring a click on a notification.
+
+### Bug Fixes
+- **Kubernetes Project Detection**. Fixed an issue with the Kubernetes project detection notification where accepting the prompt to create the run configurations didn’t do anything.
+- **2020.1 EAP**. Incremental fixes to support the latest 2020.1 EAP including a frequent runtime error: `window with id="Google Cloud Storage" isn't registered`. 
+- Fixed a language client IllegalStateException: `java.lang.IllegalStateException: completionItem.insertText must not be null`.
+
+## 20.1.3
+
+Patch release following the 20.1.2 release of Cloud Code.
+
+### Bug Fixes
+
+- Fix backwards compatibility bug in the Kubernetes template wizard causing the missing language plugin warning to throw runtime errors in IntelliJ 2019.1
+- Fix backwards compatibility bug in the Kubernetes template wizard causing the project name suggestion logic to throw runtime errors in IntelliJ 2019.2 and lower by rolling back the change
+
+## 20.1.2
+
+### New Features
+
+- Easily view the YAML of a resource in your Kubernetes cluster right from the Kubernetes Explorer. Just navigate to a resource in the Kubernetes Explorer, such as a Pod, right click and select “View Remote YAML” 
+\
+  ![view remote yaml](docs/images/release-notes/open-remote-yaml.png)
+- You can now re-open the welcome screen to view release notes and plugin details. Select: Tools > Cloud Code > Open Welcome Screen
+- The plugin now works in the latest 2020 EAP version of IntelliJ (and other Jetbrains IDEs)
+- You can now view the versions of the plugin-managed dependencies (including Skaffold and Kubectl) from the settings under Settings > Cloud Code > Kubernetes
+
+### Updates
+
+- The Kubernetes sample project wizard now suggests an appropriate project title instead of `untitled*` 
+- The Kubernetes samples project wizard will now suggest that you install the language plugin corresponding to the selected template if it is not already installed
+
+## 20.1.1
+
+### New Features
+
+- Adds a new Cloud Code Kubernetes setting to toggle the Kubernetes editing features on or off for compatibility with other plugins that provide overlapping support. Accessible under “Settings > Cloud Code > Kubernetes”.
+
+### Bug Fixes
+
+- Fixes `NoSuchMethodError at KubernetesSettingsConfigurable.disposeUiResources` caused by incorrect coroutine `cancel` invocation.
+- Fixes possible UI thread freezes by using a more lightweight approach for detecting Skaffold configuration files.
+
+## 19.12.1
+
+This release improves stability and support for the recently released version 2019.3 of IntelliJ and JetBrains family of IDEs.
+
+### Bug Fixes
+
+- Fixes intermittent errors loading Kubernetes samples from Cloud Code’s New Project wizard.
+- Fix for `It's prohibited to access index during event dispatching` exception that occurs occasionally when cloning a Kubernetes sample.
+- Catches IndexOutOfBounds exception in Cloud Code’s editing support when trying to convert an LSP position to an out of bounds document offset in the IDE.
+
+## 19.11.3
+
+We are pleased to announce that Cloud Code is now GA!
+
+### Bug Fixes
+
+- Updating Skaffold version provided by the dependency manager to 1.0.1 to fix issue with the cloudbuild profile using the sample projects.
+
+## 19.11.2
+
+This release fixes several bugs and improves stability of the Cloud Code plugin. It also contains the GA version of Skaffold, and enhancements to YAML editing support.
+
+### New Features
+
+- **Skaffold is now GA.** Skaffold, the Kubernetes development CLI tool that powers several features of Cloud Code, [is now generally available](https://cloud.google.com/blog/products/application-development/kubernetes-development-simplified-skaffold-is-now-ga). Cloud Code’s automatic dependency manager now includes the GA version of Skaffold.
+- **Snippets for more types of configuration files.** Cloud Code can now assist you with editing your Config Connector and Cloud Build configuration files:
+\
+  ![more configuration files](docs/images/release-notes/more-snippets.png)
+
+### Bug Fixes
+
+- Updated GCP login to use the new endpoint URL.
+
+## 19.11.1
+
+Note: This release updates the Kubernetes Run Configurations with new names and improved setting controls. Depending on your version of IntelliJ, you may be prompted to have your existing Cloud Code run configurations automatically converted to the new format. **Important: if you are running IntelliJ version 2019.2 through 2019.2.2, then you will likely have to update your IDE to the latest version to open existing Cloud Code projects (see a [IDEA-218071](https://youtrack.jetbrains.com/issue/IDEA-218071)) from the welcome screen.**
+
+### New Features
+
+- **Add alternate kubeconfig files.** If your workflow includes additional kubeconfig files, you can now select them for use in the Cloud Code plugin. They will then be recognized for deployment and cluster browsing:
+\
+  ![alternate kubconfigs](docs/images/release-notes/alternate-kubeconfigs.png)
+- **Configure Migrate for Anthos easily.** Cloud Code can assist you with editing your Migrate for Anthos configuration files:
+\
+  ![migrate for anthos](docs/images/release-notes/migrate-for-anthos.png)
+- **Add Kubernetes support for your Jib Java projects.** With one click, the “Add Kubernetes Support” menu action can quickly add Cloud Code Kubernetes support for your projects that use Jib to build container images.
+- **Browse your CRDs.** The Kubernetes Cluster browser now includes a node for viewing your Custom Resource Definitions:
+\
+  ![crds](docs/images/release-notes/crds.png)
+- **View the status of your Kubernetes deployments.** Kubernetes deployments now display status information and replica counts in the Cluster browser:
+\
+  ![deployment status](docs/images/release-notes/deployment-status.png)
+- **Debug your Go Applications in-cluster.** Cloud Code comes with one-click debugging of your Golang applications running in Kubernetes clusters:
+\
+  ![go debugging](docs/images/release-notes/go-debug.png)
+
+### Bug Fixes
+
+- Fixed a bug where loading your available CSR (Cloud Source Repositories) repos resulted in an error.
+- Fixed an issue where a login failure resulted in an exception. An error message is now shown.
+
+## 19.10.1
 
 This release fixes several bugs and improves stability of the Cloud Code plugin. It also contains enhancements to the Kubernetes Cluster Browser, including the ability to view containers in your pods and stream logs from them.
 
