@@ -1,7 +1,24 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## 20.4.1 - Latest Release
+
+## 20.4.3 - Latest Release
+
+### Fixes
+
+- Fixes cases where Cloud Code run configurations are not automatically created in non-IDEA JetBrains IDEs (PyCharm, GoLand, WebStorm)
+- Fixes cases where Kubernetes run configurations’ state in non-IDEA JetBrains IDEs cannot be stored
+
+## 20.4.2
+
+This is a patch release following the 20.4.1 release adding Cloud Run support earlier this week.
+
+### Fixes
+
+- Fix for NoClassDefFoundError loading JavaSdk class mainly in PyCharm IDEs
+- Fix for NoClassDefFoundError loading GradleSettings class
+
+## 20.4.1
 
 We are pleased to announce [Cloud Run](https://cloud.google.com/run) support in Cloud Code for IntelliJ!
 
