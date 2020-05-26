@@ -7,7 +7,7 @@ Google Cloud Platform products.
 
 ## Features
 
-* [Kubernetes](https://cloud.google.com/code/docs/intellij/quickstart-IDEA) Streamline your Kubernetes development process in the JetBrains family of IDEs.
+* [Kubernetes](https://cloud.google.com/code/docs/intellij/quickstart-k8s) Streamline your Kubernetes development process in the JetBrains family of IDEs.
 * [Cloud Run](https://cloud.google.com/code/docs/intellij/quickstart-cloud-run) Deploy and browse your Cloud Run services right from the IDE.
 * [Google Cloud Java Client Libraries](https://cloud.google.com/tools/intellij/docs/client-libraries) 
   Add Java client libraries to your project, enable Google Cloud APIs, and create service accounts.
@@ -38,7 +38,7 @@ The Cloud Code for IntelliJ plugin supports JetBrains IDEs version 2019.2+:
 * [other JetBrains IDEs](https://www.jetbrains.com/products.html)
 
 For GCP functionality, full support is available for IntelliJ IDEA Ultimate Edition, with limited
-support for the other platforms. See this [feature matrix](docs/gcp-feature-matrix.md) 
+support for the other platforms. See this [feature matrix](https://cloud.google.com/code/docs#features)
 for more details.
 
 ## Installation
