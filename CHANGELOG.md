@@ -2,7 +2,26 @@
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
 
-## 20.4.3 - Latest Release
+## 20.5.1 - Latest Release
+
+### New Features
+
+- You can now grab an interactive terminal into pods and containers from the Kubernetes Explorer. This feature is available for IDE versions 2019.3 and later.
+\
+  ![Kubernetes Terminal](docs/images/release-notes/terminal.png)
+- The Kubernetes Explorer now maintains its state through refreshes so that you don’t lose your location in the tree.
+- The Kubernetes Explorer now automatically updates its state on changes so that you are immediately aware of changes to your cluster without having to manually refresh.
+
+### Updates 
+
+- Hovering over a Pod in Kubernetes Explorer will display more information from the Conditions Array of the Pod Status.
+
+### Fixes 
+
+- Fixed an `IllegalStateException: Duplicate Key` error with App Engine causing some Gradle projects to not properly import.
+
+
+## 20.4.3
 
 ### Fixes
 
