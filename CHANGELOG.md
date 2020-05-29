@@ -4,6 +4,8 @@ This page documents production updates to Cloud Code for IntelliJ. You can check
 
 ## 20.5.1 - Latest Release
 
+**Note**: In the next release we plan to bump the minimum supported platform version to 2019.3. If you are on 2019.2, we recommend that you upgrade so that you will continue to get Cloud Code updates.
+
 ### New Features
 
 - You can now grab an interactive terminal into pods and containers from the Kubernetes Explorer. This feature is available for IDE versions 2019.3 and later.
