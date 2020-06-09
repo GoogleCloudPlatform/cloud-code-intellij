@@ -2,7 +2,17 @@
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
 
-## 20.5.1 - Latest Release
+## 20.6.1 - Latest Release
+
+**Note to 2020.2 EAP users**: we previously released version 20.5.1 with support for the latest EAP. We have since uncovered some compatibility issues that need to be worked through for an optimal experience, and are therefore removing support for the EAP in this release. Expect a new release as soon as possible supporting the 2020.2 EAP.
+
+### Fixes
+
+- Fixed an OOM error coming from the Kubernetes Explorer.
+- Fixed a NoSuchFileException that occurred when using the Kubernetes explorer with no ‘.kube’ folder.
+- Fixed a NoSuchMethodError coming from the Skaffold notification.
+ 
+## 20.5.1
 
 **Note**: In the next release we plan to bump the minimum supported platform version to 2019.3. If you are on 2019.2, we recommend that you upgrade so that you will continue to get Cloud Code updates.
 
