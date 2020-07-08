@@ -52,7 +52,7 @@ channel. To install them please perform the following steps:
 
 1. Install the Cloud Code plugin
     1. Copy this URL `https://plugins.jetbrains.com/plugins/alpha/8079`
-    1. Use the copied URL as the Custom Plugin URL when following [these instructions](https://www.jetbrains.com/idea/help/managing-enterprise-plugin-repositories.html)
+    1. Use the copied URL as the Custom Plugin URL when following [these instructions](https://www.jetbrains.com/help/idea/managing-plugins.html#repos)
     1. Search for the 'Cloud Code' plugin and install it.
 
 You can also grab the latest nightly build of the plugin by following the same steps as above but 
