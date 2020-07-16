@@ -1,8 +1,40 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## Version 20.7.1 - Current Release
 
-## 20.6.1 - Latest Release
+**Note:** The minimum supported platform version has been increased to 2019.3. Support for the latest EAP 2020.2 will be released separately, as soon as possible.
+
+### New Features
+
+- Develop and debug your Cloud Run application locally with the new `Cloud Run: Run Locally` run configuration. In addition to deploying your applications to Cloud Run, you can now iterate on the applications locally in a Cloud-Run-like environment.
+\
+  ![cloud_run_local_run_config](docs/images/release-notes/cloud-run-local-run-config.png)
+\
+![cloud_run_local_session](docs/images/release-notes/cloud-run-local-session.png)
+- Build your Kubernetes and Cloud Run container images with Cloud Native Buildpacks for easy containerization with no Dockerfile required!
+\
+  ![cloud_run_run_config_with_buildpakcs](docs/images/release-notes/cloud-run-buildpacks-run-config.png)
+- Enhanced Skaffold artifact builder configurability when bootstrapping projects or modifying Kubernetes run configuration settings. Easily select between available builders such as Jib (for Java projects), Docker, or buildpacks.
+\
+  ![skaffold_run_config_with_buildpacks](docs/images/release-notes/skaffold-buildpacks-run-config.png)
+- More robust debugging of Node.js applications with the ability to configure the mapping between the local path of your sources to their remote path in the container.
+\
+  ![debug_source_mappings](docs/images/release-notes/debug-source-mappings.png)
+- Expanded to support validation, hover documentation, and code completions for hundreds of popular Kubernetes Custom Resources.
+\
+  ![enhanced_crd_support](docs/images/release-notes/krm-zoo.png)
+
+### Updates
+
+- Improved UI for deployment to Cloud Run for Anthos, and better messaging for exposing deployed services. Cluster field will now auto-populate with all available options.
+- Improved error messages throughout the plugin with clearer wording and more actionable suggestions.
+
+### Fixes
+
+- Fixed various binary forward compatibility issues throughout the plugin by building with the minimum supported version of the plugin.
+
+## 20.6.1
 
 **Note to 2020.2 EAP users**: we previously released version 20.5.1 with support for the latest EAP. We have since uncovered some compatibility issues that need to be worked through for an optimal experience, and are therefore removing support for the EAP in this release. Expect a new release as soon as possible supporting the 2020.2 EAP.
 
