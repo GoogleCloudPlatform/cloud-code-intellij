@@ -10,8 +10,8 @@
 
 - Cloud Code IntelliJ version (Settings > Plugins > Cloud Code): 
 - Cloud SDK (Settings > Cloud Code > Cloud SDK): 
- - Are you allowing the plugin to manage the Cloud SDK: 
- - Version of the Cloud SDK:
+  - Are you allowing the plugin to manage the Cloud SDK: 
+  - Version of the Cloud SDK:
 - Skaffold version (If you are using Kubernetes features; Settings > Cloud Code > Kubernetes): 
 - Operating System:
 
