@@ -1,4 +1,4 @@
-(Please ensure you are running the latest version of Cloud Cloud for IntelliJ with _Help > Check for Updates_.)
+(Please ensure you are running the latest version of Cloud Cloud IntelliJ with _Help > Check for Updates_.)
 
 (screenshots are often helpful)
 
