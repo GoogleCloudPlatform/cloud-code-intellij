@@ -1,14 +1,19 @@
 (Please ensure you are running the latest version of Cloud Cloud for IntelliJ with _Help > Check for Updates_.)
 
-- Cloud Code for IntelliJ version:
-- OS:
+(screenshots are often helpful)
 
-**What did you do?**
+### Expected Behavior
 
-**What did you expect to see?**
+### Actual Behavior
 
-**What did you see instead?**
+### Aditional Information
 
-(screenshots are helpful)
+- Cloud Code IntelliJ version (Settings > Plugins > Cloud Code): 
+- Cloud SDK (Settings > Cloud Code > Cloud SDK): 
+ - Are you allowing the plugin to manage the Cloud SDK: 
+ - Version of the Cloud SDK:
+- Skaffold version (If you are using Kubernetes features; Settings > Cloud Code > Kubernetes): 
+- Operating System:
+
 
 _Feel free to deviate from this template as needed, especially if you are submitting a feature request._
