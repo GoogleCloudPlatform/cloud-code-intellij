@@ -8,6 +8,7 @@
 
 ### Aditional Information
 
+- IDE type (e.g. IntelliJ, Pycharm):
 - IDE version:
 - Cloud Code version (Settings > Plugins > Cloud Code): 
 - Cloud SDK (Settings > Cloud Code > Cloud SDK)
