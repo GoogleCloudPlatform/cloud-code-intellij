@@ -8,7 +8,9 @@
 
 ### Aditional Information
 
-- Cloud Code IntelliJ version (Settings > Plugins > Cloud Code): 
+- IDE type (e.g. IntelliJ, Pycharm):
+- IDE version:
+- Cloud Code version (Settings > Plugins > Cloud Code): 
 - Cloud SDK (Settings > Cloud Code > Cloud SDK)
   - Are you allowing the plugin to manage the Cloud SDK: 
   - Version of the Cloud SDK:
