@@ -55,7 +55,7 @@ channel. To install them please perform the following steps:
     1. Use the copied URL and add it as a custom plugin repository in the plugin settings following [these instructions](https://www.jetbrains.com/help/idea/managing-plugins.html#repos)
     1. Search for the 'Cloud Code' plugin and install it.
 
-Note: these are not published regularly and are typically updated prior to releases. If you want the latest and greatest nightly build from HEAD, follow the instructions below to grab a nightly build:
+Note: these are not published regularly and are typically updated only prior to releases. If you want the latest and greatest nightly build from HEAD, follow the instructions below to grab a nightly build:
 
 You can also grab the latest nightly build of the plugin by following the same steps as above but 
 replacing 'alpha' with 'nightly' in the URLs.
