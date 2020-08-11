@@ -47,8 +47,7 @@ You can find our plugin in the Jetbrains plugin repository by going to IntelliJ 
 
 ### Pre-releases 
 
-The pre-release binaries are being deployed to the Jetbrains plugin repository on an alpha
-channel. To install them please perform the following steps:
+The pre-release binaries published to the Jetbrains plugin repository. To install them please perform the following steps:
 
 1. Install the Cloud Code plugin
     1. Copy this URL `https://plugins.jetbrains.com/plugins/{CHANNEL}/8079` replacing `{CHANNEL}` entirely with one of the following:
