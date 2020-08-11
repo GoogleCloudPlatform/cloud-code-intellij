@@ -55,7 +55,7 @@ channel. To install them please perform the following steps:
     1. Use the copied URL and add it as a custom plugin repository in the plugin settings following [these instructions](https://www.jetbrains.com/help/idea/managing-plugins.html#repos)
     1. Search for the 'Cloud Code' plugin and install it.
     
-Replace `[CHANEL]` with one of the following:
+Replace `[CHANNEL]` with one of the following:
 \
 `alpha` - To test out a release candidate. These are not published regularly and are typically updated only prior to releases.
 \
