@@ -51,12 +51,8 @@ The pre-release binaries are being deployed to the Jetbrains plugin repository o
 channel. To install them please perform the following steps:
 
 1. Install the Cloud Code plugin
-    1. Copy this URL `https://plugins.jetbrains.com/plugins/[CHANNEL]/8079` replacing `[CHANEL]` as described below
+    1. Copy this URL `https://plugins.jetbrains.com/plugins/[CHANNEL]/8079` replacing `[CHANEL]` with one of the following:
+        1. `alpha` - To test out a release candidate. These are not published regularly and are typically updated only prior to releases.
+        1. `nightly` - To get the latest and greatest nightly build of the plugin, built from HEAD.
     1. Use the copied URL and add it as a custom plugin repository in the plugin settings following [these instructions](https://www.jetbrains.com/help/idea/managing-plugins.html#repos)
     1. Search for the 'Cloud Code' plugin and install it.
-    
-Replace `[CHANNEL]` with one of the following:
-\
-`alpha` - To test out a release candidate. These are not published regularly and are typically updated only prior to releases.
-\
-`nightly` - To get the latest and greatest nightly build of the plugin, built from HEAD.
