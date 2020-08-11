@@ -58,4 +58,4 @@ channel. To install them please perform the following steps:
 Note: these are not published regularly and are typically updated prior to releases. If you want the latest and greatest nightly build from HEAD, follow the instructions below to grab a nightly build:
 
 You can also grab the latest nightly build of the plugin by following the same steps as above but 
-replacing 'alpha' with 'nightly' in the URLs/
+replacing 'alpha' with 'nightly' in the URLs.
