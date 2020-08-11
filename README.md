@@ -58,4 +58,5 @@ channel. To install them please perform the following steps:
 Replace `[CHANEL]` with one of the following:
 \
 `alpha` - To test out a release candidate. These are not published regularly and are typically updated only prior to releases.
+\
 `nightly` - To get the latest and greatest nightly build of the plugin, built from HEAD.
