@@ -1,6 +1,38 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## Version 20.8.1 - Current Release
+**Note:** The minimum supported platform version has been increased to 2019.3.
+
+### New Features
+- Develop and debug your Cloud Run application locally with the new `Cloud Run: Run Locally` run configuration. In addition to deploying your applications to Cloud Run, you can now iterate on the applications locally in a Cloud Run-like environment.
+ 
+  ![cloud-run-local-run-config](docs/images/release-notes/cloud-run-local-run-config.png)
+\
+  ![cloud-run-local-session](docs/images/release-notes/cloud-run-local-session.png)
+- Build your Kubernetes and Cloud Run container images with Cloud Native Buildpacks for easy containerization; no Dockerfile required!
+\
+  ![cloud-run-buildpacks-run-config](docs/images/release-notes/cloud-run-buildpacks-run-config.png)
+- Enhanced Skaffold artifact builder configurability when bootstrapping projects or modifying Kubernetes run configuration settings. Easily select between available builders such as Jib (for Java projects), Docker, or buildpacks.
+\
+  ![skaffold-buildpacks-run-config](docs/images/release-notes/skaffold-buildpacks-run-config.png)
+- Improved debugging support for Node.js applications with the ability to configure the mapping between the local path of your sources to their remote path in the container.
+\
+  ![debug-source-mappings](docs/images/release-notes/debug-source-mappings.png)
+- Cloud Code now supports validation, documentation on hover, and code completions for hundreds of popular Kubernetes Custom Resource Definitions (CRDs). You can also configure additional CRD locations and access CRDs from the current Kubernetes context.
+\
+  ![krm-zoo](docs/images/release-notes/krm-zoo.png)
+
+### Updates
+- Improved UI for deployment to Cloud Run for Anthos, and better messaging for exposing deployed services. Fields such as cluster and region will now auto-populate with the available options. 
+- Improved error messages throughout the plugin with clearer wording and more actionable suggestions.
+- Added Cloud Run deployment configuration options to the UI, including minimum and maximum number of instances, timeout, and concurrency.
+- Improved logging for the output console and Event Logs.
+
+### Fixes
+- Fixed various binary forward compatibility issues throughout the plugin by building with the minimum supported version of the plugin.
+- Fixed bug where deployments did not delete on finishing when the option was selected.
+- Fixed issue where Skaffold status check was not configurable through an environment variable.
 
 ## 20.6.1 - Latest Release
 
