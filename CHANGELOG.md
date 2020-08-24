@@ -1,7 +1,13 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## Version 20.8.1 - Current Release
+## Version 20.8.2 - Current Release
+
+### Updates 
+- Adds a notification when Git is not installed on the machine when cloning a Cloud Code sample instead of throwing an error. 
+
+
+## Version 20.8.1
 **Note:** The minimum supported platform version has been increased to 2019.3.
 
 ### New Features
