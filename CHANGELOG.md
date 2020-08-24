@@ -6,7 +6,6 @@ This page documents production updates to Cloud Code for IntelliJ. You can check
 ### Updates 
 - Adds a notification when Git is not installed on the machine when cloning a Cloud Code sample instead of throwing an error. 
 
-
 ## Version 20.8.1
 **Note:** The minimum supported platform version has been increased to 2019.3.
 
