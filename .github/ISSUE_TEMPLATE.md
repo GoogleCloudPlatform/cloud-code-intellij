@@ -6,7 +6,7 @@
 
 ### Actual Behavior
 
-### Aditional Information
+### Additional Information
 
 - IDE type (e.g. IntelliJ, Pycharm):
 - IDE version:
