@@ -1,6 +1,55 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## Version 20.9.1 - Current Release
+**Note:** Cloud Code now supports the 2020.3 EAP. 
+
+### New Features
+- Kubernetes Explorer support for cluster addition: Add in existing Google Kubernetes Engine (GKE) clusters with the Cloud Code Kubernetes Explorer.
+
+  ![add-gke-cluster-toolbar](docs/images/release-notes/add-gke-cluster-toolbar.png)
+
+  ![add-gke-cluster](docs/images/release-notes/add-gke-cluster.png)
+
+- Automatic Skaffold schema upgrades: Cloud Code detects Skaffold schemas that aren’t up-to-date and prompts (via the Event Log) when a Skaffold schema version upgrade is available for existing Skaffold YAML configuration files.
+
+  ![skaffold-upgrade-event-log](docs/images/release-notes/skaffold-upgrade-event-log.png)
+
+- Alternatively, navigate to Tools > Cloud Code > Kubernetes and select the Check for Skaffold Schemas Upgrades menu item to check for available schema upgrades.
+
+  ![skaffold-upgrade-menu](docs/images/release-notes/skaffold-upgrade-menu.png)
+  
+- Spring GCP Java Libraries for Cloud APIs: Choose between recommended Google Client Java Libraries and Spring GCP Java libraries for all supported Cloud APIs with the Manage Google Cloud APIs dialog.
+
+  ![spring-gcp-apis](docs/images/release-notes/spring-gcp-apis.png)
+
+### Updates
+- Cloud Code Welcome and Release Notes screens now allow creating new sample applications for Cloud Run and Kubernetes.
+
+  ![samples-welcome-screen](docs/images/release-notes/samples-welcome-screen.png)
+
+- The list of available APIs within the Manage Google Cloud APIs dialog is now searchable.
+
+  ![cloud-apis-search](docs/images/release-notes/cloud-apis-search.png)
+
+- Cloud Code provides documentation links for all supported languages for a selected Cloud API.
+
+  ![cloud-api-docs](docs/images/release-notes/cloud-api-docs.png)
+
+- Improved presentation for builders in Cloud Run and Kubernetes run configurations.
+
+  ![builders-better-ui](docs/images/release-notes/builders-better-ui.png)
+
+- Cloud Run Explorer and Kubernetes Explorer have their root node expanded by default, making it easier to see the Kubernetes cluster list and Cloud Run services list.
+
+  ![explorer-expanded-root](docs/images/release-notes/explorer-expanded-root.png)
+  
+### Fixes
+
+- Fixed Cloud Run checks to ensure the presence of all required components when a custom Cloud SDK is used. 
+- Improved Cloud Run deployment logs.
+- Improved user experience for project selection dialog.
+
 ## Version 20.8.2 - Current Release
 
 ### Updates 
