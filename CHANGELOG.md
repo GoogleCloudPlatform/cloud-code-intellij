@@ -1,7 +1,48 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## Version 20.9.1 - Current Release
+## Version 20.10.1 - Current Release
+
+### New Features
+- **Secret Manager support:** Many applications require credentials to connect to a database, API keys to invoke a service, or certificates for authentication. Cloud Code now integrates with Google Cloud's Secret Manager to make it easy to create, view, update, and use secrets from within your IDE so you can keep this sensitive data out of your codebase and keep your applications secure. 
+  - View secrets, their versions, permissions, and properties in the Secret Manager panel. Easily leverage secrets from your application using our step-by-step guide in the “Code” tab.
+  
+    ![secret-manager-panel](docs/images/release-notes/secret-manager-panel.png)
+
+  - Create secrets by either right-clicking highlighted text within the editor and selecting **Create Secret in Secret Manager…**, or by clicking the **+** button in the Secret Manager panel.
+  
+    ![secret-create](docs/images/release-notes/secret-create.png)
+    
+  - Leverage the Google Cloud libraries browser to enable the Secret Manager API and import the Secret Manager client library in order to access secrets in your application.
+  
+    ![secret-client-library-browser](docs/images/release-notes/secret-client-library-browser.png)
+
+- **Revamped Google login experience**: Login state is now synced between your IDE and command line, allowing you to log in through either.
+- Cloud Code configures Cloud SDK [Application Default Credentials](https://cloud.google.com/sdk/gcloud/reference/auth/application-default) when you log in through your IDE to enable a seamless Google API authentication experience when developing locally (including Minikube and the Cloud Run local emulator), without you needing to download service account files or manually configure environment variables.
+
+### Updates
+- Reorganized the **Tools > Cloud Code** menu to make Cloud Code actions easier to find.
+
+  ![tools-menu-restructure](docs/images/release-notes/tools-menu-restructure.png)
+  
+- Removed the Google account management component from the main IDE toolbar. Use a project selector or the **Tools > Cloud Code** menu to sign in and out of Google Cloud.
+- Improved **Cloud Run (fully managed)** support:
+  - Deploy Cloud Run services from your IDE to these newly added regions. View the full supported list [here](https://cloud.google.com/run/docs/locations):
+    - `asia-east2` (Hong Kong)
+    - `asia-northeast3` (Seoul, South Korea)
+    - `asia-southeast2` (Jakarta)
+    - `asia-south1` (Mumbai, India)
+    - `europe-west2` (London, UK)
+    - `europe-west3` (Frankfurt, Germany)
+    - `europe-west6` (Zurich, Switzerland)
+    - `southamerica-east1` (São Paulo, Brazil)
+  - Allocate up to 4 vCPUs to container instances with the increased limit.
+  - Allocate up to 4GiB of memory to your services with the increased quota.
+
+### Fixes
+- [Issue #2827](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2827): Fixed an issue where Cloud Code previously prompted to upgrade to an older version of the Skaffold schema.
+
+## Version 20.9.1
 **Note:** Cloud Code now supports the 2020.3 EAP. 
 
 ### New Features
@@ -50,7 +91,7 @@ This page documents production updates to Cloud Code for IntelliJ. You can check
 - Improved Cloud Run deployment logs.
 - Improved user experience for project selection dialog.
 
-## Version 20.8.2 - Current Release
+## Version 20.8.2
 
 ### Updates 
 - Adds a notification when Git is not installed on the machine when cloning a Cloud Code sample instead of throwing an error. 
@@ -88,7 +129,7 @@ This page documents production updates to Cloud Code for IntelliJ. You can check
 - Fixed bug where deployments did not delete on finishing when the option was selected.
 - Fixed issue where Skaffold status check was not configurable through an environment variable.
 
-## 20.6.1 - Latest Release
+## 20.6.1
 
 **Note to 2020.2 EAP users**: we previously released version 20.5.1 with support for the latest EAP. We have since uncovered some compatibility issues that need to be worked through for an optimal experience, and are therefore removing support for the EAP in this release. Expect a new release as soon as possible supporting the 2020.2 EAP.
 
@@ -316,7 +357,7 @@ Cloud Code's Kubernetes support is now in Beta! This release includes many new f
 - Cloud Code will now execute the Skaffold process from the directory containing the Skaffold configuration file, fixing relative path issues for multi-service projects.
 - Skaffold configuration files will now validate properly when the JetBrains Kubernetes plugin is also installed.
 
-## 19.9.1 - Latest Release
+## 19.9.1
 
 - Kubernetes deployment events in the event log now show more detailed and structured output for locally port-forwarded services, including service name and namespace.
 
