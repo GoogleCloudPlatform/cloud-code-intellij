@@ -23,6 +23,7 @@ Google Cloud Platform products.
 ## Resources
 * [Learn More](https://cloud.google.com/code): Learn more about the Cloud Code Project and what it has to offer.
 * [Documentation](https://cloud.google.com/code/docs/intellij/): Visit our official documentation to learn more.
+* [Talk to us](https://join.slack.com/t/googlecloud-community/shared_invite/zt-erdf4ity-8ZMUQ18DYV~5hkbZ~gCswg): Connect to the Cloud Code development team by joining our #cloud-code Slack channel.
 * [Kubernetes Sample Applications](https://github.com/GoogleCloudPlatform/cloud-code-samples): Starter applications for working with Kubernetes; available in Java, Node, Python, and Go.
 * [File an Issue](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/new): If you discover an issue please file a bug and we will address it. 
 * [Request a Feature](https://github.com/GoogleCloudPlatform/google-cloud-intellij/issues/new): If you have any feature requests, please file a request.
