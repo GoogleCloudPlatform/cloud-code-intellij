@@ -1,7 +1,12 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## Version 20.10.1 - Current Release
+## Version 20.12.1 - Current Release
+
+### Fixes
+- [Issue #2855](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2855), [Issue #2858](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2858): Fixed an issue affecting IntelliJ 2020.3 IDEs causing Kubernetes development sessions to fail at initialization due to updates in the platform's dependencies.
+
+## Version 20.10.1
 
 ### New Features
 - **Secret Manager support:** Many applications require credentials to connect to a database, API keys to invoke a service, or certificates for authentication. Cloud Code now integrates with Google Cloud's Secret Manager to make it easy to create, view, update, and use secrets from within your IDE so you can keep this sensitive data out of your codebase and keep your applications secure. 
