@@ -13,9 +13,6 @@ This page documents production updates to Cloud Code for IntelliJ. You can check
 - Updated plugin description to capture the latest Cloud Code features, including the addition of Secret Manager and support for K8s CRDs.
 - Improve spacing in Cloud Run service details panel. The “Property” column was taking up more space than necessary.
 
-Before
-After
-
 ### Fixes
 - [Issue #2818](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2818), [Issue #2853](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2853): Fixed an issue where Dockerfiles were not found during a Cloud Run Local run when they were not located in the root directory of a project.
 - [Issue #3062](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/3062): Fixed an issue where Cloud Run services were being listed multiple times in the Cloud Run tool window.
