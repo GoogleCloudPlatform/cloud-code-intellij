@@ -17,7 +17,7 @@ Before
 After
 
 ### Fixes
-- [Issue #2818](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2818): Fixed an issue where Dockerfiles were not found during a Cloud Run Local run when they were not located in the root directory of a project.
+- [Issue #2818](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2818), [Issue #2853](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2853): Fixed an issue where Dockerfiles were not found during a Cloud Run Local run when they were not located in the root directory of a project.
 - [Issue #3062](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/3062): Fixed an issue where Cloud Run services were being listed multiple times in the Cloud Run tool window.
 
 ## Version 20.12.1
