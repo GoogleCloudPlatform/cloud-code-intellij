@@ -1,7 +1,26 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## Version 20.12.1 - Current Release
+## Version 20.12.2 - Current Release
+
+### New Features
+- **Managed Dependencies in Terminal:** You can now use Cloud Code managed dependency CLIs, such as minikube and gcloud, through IntelliJ’s terminal interface.
+
+    ![cloud-code-terminal](docs/images/release-notes/cloud-code-terminal.png)
+
+### Updates
+- Auto-populate Cloud Run service region list using `gcloud run regions list`. This ensures that users will never see an out-of-date list of available Cloud Run service regions.
+- Updated plugin description to capture the latest Cloud Code features, including the addition of Secret Manager and support for K8s CRDs.
+- Improve spacing in Cloud Run service details panel. The “Property” column was taking up more space than necessary.
+
+Before
+After
+
+### Fixes
+- [Issue #2818](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2818): Fixed an issue where Dockerfiles were not found during a Cloud Run Local run when they were not located in the root directory of a project.
+- [Issue #3062](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/3062): Fixed an issue where Cloud Run services were being listed multiple times in the Cloud Run tool window.
+
+## Version 20.12.1
 
 ### Fixes
 - [Issue #2855](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2855), [Issue #2858](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2858): Fixed an issue affecting IntelliJ 2020.3 IDEs causing Kubernetes development sessions to fail at initialization due to updates in the platform's dependencies.
