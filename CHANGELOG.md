@@ -4,18 +4,19 @@ This page documents production updates to Cloud Code for IntelliJ. You can check
 ## Version 20.12.2 - Current Release
 
 ### New Features
-- **Managed Dependencies in Terminal:** You can now use Cloud Code managed dependency CLIs, such as minikube and gcloud, through IntelliJ’s terminal interface.
+- **Cloud Code Terminal:** Allows you to access Cloud Code managed dependencies such as the Cloud SDK (gcloud), minikube, and skaffold via the IDE's built in terminal. Launch it via the Tools menu under **Cloud Code > Tools > Cloud Code Terminal**.
 
     ![cloud-code-terminal](docs/images/release-notes/cloud-code-terminal.png)
 
 ### Updates
 - Auto-populate Cloud Run service region list using `gcloud run regions list`. This ensures that users will never see an out-of-date list of available Cloud Run service regions.
-- Updated plugin description to capture the latest Cloud Code features, including the addition of Secret Manager and support for K8s CRDs.
 - Improve spacing in Cloud Run service details panel. The “Property” column was taking up more space than necessary.
+- Added support for network proxies when installing managed Cloud SDK. To configure proxies, use IDE Preferences | Appearance & Behavior | System Settings | HTTP Proxy settings.
 
 ### Fixes
 - [Issue #2818](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2818), [Issue #2853](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2853): Fixed an issue where Dockerfiles were not found during a Cloud Run Local run when they were not located in the root directory of a project.
 - [Issue #3062](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/3062): Fixed an issue where Cloud Run services were being listed multiple times in the Cloud Run tool window.
+- [Issue #2838](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2838), [Issue #2841](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2841): Improved managed Cloud SDK reliability.
 
 ## Version 20.12.1
 
