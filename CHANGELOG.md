@@ -1,7 +1,14 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## Version 20.12.2 - Current Release
+## Version 21.1.1 - Current Release
+
+### New Features
+- **Kubernetes Deployment Status Check:** This new flag allows you to control health checks performed by Skaffold for Kubernetes deployments. You can now skip health status checks for deployed Kubernetes resources when you don't need Cloud Code to wait for deployments to stabilize.
+
+  ![k8s-deploy-status-check](docs/images/release-notes/k8s-deploy-status-check.png)
+
+## Version 20.12.2
 
 ### New Features
 - **Cloud Code Terminal:** Allows you to access Cloud Code managed dependencies such as the Cloud SDK (gcloud), minikube, and skaffold via the IDE's built in terminal. Launch it via the Tools menu under **Cloud Code > Tools > Cloud Code Terminal**.
