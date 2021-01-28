@@ -11,6 +11,8 @@ This page documents production updates to Cloud Code for IntelliJ. You can check
   ![custom-templates](docs/images/release-notes/custom-templates-settings.png)
 
 ### Updates
+- **Support for 2021.1 EAP:** Cloud Code now supports the latest Early Access Preview (EAP)! Please file any issues you encounter on our [GitHub repository](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/new).
+
 - **New sample application READMEs:** When you create a new sample application with Cloud Code, the new README gives updated guidance on next steps to help you get more out of Cloud Code.
 
 - **Cloud Run:** Cloud Run managed deploys now support an 8 GiB memory option for any deployments with at least 2 CPUs allocated. This option is available in Cloud Run managed run configurations under **Advanced revision settings** > **Memory allocated**.
