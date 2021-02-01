@@ -1,7 +1,7 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## Version 21.1.2 - Current Release
+## Version 21.2.1 - Current Release
 
 ### New Features
 - **Custom templates:** You can now create applications from custom templates! Cloud Code offers the option of importing a Git template repository so that teams can get started quickly from a standard set of starter applications, services, and infrastructure configuration best suited to your technical stack and organizational policies. To add a custom template, go to **Settings** > **Cloud Code**. To read more about custom templates and how to set them up, head over to the [setting up a template repository](https://cloud.google.com/code/docs/intellij/set-up-template-repo) guide.
