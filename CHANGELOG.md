@@ -1,7 +1,30 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## Version 21.1.1 - Current Release
+## Version 21.2.1 - Current Release
+
+### New Features
+- **Custom templates:** You can now create applications from custom templates! Cloud Code offers the option of importing a Git template repository so that teams can get started quickly from a standard set of starter applications, services, and infrastructure configuration best suited to your technical stack and organizational policies. To add a custom template, go to **Settings** > **Cloud Code**. To read more about custom templates and how to set them up, head over to the [setting up a template repository](https://cloud.google.com/code/docs/intellij/set-up-template-repo) guide.
+
+  ![custom-templates](docs/images/release-notes/custom-templates-new-project.png)
+
+  ![custom-templates](docs/images/release-notes/custom-templates-settings.png)
+
+### Updates
+- **Support for 2021.1 EAP:** Cloud Code now supports the latest Early Access Preview (EAP)! Please file any issues you encounter on our [GitHub repository](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/new).
+
+- **New sample application READMEs:** When you create a new sample application with Cloud Code, the new README gives updated guidance on next steps to help you get more out of Cloud Code.
+
+- **Cloud Run:** Cloud Run managed deploys now support an 8 GiB memory option for any deployments with at least 2 CPUs allocated. This option is available in Cloud Run managed run configurations under **Advanced revision settings** > **Memory allocated**.
+
+  ![cloud-run-memory-options](docs/images/release-notes/cloud-run-memory-options.png)
+
+### Fixes
+- [Issue #2872](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2872) Fixed bug requiring a Dockerfile when running a Cloud Run application locally with a buildpacks build.
+- Fixed bug where user images in project selector were no longer being displayed.
+- Cloud SDK progress dialog now defaults to the background instead of a modal when the IDE starts.
+
+## Version 21.1.1
 
 ### New Features
 - **Kubernetes Deployment Status Check:** This new flag allows you to control health checks performed by Skaffold for Kubernetes deployments. You can now skip health status checks for deployed Kubernetes resources when you don't need Cloud Code to wait for deployments to stabilize.
