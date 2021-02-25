@@ -1,6 +1,28 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## Version 21.2.3
+
+**Note:** This is the last release containing Cloud Code updates for IntelliJ version 2019.3. Starting next release Cloud Code will support versions 2020.1 and up. See our [version support policy](https://cloud.google.com/code/docs/intellij/version-support) for more details.
+
+### New Features
+- **GKE Autopilot**: You can now deploy your application to GKE Autopilot right from IntelliJ Cloud Code configurations. GKE Autopilot is a new mode of operation of GKE clusters where infrastructure is auto managed by Google, provides auto provisioning and auto scaling of GKE infra to the end user. Overview of [GKE Autopilot](https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-overview).
+- **Kubernetes YAML Gutter Actions**: Support for dry runs on the client and server, directly applying yaml files, and viewing the differences between a YAML file in source control and a deployed YAML file.
+
+  ![kubernetes-yaml-gutter-actions](docs/images/release-notes/kubernetes-yaml-gutter-actions.png)
+
+### Updates
+- Added a link to the Google Cloud Storage console browser from the side panel explorer. Please comment on [#2802](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2802) if you would like additional enhancements to this feature.
+
+### Fixes
+- Fixed a bug where Kubernetes sessions were not automatically terminated on error, requiring the user to click the stop button. [#2837](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2837)
+- Fixed a crash during base64 decoding of secrets. [#2846](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2846)
+
+## Version 21.2.2 (EAP only)
+
+### Fixes
+- [Issue #2880](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2880) Fixed bug that caused Cloud Code to crash when starting on 2021.1 EAP
+
 ## Version 21.2.1 - Current Release
 
 ### New Features
