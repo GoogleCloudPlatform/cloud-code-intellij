@@ -1,7 +1,32 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## Version 21.2.3 - Current Release
+## Version 21.3.1 - Current Release
+
+### New Features
+- **Initial support for M1-based Apple Silicon Macs**: With this update, you can now build and work locally on your M1 Mac with Cloud Code, minikube, and Skaffold for ARM64 targets. Please note that [Rosetta 2](https://support.apple.com/en-us/HT211861) is currently required as several dependencies are still x86/64 only, refer to [instructions](https://cloud.google.com/code/docs/intellij/arm). Follow this [GitHub issue](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2891) for more information and to track the latest updates.
+- **New Secret Manager Actions**: Secret Manager now comes with more actions, such as enabling, disabling, and destroying secret versions, giving you greater flexibility to manage secrets within your IDE. Within the Secret Manager panel, under the Versions tab, right-click any secret version to access these actions. For a detailed look, see the [Managing secrets guide](https://cloud.google.com/code/docs/intellij/secret-manager).
+
+  ![Secret delete](docs/images/release-notes/secret-delete.png)
+  ![Secret enable](docs/images/release-notes/secret-enable.png)
+
+### Updates
+- Reorganized the Cloud Code settings panel to be more intuitive. All CLI dependencies required for Cloud Code can now be found in the Tools > Cloud Code > Dependencies settings panel.
+
+  ![Settings panel](docs/images/release-notes/new-dependencies.png)
+- Added support for specifying a VPC Connector when deploying to Cloud Run (fully managed). [#2885](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2885)
+- Added actions for viewing documentation and creating new sample applications to the Kubernetes and Cloud Run explorers.
+
+  ![Cloud Run actions](docs/images/release-notes/cloud-run-actions.png)
+  ![Kubernetes actions](docs/images/release-notes/kubernetes-actions.png)
+
+### Bug Fixes
+- Fixed a crash that could occur when listing Secret Manager secrets. [#2882](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2882)
+- Fixed crashes that could occur when using the Cloud Run local emulator. [#2852](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2852), [#2830](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2830)
+- Fixed timeout errors when trying to view Cloud Run services with the API not enabled. [#2851](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2851)
+- Fixed a crash that could occur when trying to use Custom Templates with invalid certificates. [#2902](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2902)
+
+## Version 21.2.3 
 
 **Note:** This is the last release containing Cloud Code updates for IntelliJ version 2019.3. Starting next release Cloud Code will support versions 2020.1 and up. See our [version support policy](https://cloud.google.com/code/docs/intellij/version-support) for more details.
 
