@@ -1,7 +1,52 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## Version 21.3.1 - Current Release
+## Version 21.4.1 - Current Release
+
+**Note**: This is the final release that contains Cloud Code updates for IntelliJ version 2020.1. Starting next release Cloud Code will support versions 2020.2 and above. See our [version support policy](https://cloud.google.com/code/docs/intellij/version-support) for more details.
+
+### New Features
+- **Kubernetes deployment to managed minikube**: Cloud Code now provides a separate option to always deploy locally to minikube. Cloud Code will manage minikube, installing and starting it, or re-using your existing minikube cluster, and starting or un-pausing minikube before each deployment as needed.
+
+  ![minikube for Kubernetes](docs/images/release-notes/k8s-minikube.png)
+
+- **Cloud Run support for Cloud Build and messaging for M1 Mac users**: For Cloud Run deployments, users can now choose between building their images on Cloud Build or locally. For M1 Mac users the option to build images for Cloud Run locally is disabled because Cloud Run is currently only able to run x86_64 images. Note: we haven't yet updated our docs to reflect these changes as we're looking at surfacing ARM specific docs in a clearer manner, please stay tuned (and follow [#2891](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2891) for ARM related updates).
+
+  ![Cloud Build in Cloud Run](docs/images/release-notes/cloud-build-in-cloud-run.png)
+
+- **Kubernetes deployment compatibility checks**: On the Kubernetes run configuration panel, Cloud Code makes a best-effort attempt to notify users if the cluster they’ve targeted for deployment has any incompatibilities with the environment in which they plan to build the image(s) being deployed (e.g. locally, Cloud Build, or in-cluster).
+
+  ![K8s Compatibility Warning](docs/images/release-notes/k8s-compatibility-warning.png)
+
+- **New contextual actions in Kubernetes Explorer**: Create and deploy Kubernetes sample applications, bootstrap and run an existing Kubernetes application, open help resources.
+
+  ![Kubernetes actions](docs/images/release-notes/k8s-context-actions.png)
+
+- **New contextual actions in Cloud Run tool window**: Create and deploy a new Cloud Run sample application, bootstrap currently open projects for local Cloud Run development, open help resources.
+
+  ![Cloud Run actions](docs/images/release-notes/cr-context-actions.png)
+
+- **New right click action in the explorer**: Remove a cluster and its associated contexts from the kubeconfig
+
+  ![Remove cluster](docs/images/release-notes/remove-cluster.png)
+
+### Updates
+
+- **Updated Kubernetes run configuration UI**: It now matches IDE guidelines and improves usability.
+
+  ![K8s Run Config UI Guidelines](docs/images/release-notes/k8s-run-config-ui-guidelines.png)
+
+- **Multiple improvements for Cloud Run tool window**: Show a region next to a service name, more friendly prompts when no services exist yet or Cloud Run API is not enabled.
+- **Cloud API improvements**: See all available API categories expanded by default for easier browsing and searching. Hyperlinks to libraries and documentation now show tooltips with their URLs.
+- **Custom Samples Rebranding**: Custom Templates have been rebranded to Custom Samples. We currently do not support custom application templating, but will consider adding the functionality in the future based on feedback.
+- **Dynamic Plugin**: Cloud Code is dynamic starting with IDE version 2021.1 and no longer requires IDE restart to be installed or updated.
+
+### Bug Fixes
+
+- Copying Kubernetes resource names using a keyboard shortcut now works properly for Kubernetes Explorer [#2898](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2898)
+- Fixed a frequent InvocationTargetException IDE error thrown in 2021.1 [#2889](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2889)
+
+## Version 21.3.1
 
 ### New Features
 - **Initial support for M1-based Apple Silicon Macs**: With this update, you can now build and work locally on your M1 Mac with Cloud Code, minikube, and Skaffold for ARM64 targets. Please note that [Rosetta 2](https://support.apple.com/en-us/HT211861) is currently required as several dependencies are still x86/64 only, refer to [instructions](https://cloud.google.com/code/docs/intellij/arm). Follow this [GitHub issue](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2891) for more information and to track the latest updates.
