@@ -1,7 +1,25 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## Version 21.4.1 - Current Release
+## Version 21.5.1 - Current Release
+
+### New Features
+- **Python Debugging**: You can now debug your Python applications running on Kubernetes and in the local Cloud Run emulator! Set breakpoints and step through your code. No more debugging via logs or having to manually configure remote debugging.
+
+  ![Python debugging](docs/images/release-notes/python-debugging.png)
+
+### Updates
+- Adds a progress indicator while attempting to bootstrap a project for Kubernetes support.
+- Modularize pieces of our managed Cloud SDK installation for faster dependency installs.
+- Cloud Run deployment settings no longer disable the local build option on ARM architectures to allow selection of supported builders (e.g. Jib, for Java applications).
+- Updated our Plugin Marketplace text with more relevant and helpful information.
+
+### Bug Fixes
+- Fixed various exceptions occurring during Skaffold schema upgrade checks.
+- Fixed a bug where the “Build Settings” pane under the “Build / Deploy” tab in the Kubernetes run configuration doesn’t properly refresh itself.
+- Fixed a TimeoutException occurring during the editor `kubectl apply` gutter action. [#2894](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2894)
+
+## Version 21.4.1
 
 **Note**: This is the final release that contains Cloud Code updates for IntelliJ version 2020.1. Starting next release Cloud Code will support versions 2020.2 and above. See our [version support policy](https://cloud.google.com/code/docs/intellij/version-support) for more details.
 
