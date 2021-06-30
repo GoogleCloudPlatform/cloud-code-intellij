@@ -17,7 +17,7 @@ This page documents production updates to Cloud Code for IntelliJ. You can check
 - **Artifact Registry Support**: Now automatically authenticates artifact registry repository urls when uploading container images.
 
 ### Updates
-- **Simplified creation of  Kubernetes sample application**: Removed the image repository prompt that was previously displayed to users in the New Project wizard when creating a Kubernetes sample application.
+- **Simplified creation of Kubernetes sample application**: Removed the image repository prompt that was previously displayed to users in the New Project wizard when creating a Kubernetes sample application.
 
 ### Bug Fixes
 - Fixed a bug where prompts to install the appropriate language plugin for a selected sample app weren’t displayed when creating a new sample-based project (e.g. the Flask Kubernetes Hello World sample now prompts you to install the python plugin).
