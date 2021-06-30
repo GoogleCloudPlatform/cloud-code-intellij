@@ -22,7 +22,7 @@ This page documents production updates to Cloud Code for IntelliJ. You can check
 ### Bug Fixes
 - Fixed a bug where prompts to install the appropriate language plugin for a selected sample app weren’t displayed when creating a new sample-based project (e.g. the Flask Kubernetes Hello World sample now prompts you to install the python plugin).
 
-## Version 21.5.1 - Current Release
+## Version 21.5.1
 
 ### New Features
 - **Python Debugging**: You can now debug your Python applications running on Kubernetes and in the local Cloud Run emulator! Set breakpoints and step through your code. No more debugging via logs or having to manually configure remote debugging.
