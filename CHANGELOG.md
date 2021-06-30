@@ -1,6 +1,27 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## Version 21.6.1
+
+### New Features
+- **Skaffold profile creation**: Create new Skaffold profiles from within your IDE. This feature is particularly useful if you’re using an M1 Mac and would like to deploy to a GKE cluster; create a profile with a “Cloud Build” build environment to build and deploy from your machine with the confidence that your images will work in an x86 cluster.
+
+  ![Profile Creation Button](docs/images/release-notes/create-profile-hover.png)
+
+  ![Profile Creation Dialog](docs/images/release-notes/create-profile-dialog.png)
+
+- **Skaffold profile filtering**: Users can now filter for Skaffold profiles with a particular build environment. If you have profiles using multiple build environments, you can easily find all the profiles that use a particular build environment. This feature is particularly useful if you want to build your images locally during development but in-cluster or via Google Cloud Build for production.
+
+  ![Profile Filter](docs/images/release-notes/profile-filter.png)
+
+- **Artifact Registry Support**: Now automatically authenticates artifact registry repository urls when uploading container images.
+
+### Updates
+- **Simplified creation of  Kubernetes sample application**: Removed the image repository prompt that was previously displayed to users in the New Project wizard when creating a Kubernetes sample application.
+
+### Bug Fixes
+- Fixed a bug where prompts to install the appropriate language plugin for a selected sample app weren’t displayed when creating a new sample-based project (e.g. the Flask Kubernetes Hello World sample now prompts you to install the python plugin).
+
 ## Version 21.5.1 - Current Release
 
 ### New Features
