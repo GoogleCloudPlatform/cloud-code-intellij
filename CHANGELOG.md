@@ -1,6 +1,19 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## Version 21.7.1
+
+### New Features
+- **Updated Welcome Screen**: Reorganizes the welcome screen content to help users better understand what they can use the plugin for.
+
+  ![New Welcome Screen](docs/images/release-notes/new-welcome-screen.png)
+
+- **Support for 2021.2 EAP**: Cloud Code now supports the latest Early Access Preview (EAP)! Please file any issues you encounter on our [GitHub repository](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/new).
+
+### Bug Fixes
+- Fixes an issue with high CPU usage when editing skaffold.yaml, causing IDE to freeze [#2952](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2952)
+- Fixes a Cloud Debugger NPE caused by calling the Git plugin on the UI thread [#2915](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2915)
+
 ## Version 21.6.1
 
 ### New Features
