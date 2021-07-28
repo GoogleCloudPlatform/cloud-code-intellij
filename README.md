@@ -61,5 +61,4 @@ The pre-release binaries published to the Jetbrains plugin repository. To instal
 
 ## Security Disclosures
 
-Please see our [security disclosure process](SECURITY.md).  All [security advisories](https://github.com/GoogleCloudPlatform/cloud-code-intellij/security/advisories) are managed on Github.
-
+Please see our [security disclosure process](SECURITY.md). All [security advisories](https://github.com/GoogleCloudPlatform/cloud-code-intellij/security/advisories) are managed on Github.
