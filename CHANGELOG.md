@@ -32,37 +32,6 @@ This page documents production updates to Cloud Code for IntelliJ. You can check
 - Fixed bug where skaffold.yaml files with multiple yaml documents in them were not correctly parsed by kubernetes run configurations.
 - Fixed bug where slow skaffold operations were run in the UI thread.
 
-## Version 21.9.1
-
-### New Features
-- **Insiders Channel**: You can now try pre-release features, provide feedback, and ask the Cloud Code team and other insiders questions by [installing pre-release builds](https://cloud.google.com/code/docs/intellij/insiders#get) and joining the [Cloud Code Insiders group](https://groups.google.com/g/cloud-code-insiders). Become a Cloud Code Insider by enabling the setting on the Cloud Code welcome screen, or in the Cloud Code settings (Preferences > Tools > Cloud Code).
-
-  ![Insiders Channel](docs/images/release-notes/insider-welcome-page.png)
-
-- **New and Improved Kubernetes Logging Experience**: Your Kubernetes development sessions now have a vastly improved logging experience!
-  - See exactly which task is executing, and the status of each task.
-
-    ![Full Logging Experience](docs/images/release-notes/logging-full-experience.png)
-
-  - View the full session logs, or drill down into an individual task helping you quickly identify errors.
-
-    ![Logging Error Case](docs/images/release-notes/logging-error-case.png)
-
-  - Stream your application logs at the container level.
-
-    ![Logging Individual Container Logs](docs/images/release-notes/logging-individual-container-logs.png)
-
-### Bug Fixes
-- Fixed bug where Cloud Code language server integration was referencing an Intellij project that had already been disposed of. [#2974](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2974)
-- Fix for NullPointerException parsing skaffold yaml configuration.  [#2975](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2975)
-- Fix “Invalid File” Throwable thrown from the language server. [#2966](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2966)
-- Removed redundant empty space in the Kubernetes dependency settings panel.
-- Fixed bug where Kubernetes deployment to managed minikube did not honor a custom kubeconfig file selection.
-- Fixed bug where AppEngine run configuration registration was intermittently run on the wrong thread.
-- Fixed bug where skaffold.yaml files with multiple yaml documents in them were not correctly parsed by kubernetes run configurations.
-- Fixed bug where slow skaffold operations were run in the UI thread.
-
-
 ## Version 21.7.1
 
 ### New Features
