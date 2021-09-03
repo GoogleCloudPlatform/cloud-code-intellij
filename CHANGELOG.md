@@ -1,7 +1,7 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
-## Version 21.9.1
+## Version 21.9.2
 
 ### New Features
 - **Insiders Channel**: You can now try pre-release features, provide feedback, and ask the Cloud Code team and other insiders questions by [installing pre-release builds](https://cloud.google.com/code/docs/intellij/insiders#get) and joining the [Cloud Code Insiders group](https://groups.google.com/g/cloud-code-insiders). Become a Cloud Code Insider by enabling the setting on the Cloud Code welcome screen, or in the Cloud Code settings (Preferences > Tools > Cloud Code).
@@ -22,6 +22,7 @@ This page documents production updates to Cloud Code for IntelliJ. You can check
     ![Logging Individual Container Logs](docs/images/release-notes/logging-individual-container-logs.png)
 
 ### Bug Fixes
+- Fixes a bug where the plugin would uninstall instead of update when a user followed the IntelliJ prompt to update to 21.9.1.
 - Fixed bug where Cloud Code language server integration was referencing an Intellij project that had already been disposed of. [#2974](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2974)
 - Fix for NullPointerException parsing skaffold yaml configuration.  [#2975](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2975)
 - Fix “Invalid File” Throwable thrown from the language server. [#2966](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2966)
@@ -30,7 +31,6 @@ This page documents production updates to Cloud Code for IntelliJ. You can check
 - Fixed bug where AppEngine run configuration registration was intermittently run on the wrong thread.
 - Fixed bug where skaffold.yaml files with multiple yaml documents in them were not correctly parsed by kubernetes run configurations.
 - Fixed bug where slow skaffold operations were run in the UI thread.
-
 
 ## Version 21.7.1
 
