@@ -1,6 +1,18 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## Version 21.10.1
+
+### New Features
+- **Support for 2021.3 EAP**: Cloud Code now supports the latest Early Access Preview (EAP)! Please file any issues you encounter on our [GitHub repository](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/new).
+- **Support for Cloud Deploy YAML Editing**: Cloud Code now offers editing support for [Cloud Deploy configuration files](https://cloud.google.com/deploy/docs/config-files). The plugin offers suggestions and auto-completions that make it easier to set up your [Cloud Deploy](https://cloud.google.com/deploy) delivery pipeline.
+- **Support for Kptfile Editing**: Cloud Code now supports [Kpt](https://kpt.dev/) users with editing support for [Kptfiles](https://kpt.dev/book/02-concepts/01-packages). The plugin offers suggestions and auto-completions that make it easier to configure your kpt package.
+
+### Bug Fixes
+- Fix crash in App Engine validation due to App Engine components not being installed. [#2939](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2939)
+- Fix StackOverflowPreventedExceptions due to isValid leading to endless recursion. [#2972](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2972)
+- Fix issue where multi document Skaffold configuration files were not parsed correctly.
+
 ## Version 21.9.2
 
 ### New Features
