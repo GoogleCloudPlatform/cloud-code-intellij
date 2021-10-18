@@ -48,16 +48,14 @@ for more details.
 
 You can find our plugin in the Jetbrains plugin repository by going to IntelliJ -> Settings -> Plugins , and search for `Cloud Code` in the 'Marketplace' tab. 
 
-### Pre-releases 
+### Insider Builds 
 
-The pre-release binaries published to the Jetbrains plugin repository. To install them please perform the following steps:
+You can access pre-release Cloud Code features by participating in the [Cloud Code Insiders program](https://cloud.google.com/code/docs/intellij/insiders):
 
-1. Install the Cloud Code plugin
-    1. Copy this URL `https://plugins.jetbrains.com/plugins/{CHANNEL}/8079` replacing `{CHANNEL}` entirely with one of the following:
-        1. `alpha` - To test out a release candidate. These are not published regularly and are typically updated only prior to releases.
-        1. `nightly` - To get the latest and greatest nightly build of the plugin, built from HEAD.
-    1. Use the copied URL and add it as a custom plugin repository in the plugin settings following [these instructions](https://www.jetbrains.com/help/idea/managing-plugins.html#repos)
-    1. Search for the 'Cloud Code' plugin and install it.
+1. Open the IDE with the Cloud Code plugin installed
+    1. Select `Tools` > `Cloud Code` > `Help / About` > `About Cloud Code...`
+    2. Navigate to the `Cloud Code Insiders` section via the table of contents.
+    3. Enable the Insider build by clicking the toggle button. Note: after enabling the toggle, a notification will appear prompting you to check for updates - follow this prompt to install the latest Insider build.
 
 ## Security Disclosures
 
