@@ -1,6 +1,20 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## Version 21.11.1
+
+### New Features
+- **Microservice development**: Cloud Code introduces module based application deployment through [Skaffold modules](https://cloud.google.com/code/docs/intellij/skaffold-modules) that helps developers to iterate on a part of the application rather than deploying your entire application. Configure the set of modules in the Run Configuration UI under the “Build / Deploy” tab. Try out one of the Cloud Code Kubernetes Guestbook sample applications to see it in action by clicking File -> New -> Project -> Cloud Code: Kubernetes. 
+
+  ![Insiders Channel](docs/images/release-notes/release-notes-modules-ui.png)
+
+### Updates 
+- Cloud Code release notes are now easier to access within the plugin - the release notes have better formatting and are now displayed within the Cloud Code Welcome page (visit Tools > Cloud Code > Help / About > About Cloud Code…).
+
+### Bug Fixes
+- Fixed a GitServiceException: 'origin/master' is not a commit and a branch 'origin/master' cannot be created from it. [#3016](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/3016)
+- Fixed an issue where attempting to set a Kotlin breakpoint incorrectly asks user if they want to set a Java breakpoint. [#3009](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/3009) 
+
 ## Version 21.10.1
 
 ### New Features
