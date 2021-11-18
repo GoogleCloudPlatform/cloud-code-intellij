@@ -4,7 +4,7 @@ This page documents production updates to Cloud Code for IntelliJ. You can check
 ## Version 21.11.2-IB.1 - [Cloud Code Insiders](https://cloud.google.com/code/docs/intellij/insiders) Release
 
 ### New Features
-- **Artifact Registry Support**:> Easily configure your Kubernetes and Cloud Run deployments to use Artifact Registry to store your container images.
+- **Artifact Registry Support**: Easily configure your Kubernetes and Cloud Run deployments to use Artifact Registry to store your container images.
 
   ![Artifact Registry](docs/images/release-notes/artifact-registry-support.png)
   ![Artifact Registry Dialog](docs/images/release-notes/artifact-registry-dialog.png)
