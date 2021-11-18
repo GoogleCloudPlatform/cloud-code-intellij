@@ -1,6 +1,25 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## Version 21.11.2-IB.1 - [Cloud Code Insiders](https://cloud.google.com/code/docs/intellij/insiders) Release
+
+### New Features
+- **Artifact Registry Support**: Easily configure your Kubernetes and Cloud Run deployments to use Artifact Registry to store your container images.
+
+  ![Artifact Registry](docs/images/release-notes/artifact-registry-support.png)
+  ![Artifact Registry Dialog](docs/images/release-notes/artifact-registry-dialog.png)
+
+- **Apply changes "On Demand"**: Instead of rebuilding and redeploying your application on every file save, you can now configure "On Demand" watch mode to apply changes only when you are ready. Configure "On Demand" watch mode in the run configuration settings and trigger a reload by clicking the >> trigger button or the "Alt+Control+," / "Command+Option+," shortcut.
+
+  ![On Demand Mode Configuration](docs/images/release-notes/interactive-watch-mode-configuration.png)
+  ![On Demand Trigger](docs/images/release-notes/on-demand-button.png)
+
+- **Iterate on code while debugging**: You can now make changes to, and iterate on, your source code while debugging your Kubernetes or Cloud Run locally emulated applications! Set the watch mode in the run configuration to “On Demand”, and Cloud Code will apply the changes to the running container without terminating your debug session.
+
+### Updates 
+
+- Removed the “Run on Kubernetes” run configuration during the creation of newly cloned samples. Use the “Develop on Kubernetes” run configuration for developing your Kubernetes apps.
+
 ## Version 21.11.1
 
 ### New Features
