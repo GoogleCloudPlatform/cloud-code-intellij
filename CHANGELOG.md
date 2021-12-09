@@ -1,6 +1,31 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## Version 21.12.1
+
+**Note**: This is the final release that contains Cloud Code updates for IntelliJ version 2020.3. Starting next release Cloud Code will support versions 2021.1 and above. See our [version support policy](https://cloud.google.com/code/docs/intellij/version-support) for more details.
+
+### New Features
+- **Artifact Registry Support**: Easily configure your Kubernetes and Cloud Run deployments to use Artifact Registry to store your container images.
+
+  ![Artifact Registry](docs/images/release-notes/artifact-registry-support.png)
+  ![Artifact Registry Dialog](docs/images/release-notes/artifact-registry-dialog.png)
+
+- **Apply changes "On Demand"**: Instead of rebuilding and redeploying your application on every file save, you can now configure "On Demand" watch mode to apply changes only when you are ready. Configure "On Demand" watch mode in the run configuration settings and trigger a reload by clicking the >> trigger button or the "Alt+Control+," / "Command+Option+," shortcut.
+
+  ![On Demand Mode Configuration](docs/images/release-notes/interactive-watch-mode-configuration.png)
+  ![On Demand Trigger](docs/images/release-notes/on-demand-button.png)
+
+- **Iterate on code while debugging**: You can now make changes to, and iterate on, your source code while debugging your Kubernetes or Cloud Run locally emulated applications! Set the watch mode in the run configuration to “On Demand”, and Cloud Code will apply the changes to the running container without terminating your debug session.
+
+### Updates
+- Removed the “Run on Kubernetes” run configuration during the creation of newly cloned samples. Use the “Develop on Kubernetes” run configuration for developing your Kubernetes apps.
+
+### Bug Fixes
+- Fixed SkaffoldConfigurationDetector.addVirtualFileListener already disposed. [#2982](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2982)
+- Fixed regex parsing bug which caused CloudApi searches to throw errors. [#3036](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/3036)
+- Fixed Docker detection bug causing development sessions to fail even though Docker is present. [#3041](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/3041)
+
 ## Version 21.11.2-IB.1 - [Cloud Code Insiders](https://cloud.google.com/code/docs/intellij/insiders) Release
 
 ### New Features
