@@ -24,6 +24,7 @@ This page documents production updates to Cloud Code for IntelliJ. You can check
 ### Bug Fixes
 - Fixed SkaffoldConfigurationDetector.addVirtualFileListener already disposed. [#2982](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/2982)
 - Fixed regex parsing bug which caused CloudApi searches to throw errors. [#3036](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/3036)
+- Fixed Docker detection bug causing development sessions to fail even though Docker is present. [#3041](https://github.com/GoogleCloudPlatform/cloud-code-intellij/issues/3041)
 
 ## Version 21.11.2-IB.1 - [Cloud Code Insiders](https://cloud.google.com/code/docs/intellij/insiders) Release
 
