@@ -1,5 +1,11 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
+
+## Version 22.2.1
+
+### Bug Fixes
+- Fixed a bug with the error feedback reporting logic preventing form submissions from Cloud Code 21.12.1.
+
 ## Version 21.12.1-IB.3 - [Cloud Code Insiders](https://cloud.google.com/code/docs/intellij/insiders) Release
 
 ### New Features
