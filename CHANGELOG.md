@@ -1,6 +1,19 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## Version 22.2.1-IB.2 - [Cloud Code Insiders](https://cloud.google.com/code/docs/intellij/insiders) Release
+
+- **[GCP API Code Samples](https://cloud.google.com/code/docs/intellij/client-libraries#using_api_samples)**
+  - Discover code snippets in the IDE from a new "Code Samples" tab where you can search for and use code samples for each GCP API exposed in the API Browser.
+  - In the menu bar, select “Tools > Cloud Code > Cloud APIs..”
+  - Select an API
+  - Click "Code Samples"
+  - Choose the language you are interested in
+  - Choose a sample to view the code snippets
+
+ 
+  ![GCP API Snippets](docs/images/release-notes/code-snippets.png)
+  
 ## Version 22.2.1
 
 ### Bug Fixes
