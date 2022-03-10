@@ -1,6 +1,16 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## Version 22.2.1-IB.3 - [Cloud Code Insiders](https://cloud.google.com/code/docs/intellij/insiders) Release
+
+This release contains various bug fixes and improvements
+
+- Fix to GCP sign in flow. If you are attempting to sign in to your GCP account, but Cloud SDK is not finished installing, Cloud Code will show a better message.
+- Fixed the Cloud Code terminal (Tools > Cloud Code > Tools > Cloud Code Terminal) to work for PowerShell users.
+- Improved Docker warnings. If you are attempting to use a feature that requires Docker, the messages now clearly explain why Docker is required and provides better links.
+- Fixed various NoClassDefFoundError's that occasionally can occur after updating or installing the plugin.
+- Updated the GCP API code snippet UI to show a clearer message when a certain API does not have any code snippets.
+
 ## Version 22.2.1-IB.2 - [Cloud Code Insiders](https://cloud.google.com/code/docs/intellij/insiders) Release
 
 - **[GCP API Code Samples](https://cloud.google.com/code/docs/intellij/client-libraries#using_api_samples)**
