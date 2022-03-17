@@ -1,6 +1,30 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## Version 22.3.1
+
+### New Features
+
+- **Private Cluster Support**: Cloud Code provides guidance and helper utilities to help you [connect to your GKE private clusters](https://cloud.google.com/code/docs/intellij/managing-private-clusters)
+
+  - When there is an issue connecting to a private cluster, Cloud Code shows error messages with suggested workarounds for the private cluster configuration it detects. To see the workarounds, hover over the cluster node to display the tooltip.
+
+  ![Private Cluster Kubernetes Explorer](docs/images/release-notes/private-cluster-k8-explorer.png)
+
+  - Cloud Code will help you set up a [Cloud NAT](https://cloud.google.com/nat/docs/overview) configuration for your GKE cluster’s VPC so nodes have outbound internet access. By default, GKE private clusters don't provide nodes with access to the public internet, which makes container image repositories outside Google Cloud inaccessible.
+
+  ![Private Cluster Kubernetes Explorer Options](docs/images/release-notes/private-cluster-k8-explorer-options.png)
+
+### Updates
+
+- Extend version support range to support the current 2022.1 EAP.
+
+### Bug Fixes
+
+- Fix to GCP sign in flow. If you are attempting to sign in to your GCP account, but Cloud SDK is not finished installing, Cloud Code will show a better message.
+- Fixed the Cloud Code terminal (Tools > Cloud Code > Tools > Cloud Code Terminal) to work for PowerShell users.
+- Improved Docker warnings. If you are attempting to use a feature that requires Docker, the messages now clearly explain why Docker is required and provides better links.
+
 ## Version 22.2.1-IB.3 - [Cloud Code Insiders](https://cloud.google.com/code/docs/intellij/insiders) Release
 
 This release contains various bug fixes and improvements
