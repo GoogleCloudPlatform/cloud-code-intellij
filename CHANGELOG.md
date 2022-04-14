@@ -1,6 +1,14 @@
 # Release notes
 This page documents production updates to Cloud Code for IntelliJ. You can check this page for announcements about new or updated features, bug fixes, known issues, and deprecated functionality.
 
+## Version 22.4.1
+
+This release fixes Cloud libraries local authentication.
+
+### Bug Fixes
+
+- Fixes Cloud libraries local authentication. When you sign in to your GCP account via Cloud Code, GCP Cloud libraries will work locally (including Cloud Code managed minikube and Cloud Run emulator environments).
+
 ## Version 22.3.1
 
 ### New Features
