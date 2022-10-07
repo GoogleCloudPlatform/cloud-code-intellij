@@ -1,3 +1,12 @@
+---
+name: Cloud Code Bug Report
+about: Create a report to help us improve
+title: ''
+labels: ''
+assignees: ''
+
+---
+
 (Please ensure you are running the latest version of Cloud Cloud IntelliJ with _Help > Check for Updates_.)
 
 (screenshots are often helpful)
