@@ -1,5 +1,5 @@
 ---
-name: Cloud Code Bug Report
+name: Cloud Code Report
 about: Create a report to help us improve
 title: ''
 labels: ''
