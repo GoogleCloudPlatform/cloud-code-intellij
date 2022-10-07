@@ -9,7 +9,7 @@ assignees: ''
 
 **Version Information**
 
-JetBrains Gateway bersion: 
+JetBrains Gateway version:
 
 Cloud Workstations plugin version:
 
