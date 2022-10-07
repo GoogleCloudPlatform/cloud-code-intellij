@@ -1,5 +1,5 @@
 ---
-name: Cloud Code Report
+name: Cloud Code Plugin Report
 about: Create a report to help us improve
 title: ''
 labels: ''
